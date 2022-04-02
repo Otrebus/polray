@@ -17,7 +17,6 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -53,25 +52,23 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared" >
+  <ImportGroup Label="Shared">
   </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-    <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-      <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    </ImportGroup>
-
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -85,7 +82,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -118,12 +114,16 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_HAS_STD_BYTE=0</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files (x86)\Microsoft DirectX SDK (June 2010)\Lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>kernel32.lib;dxguid.lib;ddraw.lib;dinput8.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -132,18 +132,137 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_HAS_STD_BYTE=0</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>kernel32.lib;dxguid.lib;ddraw.lib;dinput8.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-
-  <ItemGroup></ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="source\AreaLight.cpp" />
+    <ClCompile Include="source\AshikhminShirley.cpp" />
+    <ClCompile Include="source\BDPT.cpp" />
+    <ClCompile Include="source\BoundingBox.cpp" />
+    <ClCompile Include="source\Bytestream.cpp" />
+    <ClCompile Include="source\Camera.cpp" />
+    <ClCompile Include="source\Color.cpp" />
+    <ClCompile Include="source\ColorBuffer.cpp" />
+    <ClCompile Include="source\CsgCuboid.cpp" />
+    <ClCompile Include="source\CsgCylinder.cpp" />
+    <ClCompile Include="source\CsgDifference.cpp" />
+    <ClCompile Include="source\CsgIntersection.cpp" />
+    <ClCompile Include="source\CsgObject.cpp" />
+    <ClCompile Include="source\CsgSphere.cpp" />
+    <ClCompile Include="source\Cubemap.cpp" />
+    <ClCompile Include="source\DielectricMaterial.cpp" />
+    <ClCompile Include="source\Draw.cpp" />
+    <ClCompile Include="source\EmissiveMaterial.cpp" />
+    <ClCompile Include="source\EnvironmentLight.cpp" />
+    <ClCompile Include="source\GeometricRoutines.cpp" />
+    <ClCompile Include="source\Gfx.cpp" />
+    <ClCompile Include="source\Input.cpp" />
+    <ClCompile Include="source\IntersectionInfo.cpp" />
+    <ClCompile Include="source\KDTree.cpp" />
+    <ClCompile Include="source\LambertianMaterial.cpp" />
+    <ClCompile Include="source\Light.cpp" />
+    <ClCompile Include="source\LightTracer.cpp" />
+    <ClCompile Include="source\LightTree.cpp" />
+    <ClCompile Include="source\Logger.cpp" />
+    <ClCompile Include="source\Main.cpp" />
+    <ClCompile Include="source\Material.cpp" />
+    <ClCompile Include="source\Matrix3d.cpp" />
+    <ClCompile Include="source\MeshLight.cpp" />
+    <ClCompile Include="source\MirrorMaterial.cpp" />
+    <ClCompile Include="source\Model.cpp" />
+    <ClCompile Include="source\PathTracer.cpp" />
+    <ClCompile Include="source\PhongMaterial.cpp" />
+    <ClCompile Include="source\PinholeCamera.cpp" />
+    <ClCompile Include="source\PointLight.cpp" />
+    <ClCompile Include="source\PreethamSky.cpp" />
+    <ClCompile Include="source\Primitive.cpp" />
+    <ClCompile Include="source\Random.cpp" />
+    <ClCompile Include="source\Ray.cpp" />
+    <ClCompile Include="source\RayTracer.cpp" />
+    <ClCompile Include="source\Renderer.cpp" />
+    <ClCompile Include="source\Rendering.cpp" />
+    <ClCompile Include="source\Scene.cpp" />
+    <ClCompile Include="source\Shape.cpp" />
+    <ClCompile Include="source\Sphere.cpp" />
+    <ClCompile Include="source\SphereLight.cpp" />
+    <ClCompile Include="source\Texture.cpp" />
+    <ClCompile Include="source\ThinLensCamera.cpp" />
+    <ClCompile Include="source\Timer.cpp" />
+    <ClCompile Include="source\Triangle.cpp" />
+    <ClCompile Include="source\TriangleMesh.cpp" />
+    <ClCompile Include="source\Vector3d.cpp" />
+    <ClCompile Include="source\Vertex3d.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="source\AreaLight.h" />
+    <ClInclude Include="source\AshikhminShirley.h" />
+    <ClInclude Include="source\BDPT.h" />
+    <ClInclude Include="source\BoundingBox.h" />
+    <ClInclude Include="source\Bytestream.h" />
+    <ClInclude Include="source\Camera.h" />
+    <ClInclude Include="source\Color.h" />
+    <ClInclude Include="source\ColorBuffer.h" />
+    <ClInclude Include="source\CsgCuboid.h" />
+    <ClInclude Include="source\CsgCylinder.h" />
+    <ClInclude Include="source\CsgDifference.h" />
+    <ClInclude Include="source\CsgIntersection.h" />
+    <ClInclude Include="source\CsgObject.h" />
+    <ClInclude Include="source\CsgSphere.h" />
+    <ClInclude Include="source\Cubemap.h" />
+    <ClInclude Include="source\DielectricMaterial.h" />
+    <ClInclude Include="source\Draw.h" />
+    <ClInclude Include="source\EmissiveMaterial.h" />
+    <ClInclude Include="source\EnvironmentLight.h" />
+    <ClInclude Include="source\GeometricRoutines.h" />
+    <ClInclude Include="source\Gfx.h" />
+    <ClInclude Include="source\Input.h" />
+    <ClInclude Include="source\IntersectionInfo.h" />
+    <ClInclude Include="source\KDTree.h" />
+    <ClInclude Include="source\LambertianMaterial.h" />
+    <ClInclude Include="source\Light.h" />
+    <ClInclude Include="source\LightTracer.h" />
+    <ClInclude Include="source\LightTree.h" />
+    <ClInclude Include="source\Logger.h" />
+    <ClInclude Include="source\Main.h" />
+    <ClInclude Include="source\Material.h" />
+    <ClInclude Include="source\Matrix3d.h" />
+    <ClInclude Include="source\MeshLight.h" />
+    <ClInclude Include="source\MirrorMaterial.h" />
+    <ClInclude Include="source\Model.h" />
+    <ClInclude Include="source\PathTracer.h" />
+    <ClInclude Include="source\PhongMaterial.h" />
+    <ClInclude Include="source\PinholeCamera.h" />
+    <ClInclude Include="source\PointLight.h" />
+    <ClInclude Include="source\PreethamSky.h" />
+    <ClInclude Include="source\Primitive.h" />
+    <ClInclude Include="source\Random.h" />
+    <ClInclude Include="source\Ray.h" />
+    <ClInclude Include="source\RayTracer.h" />
+    <ClInclude Include="source\Renderer.h" />
+    <ClInclude Include="source\Rendering.h" />
+    <ClInclude Include="source\Scene.h" />
+    <ClInclude Include="source\Shape.h" />
+    <ClInclude Include="source\Sphere.h" />
+    <ClInclude Include="source\SphereLight.h" />
+    <ClInclude Include="source\Texture.h" />
+    <ClInclude Include="source\ThinLensCamera.h" />
+    <ClInclude Include="source\Timer.h" />
+    <ClInclude Include="source\Triangle.h" />
+    <ClInclude Include="source\TriangleMesh.h" />
+    <ClInclude Include="source\Vector3d.h" />
+    <ClInclude Include="source\Vertex3d.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

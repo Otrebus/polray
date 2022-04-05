@@ -102,7 +102,7 @@ void Rendering::Thread()
 					accumulation->SetPixel(x, y, k);
 			}
 		}
-		//WaitForSingleObject(bufferMutex, INFINITE);
+		WaitForSingleObject(bufferMutex, INFINITE);
 		for(int y = 0; y < image->GetYRes(); y++)
 		{
 			for(int x = 0; x < image->GetXRes(); x++)
@@ -118,7 +118,7 @@ void Rendering::Thread()
 			}
 		}
         updated = true;
-		//ReleaseMutex(bufferMutex);
+		ReleaseMutex(bufferMutex);
     	nSamples += nNewSamples;
 	}
 }

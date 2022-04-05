@@ -44,10 +44,7 @@ Texture* normalmap;
 Texture* test;
 Texture* bl;
 Cubemap* cubemap;
-//HANDLE bufferMutex;
 
-//#define CONFERENCE
-//#define DEFAULTBOX
 #define BALLSBOX
 //#define LEGOCAR
 //#define KITCHEN
@@ -245,7 +242,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->AddToScene(*s);
     cubearealight->AddToScene(s);
     
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
     //LambertianMaterial* csgMat1 = new LambertianMaterial;
     //csgMat1->Kd = Color(0.7, 0.7, 0.7);

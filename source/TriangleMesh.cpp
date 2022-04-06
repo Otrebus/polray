@@ -580,6 +580,8 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 
     		MeshVertex* pv0, *pv1, *pv2;
 
+			if (v0 < 0)
+				v0 = vectors.size() + v0 + 1;
             auto it = groupVertices.find(v0-1);
 			if(it == groupVertices.end()) // We have not seen this vertex before in this group
 			{                             // so create a new one
@@ -606,6 +608,8 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
                 }  
 			}
 
+			if (v1 < 0)
+				v1 = vectors.size() + v1 + 1;
 	    	it = groupVertices.find(v1-1);
             if(it == groupVertices.end())
 			{
@@ -632,9 +636,11 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
                 }  
 			}
 
+			if (v2 < 0)
+				v2 = vectors.size() + v2 + 1;
 	    	it = groupVertices.find(v2-1);
             if(it == groupVertices.end()) // We have not seen this vertex before in this group
-			{                             // so create a new one
+			{                             // so create a new 
 				pv2 = groupVertices[v2-1] = new MeshVertex(*vectors[v2-1]);
                 if(n2)
 			    {

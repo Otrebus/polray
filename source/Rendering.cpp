@@ -118,8 +118,8 @@ void Rendering::Thread()
 			}
 		}
         updated = true;
-		ReleaseMutex(bufferMutex);
     	nSamples += nNewSamples;
+		ReleaseMutex(bufferMutex);
 	}
 }
 

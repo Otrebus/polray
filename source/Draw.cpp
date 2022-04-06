@@ -46,6 +46,8 @@ Texture* bl;
 Cubemap* cubemap;
 
 #define BALLSBOX
+//#define CONFERENCE
+// #define BALLBOX
 //#define LEGOCAR
 //#define KITCHEN
 //#define EMPTYBOX
@@ -164,15 +166,15 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
 	//Renderer* boxrenderer = new RayTracer();
-	auto s = std::shared_ptr<Scene> (new Scene("cornellbox.obj"));
+	auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
-    Vector3d camPos = Vector3d(0.0f, -0.5f, 2.0f);
-    Vector3d target = Vector3d(-0.5, -0.8f, 2.5f);
+    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d target = Vector3d(0, 1, 0);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
     //box.camera = new Camera(Vector3d(0, 1, 0), camPos, camdir);
-    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), Vector3d(0.0, 0.0001, -0.75), Vector3d(0, 0, 1.0018), XRES, YRES, 75, 2.4, 0.05));
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 65));
 	
     //box.camera->SetFov(75);
@@ -228,9 +230,10 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     Random ballsC(0);
 
-    AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.99, 0.00), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(2200, 2200, 2200), s);
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-0.3, 1.5, -0.3), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(5, 5, 5), s);
+    SphereLight* cubearealight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
 
-    LambertianMaterial* sphereMat = new LambertianMaterial();
+    /*LambertianMaterial* sphereMat = new LambertianMaterial();
     LambertianMaterial* sphereMat2 = new LambertianMaterial();
     sphereMat->Kd = Color(0.9, 0.9, 0.9);
     sphereMat2->Kd = Color(0.9, 0.4, 0.3);
@@ -239,10 +242,10 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere->SetMaterial(sphereMat);
     sphere2->SetMaterial(sphereMat2);
     sphere->AddToScene(*s);
-    sphere2->AddToScene(*s);
+    sphere2->AddToScene(*s);*/
     cubearealight->AddToScene(s);
     
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
     //LambertianMaterial* csgMat1 = new LambertianMaterial;
     //csgMat1->Kd = Color(0.7, 0.7, 0.7);
@@ -291,7 +294,6 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //LambertianMaterial* m = new LambertianMaterial();
     //m->Kd = Color(0, 1, 1);
     //m->alpha = 100;
-
 
     //Triangle* t = new Triangle(Vertex3d(Vector3d(-0.4, 0.6, 2), Vector3d(1/sqrtf(2), 1/sqrtf(2), 0), Vector2d(0, 0)), Vertex3d(Vector3d(-0.4, 0.6, 1.5), Vector3d(1/sqrtf(2), 1/sqrtf(2), 0), Vector2d(0, 0)), Vertex3d(Vector3d(0.4, 0.4, 1.5), Vector3d(1/sqrtf(2), 1/sqrtf(2), 0), Vector2d(0, 0)));
 
@@ -350,6 +352,82 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 	r->SetSPP(1);
     //transsphere->AddToScene(box);
 #endif
+#ifdef BALLBOX
+
+    auto s = std::shared_ptr<Scene>(new Scene());
+
+    LambertianMaterial* sphereLeftMat = new LambertianMaterial();
+    sphereLeftMat->Kd = Color(0.7, 0.0, 0.0);
+
+    LambertianMaterial* sphereRightMat = new LambertianMaterial();
+    sphereRightMat->Kd = Color(0.0, 0.7, 0.0);
+
+    LambertianMaterial* sphereMat = new LambertianMaterial();
+    sphereMat->Kd = Color(0.7, 0.7, 0.7);
+
+    Sphere* leftSphere = new Sphere(Vector3d(-10, 0, 0), 9);
+    leftSphere->SetMaterial(sphereLeftMat);
+
+    Sphere* rightSphere = new Sphere(Vector3d(10, 0, 0), 9);
+    rightSphere->SetMaterial(sphereRightMat);
+
+    Sphere* topSphere = new Sphere(Vector3d(0, 0, 10), 9);
+    topSphere->SetMaterial(sphereMat);
+
+    Sphere* bottomSphere = new Sphere(Vector3d(0, 0, -10), 9);
+    bottomSphere ->SetMaterial(sphereMat);
+
+    Sphere* backSphere = new Sphere(Vector3d(0, 10, 0), 9);
+    backSphere->SetMaterial(sphereMat);
+
+    Sphere* smallSphere = new Sphere(Vector3d(1, 0, -1), 0.5);
+    smallSphere->SetMaterial(sphereMat);
+
+    Sphere* bigSphere = new Sphere(Vector3d(-1, 0, -1), 0.5);
+    bigSphere->SetMaterial(sphereMat);
+
+    topSphere->AddToScene(*s);
+    leftSphere->AddToScene(*s);
+    rightSphere->AddToScene(*s);
+    bottomSphere->AddToScene(*s);
+    backSphere->AddToScene(*s);
+    smallSphere->AddToScene(*s);
+    bigSphere->AddToScene(*s);
+
+    SphereLight* sphereLight = new SphereLight(Vector3d(0, 1.5, 0.5), 0.5, Color(500, 500, 500));
+
+    sphereLight->AddToScene(s);
+
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 0, 1.0f), Vector3d(0, -10, 0), Vector3d(0, 1, 0), XRES, YRES, 50, 10, 0.3f));
+
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+
+
+#endif
+
+#ifdef CONFERENCE
+    stringstream sstr;
+
+    Vector3d camerapos(28.3f, 3.0f, 5.8f);
+    Vector3d cameradir = Vector3d(7.6f, 24.9f, 1.5f) - camerapos;
+    Vector3d cameraup(0, 0, 1.0f);
+
+    //RayTracer* confrenderer = new RayTracer();
+    //Renderer* confrenderer = new RayTracer();
+    Vector3d confcamerapos(28.3f, 3.0f, 5.8f);
+    Vector3d confcameradir = Vector3d(7.6f, 24.9f, 1.5f) - confcamerapos;
+    confcameradir.Normalize();
+
+    auto s = std::shared_ptr<Scene>(new Scene("conference.obj"));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    auto camera = new PinholeCamera(Vector3d(0, 0, 1.0f), Vector3d(28.3f, 3.0f, 5.8f) + confcameradir * 3, confcameradir, XRES, YRES, 65);
+    s->SetCamera(camera);
+    //PointLight* conferencelight = new PointLight(Vector3d(19.0f, 11.0f, 8.0f), Color(1000.0f, 1000.0f, 1000.0f), &conference);
+    AreaLight* conferencelight = new AreaLight(Vector3d(14.0f, 11.0f, 8.78f), Vector3d(0.0f, 3.0f, 0.0f), Vector3d(3.0f, 0.0f, 0.0f), Color(300, 300, 300), s);
+    conferencelight->AddToScene(s);
+
+#endif
+
     #ifdef KITCHEN
     Vector3d camerapos(48.7f, 103.2f, 3.7f);
     Vector3d cameradir = Vector3d(-62.9f, -62.4f, -35.1f) - camerapos;

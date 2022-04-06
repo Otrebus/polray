@@ -410,8 +410,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	std::string str1 = sstr.str();
 	sstr.precision(3);
 
-    sstr << numintersects << " " << frames << " " << float(numintersects)/(float(XRES*YRES)*float(frames));
-    logger.Box(sstr.str());
+    /*sstr << numintersects << " " << frames << " " << float(numintersects)/(float(XRES*YRES)*float(frames));
+    logger.Box(sstr.str());*/
 
 	delete gfx;
     delete input;

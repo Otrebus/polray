@@ -68,7 +68,6 @@ public:
     void Load(Bytestream& stream);
 
 protected:	
-	bool normalsuptodate;
 	vector<MeshTriangle*> triangles;
 	vector<MeshVertex*> points;
     vector<Material*> materials;

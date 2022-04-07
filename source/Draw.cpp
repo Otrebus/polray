@@ -233,6 +233,19 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //AreaLight* cubearealight = new AreaLight(Vector3d(-0.3, 1.5, -0.3), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(5, 5, 5), s);
     SphereLight* cubearealight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
 
+    auto a = new AshikhminShirley();
+    a->Rs = Color(0.5, 0.4, 0.6);
+    a->Rd = Color(0.3, 0.4, 0.6);
+    a->n = 200;
+    Sphere* sphere = new Sphere(Vector3d(-0.1, 1.1, 0.3), 0.11);
+    sphere->SetMaterial(a);
+    sphere->AddToScene(*s);
+    
+    auto g = new DielectricMaterial();
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.8, 0.3), 0.11);
+    sphere2->SetMaterial(g);
+    sphere2->AddToScene(*s);
+
     /*LambertianMaterial* sphereMat = new LambertianMaterial();
     LambertianMaterial* sphereMat2 = new LambertianMaterial();
     sphereMat->Kd = Color(0.9, 0.9, 0.9);
@@ -245,7 +258,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->AddToScene(*s);*/
     cubearealight->AddToScene(s);
     
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<LightTracer>(new LightTracer(s));
 
     //LambertianMaterial* csgMat1 = new LambertianMaterial;
     //csgMat1->Kd = Color(0.7, 0.7, 0.7);

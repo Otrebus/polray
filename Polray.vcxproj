@@ -194,6 +194,7 @@
     <ClCompile Include="source\Rendering.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\Shape.cpp" />
+    <ClCompile Include="source\Source.cpp" />
     <ClCompile Include="source\Sphere.cpp" />
     <ClCompile Include="source\SphereLight.cpp" />
     <ClCompile Include="source\Texture.cpp" />
@@ -253,6 +254,7 @@
     <ClInclude Include="source\Rendering.h" />
     <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\Shape.h" />
+    <ClInclude Include="source\Source.h" />
     <ClInclude Include="source\Sphere.h" />
     <ClInclude Include="source\SphereLight.h" />
     <ClInclude Include="source\Texture.h" />

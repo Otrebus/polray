@@ -11,6 +11,7 @@
 #include "AshikhminShirley.h"
 #include "Scene.h"
 #include <filesystem>
+#include "Utils.h"
 
 #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
 #define new DEBUG_NEW
@@ -282,7 +283,6 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 
 TriangleMesh::TriangleMesh(string file, Material* mat)
 {
-	normalsuptodate = false;
 	logger.File("Reading from file");
 	ReadFromFile(file, mat);
 }
@@ -475,248 +475,349 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 		}
         if(a == "f")
 		{
+			std::vector<MeshVertex*> face;
+			std::vector<int> faceNormals;
+
 			string s1, s2, s3;
-			string number;
 
-			ins >> s1 >> s2 >> s3;
-			stringstream ss(s1);
+			while(!ins.eof()) {
+				std::string st; // The "v/t/n" string
+				ins >> st;
+				if(!st.size())
+					break;
 
-			ss >> v0;
-			if(ss.fail())
-				__debugbreak();
-			ss >> slash;
-			if(!ss.fail())
-			{
-				// We (possibly) have some texture coordinates
-				if(slash != '/')
-					__debugbreak();
-				ss >> t0;
-				if(ss.fail())
-					// No texture coordinate
-					ss.clear();
-			}
-			else
-				ss.clear();
+				auto s = split(st, '/');
+				int v = 0, t = 0, n = 0;
 
-			ss >> slash;
-			if(!ss.fail())
-			{
-				if(slash != '/')
-					__debugbreak();
-				// We have a normal
-				normalsuptodate = true;
-				ss >> n0;
-				if(ss.fail())
-					__debugbreak();
-			}
-			else
-				ss.clear();
+				if(s.size() == 1) { // No normals or coordinates
+					v = std::stoi(s[0]);
+				} else if(s.size() == 2) { // Texture coordinates only
+					v = std::stoi(s[0]);
+					t = std::stoi(s[1]);
+				} else if(s.size() == 3 && s[1].size() == 0) { // Normals only
+					v = std::stoi(s[0]);
+					n = std::stoi(s[2]);
+				} else { // Texture coordinates and normals
+					v = std::stoi(s[0]);
+					t = std::stoi(s[1]);
+					n = std::stoi(s[2]);
+				}
 
-			ss.clear();
-			ss.str(s2);
-			ss >> v1;
-			if(ss.fail())
-				__debugbreak();
-			ss >> slash;
-			if(!ss.fail())
-			{
-				// We (possibly) have some texture coordinates
-				if(slash != '/')
-					__debugbreak();
-				ss >> t1;
-				if(ss.fail())
-					// No texture coordinate
-					ss.clear();
-			}
-			else
-				ss.clear();
+				MeshVertex* mv;
 
-			ss >> slash;
-			if(!ss.fail())
-			{
-				if(slash != '/')
-					__debugbreak();
-				// We have a normal
-				normalsuptodate = true;
-				ss >> n1;
-				if(ss.fail())
-					__debugbreak();
-			}
-			else
-				ss.clear();
+				if (v < 0)
+					v = vectors.size() + v + 1;
+				auto it = groupVertices.find(v - 1);
+				if (it == groupVertices.end()) { // We have not seen this vertex before in this group so create a new one
+					mv = groupVertices[v-1] = new MeshVertex(*vectors[v-1]);
+					if(n) {
+						normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
+						mv->normal = normals[n-1];
+					}
 
-			ss.clear();
-			ss.str(s3);
-			ss >> v2;
-			if(ss.fail())
-				__debugbreak();
-			ss >> slash;
-			if(!ss.fail())
-			{
-				// We (possibly) have some texture coordinates
-				if(slash != '/')
-					__debugbreak();
-				ss >> t2;
-				if(ss.fail())
-					// No texture coordinate
-					ss.clear();
-			}
-			else
-				ss.clear();
+					points.push_back(mv);
 
-			ss >> slash;
-			if(!ss.fail())
-			{
-				if(slash != '/')
-					__debugbreak();
-				// We have a normal
-				normalsuptodate = true;
-				ss >> n2;
-				if(ss.fail())
-					__debugbreak();
-			}
-			else
-				ss.clear();
-
-    		MeshVertex* pv0, *pv1, *pv2;
-
-			if (v0 < 0)
-				v0 = vectors.size() + v0 + 1;
-            auto it = groupVertices.find(v0-1);
-			if(it == groupVertices.end()) // We have not seen this vertex before in this group
-			{                             // so create a new one
-				pv0 = groupVertices[v0-1] = new MeshVertex(*vectors[v0-1]);
-                if(n0)
-			    {
-				    normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
-					pv0->normal = normals[n0-1];
-                }
-                points.push_back(pv0);
-			}
-			else
-			{ // This vertex is already among the parsed vertices in this group so use that particular one
-				pv0 = (*it).second;
-                if(n0)
-                {
-                    normalInterp = false;
-                    if(pv0->normal != normals[n0-1])  // A different normal was given though, so we still need
-                    {                                 // to create an entirely new vertex
-					    pv0 = new MeshVertex(*pv0); 
-                        points.push_back(pv0);
-                    }
-                    pv0->normal = normals[n0-1];
-                }  
+					face.push_back(mv);
+					faceNormals.push_back(n);
+				}
 			}
 
-			if (v1 < 0)
-				v1 = vectors.size() + v1 + 1;
-	    	it = groupVertices.find(v1-1);
-            if(it == groupVertices.end())
-			{
-				pv1 = groupVertices[v1-1] = new MeshVertex(*vectors[v1-1]);
-                if(n1)
-			    {
-				    normalInterp = false;
-					pv1->normal = normals[n1-1];
-                }
-                points.push_back(pv1);
-			}
-			else
-			{
-				pv1 = (*it).second;
-                if(n1)
-                {
-                    normalInterp = false;
-                    if(pv1->normal != normals[n1-1])
-                    {
-					    pv1 = new MeshVertex(*pv1); 
-                        points.push_back(pv1);
-                    }
-                    pv1->normal = normals[n1-1];
-                }  
-			}
+			for(int i = 0; i < (int) face.size()-2; i++) {
+				auto pv0 = face[0], pv1 = face[i+1], pv2 = face[i+2];
 
-			if (v2 < 0)
-				v2 = vectors.size() + v2 + 1;
-	    	it = groupVertices.find(v2-1);
-            if(it == groupVertices.end()) // We have not seen this vertex before in this group
-			{                             // so create a new 
-				pv2 = groupVertices[v2-1] = new MeshVertex(*vectors[v2-1]);
-                if(n2)
-			    {
-				    normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
-					pv2->normal = normals[n2-1];
-                }
-                points.push_back(pv2);
-            }
-			else
-			{ // This vertex is already among the parsed vertices in this group so use that particular one
-				pv2 = (*it).second;
-                if(n2)
-                {
-                    normalInterp = false;
-                    if(pv2->normal != normals[n2-1])  // A different normal was given though, so we still need
-                    {                                 // to create an entirely new vertex
-					    pv2 = new MeshVertex(*pv2); 
-                        points.push_back(pv2);
-                    }
-                    pv2->normal = normals[n2-1];
-                }  
+				MeshTriangle* tri = new MeshTriangle(pv0, pv1, pv2);
+				triangles.push_back(tri);
+
+				pv0->triangles.push_back(tri);
+				pv1->triangles.push_back(tri);
+				pv2->triangles.push_back(tri);
+
+				tri->v0 = pv0;
+				tri->v1 = pv1;
+				tri->v2 = pv2;
+
+				if (!n0)
+				{
+					tri->v0->normal = tri->GetNormal();
+					tri->v1->normal = tri->v0->normal;
+					tri->v2->normal = tri->v0->normal;
+
+					if (!tri->v0->normal.IsNull())
+						tri->v0->normal.Normalize();
+					if (!tri->v1->normal.IsNull())
+						tri->v1->normal.Normalize();
+					if (!tri->v2->normal.IsNull())
+						tri->v2->normal.Normalize();
+				}
+
+				// No material defined
+				if (!curmat)
+				{
+					//PhongMaterial* mat = new PhongMaterial();
+					//mat->Kd = Color(0, 0, 0.8f);
+					//mat->Ks = Color(0.05f, 0.05f, 0.05f);
+					//tri->material = mat;
+					DielectricMaterial* mat = new DielectricMaterial();
+					//MirrorMaterial* mat = new MirrorMaterial();
+					mat->m_ior = 1.5f;
+					tri->SetMaterial(mat);
+					//PhongMaterial* mat = new PhongMaterial();
+
+					//mat->Ka = Color(0.0f, 0.0f, 0.0f);
+					//mat->Ks = Color(0.0f, 0.0f, 0.0f);
+					//mat->Kd = Color(0.7f, 0.7f, 0.7f);
+					//mat->alpha = 0;
+					//tri->material = mat;
+				}
+				if (curmat && !meshMat)
+					tri->SetMaterial(curmat);
+				else if (meshMat)
+					tri->SetMaterial(meshMat);
 			}
 
-			MeshTriangle* tri = new MeshTriangle(pv0, pv1, pv2);
-			triangles.push_back(tri);
 
-            pv0->triangles.push_back(tri);
-            pv1->triangles.push_back(tri);
-			pv2->triangles.push_back(tri);
 
-			if((n0 || n1 || n2) && !(n0 && n1 && n2))
-				__debugbreak();
 
-			tri->v0 = pv0;
-			tri->v1 = pv1;
-			tri->v2 = pv2;
 
-			if(!n0)
-			{
-				tri->v0->normal = tri->GetNormal();
-				tri->v1->normal = tri->v0->normal;
-				tri->v2->normal = tri->v0->normal;
-				
-				if(!tri->v0->normal.IsNull())
-					tri->v0->normal.Normalize();
-				if(!tri->v1->normal.IsNull())   
-					tri->v1->normal.Normalize();
-				if(!tri->v2->normal.IsNull())
-					tri->v2->normal.Normalize();
-			}
 
-			// No material defined
-			if(!curmat)
-			{
-                //PhongMaterial* mat = new PhongMaterial();
-	            //mat->Kd = Color(0, 0, 0.8f);
-	            //mat->Ks = Color(0.05f, 0.05f, 0.05f);
-                //tri->material = mat;
-                DielectricMaterial* mat = new DielectricMaterial();
-                //MirrorMaterial* mat = new MirrorMaterial();
-                mat->m_ior = 1.5f;
-                tri->SetMaterial(mat);
-				//PhongMaterial* mat = new PhongMaterial();
-				
-				//mat->Ka = Color(0.0f, 0.0f, 0.0f);
-				//mat->Ks = Color(0.0f, 0.0f, 0.0f);
-				//mat->Kd = Color(0.7f, 0.7f, 0.7f);
-				//mat->alpha = 0;
-				//tri->material = mat;
-			}
-			if(curmat && !meshMat)
-				tri->SetMaterial(curmat);
-            else if(meshMat)
-                tri->SetMaterial(meshMat);
 
-		//	triangles.push_back(tri);
+
+
+
+
+			//ins >> s1 >> s2 >> s3;
+			//stringstream ss(s1);
+
+			//ss >> v0;
+			//if(ss.fail())
+			//	__debugbreak();
+			//ss >> slash;
+			//if(!ss.fail())
+			//{
+			//	// We (possibly) have some texture coordinates
+			//	if(slash != '/')
+			//		__debugbreak();
+			//	ss >> t0;
+			//	if(ss.fail())
+			//		// No texture coordinate
+			//		ss.clear();
+			//}
+			//else
+			//	ss.clear();
+
+			//ss >> slash;
+			//if(!ss.fail())
+			//{
+			//	if(slash != '/')
+			//		__debugbreak();
+			//	// We have a normal;
+			//	ss >> n0;
+			//	if(ss.fail())
+			//		__debugbreak();
+			//}
+			//else
+			//	ss.clear();
+
+			//ss.clear();
+			//ss.str(s2);
+			//ss >> v1;
+			//if(ss.fail())
+			//	__debugbreak();
+			//ss >> slash;
+			//if(!ss.fail())
+			//{
+			//	// We (possibly) have some texture coordinates
+			//	if(slash != '/')
+			//		__debugbreak();
+			//	ss >> t1;
+			//	if(ss.fail())
+			//		// No texture coordinate
+			//		ss.clear();
+			//}
+			//else
+			//	ss.clear();
+
+			//ss >> slash;
+			//if(!ss.fail())
+			//{
+			//	if(slash != '/')
+			//		__debugbreak();
+			//	// We have a normal
+			//	ss >> n1;
+			//	if(ss.fail())
+			//		__debugbreak();
+			//}
+			//else
+			//	ss.clear();
+
+			//ss.clear();
+			//ss.str(s3);
+			//ss >> v2;
+			//if(ss.fail())
+			//	__debugbreak();
+			//ss >> slash;
+			//if(!ss.fail())
+			//{
+			//	// We (possibly) have some texture coordinates
+			//	if(slash != '/')
+			//		__debugbreak();
+			//	ss >> t2;
+			//	if(ss.fail())
+			//		// No texture coordinate
+			//		ss.clear();
+			//}
+			//else
+			//	ss.clear();
+
+			//ss >> slash;
+			//if(!ss.fail())
+			//{
+			//	if(slash != '/')
+			//		__debugbreak();
+			//	ss >> n2;
+			//	if(ss.fail())
+			//		__debugbreak();
+			//}
+			//else
+			//	ss.clear();
+
+   // 		MeshVertex* pv0, *pv1, *pv2;
+
+			//if (v0 < 0)
+			//	v0 = vectors.size() + v0 + 1;
+   //         auto it = groupVertices.find(v0-1);
+			//if(it == groupVertices.end()) // We have not seen this vertex before in this group
+			//{                             // so create a new one
+			//	pv0 = groupVertices[v0-1] = new MeshVertex(*vectors[v0-1]);
+   //             if(n0)
+			//    {
+			//	    normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
+			//		pv0->normal = normals[n0-1];
+   //             }
+   //             points.push_back(pv0);
+			//}
+			//else
+			//{ // This vertex is already among the parsed vertices in this group so use that particular one
+			//	pv0 = (*it).second;
+   //             if(n0)
+   //             {
+   //                 normalInterp = false;
+   //                 if(pv0->normal != normals[n0-1])  // A different normal was given though, so we still need
+   //                 {                                 // to create an entirely new vertex
+			//		    pv0 = new MeshVertex(*pv0); 
+   //                     points.push_back(pv0);
+   //                 }
+   //                 pv0->normal = normals[n0-1];
+   //             }  
+			//}
+
+			//if (v1 < 0)
+			//	v1 = vectors.size() + v1 + 1;
+	  //  	it = groupVertices.find(v1-1);
+   //         if(it == groupVertices.end())
+			//{
+			//	pv1 = groupVertices[v1-1] = new MeshVertex(*vectors[v1-1]);
+   //             if(n1)
+			//    {
+			//	    normalInterp = false;
+			//		pv1->normal = normals[n1-1];
+   //             }
+   //             points.push_back(pv1);
+			//}
+			//else
+			//{
+			//	pv1 = (*it).second;
+   //             if(n1)
+   //             {
+   //                 normalInterp = false;
+   //                 if(pv1->normal != normals[n1-1])
+   //                 {
+			//		    pv1 = new MeshVertex(*pv1); 
+   //                     points.push_back(pv1);
+   //                 }
+   //                 pv1->normal = normals[n1-1];
+   //             }  
+			//}
+
+			//if (v2 < 0)
+			//	v2 = vectors.size() + v2 + 1;
+	  //  	it = groupVertices.find(v2-1);
+   //         if(it == groupVertices.end()) // We have not seen this vertex before in this group
+			//{                             // so create a new 
+			//	pv2 = groupVertices[v2-1] = new MeshVertex(*vectors[v2-1]);
+   //             if(n2)
+			//    {
+			//	    normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
+			//		pv2->normal = normals[n2-1];
+   //             }
+   //             points.push_back(pv2);
+   //         }
+			//else
+			//{ // This vertex is already among the parsed vertices in this group so use that particular one
+			//	pv2 = (*it).second;
+   //             if(n2)
+   //             {
+   //                 normalInterp = false;
+   //                 if(pv2->normal != normals[n2-1])  // A different normal was given though, so we still need
+   //                 {                                 // to create an entirely new vertex
+			//		    pv2 = new MeshVertex(*pv2); 
+   //                     points.push_back(pv2);
+   //                 }
+   //                 pv2->normal = normals[n2-1];
+   //             }  
+			//}
+
+			//MeshTriangle* tri = new MeshTriangle(pv0, pv1, pv2);
+			//triangles.push_back(tri);
+
+   //         pv0->triangles.push_back(tri);
+   //         pv1->triangles.push_back(tri);
+			//pv2->triangles.push_back(tri);
+
+			//if((n0 || n1 || n2) && !(n0 && n1 && n2))
+			//	__debugbreak();
+
+			//tri->v0 = pv0;
+			//tri->v1 = pv1;
+			//tri->v2 = pv2;
+
+			//if(!n0)
+			//{
+			//	tri->v0->normal = tri->GetNormal();
+			//	tri->v1->normal = tri->v0->normal;
+			//	tri->v2->normal = tri->v0->normal;
+			//	
+			//	if(!tri->v0->normal.IsNull())
+			//		tri->v0->normal.Normalize();
+			//	if(!tri->v1->normal.IsNull())   
+			//		tri->v1->normal.Normalize();
+			//	if(!tri->v2->normal.IsNull())
+			//		tri->v2->normal.Normalize();
+			//}
+
+			//// No material defined
+			//if(!curmat)
+			//{
+   //             //PhongMaterial* mat = new PhongMaterial();
+	  //          //mat->Kd = Color(0, 0, 0.8f);
+	  //          //mat->Ks = Color(0.05f, 0.05f, 0.05f);
+   //             //tri->material = mat;
+   //             DielectricMaterial* mat = new DielectricMaterial();
+   //             //MirrorMaterial* mat = new MirrorMaterial();
+   //             mat->m_ior = 1.5f;
+   //             tri->SetMaterial(mat);
+			//	//PhongMaterial* mat = new PhongMaterial();
+			//	
+			//	//mat->Ka = Color(0.0f, 0.0f, 0.0f);
+			//	//mat->Ks = Color(0.0f, 0.0f, 0.0f);
+			//	//mat->Kd = Color(0.7f, 0.7f, 0.7f);
+			//	//mat->alpha = 0;
+			//	//tri->material = mat;
+			//}
+			//if(curmat && !meshMat)
+			//	tri->SetMaterial(curmat);
+   //         else if(meshMat)
+   //             tri->SetMaterial(meshMat);
 		}
         if(a == "g" || myfile.eof())
 		{   

@@ -46,7 +46,7 @@ void Logger::File(const string& msg)
     ofstream file;
     time_t currentTime;
     time(&currentTime);
-	char timestamp[ 100 ];
+    char timestamp[ 100 ];
 
     file.open (m_fileName.c_str(), ofstream::app);
     if(file.fail())
@@ -54,10 +54,10 @@ void Logger::File(const string& msg)
         Box("Could not open debug log file.");
         exit(1);
     }
-	
+    
     sprintf( timestamp, "%s", ctime( &currentTime ) );
-	timestamp[ strlen( timestamp ) - 1 ] = 32;
+    timestamp[ strlen( timestamp ) - 1 ] = 32;
 
-	file << timestamp << ":: " << msg << endl;
+    file << timestamp << ":: " << msg << endl;
     file.close();
 }

@@ -17,13 +17,13 @@ using namespace std;
 class Renderer
 {
 public:
-	Renderer(std::shared_ptr<Scene> scene);
-	virtual ~Renderer();
+    Renderer(std::shared_ptr<Scene> scene);
+    virtual ~Renderer();
 
-	//virtual void Setup(const std::vector<Primitive*>& primitives, const std::vector<Light*>& lights) = 0;
-	virtual void Render(Camera& cam, ColorBuffer& colBuf) = 0;
-	virtual bool TraceShadowRay(const Ray& ray, float tmax) const;
-	virtual bool ShootRay(const Ray& ray, IntersectionInfo& info) const;
+    //virtual void Setup(const std::vector<Primitive*>& primitives, const std::vector<Light*>& lights) = 0;
+    virtual void Render(Camera& cam, ColorBuffer& colBuf) = 0;
+    virtual bool TraceShadowRay(const Ray& ray, float tmax) const;
+    virtual bool ShootRay(const Ray& ray, IntersectionInfo& info) const;
 
     virtual unsigned int GetSPP() const = 0;
     virtual void SetSPP(unsigned int) = 0;
@@ -36,14 +36,14 @@ public:
     static const unsigned int typeLightTracer = 2;
     static const unsigned int typeBDPT = 3;
 protected:
-	KDTree m_tree;
+    KDTree m_tree;
     std::shared_ptr<Scene> scene;
 
     bool stopping;
 
-  	int m_SPP;
-	mutable Random m_random;
-	vector<Light*> m_lights;
+    int m_SPP;
+    mutable Random m_random;
+    vector<Light*> m_lights;
     LightNode* lightTree;
 };
 

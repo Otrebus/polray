@@ -29,14 +29,14 @@ PinholeCamera::~PinholeCamera()
 //------------------------------------------------------------------------------
 Ray PinholeCamera::GetRayFromPixel(int x, int y, float a, float b, float, float) const
 {
-	float rx = halfwidth*(2.f*float(x) - float(xres) + (2.f*a)) / float(xres);
-	float ry = halfwidth*(2.f*float(y) - float(yres) + (2.f*b)) / float(xres);
-	
-	Vector3d left = up^dir;
-	left.Normalize();
-	Vector3d raydir = dir - (up*ry + left*rx);
-	raydir.Normalize();
-	return Ray(pos, raydir);
+    float rx = halfwidth*(2.f*float(x) - float(xres) + (2.f*a)) / float(xres);
+    float ry = halfwidth*(2.f*float(y) - float(yres) + (2.f*b)) / float(xres);
+    
+    Vector3d left = up^dir;
+    left.Normalize();
+    Vector3d raydir = dir - (up*ry + left*rx);
+    raydir.Normalize();
+    return Ray(pos, raydir);
 }
 
 //------------------------------------------------------------------------------
@@ -47,30 +47,30 @@ Ray PinholeCamera::GetRayFromPixel(int x, int y, float a, float b, float, float)
 //------------------------------------------------------------------------------
 bool PinholeCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, float, float) const
 {
-	if(ray.direction*dir > 0) // Ray shooting away from camera
-		return false;
+    if(ray.direction*dir > 0) // Ray shooting away from camera
+        return false;
 
-	if((ray.origin-pos) * dir < 0) // Ray origin behind camera
-		return false;
+    if((ray.origin-pos) * dir < 0) // Ray origin behind camera
+        return false;
 
-	float ratio = (float)yres/(float)xres;
-	Vector3d left = up^dir;
-	left.Normalize();
+    float ratio = (float)yres/(float)xres;
+    Vector3d left = up^dir;
+    left.Normalize();
 
-	Vector3d A = left^up;
-	Vector3d B = dir^ray.direction;
+    Vector3d A = left^up;
+    Vector3d B = dir^ray.direction;
 
-	float det = ray.direction*(A);
-	float rx = 1/halfwidth*up*B/det;
-	float ry = 1/halfwidth*-left*B/det;
+    float det = ray.direction*(A);
+    float rx = 1/halfwidth*up*B/det;
+    float ry = 1/halfwidth*-left*B/det;
 
-	x = (int)((float)xres*(1.0f - rx)/2.0f);
-	y = (int)((float)yres*(ratio - ry)/(ratio*2.0f));
+    x = (int)((float)xres*(1.0f - rx)/2.0f);
+    y = (int)((float)yres*(ratio - ry)/(ratio*2.0f));
 
-	if(x < 0 || x >= xres || y < 0 || y >= yres)
-		return false;
+    if(x < 0 || x >= xres || y < 0 || y >= yres)
+        return false;
 
-	return true;
+    return true;
 }
 
 

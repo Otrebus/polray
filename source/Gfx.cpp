@@ -1,4 +1,4 @@
-	//------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------
 // File: Gfx.cpp
 //  
 // Handles graphics
@@ -23,12 +23,12 @@ Gfx::Gfx()
 //------------------------------------------------------------------------------
 Gfx::~Gfx() 
 {
-	// The application freezes at any of these if the Directdraw object has been
-	// used in another thread apparently.
-	if(m_isLocked)
-		Unlock();
+    // The application freezes at any of these if the Directdraw object has been
+    // used in another thread apparently.
+    if(m_isLocked)
+        Unlock();
     m_pDD->RestoreDisplayMode();
-		
+        
     if(m_pDD)
         m_pDD->Release();
 
@@ -46,7 +46,7 @@ bool Gfx::Initialize(HWND hWnd, bool windowed, int xres, int yres)
     m_isWindowed = windowed;
     m_xres = xres;
     m_yres = yres;
-	m_isLocked = false;
+    m_isLocked = false;
 
     if(DirectDrawCreateEx(NULL, (LPVOID*) &m_pDD, IID_IDirectDraw7, NULL) != DD_OK)
     {
@@ -93,7 +93,7 @@ bool Gfx::Initialize(HWND hWnd, bool windowed, int xres, int yres)
   
     if(m_pDD->SetCooperativeLevel(hWnd, DDSCL_EXCLUSIVE | DDSCL_FULLSCREEN) != DD_OK)
     {
-		m_lastError = "SetCooperativeLevel failed in Gfx::Initialize";
+        m_lastError = "SetCooperativeLevel failed in Gfx::Initialize";
         m_pDD->Release();
         return(false);
     }
@@ -125,8 +125,8 @@ void Gfx::Plot(int x, int y, uchar r, uchar g, uchar b)
 //------------------------------------------------------------------------------
 void Gfx::PutPixel(int x, int y, uchar r, uchar g, uchar b)
 {
-	HDC hdc = GetDC(m_hWnd);
-	SetPixelV(hdc, x, y, RGB(r, g, b));
+    HDC hdc = GetDC(m_hWnd);
+    SetPixelV(hdc, x, y, RGB(r, g, b));
 }
 
 //------------------------------------------------------------------------------
@@ -168,7 +168,7 @@ bool Gfx::Lock()
 {
     assert(!m_isLocked);
     HRESULT hresult;
-	memset(&m_ddsd, 0, sizeof(m_ddsd));
+    memset(&m_ddsd, 0, sizeof(m_ddsd));
     m_ddsd.dwSize = sizeof(m_ddsd);
     hresult = m_pDDSBack->Lock(NULL, &m_ddsd, DDLOCK_SURFACEMEMORYPTR | DDLOCK_WAIT, NULL);
     if(hresult == DDERR_SURFACELOST)
@@ -322,7 +322,7 @@ bool Gfx::ChangeDisplayMode(bool windowed, int bpp, int xres, int yres)
             return false;
         }
     }
-	ShowWindow(m_hWnd, SW_SHOW);
+    ShowWindow(m_hWnd, SW_SHOW);
 
     return CreateSurfaces(windowed, bpp, xres, yres);
 }
@@ -506,16 +506,16 @@ bool Gfx::IsReady() const
 
 int Gfx::GetYRes() const
 {
-	return m_yres;
+    return m_yres;
 }
 
 int Gfx::GetXRes() const
 {
-	return m_xres;
+    return m_xres;
 }
 
 string Gfx::GetLastError() const
 {
-	return m_lastError;
+    return m_lastError;
 }
 

@@ -30,14 +30,14 @@ ThinLensCamera::~ThinLensCamera()
 //------------------------------------------------------------------------------
 Ray ThinLensCamera::GetRayFromPixel(int x, int y, float a, float b, float u, float v) const
 {
-	float rx = halfwidth*(2.f*float(x) - float(xres) + (2.f*a)) / float(xres);
-	float ry = halfwidth*(2.f*float(y) - float(yres) + (2.f*b)) / float(xres);
-	
-	Vector3d right = dir^up;
-	right.Normalize();
-	Vector3d raydir = dir - (up*ry - right*rx);
-	raydir.Normalize();
-	Ray centerRay = Ray(pos, raydir);
+    float rx = halfwidth*(2.f*float(x) - float(xres) + (2.f*a)) / float(xres);
+    float ry = halfwidth*(2.f*float(y) - float(yres) + (2.f*b)) / float(xres);
+    
+    Vector3d right = dir^up;
+    right.Normalize();
+    Vector3d raydir = dir - (up*ry - right*rx);
+    raydir.Normalize();
+    Ray centerRay = Ray(pos, raydir);
 
     Vector3d lensPoint = pos+lensRadius*v*(right*cos(u)+up*sin(u));
 
@@ -57,11 +57,11 @@ Ray ThinLensCamera::GetRayFromPixel(int x, int y, float a, float b, float u, flo
 //------------------------------------------------------------------------------
 bool ThinLensCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, float u, float v) const
 {
-	if(ray.direction*dir > 0) // Ray shooting away from camera
-		return false;
+    if(ray.direction*dir > 0) // Ray shooting away from camera
+        return false;
 
-	if((ray.origin-pos) * dir < 0) // Ray origin behind camera
-		return false;
+    if((ray.origin-pos) * dir < 0) // Ray origin behind camera
+        return false;
 
     Vector3d right = dir^up;
     Vector3d lensPoint = pos+lensRadius*v*(right*cos(u)+up*sin(u));
@@ -77,24 +77,24 @@ bool ThinLensCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, float u, fl
     camRay.direction.Normalize();
     centerRay.direction.Normalize();
 
-	float ratio = (float)yres/(float)xres;
-	Vector3d left = up^dir;
-	left.Normalize();
+    float ratio = (float)yres/(float)xres;
+    Vector3d left = up^dir;
+    left.Normalize();
 
-	Vector3d A = left^up;
-	Vector3d B = dir^centerRay.direction;
+    Vector3d A = left^up;
+    Vector3d B = dir^centerRay.direction;
 
-	float det = centerRay.direction*(A);
-	float rx = 1/halfwidth*up*B/det;
-	float ry = 1/halfwidth*-left*B/det;
+    float det = centerRay.direction*(A);
+    float rx = 1/halfwidth*up*B/det;
+    float ry = 1/halfwidth*-left*B/det;
 
-	x = (int)((float)xres*(1.0f - rx)/2.0f);
-	y = (int)((float)yres*(ratio - ry)/(ratio*2.0f));
+    x = (int)((float)xres*(1.0f - rx)/2.0f);
+    y = (int)((float)yres*(ratio - ry)/(ratio*2.0f));
 
-	if(x < 0 || x >= xres || y < 0 || y >= yres)
-		return false;
+    if(x < 0 || x >= xres || y < 0 || y >= yres)
+        return false;
 
-	return true;
+    return true;
 }
 
 

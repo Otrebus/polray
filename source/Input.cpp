@@ -65,17 +65,17 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hWnd)
         logger.File("Input::Initialize failed at SetCooperativeLevel (keyboard)");
         return false; 
     }
-	DIPROPDWORD dipdw;
+    DIPROPDWORD dipdw;
     dipdw.diph.dwSize       = sizeof(DIPROPDWORD);
     dipdw.diph.dwHeaderSize = sizeof(DIPROPHEADER);
     dipdw.diph.dwObj        = 0;
     dipdw.diph.dwHow        = DIPH_DEVICE;
     dipdw.dwData            = 32;
  
- 	if (FAILED(m_pKeyboard->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph)))
+    if (FAILED(m_pKeyboard->SetProperty(DIPROP_BUFFERSIZE, &dipdw.diph)))
     {
         logger.File("Input::Initialize failed at SetProperty");
-		return false;
+        return false;
     }
 
     m_pKeyboard->Acquire();
@@ -89,7 +89,7 @@ bool Input::Initialize(HINSTANCE hInstance, HWND hWnd)
     if (FAILED(m_pMouse->SetDataFormat(&c_dfDIMouse)))
     {
         logger.File("Input::Initialize failed at CreateDevice (mouse)");
-	    return false;
+        return false;
     }
 
     if (FAILED(m_pMouse->SetCooperativeLevel(hWnd, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND)))
@@ -129,7 +129,7 @@ void Input::ReadMouseEvents()
             m_mouseButtons = 0;
             m_pMouse->Acquire();
             hr = m_pMouse->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), od, &dwElements, 0);
-		}
+        }
 
         if (FAILED(hr) || dwElements == 0)
         {
@@ -185,7 +185,7 @@ void Input::ReadKeyboardEvents()
                 m_keys[i] = false;
             m_pKeyboard->Acquire();
             hr = m_pKeyboard->GetDeviceData(sizeof(DIDEVICEOBJECTDATA), od, &dwElements, 0);
-		}
+        }
 
         if(FAILED(hr) || dwElements == 0)
         {
@@ -224,21 +224,21 @@ char Input::NextMouseEvent()
         m_mouseDy = od->dwData;
         break;
 
-	case DIMOFS_BUTTON0:
+    case DIMOFS_BUTTON0:
         if (od->dwData != 0)
             m_mouseButtons |= 1;
         else
             m_mouseButtons &= ~1;
         break;
 
-	case DIMOFS_BUTTON1:
+    case DIMOFS_BUTTON1:
         if (od->dwData != 0)
             m_mouseButtons |= 2;
         else
             m_mouseButtons &= ~2;
         break;
 
-	case DIMOFS_BUTTON2:
+    case DIMOFS_BUTTON2:
         if (od->dwData != 0)
             m_mouseButtons |= 4;
         else

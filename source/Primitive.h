@@ -16,23 +16,23 @@ class IntersectionInfo;
 class Primitive
 {
 public:
-	Primitive();
-	virtual ~Primitive();
-	
+    Primitive();
+    virtual ~Primitive();
+    
     virtual BoundingBox GetBoundingBox() const = 0;
     virtual bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const = 0;
 
     virtual float Intersect(const Ray& ray) const = 0;
-	virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
+    virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
 
     void SetMaterial(Material* material);
     Material* GetMaterial() const;
 
-	// ugly temporary hack thingy until nlogn kd tree builder is proper
-	mutable int side;
+    // ugly temporary hack thingy until nlogn kd tree builder is proper
+    mutable int side;
 
 protected:
-	Material* material;
+    Material* material;
 };
 
 #endif

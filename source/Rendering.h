@@ -22,7 +22,7 @@ public:
 
     bool WasBufferRedrawn() const;
     ColorBuffer GetImage();
-private:
+//private:
     void Thread();
     static void __cdecl Thread(void*);
 

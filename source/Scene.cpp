@@ -30,17 +30,6 @@ Scene::~Scene()
 
 }
 
-/*
-void Scene::Build()
-{
-	tree->Build(primitives);
-}
-
-void Scene::Render(ColorBuffer& colBuf)
-{
-    m_renderer->Render(*camera, colBuf);
-}*/
-
 void Scene::AddModel(Model* s)
 {
 	// It's done this way since every primitive adds to the scene array differently. Triangle meshes
@@ -54,15 +43,6 @@ void Scene::AddLight(Light* l)
     l->AddToScene(shared_from_this());
 }
 
-/*void Scene::SetRenderer(Renderer* rnd)
-{
-	m_renderer = rnd;
-}
-
-Renderer* Scene::GetRenderer() const
-{
-	return m_renderer;
-}*/
 
 void Scene::SetCamera(Camera* cam)
 {

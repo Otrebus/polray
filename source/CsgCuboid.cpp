@@ -191,8 +191,8 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, float& tNear, float& tFar, int& axis
     Vector3d transDir = Multiply(invMatU_, invMatV_, invMatW_, inRay.direction);
     Ray ray(transOrigin - transPos, transDir);
 
-	tFar = std::numeric_limits<float>::infinity();
-	tNear = -std::numeric_limits<float>::infinity();
+    tFar = std::numeric_limits<float>::infinity();
+    tNear = -std::numeric_limits<float>::infinity();
 
     Vector3d c1(-a_/2, -b_/2, -c_/2);
     Vector3d c2(a_/2, b_/2, c_/2);
@@ -200,12 +200,12 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, float& tNear, float& tFar, int& axis
     for(int u = 0; u < 3; u++)
     {
         if (ray.direction[u] == 0)
-	    {  
+        {  
             if (ray.origin[u] > c2[u] || ray.origin[u] < c1[u]) 
                 return false;
-	    }
+        }
         else
-	    {  
+        {  
             float tmpSideNear = -1;
             float tmpSideFar = 1;
             float t1 = (c1[u] - ray.origin[u]) / ray.direction[u];
@@ -219,7 +219,7 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, float& tNear, float& tFar, int& axis
             {
                 sideNear = tmpSideNear;
                 axisNear = u;
-			    tNear = t1;
+                tNear = t1;
             }
             if (t2 < tFar) 
             {

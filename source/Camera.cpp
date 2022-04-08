@@ -43,7 +43,7 @@ void Camera::SetFov(float fov)
 //------------------------------------------------------------------------------
 float Camera::GetPixelArea() const
 {
-	return halfwidth*halfwidth*4.0f*((float)yres/float(xres))/float(xres*yres);
+    return halfwidth*halfwidth*4.0f*((float)yres/float(xres))/float(xres*yres);
 }
 
 int Camera::GetXRes() const

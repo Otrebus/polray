@@ -11,40 +11,40 @@
 class Color
 {
 public:
-	Color(float, float, float);
-	//Color(const Vector3d&);
-	Color(int);
-	Color();
-	int GetInt() const;
-	~Color();
-	Color operator+(const Color& v) const;
+    Color(float, float, float);
+    //Color(const Vector3d&);
+    Color(int);
+    Color();
+    int GetInt() const;
+    ~Color();
+    Color operator+(const Color& v) const;
     Color operator-(const Color& v) const;
-	Color operator*(float) const;
-	Color operator/(float) const;
+    Color operator*(float) const;
+    Color operator/(float) const;
     Color operator*(int) const;
-	Color operator/(int) const;
-	Color operator*(const Color& v) const;
-	Color operator+=(const Color& c);
-	Color operator*=(const Color& c);
-	Color operator/=(float t);
-	Color operator*=(float t);
-	float& operator[](int);
-	bool operator!() const;
+    Color operator/(int) const;
+    Color operator*(const Color& v) const;
+    Color operator+=(const Color& c);
+    Color operator*=(const Color& c);
+    Color operator/=(float t);
+    Color operator*=(float t);
+    float& operator[](int);
+    bool operator!() const;
 
-	bool IsValid() const;
+    bool IsValid() const;
 
     void SetLuminance(float L);
     float GetLuminance() const;
-	float GetIntensity() const;
-	float GetAverage() const;
-	float GetMax() const;
-	float GetSum() const;
+    float GetIntensity() const;
+    float GetAverage() const;
+    float GetMax() const;
+    float GetSum() const;
 
-	void Normalize();
+    void Normalize();
 
-	float r;
-	float g;
-	float b;
+    float r;
+    float g;
+    float b;
 
     const static Color Identity;
     const static Color Black;

@@ -28,9 +28,9 @@ DielectricMaterial::~DielectricMaterial()
 Color DielectricMaterial::GetSampleE(const IntersectionInfo& info, Ray& out, 
     float& pdf, float& rpdf, unsigned char& component, bool adjoint) const
 {
-	pdf = 1;  // This is not true, of course, which is indicated by the
-	rpdf = 1; // specularity of this brdf
-	component = 1;
+    pdf = 1;  // This is not true, of course, which is indicated by the
+    rpdf = 1; // specularity of this brdf
+    component = 1;
 
     return GetSample(info, out, adjoint); // We can just call the non-extended sampling 
 }                                         // function here
@@ -43,7 +43,7 @@ Color DielectricMaterial::GetSampleE(const IntersectionInfo& info, Ray& out,
 Color DielectricMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const
 {
     Vector3d _normal = info.GetNormal();
-	Vector3d normal;
+    Vector3d normal;
 
     Vector3d& wo = out.direction;
     const Vector3d& wi = info.GetDirection();
@@ -66,22 +66,22 @@ Color DielectricMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool
         normal = -_normal;
         cosi = -cosi;
     }
-	
+    
     float d = 1-(n1/n2)*(n1/n2)*(1-cosi*cosi);
 
-	if(d < 0) // Total internal reflection
+    if(d < 0) // Total internal reflection
     {
-		out.direction = Reflect(info.GetDirection(), Ns);
-	    out.direction.Normalize();
-	    out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
+        out.direction = Reflect(info.GetDirection(), Ns);
+        out.direction.Normalize();
+        out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
         return adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
     }
-	Vector3d refraction = wi*(n1/n2) + Ns*(cosi*(n1/n2) - sqrt(d));
-	refraction.Normalize();
-	float cost = -refraction*normal;
+    Vector3d refraction = wi*(n1/n2) + Ns*(cosi*(n1/n2) - sqrt(d));
+    refraction.Normalize();
+    float cost = -refraction*normal;
     float Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
-	float Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
-	float R = (Rs*Rs+Rp*Rp)/2.0f;
+    float Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
+    float R = (Rs*Rs+Rp*Rp)/2.0f;
 
     if(m_rnd.GetFloat(0, 1) > R) // Refracted
     {
@@ -93,8 +93,8 @@ Color DielectricMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool
     else // Reflected
     {
         out.direction = Reflect(info.GetDirection(), Ns);
-	    out.direction.Normalize();
-	    out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
+        out.direction.Normalize();
+        out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
         return adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
     }
 }
@@ -107,7 +107,7 @@ Color DielectricMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool
 Color DielectricMaterial::BRDF(const IntersectionInfo& info, 
     const Vector3d& out) const
 {
-	return Color(0, 0, 0); // The chance that the out, in vectors 
+    return Color(0, 0, 0); // The chance that the out, in vectors 
 }                          // are reflectant is 0
 
 //------------------------------------------------------------------------------
@@ -119,8 +119,8 @@ Color DielectricMaterial::BRDF(const IntersectionInfo& info,
 Color DielectricMaterial::ComponentBRDF(const IntersectionInfo& info, 
     const Vector3d& out, unsigned char component) const
 {
-	assert(component == 1);
-	return Color(0, 0, 0);
+    assert(component == 1);
+    return Color(0, 0, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -128,7 +128,7 @@ Color DielectricMaterial::ComponentBRDF(const IntersectionInfo& info,
 //------------------------------------------------------------------------------
 Light* DielectricMaterial::GetLight() const
 {
-	return light;
+    return light;
 }
 
 //------------------------------------------------------------------------------
@@ -137,8 +137,8 @@ Light* DielectricMaterial::GetLight() const
 //------------------------------------------------------------------------------
 bool DielectricMaterial::IsSpecular(unsigned char component) const
 {
-	assert(component == 1);	
-	return true;
+    assert(component == 1);	
+    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -146,13 +146,13 @@ bool DielectricMaterial::IsSpecular(unsigned char component) const
 //------------------------------------------------------------------------------
 void DielectricMaterial::ReadProperties(stringstream& ss)
 {
-	while(!ss.eof())
-	{
-		string line;
-		getline(ss, line);
-		stringstream ss2(line);
-		ss2 >> m_ior;
-	}
+    while(!ss.eof())
+    {
+        string line;
+        getline(ss, line);
+        stringstream ss2(line);
+        ss2 >> m_ior;
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -165,8 +165,8 @@ void DielectricMaterial::ReadProperties(stringstream& ss)
 float DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out,
     unsigned char component, bool adjoint) const
 {
-	assert(component == 1);
-	return 1;
+    assert(component == 1);
+    return 1;
 }
 
 void DielectricMaterial::Save(Bytestream& stream) const

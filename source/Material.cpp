@@ -10,18 +10,18 @@ int Material::highestId = 0;
 
 Material::Material()
 {
-	id = highestId++;
-	texture = 0;
-	normalmap = 0;
+    id = highestId++;
+    texture = 0;
+    normalmap = 0;
     light = 0;
 }
 
 Material::~Material()
 {
-	if(normalmap)
-		delete normalmap;
-	if(texture)
-		delete texture;
+    if(normalmap)
+        delete normalmap;
+    if(texture)
+        delete texture;
 }
 
 Material* Material::Create(unsigned char id)

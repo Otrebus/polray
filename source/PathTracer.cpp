@@ -10,13 +10,13 @@
 
 PathTracer::PathTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
-	//m_random.Seed(GetTickCount());
+    //m_random.Seed(GetTickCount());
 #ifdef DETERMINISTIC
-	m_random.Seed(0);
+    m_random.Seed(0);
 #else
-	m_random.Seed(GetTickCount() + int(this));
+    m_random.Seed(GetTickCount() + int(this));
 #endif
-	m_SPP = 1;
+    m_SPP = 1;
 }
 
 PathTracer::~PathTracer()
@@ -25,12 +25,12 @@ PathTracer::~PathTracer()
 
 void PathTracer::SetSPP(unsigned int s)
 {
-	m_SPP = s;
+    m_SPP = s;
 }
 
 unsigned int PathTracer::GetSPP() const
 {
-	return m_SPP;
+    return m_SPP;
 }
 
 //Color PathTracer::TracePathPrimitive(const Ray& ray) const
@@ -238,19 +238,19 @@ unsigned int PathTracer::GetSPP() const
 
 void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
-	int xres = colBuf.GetXRes();
-	int yres = colBuf.GetYRes();
+    int xres = colBuf.GetXRes();
+    int yres = colBuf.GetYRes();
 
-	for(int y = 0; y < yres; y++)
-	{
-		for(int x = 0; x < xres; x++)
-		{
-			Color result(0, 0, 0);
-			for(int i = 0; i < m_SPP; i++)
-			{
-				if(stopping)
-					colBuf.SetPixel(x, y, Color(0, 0, 0));
-				else
+    for(int y = 0; y < yres; y++)
+    {
+        for(int x = 0; x < xres; x++)
+        {
+            Color result(0, 0, 0);
+            for(int i = 0; i < m_SPP; i++)
+            {
+                if(stopping)
+                    colBuf.SetPixel(x, y, Color(0, 0, 0));
+                else
                 {
                     float q = m_random.GetFloat(0, 1);
                     float p = m_random.GetFloat(0, 1);
@@ -260,10 +260,10 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     Ray outRay = cam.GetRayFromPixel(x, y, q, p, u, v);
                     result += TracePath(outRay);
                 }
-			}
-			colBuf.SetPixel(x, y, result/(float)m_SPP);
-		}
-	}
+            }
+            colBuf.SetPixel(x, y, result/(float)m_SPP);
+        }
+    }
 }
 
 unsigned int PathTracer::GetType() const
@@ -274,13 +274,13 @@ unsigned int PathTracer::GetType() const
 
 Color PathTracer::TracePath(const Ray& ray) const
 {
-	const Primitive* minprimitive;
-	IntersectionInfo info;
-	Ray outRay, inRay;
-	Color pathColor(1.f, 1.f, 1.f);
-	Color finalColor(0, 0, 0);
-	bool sampledLight = false;
-	inRay = ray;
+    const Primitive* minprimitive;
+    IntersectionInfo info;
+    Ray outRay, inRay;
+    Color pathColor(1.f, 1.f, 1.f);
+    Color finalColor(0, 0, 0);
+    bool sampledLight = false;
+    inRay = ray;
     float rr = 1.0f;
     unsigned char lastComp;
 
@@ -288,26 +288,26 @@ Color PathTracer::TracePath(const Ray& ray) const
     float r = m_random.GetFloat(0.0f, 1.0f);
     Light* light = lightTree->PickLight(r, lightWeight);
 
-	do
-	{
+    do
+    {
         if(m_tree.Intersect(inRay, minprimitive) < 0)
         {
         //    if(scene->GetEnvironmentLight())
         //      return scene->GetEnvironmentLight()->GetRadiance(outRay.direction);
         //    3*Color(0.9, 1.2, 1.5) was the original sky color
-			break;
+            break;
         }
-		minprimitive->GenerateIntersectionInfo(inRay, info);
-		Material* material = info.GetMaterial();
+        minprimitive->GenerateIntersectionInfo(inRay, info);
+        Material* material = info.GetMaterial();
        
         // Randomly interesected a light source
-		if(info.GetMaterial()->GetLight() == light)
-		{
-			if(sampledLight) // We already sampled with next event estimation
-				return finalColor;
-			else return pathColor*( info.GetNormal()*info.GetDirection() < 0
+        if(info.GetMaterial()->GetLight() == light)
+        {
+            if(sampledLight) // We already sampled with next event estimation
+                return finalColor;
+            else return pathColor*( info.GetNormal()*info.GetDirection() < 0
                         ? light->GetIntensity()/lightWeight : Color(0, 0, 0) );
-		}
+        }
 
         float dummy;
         Color c = material->GetSampleE(info, outRay, dummy, dummy, lastComp, false);
@@ -315,16 +315,16 @@ Color PathTracer::TracePath(const Ray& ray) const
         // No use to sample using next event estimation if the material
         // is specular since the BRDF will be 0
         if(material->IsSpecular(1))
-			sampledLight = false;
-		else
+            sampledLight = false;
+        else
         {
             finalColor += pathColor*light->NextEventEstimation(this, info, lastComp)/lightWeight;
             sampledLight = true;
         }
         pathColor *= c/0.7f;
         inRay = outRay;
-	}   
+    }   
     while(m_random.GetFloat(0, 1) < 0.7f);
-	
+    
     return finalColor;
 }

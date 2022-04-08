@@ -27,7 +27,7 @@ class MeshLight : public Light
 public:
     MeshLight(Color intensity, std::string fileName);
     ~MeshLight();
-	virtual Color SampleRay(Ray& ray, Vector3d& Normal, float& areaPdf, float& anglePdf) const;
+    virtual Color SampleRay(Ray& ray, Vector3d& Normal, float& areaPdf, float& anglePdf) const;
     float SamplePoint(Vector3d& point, Vector3d& Normal) const;
 
     virtual float Pdf(const IntersectionInfo& info, const Vector3d& out) const;
@@ -41,7 +41,7 @@ public:
                                unsigned int component) const;
 
     virtual float GetArea() const;
-	virtual void AddToScene(std::shared_ptr<Scene>);
+    virtual void AddToScene(std::shared_ptr<Scene>);
 
     virtual void Save(Bytestream& s) const;
     virtual void Load(Bytestream& s);
@@ -56,7 +56,7 @@ protected:
     TriangleNode* BuildTree(int from, int to, float area, float cutoff);
     MeshTriangle* PickRandomTriangle() const;
     float area_;
-	TriangleMesh* mesh_;
+    TriangleMesh* mesh_;
     Material* mat_;
     mutable Random r;
     TriangleNode* triangleTree_;

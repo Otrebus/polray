@@ -17,11 +17,11 @@ class ThinLensCamera : public Camera
 {
 public:
     ThinLensCamera();
-	ThinLensCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, float fov, float focalLength, float lensRadius);
-	~ThinLensCamera();
-	
-	Ray GetRayFromPixel(int x, int y, float a, float b, float u, float v) const;
-	bool GetPixelFromRay(const Ray& ray, int& x, int& y, float u, float v) const;
+    ThinLensCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, float fov, float focalLength, float lensRadius);
+    ~ThinLensCamera();
+    
+    Ray GetRayFromPixel(int x, int y, float a, float b, float u, float v) const;
+    bool GetPixelFromRay(const Ray& ray, int& x, int& y, float u, float v) const;
 
     void SampleAperture(Vector3d& pos, float& u, float& v) const;
 
@@ -29,7 +29,7 @@ public:
     void SetFocalLength(float focalLength);
     void SetLensRadius(float lensRadius);
 
-	float GetPixelArea() const;
+    float GetPixelArea() const;
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

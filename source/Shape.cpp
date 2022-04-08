@@ -2,7 +2,7 @@
 
 Shape::Shape()
 {
-	material = 0;
+    material = 0;
 }
 
 Shape::~Shape()

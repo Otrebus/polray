@@ -30,7 +30,7 @@ public:
     virtual bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const = 0;
 
     virtual float Intersect(const Ray& ray) const = 0;
-	virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
+    virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
 
     virtual void Translate(const Vector3d& direction) = 0;
     virtual void Rotate(const Vector3d& axis, float angle) = 0;

@@ -31,13 +31,13 @@ public:
 
     bool Text(int xout, int yout, const char *txout, int r, int g, int b);  
 
-	// Plots to the backbuffer
+    // Plots to the backbuffer
     void Plot(int x, int y, uchar r, uchar g, uchar b);
     void Plot(int x, int y, int color);
 
-	// Plots directly to the client area
-	void PutPixel(int x, int y, uchar r, uchar g, uchar b);
-	
+    // Plots directly to the client area
+    void PutPixel(int x, int y, uchar r, uchar g, uchar b);
+    
     void Line(int fromx, int fromy, int tox, int toy, uchar r, uchar g, uchar b);
     void Circle(int x, int y, int radius, uchar r, uchar g, uchar b);
     bool ClearScreen(uchar, uchar, uchar);
@@ -45,15 +45,15 @@ public:
     bool IsWindowed() const;
     bool IsReady() const;
 
-	int GetYRes() const;
-	int GetXRes() const;
+    int GetYRes() const;
+    int GetXRes() const;
 
     void DestroySurfaces();
     bool CreateSurfaces(bool, int, int, int);
 
-	string GetLastError() const;
+    string GetLastError() const;
 
-	string					m_lastError;
+    string					m_lastError;
     bool                    m_isLocked;
     bool                    m_isWindowed;
     int                     m_xres, m_yres;

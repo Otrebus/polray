@@ -82,7 +82,7 @@ Color MeshLight::SampleRay(Ray& ray, Vector3d& normal, float& areaPdf, float& an
         Vector3d portalNormal = p.v1^p.v2;
         portalNormal.Normalize();
         float x = r.GetFloat(0, 0.9999f);
-	    float y = r.GetFloat(0, 0.9999f);
+        float y = r.GetFloat(0, 0.9999f);
 
         Vector3d portalPos = p.pos + p.v1*x + p.v2*y;
 
@@ -95,10 +95,10 @@ Color MeshLight::SampleRay(Ray& ray, Vector3d& normal, float& areaPdf, float& an
 
     float r1 = r.GetFloat(0, 2*F_PI);
     float r2 = r.GetFloat(0, 0.9999f);
- 	ray.direction =  forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
+    ray.direction =  forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
         + normal * sqrt(1-r2);
     anglePdf = abs(ray.direction*normal)/(F_PI);
-	return Color(1, 1, 1)*(F_PI);
+    return Color(1, 1, 1)*(F_PI);
 }
 
 
@@ -113,35 +113,35 @@ float MeshLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     {   // Intersect the portal with the ray - this is almost
         // the same code as ordinary triangle intersection
         LightPortal p = portals.front();
-       	float u, v, t;
-	    Vector3d D;
+        float u, v, t;
+        Vector3d D;
 
-	    D.x = ray.direction.x;
-	    D.y = ray.direction.y;
-	    D.z = ray.direction.z;
+        D.x = ray.direction.x;
+        D.y = ray.direction.y;
+        D.z = ray.direction.z;
 
-	    Vector3d E1 = p.v1;
-	    Vector3d E2 = p.v2;
-	    Vector3d T = ray.origin - p.pos;
+        Vector3d E1 = p.v1;
+        Vector3d E2 = p.v2;
+        Vector3d T = ray.origin - p.pos;
 
-	    Vector3d P = E2^T;
-	    Vector3d Q = E1^D;
+        Vector3d P = E2^T;
+        Vector3d Q = E1^D;
 
-	    float det = E2*Q;
-	    if(det < 0.0000000001f && det > -0.0000000001f)
-		    return 0;
+        float det = E2*Q;
+        if(det < 0.0000000001f && det > -0.0000000001f)
+            return 0;
 
-	    u = D*P/det;
+        u = D*P/det;
 
-	    if(u > 1 || u < 0)
-		    return 0;
+        if(u > 1 || u < 0)
+            return 0;
 
-	    v = T*Q/det;
+        v = T*Q/det;
 
-	    if(v > 1 || v < 0)
-		    return 0;
+        if(v > 1 || v < 0)
+            return 0;
 
-	    t = E1*P/det;
+        t = E1*P/det;
         if(t < 0)
             return 0;
         return (1/p.GetArea())*t*t/(abs(p.GetNormal()*ray.direction));
@@ -196,20 +196,20 @@ Color MeshLight::NextEventEstimation(const Renderer* renderer, const Intersectio
 
     if(toLight*lightNormal < 0)
     {
-   		float d = toLight.GetLength();
-		toLight.Normalize();
+        float d = toLight.GetLength();
+        toLight.Normalize();
 
-		Ray lightRay = Ray(info.GetPosition(), toLight);
+        Ray lightRay = Ray(info.GetPosition(), toLight);
 
-		if(renderer->TraceShadowRay(lightRay, d))
-		{
-			float cosphi = abs(normal*toLight);
-			float costheta = abs(toLight*lightNormal);
+        if(renderer->TraceShadowRay(lightRay, d))
+        {
+            float cosphi = abs(normal*toLight);
+            float costheta = abs(toLight*lightNormal);
             Color c;
-			c = info.GetMaterial()->ComponentBRDF(info, toLight, component)
+            c = info.GetMaterial()->ComponentBRDF(info, toLight, component)
                 *costheta*cosphi*intensity_*GetArea()/(d*d);
             return c;
-		}
+        }
     }
     return Color(0, 0, 0);
 }
@@ -223,22 +223,22 @@ Color MeshLight::NextEventEstimationMIS(const Renderer* renderer, const Intersec
 
     if(toLight*lightNormal < 0)
     {
-   		float d = toLight.GetLength();
-		toLight.Normalize();
-		Ray lightRay = Ray(info.GetPosition(), toLight);
+        float d = toLight.GetLength();
+        toLight.Normalize();
+        Ray lightRay = Ray(info.GetPosition(), toLight);
 
         if(renderer->TraceShadowRay(lightRay, d))
-		{
-			float cosphi = abs(normal*toLight);
-			float costheta = abs(toLight*lightNormal);
+        {
+            float cosphi = abs(normal*toLight);
+            float costheta = abs(toLight*lightNormal);
             Material* mat = info.GetMaterial();
-			Color c = mat->ComponentBRDF(info, toLight, component)
+            Color c = mat->ComponentBRDF(info, toLight, component)
                       *costheta*cosphi*intensity_*GetArea()/(d*d);
             float brdfPdf = costheta*mat->PDF(info, toLight, 
                                               component, false)/(d*d);
             float lightPdf = 1.0f/GetArea();
             return c/(1.0f + brdfPdf*brdfPdf/(lightPdf*lightPdf));
-		}
+        }
     }
     return Color(0, 0, 0);
 }

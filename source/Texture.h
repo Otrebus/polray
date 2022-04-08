@@ -13,22 +13,22 @@ using namespace std;
 class Texture
 {
 public:
-	Texture(const wstring& file);
-	Texture(int, int);
-	~Texture();
-	Texture(Texture&);
-	Color GetTexel(int x, int y) const;
-	void SetTexel(int x, int y, int color);
-	Color GetTexelBLInterp(float x, float y) const;
+    Texture(const wstring& file);
+    Texture(int, int);
+    ~Texture();
+    Texture(Texture&);
+    Color GetTexel(int x, int y) const;
+    void SetTexel(int x, int y, int color);
+    Color GetTexelBLInterp(float x, float y) const;
 
-	int GetHeight() const;
-	int GetWidth() const;
-	static HINSTANCE hInstance;
+    int GetHeight() const;
+    int GetWidth() const;
+    static HINSTANCE hInstance;
 
 protected:
-	int*		m_texture;
-	int			m_height, m_width;
-	float       m_fHeight, m_fWidth;
+    int*		m_texture;
+    int			m_height, m_width;
+    float       m_fHeight, m_fWidth;
 };
 
 #endif

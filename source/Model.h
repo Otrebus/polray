@@ -11,9 +11,9 @@ class Bytestream;
 class Model
 {
 public:
-	Model();
-	virtual ~Model();
-	virtual void AddToScene(Scene& scene) = 0;
+    Model();
+    virtual ~Model();
+    virtual void AddToScene(Scene& scene) = 0;
 
     static Model* Create(unsigned char n);
 

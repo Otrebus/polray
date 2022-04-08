@@ -10,19 +10,19 @@ CsgSphere::CsgSphere(const Vector3d& position, float radius)
 bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
 {
     float tNear, tFar;
-	Vector3d dir(ray.direction);
-	Vector3d vec = ray.origin - pos_;
+    Vector3d dir(ray.direction);
+    Vector3d vec = ray.origin - pos_;
 
-	float A = dir*dir;
-	float B = 2*(vec*dir);
+    float A = dir*dir;
+    float B = 2*(vec*dir);
     float C = vec*vec - radius_*radius_;
-	float D = (B*B/(4*A) - C)/A;
+    float D = (B*B/(4*A) - C)/A;
 
     
     if(D < 0)
         return false;
 
-	tNear = -B/(2*A) - sqrt(D);
+    tNear = -B/(2*A) - sqrt(D);
     tFar = -B/(2*A) + sqrt(D);
 
     IntersectionInfo nearInfo, farInfo;
@@ -68,19 +68,19 @@ bool CsgSphere::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& r
 float CsgSphere::Intersect(const Ray& ray) const
 {
     float t;
-	Vector3d dir(ray.direction);
-	Vector3d vec = ray.origin - pos_;
-	float A = dir*dir;
-	float B = 2*(vec*dir);
+    Vector3d dir(ray.direction);
+    Vector3d vec = ray.origin - pos_;
+    float A = dir*dir;
+    float B = 2*(vec*dir);
     float C = vec*vec - radius_*radius_;
-	float D = (B*B/(4*A) - C)/A;
+    float D = (B*B/(4*A) - C)/A;
     if(D < 0)
         return -1.0f;
     t = -B/(2*A) - sqrt(D);
     if(t < 0)
         t = -B/(2*A) + sqrt(D);
     if(t < 0)
-		return false;
+        return false;
     return true;
 }
 

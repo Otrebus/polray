@@ -1,5 +1,4 @@
 #include "TriangleMesh.h"
-//#include "triboxoverlap.h"
 #include <stack>
 #include <map>
 #include "PhongMaterial.h"
@@ -91,9 +90,6 @@ float MeshTriangle::Intersect(const Ray& ray) const
 	D.y = ray.direction.y;
 	D.z = ray.direction.z;
 
-	// THIS IS HORRIBLE FOR MULTITHREADING
-	//numintersects++;
-
 	Vector3d E1 = v1->pos-v0->pos;
 	Vector3d E2 = v2->pos-v0->pos;
 	Vector3d T = ray.origin - v0->pos;
@@ -120,93 +116,6 @@ float MeshTriangle::Intersect(const Ray& ray) const
 
 	return t;
 }
-/*
-bool MeshTriangle::Intersect(const BoundingBox& box)
-{
-	float boxhalfsize[3] = {(box.c2.x - box.c1.x)/2.0f, (box.c2.y - box.c1.y)/2.0f, (box.c2.z - box.c1.z)/2.0f};
-	float boxcenter[3] = {box.c2.x - boxhalfsize[0], box.c2.y - boxhalfsize[1], box.c2.z - boxhalfsize[2]};
-	float triverts[3][3] = {{v0->pos.x, v0->pos.y, v0->pos.z}, {v1->pos.x, v1->pos.y, v1->pos.z}, {v2->pos.x, v2->pos.y, v2->pos.z}};
-	return triBoxOverlap(boxcenter, boxhalfsize, triverts) == 1 ? true : 0;
-}*/
-	
-
-	
-
-/*float MeshTriangle::Intersect(const Ray& ray)
-{
-	float u, v, t;
-	float Dx, Dy, Dz;
-	Dx = ray.direction.x;
-	Dy = ray.direction.y;
-	Dz = ray.direction.z;
-
-	float E1x, E1y, E1z;
-	float E2x, E2y, E2z;
-	float Tx, Ty, Tz;
-	float Px, Py, Pz;
-	float Qx, Qy, Qz;
-
-	E1x = v1->pos.x - v0->pos.x;
-	E1y = v1->pos.y - v0->pos.y;
-	E1z = v1->pos.z - v0->pos.z;
-
-	E2x = v2->pos.x - v0->pos.x;
-	E2y = v2->pos.y - v0->pos.y;
-	E2z = v2->pos.z - v0->pos.z;
-
-	Tx = ray.origin.x - v0->pos.x;
-	Ty = ray.origin.y - v0->pos.y;
-	Tz = ray.origin.z - v0->pos.z;
-
-
-	
-
-	//Vector3d E1 = v1->pos-v0->pos;
-	//Vector3d E2 = v2->pos-v0->pos;
-	//Vector3d T = ray.origin - v0->pos;
-// y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x
-	Px = E2y*Tz -E2z*Ty;
-	Py = E2z*Tx -E2x*Tz;
-	Pz = E2x*Ty-E2y*Tx;
-
-	Qx = E1y*Dz -E1z*Dy;
-	Qy = E1z*Dx -E1x*Dz;
-	Qz = E1x*Dy-E1y*Dx;
-
-
-	//Vector3d P = E2^T;
-	//Vector3d Q = E1^D;
-
-	float det;
-	det = E2x*Qx + E2y*Qy + E2z * Qz;
-
-	//float det = E2*Q;
-	if(det < 0.00001f && det > -0.00001f) // Ray in (almost) the same plane as the triangle
-		return -1.0f;
-
-	u = Dx*Px + Dy*Py + Dz*Pz;
-	u/= det;
-	//u = D*P/det;
-
-	if(u > 1 || u < 0)
-		return -1.0f;
-
-	v = Tx*Qx + Ty*Qy + Tz*Qz;
-	v/= det;
-
-	//v = T*Q/det;
-
-	if(u+v > 1 || u < 0 || v < 0)
-		return -1.0f;
-
-	t = E1x*Px + E1y*Py + E1z*Pz;
-	t/= det;
-	//t = E1*P/det;
-	if(t < 0.00001f)
-		return -1.0f;
-
-	return t;
-}*/
 
 
 bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
@@ -433,10 +342,7 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 	ifstream myfile;
 	string line;
 	myfile.open(file.c_str(), ios::out);
-	char tmp[256];
 
-	auto s = std::filesystem::current_path();
-	cout << "Current working directory: " << tmp << endl;
 	if(myfile.fail())
 	{
 		myfile.close();
@@ -476,7 +382,8 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
         if(a == "f")
 		{
 			std::vector<MeshVertex*> face;
-			std::vector<int> faceNormals;
+			std::vector<int> ns;
+			std::vector<int> ts;
 
 			string s1, s2, s3;
 
@@ -516,10 +423,11 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 					}
 
 					points.push_back(mv);
-
-					face.push_back(mv);
-					faceNormals.push_back(n);
-				}
+				} else
+					mv = it->second;
+				face.push_back(mv);
+				ns.push_back(n);
+				ts.push_back(t);
 			}
 
 			for(int i = 0; i < (int) face.size()-2; i++) {
@@ -536,9 +444,10 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 				tri->v1 = pv1;
 				tri->v2 = pv2;
 
-				if (!n0)
-				{
+				if (!ns[0]) {
 					tri->v0->normal = tri->GetNormal();
+					if(tri->v0->normal.x != tri->v0->normal.x)
+						__debugbreak();
 					tri->v1->normal = tri->v0->normal;
 					tri->v2->normal = tri->v0->normal;
 
@@ -550,274 +459,17 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 						tri->v2->normal.Normalize();
 				}
 
-				// No material defined
-				if (!curmat)
-				{
-					//PhongMaterial* mat = new PhongMaterial();
-					//mat->Kd = Color(0, 0, 0.8f);
-					//mat->Ks = Color(0.05f, 0.05f, 0.05f);
-					//tri->material = mat;
-					DielectricMaterial* mat = new DielectricMaterial();
-					//MirrorMaterial* mat = new MirrorMaterial();
-					mat->m_ior = 1.5f;
+				// No material defined, set to diffuse
+				if (!curmat) {
+					LambertianMaterial* mat = new LambertianMaterial();
+					mat->Kd = Color(0.7f, 0.7f, 0.7f);
 					tri->SetMaterial(mat);
-					//PhongMaterial* mat = new PhongMaterial();
-
-					//mat->Ka = Color(0.0f, 0.0f, 0.0f);
-					//mat->Ks = Color(0.0f, 0.0f, 0.0f);
-					//mat->Kd = Color(0.7f, 0.7f, 0.7f);
-					//mat->alpha = 0;
-					//tri->material = mat;
 				}
 				if (curmat && !meshMat)
 					tri->SetMaterial(curmat);
 				else if (meshMat)
 					tri->SetMaterial(meshMat);
 			}
-
-
-
-
-
-
-
-
-
-
-
-			//ins >> s1 >> s2 >> s3;
-			//stringstream ss(s1);
-
-			//ss >> v0;
-			//if(ss.fail())
-			//	__debugbreak();
-			//ss >> slash;
-			//if(!ss.fail())
-			//{
-			//	// We (possibly) have some texture coordinates
-			//	if(slash != '/')
-			//		__debugbreak();
-			//	ss >> t0;
-			//	if(ss.fail())
-			//		// No texture coordinate
-			//		ss.clear();
-			//}
-			//else
-			//	ss.clear();
-
-			//ss >> slash;
-			//if(!ss.fail())
-			//{
-			//	if(slash != '/')
-			//		__debugbreak();
-			//	// We have a normal;
-			//	ss >> n0;
-			//	if(ss.fail())
-			//		__debugbreak();
-			//}
-			//else
-			//	ss.clear();
-
-			//ss.clear();
-			//ss.str(s2);
-			//ss >> v1;
-			//if(ss.fail())
-			//	__debugbreak();
-			//ss >> slash;
-			//if(!ss.fail())
-			//{
-			//	// We (possibly) have some texture coordinates
-			//	if(slash != '/')
-			//		__debugbreak();
-			//	ss >> t1;
-			//	if(ss.fail())
-			//		// No texture coordinate
-			//		ss.clear();
-			//}
-			//else
-			//	ss.clear();
-
-			//ss >> slash;
-			//if(!ss.fail())
-			//{
-			//	if(slash != '/')
-			//		__debugbreak();
-			//	// We have a normal
-			//	ss >> n1;
-			//	if(ss.fail())
-			//		__debugbreak();
-			//}
-			//else
-			//	ss.clear();
-
-			//ss.clear();
-			//ss.str(s3);
-			//ss >> v2;
-			//if(ss.fail())
-			//	__debugbreak();
-			//ss >> slash;
-			//if(!ss.fail())
-			//{
-			//	// We (possibly) have some texture coordinates
-			//	if(slash != '/')
-			//		__debugbreak();
-			//	ss >> t2;
-			//	if(ss.fail())
-			//		// No texture coordinate
-			//		ss.clear();
-			//}
-			//else
-			//	ss.clear();
-
-			//ss >> slash;
-			//if(!ss.fail())
-			//{
-			//	if(slash != '/')
-			//		__debugbreak();
-			//	ss >> n2;
-			//	if(ss.fail())
-			//		__debugbreak();
-			//}
-			//else
-			//	ss.clear();
-
-   // 		MeshVertex* pv0, *pv1, *pv2;
-
-			//if (v0 < 0)
-			//	v0 = vectors.size() + v0 + 1;
-   //         auto it = groupVertices.find(v0-1);
-			//if(it == groupVertices.end()) // We have not seen this vertex before in this group
-			//{                             // so create a new one
-			//	pv0 = groupVertices[v0-1] = new MeshVertex(*vectors[v0-1]);
-   //             if(n0)
-			//    {
-			//	    normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
-			//		pv0->normal = normals[n0-1];
-   //             }
-   //             points.push_back(pv0);
-			//}
-			//else
-			//{ // This vertex is already among the parsed vertices in this group so use that particular one
-			//	pv0 = (*it).second;
-   //             if(n0)
-   //             {
-   //                 normalInterp = false;
-   //                 if(pv0->normal != normals[n0-1])  // A different normal was given though, so we still need
-   //                 {                                 // to create an entirely new vertex
-			//		    pv0 = new MeshVertex(*pv0); 
-   //                     points.push_back(pv0);
-   //                 }
-   //                 pv0->normal = normals[n0-1];
-   //             }  
-			//}
-
-			//if (v1 < 0)
-			//	v1 = vectors.size() + v1 + 1;
-	  //  	it = groupVertices.find(v1-1);
-   //         if(it == groupVertices.end())
-			//{
-			//	pv1 = groupVertices[v1-1] = new MeshVertex(*vectors[v1-1]);
-   //             if(n1)
-			//    {
-			//	    normalInterp = false;
-			//		pv1->normal = normals[n1-1];
-   //             }
-   //             points.push_back(pv1);
-			//}
-			//else
-			//{
-			//	pv1 = (*it).second;
-   //             if(n1)
-   //             {
-   //                 normalInterp = false;
-   //                 if(pv1->normal != normals[n1-1])
-   //                 {
-			//		    pv1 = new MeshVertex(*pv1); 
-   //                     points.push_back(pv1);
-   //                 }
-   //                 pv1->normal = normals[n1-1];
-   //             }  
-			//}
-
-			//if (v2 < 0)
-			//	v2 = vectors.size() + v2 + 1;
-	  //  	it = groupVertices.find(v2-1);
-   //         if(it == groupVertices.end()) // We have not seen this vertex before in this group
-			//{                             // so create a new 
-			//	pv2 = groupVertices[v2-1] = new MeshVertex(*vectors[v2-1]);
-   //             if(n2)
-			//    {
-			//	    normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
-			//		pv2->normal = normals[n2-1];
-   //             }
-   //             points.push_back(pv2);
-   //         }
-			//else
-			//{ // This vertex is already among the parsed vertices in this group so use that particular one
-			//	pv2 = (*it).second;
-   //             if(n2)
-   //             {
-   //                 normalInterp = false;
-   //                 if(pv2->normal != normals[n2-1])  // A different normal was given though, so we still need
-   //                 {                                 // to create an entirely new vertex
-			//		    pv2 = new MeshVertex(*pv2); 
-   //                     points.push_back(pv2);
-   //                 }
-   //                 pv2->normal = normals[n2-1];
-   //             }  
-			//}
-
-			//MeshTriangle* tri = new MeshTriangle(pv0, pv1, pv2);
-			//triangles.push_back(tri);
-
-   //         pv0->triangles.push_back(tri);
-   //         pv1->triangles.push_back(tri);
-			//pv2->triangles.push_back(tri);
-
-			//if((n0 || n1 || n2) && !(n0 && n1 && n2))
-			//	__debugbreak();
-
-			//tri->v0 = pv0;
-			//tri->v1 = pv1;
-			//tri->v2 = pv2;
-
-			//if(!n0)
-			//{
-			//	tri->v0->normal = tri->GetNormal();
-			//	tri->v1->normal = tri->v0->normal;
-			//	tri->v2->normal = tri->v0->normal;
-			//	
-			//	if(!tri->v0->normal.IsNull())
-			//		tri->v0->normal.Normalize();
-			//	if(!tri->v1->normal.IsNull())   
-			//		tri->v1->normal.Normalize();
-			//	if(!tri->v2->normal.IsNull())
-			//		tri->v2->normal.Normalize();
-			//}
-
-			//// No material defined
-			//if(!curmat)
-			//{
-   //             //PhongMaterial* mat = new PhongMaterial();
-	  //          //mat->Kd = Color(0, 0, 0.8f);
-	  //          //mat->Ks = Color(0.05f, 0.05f, 0.05f);
-   //             //tri->material = mat;
-   //             DielectricMaterial* mat = new DielectricMaterial();
-   //             //MirrorMaterial* mat = new MirrorMaterial();
-   //             mat->m_ior = 1.5f;
-   //             tri->SetMaterial(mat);
-			//	//PhongMaterial* mat = new PhongMaterial();
-			//	
-			//	//mat->Ka = Color(0.0f, 0.0f, 0.0f);
-			//	//mat->Ks = Color(0.0f, 0.0f, 0.0f);
-			//	//mat->Kd = Color(0.7f, 0.7f, 0.7f);
-			//	//mat->alpha = 0;
-			//	//tri->material = mat;
-			//}
-			//if(curmat && !meshMat)
-			//	tri->SetMaterial(curmat);
-   //         else if(meshMat)
-   //             tri->SetMaterial(meshMat);
 		}
         if(a == "g" || myfile.eof())
 		{   
@@ -1046,68 +698,9 @@ BoundingBox MeshTriangle::GetBoundingBox() const
 	return BoundingBox(c1, c2);
 }
 
-/*
-BoundingBox TriangleMesh::GetBoundingBox()
-{
-	if(boundingboxuptodate)
-		return bbox;
-	float maxz = -10e30f;
-	float maxy = -10e30f;
-	float maxx = -10e30f;
-	float minz = 10e30f;
-	float miny = 10e30f;
-	float minx = 10e30f;
-
-	vector<MeshTriangle*> blah = triangles;
-
-	for(vector<MeshTriangle*>::iterator it = blah.begin(); it < blah.end(); it++)
-	{
-		MeshTriangle tri = **it;
-		BoundingBox box = tri.GetBoundingBox();
-		if(box.c2.z > maxz)
-			maxz = box.c2.z;
-		if(box.c2.y > maxy)
-			maxy = box.c2.y;
-		if(box.c2.x > maxx)
-			maxx = box.c2.x;
-		if(box.c1.z < minz)
-			minz = box.c1.z;
-		if(box.c1.y < miny)
-			miny = box.c1.y;
-		if(box.c1.x < minx)
-			minx = box.c1.x;
-	}
-
-	boundingboxuptodate = true;
-	bbox = BoundingBox(Vector3d(minx, miny, minz), Vector3d(maxx, maxy, maxz));
-	return bbox;
-}
-
-int MeshTriangle::GetType()
-{
-	return type_meshtriangle;
-}
-*/
 TriangleMesh::~TriangleMesh()
 {
 }
-/*
-float TriangleMesh::Intersect(const Ray& ray)
-{
-	Shape* dummy = 0;
-    return -1.0f;
-//	return tree.Intersect(Ray(ray), dummy);
-}
-
-bool TriangleMesh::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
-{
-	Shape* shape = 0;
-	/*if(tree.Intersect(Ray(ray), shape) > -1.0f)
-	{
-		return shape->GenerateIntersectionInfo(Ray(ray), info);
-	}*//*
-	return false;
-}*/
 
 void TriangleMesh::CalculateVertexNormals()
 {
@@ -1125,27 +718,6 @@ void TriangleMesh::CalculateVertexNormals()
 		totalnormal = Vector3d(0,0,0);
 	}
 }
-/*
-void MeshTriangle::UpdateBoundingBox()
-{
-	Vector3d c1, c2;
-
-	c1.x = min(v0->pos.x, min(v1->pos.x, v2->pos.x));
-	c1.y = min(v0->pos.y, min(v1->pos.y, v2->pos.y));
-	c1.z = min(v0->pos.z, min(v1->pos.z, v2->pos.z));
-
-	c2.x = max(v0->pos.x, max(v1->pos.x, v2->pos.x));
-	c2.y = max(v0->pos.y, max(v1->pos.y, v2->pos.y));
-	c2.z = max(v0->pos.z, max(v1->pos.z, v2->pos.z));
-
-//	bbox = BoundingBox(c1, c2);
-}*/
-
-						
-/*
-void TriangleMesh::ComputeTangentSpaceVectors()
-{
-}*/
 
 void TriangleMesh::RemoveDuplicateVertices(float threshold)
 {
@@ -1228,13 +800,6 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
 		return false;
 }
 
-/*
-bool TriangleMesh::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox)
-{
-	resultbox = GetBoundingBox();
-	return true;
-}*/
-
 void TriangleMesh::AddToScene(Scene& scene)
 {
 	for(vector<MeshTriangle*>::iterator it = triangles.begin(); it < triangles.end(); it++)
@@ -1250,9 +815,10 @@ void TriangleMesh::Transform(const Matrix3d& m)
         m(0,2)*m(2,1)-m(0,1)*m(2,2),m(0,0)*m(2,2)-m(0,2)*m(2,0),m(0,1)*m(2,0)-m(0,0)*m(2,1),0,
         m(0,1)*m(1,2)-m(0,2)*m(1,1),m(0,2)*m(1,0)-m(0,0)*m(1,2),m(0,0)*m(1,1)-m(0,1)*m(1,0),0,
         0,0,0,1);
-                int i = 0;
+
+    int i = 0;
     for(auto it = points.begin(); it < points.end(); it++)
-    {
+	{
         i++;
         Vertex3d* v = *it;
         v->pos = m*v->pos;
@@ -1289,10 +855,7 @@ void TriangleMesh::Save(Bytestream& stream) const
     {
         unsigned int a, b, c;
         MeshTriangle* v = *it;
-        //a = vertexMemToIndex[v->v0];
-        //b = vertexMemToIndex[v->v1];
-        //c = vertexMemToIndex[v->v2];
-        //stream << a << b << c;
+
         stream << vertexMemToIndex[v->v0] 
                << vertexMemToIndex[v->v1] << vertexMemToIndex[v->v2];
         stream << materialMemToIndex[v->GetMaterial()];

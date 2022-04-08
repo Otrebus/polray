@@ -9,10 +9,10 @@ Color::Color()
 
 Color::Color(int c)
 {
-	r = (float)((c >> 16) & 0xFF) / 255.0f;
-	g = (float)((c >> 8) & 0xFF) / 255.0f;
-	b = (float)(c & 0xFF) / 255.0f;
-	assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
+    r = (float)((c >> 16) & 0xFF) / 255.0f;
+    g = (float)((c >> 8) & 0xFF) / 255.0f;
+    b = (float)(c & 0xFF) / 255.0f;
+    assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
 }
 
 Color::Color(float f)
@@ -21,21 +21,21 @@ Color::Color(float f)
 
 /*Color::Color(const Vector3d& v)
 {
-	r = v.x;
-	g = v.y;
-	b = v.z;
-	assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
+    r = v.x;
+    g = v.y;
+    b = v.z;
+    assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
 }*/
 
 int Color::GetInt() const
 {
-	return (int)(b*255) | (int)(g*255) << 8 | (int)(r*255) << 16;
+    return (int)(b*255) | (int)(g*255) << 8 | (int)(r*255) << 16;
 }
 
 
 Color::Color(float _r, float _g, float _b) : r(_r), g(_g), b(_b)
 {
-	assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
+    assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
 }
 
 Color::~Color()
@@ -44,77 +44,77 @@ Color::~Color()
 
 Color Color::operator+(const Color& v) const
 {
-	assert(v.r >= 0 && v.g >= 0 && v.b >= 0 && r == r && g == g && b == b);
-	return Color(r+v.r, g+v.g, b+v.b);
+    assert(v.r >= 0 && v.g >= 0 && v.b >= 0 && r == r && g == g && b == b);
+    return Color(r+v.r, g+v.g, b+v.b);
 }
 
 Color Color::operator-(const Color& v) const
 {
-	assert(r-v.r >= 0 && g-v.g >= 0 && g-v.b >= 0 && r == r && g == g && b == b);
-	return Color(r-v.r, g-v.g, b-v.b);
+    assert(r-v.r >= 0 && g-v.g >= 0 && g-v.b >= 0 && r == r && g == g && b == b);
+    return Color(r-v.r, g-v.g, b-v.b);
 }
 
 Color Color::operator*(float t) const
 {
-	assert(t >= 0 && r == r && g == g && b == b);
-	return Color(r*t, g*t, b*t);
+    assert(t >= 0 && r == r && g == g && b == b);
+    return Color(r*t, g*t, b*t);
 }
 
 Color Color::operator*(int t) const
 {
-	assert(t >= 0 && r == r && g == g && b == b);
-	return Color(r*float(t), g*float(t), b*float(t));
+    assert(t >= 0 && r == r && g == g && b == b);
+    return Color(r*float(t), g*float(t), b*float(t));
 }
 
 void Color::Normalize()
 {
-	float rl = 1.0f/sqrt(r*r + g*g + b*b);
-	r*=rl;
-	g*=rl;
-	b*=rl;
+    float rl = 1.0f/sqrt(r*r + g*g + b*b);
+    r*=rl;
+    g*=rl;
+    b*=rl;
 }
 
 Color operator*(float t, const Color& c)
 {
-	assert(t >= 0 && c.r >= 0 && c.g >= 0 && c.b >= 0 && c.r == c.r && c.g == c.g && c.b == c.b && t == t);
-	return Color(c.r*t, c.g*t, c.b*t);
+    assert(t >= 0 && c.r >= 0 && c.g >= 0 && c.b >= 0 && c.r == c.r && c.g == c.g && c.b == c.b && t == t);
+    return Color(c.r*t, c.g*t, c.b*t);
 }
 
 Color operator*(int t, const Color& c)
 {
-	assert(t >= 0 && c.r >= 0 && c.g >= 0 && c.b >= 0 && c.r == c.r && c.g == c.g && c.b == c.b && t == t);
-	return Color(c.r*float(t), c.g*float(t), c.b*float(t));
+    assert(t >= 0 && c.r >= 0 && c.g >= 0 && c.b >= 0 && c.r == c.r && c.g == c.g && c.b == c.b && t == t);
+    return Color(c.r*float(t), c.g*float(t), c.b*float(t));
 }
 
 Color Color::operator/(float t) const
 {
-	assert(t >= 0 && t == t);
-	return Color(r/t, g/t, b/t);
+    assert(t >= 0 && t == t);
+    return Color(r/t, g/t, b/t);
 }
 
 Color Color::operator/(int t) const
 {
-	assert(t >= 0 && t == t);
-	return Color(r/float(t), g/float(t), b/float(t));
+    assert(t >= 0 && t == t);
+    return Color(r/float(t), g/float(t), b/float(t));
 }
 
 Color Color::operator*(const Color& v) const
 {
-	assert(v.r >= 0 && v.g >= 0 && v.b >= 0 
-		   && r == r && g == g && b == b);
-	return Color(r*v.r, g*v.g, b*v.b);
+    assert(v.r >= 0 && v.g >= 0 && v.b >= 0 
+           && r == r && g == g && b == b);
+    return Color(r*v.r, g*v.g, b*v.b);
 }
 
 
 Color Color::operator+=(const Color& c)
 {
-	assert(c.r >= 0 && c.g >= 0 && c.b >= 0 
-		   && r == r && g == g && b == b);
-	r+=c.r;
-	g+=c.g;
-	b+=c.b;
+    assert(c.r >= 0 && c.g >= 0 && c.b >= 0 
+           && r == r && g == g && b == b);
+    r+=c.r;
+    g+=c.g;
+    b+=c.b;
 
-	return Color(r, g, b);
+    return Color(r, g, b);
 }
 
 /**
@@ -125,9 +125,9 @@ Color Color::operator+=(const Color& c)
  */
 Color Color::operator*=(const Color& c)
 {
-	assert(c.r >= 0 && c.g >= 0 && c.b >= 0 && r == r && g == g && b == b);
-	r *= c.r; g *= c.g; b *= c.b;
-	return Color(r, g, b);
+    assert(c.r >= 0 && c.g >= 0 && c.b >= 0 && r == r && g == g && b == b);
+    r *= c.r; g *= c.g; b *= c.b;
+    return Color(r, g, b);
 }
 
 /**
@@ -137,9 +137,9 @@ Color Color::operator*=(const Color& c)
  */
 Color Color::operator*=(float f)
 {
-	assert(f >= 0.f);
-	r *= f; g *= f;	b *= f;
-	return Color(r, g, b);
+    assert(f >= 0.f);
+    r *= f; g *= f;	b *= f;
+    return Color(r, g, b);
 }
 
 /**
@@ -149,34 +149,34 @@ Color Color::operator*=(float f)
  */
 Color Color::operator/=(float t)
 {
-	assert(t >= 0 && t == t);
-	r /= t;	g /= t;	b /= t;
-	return Color(r, g, b);
+    assert(t >= 0 && t == t);
+    r /= t;	g /= t;	b /= t;
+    return Color(r, g, b);
 }
 
 bool Color::operator!() const
 {
-	return (r == 0 && g == 0 && b == 0);
+    return (r == 0 && g == 0 && b == 0);
 }
 
 float Color::GetIntensity() const
 {
-	return sqrt(r*r + g*g + b*b);
+    return sqrt(r*r + g*g + b*b);
 }
 
 float Color::GetMax() const
 {
-	return __max(r, __max(g, b));
+    return __max(r, __max(g, b));
 }
 
 float Color::GetAverage() const
 {
-	return (r + g + b)/3.0f;
+    return (r + g + b)/3.0f;
 }
 
 float Color::GetSum() const
 {
-	return r + g + b;
+    return r + g + b;
 }
 
 float Color::GetLuminance() const
@@ -193,22 +193,22 @@ void Color::SetLuminance(float L)
 
 bool Color::IsValid() const
 {
-	return r == r && g == g && b == b && r >= 0 && 
-		   g >= 0 && b >= 0 && 
-		   r < std::numeric_limits<float>::infinity() && 
-		   g < std::numeric_limits<float>::infinity() && 
-		   b < std::numeric_limits<float>::infinity() &&
-		   r > -std::numeric_limits<float>::infinity() &&
-		   g > -std::numeric_limits<float>::infinity() &&
-		   b > -std::numeric_limits<float>::infinity();
+    return r == r && g == g && b == b && r >= 0 && 
+           g >= 0 && b >= 0 && 
+           r < std::numeric_limits<float>::infinity() && 
+           g < std::numeric_limits<float>::infinity() && 
+           b < std::numeric_limits<float>::infinity() &&
+           r > -std::numeric_limits<float>::infinity() &&
+           g > -std::numeric_limits<float>::infinity() &&
+           b > -std::numeric_limits<float>::infinity();
 }
 
 std::ostream& operator << (std::ostream& s , const Color& v)
 {
-	return(s << "(" << v.r << "," << v.g << "," << v.b << ")");
+    return(s << "(" << v.r << "," << v.g << "," << v.b << ")");
 }
 
 float& Color::operator[](int t)
 {
-	return (&r)[t];
+    return (&r)[t];
 }

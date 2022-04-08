@@ -14,35 +14,35 @@ IntersectionInfo::~IntersectionInfo()
 
 Vector3d IntersectionInfo::GetNormal() const
 {
-	return normal;
+    return normal;
 }
 
 Vector3d IntersectionInfo::GetPosition() const
 {
-	return position;
+    return position;
 }
 
 Vector3d IntersectionInfo::GetRayPosition() const
 {
-	return rayposition;
+    return rayposition;
 }
 
 Vector2d IntersectionInfo::GetTexturePosition() const
 {
-	return texpos;
+    return texpos;
 }
 
 Material* IntersectionInfo::GetMaterial() const
 {
-	return material;
+    return material;
 }
 
 Vector3d IntersectionInfo::GetDirection() const
 {
-	return direction;
+    return direction;
 }
 
 Vector3d IntersectionInfo::GetGeometricNormal() const
 {
-	return geometricnormal;
+    return geometricnormal;
 }

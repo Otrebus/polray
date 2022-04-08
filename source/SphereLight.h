@@ -19,7 +19,7 @@ public:
     SphereLight(Vector3d position, float radius, Color intensity);
     ~SphereLight();
 
-	virtual Color SampleRay(Ray& ray, Vector3d& Normal, float& areaPdf, float& pdf) const;
+    virtual Color SampleRay(Ray& ray, Vector3d& Normal, float& areaPdf, float& pdf) const;
     virtual void SamplePoint(Vector3d& point, Vector3d& Normal) const;
 
     virtual float Pdf(const IntersectionInfo& info, const Vector3d& out) const;
@@ -29,7 +29,7 @@ public:
     virtual Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, unsigned int component) const;
 
     virtual float GetArea() const;
-	virtual void AddToScene(std::shared_ptr<Scene>);
+    virtual void AddToScene(std::shared_ptr<Scene>);
 
     virtual void Save(Bytestream& s) const;
     virtual void Load(Bytestream& s);
@@ -42,8 +42,8 @@ protected:
     Vector3d position_;
     float radius_;
     std::shared_ptr<Scene> scene_;
-	EmissiveMaterial* material_;
-	mutable Random r_;
+    EmissiveMaterial* material_;
+    mutable Random r_;
 };
 
 #endif

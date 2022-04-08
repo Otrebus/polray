@@ -15,22 +15,22 @@ MirrorMaterial::~MirrorMaterial()
 
 Color MirrorMaterial::GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const
 {
-	//Vector3d normal = info.GetGeometricNormal();
+    //Vector3d normal = info.GetGeometricNormal();
     Vector3d normal = info.GetNormal();
-	out.direction = Reflect(info.GetDirection(), normal);
-	out.origin = info.GetPosition() + normal*0.0001f;
-	out.direction.Normalize();
+    out.direction = Reflect(info.GetDirection(), normal);
+    out.origin = info.GetPosition() + normal*0.0001f;
+    out.direction.Normalize();
 
-	pdf = 1;
-	rpdf = 1;
-	component = 1;
+    pdf = 1;
+    rpdf = 1;
+    component = 1;
 
-	return Color(1, 1, 1);
+    return Color(1, 1, 1);
 }
 
 Color MirrorMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const
 {
-	Vector3d Ng, Ns;
+    Vector3d Ng, Ns;
     const Vector3d in = info.GetDirection();
 
     if(in*info.GetGeometricNormal() < 0)
@@ -46,9 +46,9 @@ Color MirrorMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adj
 
     Vector3d normal = Ns;
 
-	out.direction = Reflect(info.GetDirection(), normal);
-	out.origin = info.GetPosition() + normal*0.0001f;
-	out.direction.Normalize();
+    out.direction = Reflect(info.GetDirection(), normal);
+    out.origin = info.GetPosition() + normal*0.0001f;
+    out.direction.Normalize();
 
     float fac1 = (out.direction*Ns)*(in*Ns);
     float fac2 = (out.direction*Ng)*(in*Ng);
@@ -61,41 +61,41 @@ Color MirrorMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adj
 
 Color MirrorMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out) const
 {
-	return Color(0, 0, 0); // The chance that the out, in vectors are reflecant is effectively 0
+    return Color(0, 0, 0); // The chance that the out, in vectors are reflecant is effectively 0
 }
 
 Color MirrorMaterial::ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const
 {
-	assert(component == 1);
-	return Color(0, 0, 0);
+    assert(component == 1);
+    return Color(0, 0, 0);
 }
 
 Light* MirrorMaterial::GetLight() const
 {
-	return light;
+    return light;
 }
 
 bool MirrorMaterial::IsSpecular(unsigned char component) const
 {
-	assert(component == 1);	
-	return true;
+    assert(component == 1);	
+    return true;
 }
 
 void MirrorMaterial::ReadProperties(stringstream& ss)
 {
-	while(!ss.eof())
-	{
-		string line, s;
-		getline(ss, line);
-		stringstream ss2(line);
-		ss2 >> s;
-	}
+    while(!ss.eof())
+    {
+        string line, s;
+        getline(ss, line);
+        stringstream ss2(line);
+        ss2 >> s;
+    }
 }
 
 float MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const
 {
-	assert(component == 1);
-	return 1;
+    assert(component == 1);
+    return 1;
 }
 
 void MirrorMaterial::Save(Bytestream& stream) const

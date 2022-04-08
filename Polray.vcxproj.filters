@@ -212,7 +212,7 @@
     <ClCompile Include="source\Draw.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
-    <ClCompile Include="source\Source.cpp">
+    <ClCompile Include="source\Utils.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
@@ -388,7 +388,7 @@
     <ClInclude Include="source\IntersectionInfo.h">
       <Filter>Source Files\Math</Filter>
     </ClInclude>
-    <ClInclude Include="source\Source.h">
+    <ClInclude Include="source\Utils.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>

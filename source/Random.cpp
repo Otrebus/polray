@@ -41,10 +41,10 @@ HANDLE Random::hMutex = CreateMutex(0, false, 0);
 Random::Random()
 {
 #ifdef USE_MERSENNE
-	mti =N+1; /* mti==N+1 means mt[N] is not initialized */
-	init_genrand((unsigned long)this);
+    mti =N+1; /* mti==N+1 means mt[N] is not initialized */
+    init_genrand((unsigned long)this);
 #else
-		m_lastNumber = 0;
+        m_lastNumber = 0;
 #endif
 }
 
@@ -57,7 +57,7 @@ Random::Random(unsigned int seed)
 #ifndef USE_MERSENNE
     m_lastNumber = seed;
 #else
-	init_genrand(seed);
+    init_genrand(seed);
 #endif
 }
 
@@ -75,16 +75,16 @@ float Random::GetFloat(float a, float b)
         return a;
 #ifdef USE_MERSENNE
    // WaitForSingleObject(hMutex, INFINITE);
-	return a + genrand_real2() * (b-a);
+    return a + genrand_real2() * (b-a);
    // ReleaseMutex(hMutex);
 #else
-	int number;
+    int number;
 
-	//m_lastNumber = m_lastNumber * 0x343FD + 0x269EC3; 
-	//number = m_lastNumber >> 16 & 0x7FFF;
+    //m_lastNumber = m_lastNumber * 0x343FD + 0x269EC3; 
+    //number = m_lastNumber >> 16 & 0x7FFF;
     m_lastNumber = m_lastNumber * 1664525 +	1013904223;
 
-	//return a + ((float) number / (float) 0x7FFF)*(b-a);
+    //return a + ((float) number / (float) 0x7FFF)*(b-a);
     return a + ((float) m_lastNumber / (float) 0xFFFFFFFF)*(b-a);
 #endif
 }
@@ -92,7 +92,7 @@ float Random::GetFloat(float a, float b)
 void Random::Seed(unsigned int seed)
 {
 #ifndef USE_MERSENNE
-	m_lastNumber = seed;
+    m_lastNumber = seed;
 #endif
 }
 

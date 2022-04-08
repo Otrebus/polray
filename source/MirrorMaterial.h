@@ -19,30 +19,30 @@ class Ray;
 class MirrorMaterial : public Material
 {
 public:
-	MirrorMaterial();
-	~MirrorMaterial();
+    MirrorMaterial();
+    ~MirrorMaterial();
 
-	Color GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const;
-	Color GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const;
+    Color GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const;
+    Color GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const;
 
-	Color BRDF(const IntersectionInfo& info, const Vector3d& out) const;
-	Color ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const;
+    Color BRDF(const IntersectionInfo& info, const Vector3d& out) const;
+    Color ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const;
 
-	Light* GetLight() const;
-	bool IsSpecular(unsigned char component) const;
+    Light* GetLight() const;
+    bool IsSpecular(unsigned char component) const;
     
-    	virtual float PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const;
+        virtual float PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const;
 
-	void ReadProperties(stringstream& ss);
+    void ReadProperties(stringstream& ss);
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
-	static int highestId;
-	int id;
-	Texture* texture;
-	Texture* normalmap;
+    static int highestId;
+    int id;
+    Texture* texture;
+    Texture* normalmap;
 };
 
 #endif
-	
+    

@@ -13,24 +13,24 @@
 class Shape
 {
 public:
-	Shape();
-	virtual ~Shape();
-	virtual BoundingBox GetBoundingBox() = 0;
-	virtual float Intersect(const Ray& ray) = 0;
-	virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) = 0;
-	virtual int GetType() = 0;
-	virtual void ComputeTangentSpaceVectors() = 0;
-	virtual bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) = 0;
-	virtual void AddToScene(Scene& scene) = 0;
-	static const int type_triangle = 0;
-	static const int type_sphere = 1;
-	static const int type_trianglemesh = 2;
-	static const int type_meshtriangle = 3;
+    Shape();
+    virtual ~Shape();
+    virtual BoundingBox GetBoundingBox() = 0;
+    virtual float Intersect(const Ray& ray) = 0;
+    virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) = 0;
+    virtual int GetType() = 0;
+    virtual void ComputeTangentSpaceVectors() = 0;
+    virtual bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) = 0;
+    virtual void AddToScene(Scene& scene) = 0;
+    static const int type_triangle = 0;
+    static const int type_sphere = 1;
+    static const int type_trianglemesh = 2;
+    static const int type_meshtriangle = 3;
 
-	Material* material;
+    Material* material;
 
-	// ugly temporary hack thingy until nlogn kd tree builder is proper
-	int side;
+    // ugly temporary hack thingy until nlogn kd tree builder is proper
+    int side;
 };
 
 #endif*/

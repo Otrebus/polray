@@ -36,7 +36,7 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, float& areaPdf, float& 
 
     float r1 = r_.GetFloat(0, 2*M_PI);
     float r2 = r_.GetFloat(0, 0.9999f);
-	ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
+    ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
                     + normal * sqrt(1 - r2);
     pdf = abs(ray.direction*normal)/M_PI;
 
@@ -105,15 +105,15 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
 
     if(toLight*lightNormal < 0)
     {
-		if(renderer->TraceShadowRay(lightRay, d))
-		{
+        if(renderer->TraceShadowRay(lightRay, d))
+        {
             float cosphi = abs(normal*toLight);
-			float costheta = abs(toLight*lightNormal);
+            float costheta = abs(toLight*lightNormal);
             Color c;
-			c = info.GetMaterial()->ComponentBRDF(info, toLight, component)
+            c = info.GetMaterial()->ComponentBRDF(info, toLight, component)
                 *costheta*cosphi*intensity_*GetArea()/(2*d*d);
             return c;
-		}
+        }
     }
     return Color(0, 0, 0);
 }
@@ -132,10 +132,10 @@ Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const Inters
 
     if(toLight*lightNormal < 0)
     {
-		if(renderer->TraceShadowRay(lightRay, d))
-		{
+        if(renderer->TraceShadowRay(lightRay, d))
+        {
             float cosphi = abs(normal*toLight);
-			float costheta = abs(toLight*lightNormal);
+            float costheta = abs(toLight*lightNormal);
             Color c;
             Material* mat = info.GetMaterial();			
             c = mat->ComponentBRDF(info, toLight, component)
@@ -144,7 +144,7 @@ Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const Inters
                                               component, false)/(d*d);
             float lightPdf = 2.0f/GetArea();
             return c;
-		}
+        }
     }
     return Color(0, 0, 0);
 }

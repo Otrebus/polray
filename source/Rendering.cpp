@@ -12,7 +12,7 @@ Rendering::Rendering(std::shared_ptr<Renderer> r) :
     int yres = r->GetScene()->GetCamera()->GetYRes();
     image = new ColorBuffer(xres, yres);
     accumulation = new ColorBuffer(xres, yres);
-	accumulation->Clear(0);
+    accumulation->Clear(0);
     image->Clear(0);
     bufferMutex = CreateMutex(0, false, 0);
 }
@@ -70,57 +70,56 @@ ColorBuffer Rendering::GetImage()
 
 void Rendering::Thread()
 {
-	ColorBuffer temp(image->GetXRes(), image->GetYRes());
-
     std::cout << "hi";
 
-	while(true)
-	{
+    while(true)
+    {
+        ColorBuffer temp(image->GetXRes(), image->GetYRes());
         unsigned int nNewSamples = renderer->GetSPP();
         renderer->Render(*(renderer->GetScene()->GetCamera()), temp);
 
-		if(stopping) // If we were asked to stop rendering, the latest frame 
-			break;   // was not rendered entirely and should be discarded
+        if(stopping) // If we were asked to stop rendering, the latest frame 
+            break;   // was not rendered entirely and should be discarded
 
-		for(int y = 0; y < image->GetYRes(); y++)
-		{
-			for(int x = 0; x < image->GetXRes(); x++)			
-			{
-				Color k = temp.GetPixel(x, y);
-				Color c = accumulation->GetPixel(x, y);
+        for(int y = 0; y < image->GetYRes(); y++)
+        {
+            for(int x = 0; x < image->GetXRes(); x++)			
+            {
+                Color k = temp.GetPixel(x, y);
+                Color c = accumulation->GetPixel(x, y);
 
-				if(nSamples > 0)
-				{   // Calculate the new average image based on the new samples
+                if(nSamples > 0)
+                {   // Calculate the new average image based on the new samples
                     // and the number of old samples (running average)
                     float D = float(nSamples + nNewSamples);
                     float final_r = c.r + nNewSamples*(k.r - c.r)/D;
                     float final_g = c.g + nNewSamples*(k.g - c.g)/D;
                     float final_b = c.b + nNewSamples*(k.b - c.b)/D;
                     accumulation->SetPixel(x, y, final_r, final_g, final_b);
-				}
-				else
-					accumulation->SetPixel(x, y, k);
-			}
-		}
-		WaitForSingleObject(bufferMutex, INFINITE);
-		for(int y = 0; y < image->GetYRes(); y++)
-		{
-			for(int x = 0; x < image->GetXRes(); x++)
-			{
-				Color c = accumulation->GetPixel(x, y);
-				
-				float exposure = 0.75;
-				c.r = 1 - exp(-exposure*c.r);
-				c.g = 1 - exp(-exposure*c.g);
-				c.b = 1 - exp(-exposure*c.b);
+                }
+                else
+                    accumulation->SetPixel(x, y, k);
+            }
+        }
+        WaitForSingleObject(bufferMutex, INFINITE);
+        for(int y = 0; y < image->GetYRes(); y++)
+        {
+            for(int x = 0; x < image->GetXRes(); x++)
+            {
+                Color c = accumulation->GetPixel(x, y);
+                
+                float exposure = 0.75;
+                c.r = 1 - exp(-exposure*c.r);
+                c.g = 1 - exp(-exposure*c.g);
+                c.b = 1 - exp(-exposure*c.b);
 
-				image->SetPixel(x, y, c);
-			}
-		}
+                image->SetPixel(x, y, c);
+            }
+        }
         updated = true;
-    	nSamples += nNewSamples;
-		ReleaseMutex(bufferMutex);
-	}
+        nSamples += nNewSamples;
+        ReleaseMutex(bufferMutex);
+    }
 }
 
 void Rendering::Thread(void* r)

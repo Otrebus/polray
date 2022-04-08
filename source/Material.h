@@ -26,20 +26,20 @@ class ShadingState;
 class Material
 {
 public:
-	Material();
-	~Material();
+    Material();
+    ~Material();
 
-	virtual Color GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const = 0;
-	virtual Color GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const = 0;
+    virtual Color GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const = 0;
+    virtual Color GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const = 0;
 
-	virtual Color BRDF(const IntersectionInfo& info, const Vector3d& out) const = 0;
-	virtual Color ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const = 0;
+    virtual Color BRDF(const IntersectionInfo& info, const Vector3d& out) const = 0;
+    virtual Color ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const = 0;
 
     virtual Light* GetLight() const = 0;
-	virtual bool IsSpecular(unsigned char component) const = 0;
+    virtual bool IsSpecular(unsigned char component) const = 0;
 
-	virtual void ReadProperties(stringstream& ss) = 0;
-	virtual float PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const = 0;
+    virtual void ReadProperties(stringstream& ss) = 0;
+    virtual float PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const = 0;
 
     virtual void Save(Bytestream& stream) const = 0;
     virtual void Load(Bytestream& stream) = 0;
@@ -47,11 +47,11 @@ public:
     static Material* Create(unsigned char);
 
     Light* light;
-	static int highestId;
-	int id;
-	Texture* texture;
-	Texture* normalmap;
+    static int highestId;
+    int id;
+    Texture* texture;
+    Texture* normalmap;
 };
 
 #endif
-	
+    

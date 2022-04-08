@@ -8,18 +8,18 @@
 class PointLight : public Light
 {
 public:
-	PointLight(const Vector3d&, const Color&, Scene*);
-	~PointLight();
-	//Color CalculateSurfaceRadiance(const Vector3d&, const IntersectionInfo&);
+    PointLight(const Vector3d&, const Color&, Scene*);
+    ~PointLight();
+    //Color CalculateSurfaceRadiance(const Vector3d&, const IntersectionInfo&);
 
-	Color Sample(Vector3d& ray) const;
+    Color Sample(Vector3d& ray) const;
 
-	//Color SamplePoint (const Vector3d& frompoint, Vector3d& point, Vector3d& normal) const;
+    //Color SamplePoint (const Vector3d& frompoint, Vector3d& point, Vector3d& normal) const;
 
-	void AddToScene(Scene& scn);
-	Vector3d pos;
-	Color intensity;
-	Scene* scene;
+    void AddToScene(Scene& scn);
+    Vector3d pos;
+    Color intensity;
+    Scene* scene;
 };
 
 #endif*/

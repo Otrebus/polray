@@ -3,7 +3,6 @@
 
 #include "Vector3d.h"
 #include "Ray.h"
-#include "Shape.h"
 #include "Model.h"
 #include "Primitive.h"
 

@@ -184,7 +184,6 @@
     <ClCompile Include="source\PathTracer.cpp" />
     <ClCompile Include="source\PhongMaterial.cpp" />
     <ClCompile Include="source\PinholeCamera.cpp" />
-    <ClCompile Include="source\PointLight.cpp" />
     <ClCompile Include="source\PreethamSky.cpp" />
     <ClCompile Include="source\Primitive.cpp" />
     <ClCompile Include="source\Random.cpp" />
@@ -193,7 +192,6 @@
     <ClCompile Include="source\Renderer.cpp" />
     <ClCompile Include="source\Rendering.cpp" />
     <ClCompile Include="source\Scene.cpp" />
-    <ClCompile Include="source\Shape.cpp" />
     <ClCompile Include="source\Utils.cpp" />
     <ClCompile Include="source\Sphere.cpp" />
     <ClCompile Include="source\SphereLight.cpp" />
@@ -244,7 +242,6 @@
     <ClInclude Include="source\PathTracer.h" />
     <ClInclude Include="source\PhongMaterial.h" />
     <ClInclude Include="source\PinholeCamera.h" />
-    <ClInclude Include="source\PointLight.h" />
     <ClInclude Include="source\PreethamSky.h" />
     <ClInclude Include="source\Primitive.h" />
     <ClInclude Include="source\Random.h" />
@@ -253,7 +250,6 @@
     <ClInclude Include="source\Renderer.h" />
     <ClInclude Include="source\Rendering.h" />
     <ClInclude Include="source\Scene.h" />
-    <ClInclude Include="source\Shape.h" />
     <ClInclude Include="source\Utils.h" />
     <ClInclude Include="source\Sphere.h" />
     <ClInclude Include="source\SphereLight.h" />

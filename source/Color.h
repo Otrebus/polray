@@ -6,7 +6,6 @@
 #include <math.h>
 #include "Vector3d.h"
 #include <stdlib.h>
-#include <limits>
 
 class Color
 {
@@ -39,8 +38,6 @@ public:
     float GetAverage() const;
     float GetMax() const;
     float GetSum() const;
-
-    void Normalize();
 
     float r;
     float g;

@@ -103,16 +103,11 @@ void KDNode::Build()
 
 BoundingBox KDTree::CalculateExtents(vector<const Primitive*>& primitives)
 {
-    float maxx = -numeric_limits<float>::infinity();
-    float maxy = -numeric_limits<float>::infinity();
-    float maxz = -numeric_limits<float>::infinity();
-    float minx = numeric_limits<float>::infinity();
-    float miny = numeric_limits<float>::infinity();
-    float minz = numeric_limits<float>::infinity();
+    const auto inf = numeric_limits<float>::infinity();
+    float maxx = -inf, maxy = -inf, maxz = -inf, minx = inf, miny = inf, minz = inf;
 
-    for(vector<const Primitive*>::iterator it = primitives.begin(); it < primitives.end(); it++)
+    for(auto& s : primitives)
     {
-        const Primitive* s = *it;
         float smaxx, smaxy, smaxz, sminx, sminy, sminz;
 
         smaxx = s->GetBoundingBox().c2.x;
@@ -275,39 +270,27 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     const int rightonly = 2;
 
     // Mark all primitives as straddling for now
-    for(vector<const Primitive*>::iterator it = primitives.begin(); it < primitives.end(); it++)
+    for(auto& s : primitives)
+        s->side = both;
+    for(auto& e : events[a])
     {
-        (*it)->side = both;
-    }
-    for(vector<SAHEvent*>::iterator it = events[a].begin(); it < events[a].end(); it++)
-    {
-        SAHEvent* e = *it;
         if(e->position <= bestsplit && e->type == SAHEvent::end)
-        {
             e->triangle->side = leftonly;
-        }
-        if(e->position >= bestsplit && e->type == SAHEvent::start)
-        {
+        else if(e->position >= bestsplit && e->type == SAHEvent::start)
             e->triangle->side = rightonly;
-        }
-        if(e->position == bestsplit && e->type == SAHEvent::planar)
+        else if(e->position == bestsplit && e->type == SAHEvent::planar)
         {
             if(bestside == KDTree::left)
-            {
                 e->triangle->side = leftonly;
-            }
             else
-            {
                 e->triangle->side = rightonly;
-            }
         }
     }
 
     for(int u = 0; u < 3; u++)
     {
-        for(vector<SAHEvent*>::iterator it = events[u].begin(); it < events[u].end(); it++)
+        for(auto& e : events[u])
         {
-            SAHEvent* e = *it;
             const Primitive* s = e->triangle;
 
             if(s->side == leftonly)
@@ -317,10 +300,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         }
     }
 
-    for(vector<const Primitive*>::iterator it = primitives.begin(); it < primitives.end(); it++)
+    for(auto s : primitives)
     {
-        const Primitive* s = *it;
-
         if(s->side == leftonly)
             leftprimitives.push_back(s);
         if(s->side == rightonly)
@@ -452,9 +433,9 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
 
     for(int u = 0; u < 3; u++)
     {
-        sort(addright[u].begin(), addright[u].end(), 
-            [] (SAHEvent* e1, SAHEvent* e2) -> bool 
-        { return e1->position == e2->position ? e1->type < e2->type : e1->position < e2->position; });
+        std::sort(addright[u].begin(), addright[u].end(), [] (SAHEvent* e1, SAHEvent* e2) {
+            return e1->position == e2->position ? e1->type < e2->type : e1->position < e2->position;
+        });
 
         vector<SAHEvent*>::iterator evIt = rightevents[u].begin();
         vector<SAHEvent*>::iterator addIt = addright[u].begin();
@@ -516,22 +497,16 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
 
     for(int u = 0; u < 3; u++)
     {
-        for(vector<SAHEvent*>::iterator it = addleft[u].begin(); it < addleft[u].end(); it++)
-        {
-            delete *it;
-        }
+        for(auto& e : addleft[u])
+            delete e;
         addleft[u].clear();
         mergedLeft[u].clear();
     }
 
     BuildNode(node->right, rightbbox, mergedRight, rightprimitives, depth+1, badsplits);
     for(int u = 0; u < 3; u++)
-    {
-        for(vector<SAHEvent*>::iterator it = addright[u].begin(); it < addright[u].end(); it++)
-        {
-            delete *it;
-        }
-    }
+        for(auto& e : addright[u])
+            delete e;
 }
 
 //------------------------------------------------------------------------------
@@ -552,13 +527,9 @@ void KDTree::Build(vector<const Primitive*> primitives)
         if(g_quitting)
             return;
 
-        //eventlist[u].reserve(primitives.size()*2);
-
         // Create event lists from the objects
-        for(vector<const Primitive*>::iterator it = primitives.begin(); it < primitives.end(); it++)
+        for(auto& s : primitives)
         {
-            const Primitive* s = *it;
-
             // Get the bounding box of the to this bounding box culled primitive
             BoundingBox clippedbox;
             if(!s->GetClippedBoundingBox(m_bbox, clippedbox))
@@ -584,7 +555,7 @@ void KDTree::Build(vector<const Primitive*> primitives)
         }
 
         // Sort the event list
-        sort(eventlist[u].begin(), eventlist[u].end(), 
+        std::sort(eventlist[u].begin(), eventlist[u].end(), 
             [] (SAHEvent* e1, SAHEvent* e2) -> bool 
         { return e1->position < e2->position;});
     }
@@ -592,12 +563,8 @@ void KDTree::Build(vector<const Primitive*> primitives)
     BuildNode(m_root, m_bbox, eventlist, primitives, 0, 3);
 
     for(int u = 0; u < 3; u++)
-    {
-        for(vector<SAHEvent*>::iterator it = eventlist[u].begin(); it < eventlist[u].end(); it++)
-        {
-            delete *it;
-        }
-    }
+        for(auto& e : eventlist[u])
+            delete e;
 }
 
 float KDNode::IntersectRec(const Ray& _ray, const Primitive* &minprimitive, float tmin, float tmax) const
@@ -613,9 +580,8 @@ float KDNode::IntersectRec(const Ray& _ray, const Primitive* &minprimitive, floa
     {
         bool hit = false;
         float t;
-        for(vector<const Primitive*>::const_iterator it = m_primitives.begin(); it < m_primitives.end(); it++)
+        for(auto& s : m_primitives)
         {
-            const Primitive* s = (*it);
             t = s->Intersect(ray);
             if(t > 0)
             {
@@ -720,9 +686,8 @@ float KDNode::IntersectIter(const Ray& _ray, const Primitive* &minprimitive, flo
             float locmint = numeric_limits<float>::infinity();
             const Primitive* locminprimitive = 0;
             float t;
-            for(vector<const Primitive*>::const_iterator it = curnode->m_primitives.begin(); it < curnode->m_primitives.end(); it++)
+            for(auto& s : curnode->m_primitives)
             {
-                const Primitive* s = (*it);
                 t = s->Intersect(ray);
                 if(t > 0 && t < locmint)
                 {
@@ -861,9 +826,8 @@ bool KDNode::Intersect(const Ray& _ray, float tmax) const
             return false;
         if(curnode->IsLeaf())
         {
-            for(auto it = curnode->m_primitives.cbegin(); it < curnode->m_primitives.cend(); it++)
+            for(auto& s : m_primitives)
             {
-                const Primitive* s = (*it);
                 float t = s->Intersect(ray);
                 if(t > 0 && t < tmax)
                     return true;

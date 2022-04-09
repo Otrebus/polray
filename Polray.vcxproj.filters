@@ -113,9 +113,6 @@
     <ClCompile Include="source\Triangle.cpp">
       <Filter>Source Files\Shapes</Filter>
     </ClCompile>
-    <ClCompile Include="source\Shape.cpp">
-      <Filter>Source Files\Shapes</Filter>
-    </ClCompile>
     <ClCompile Include="source\Primitive.cpp">
       <Filter>Source Files\Shapes</Filter>
     </ClCompile>
@@ -123,9 +120,6 @@
       <Filter>Source Files\Shapes</Filter>
     </ClCompile>
     <ClCompile Include="source\EnvironmentLight.cpp">
-      <Filter>Source Files\Lights</Filter>
-    </ClCompile>
-    <ClCompile Include="source\PointLight.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
     <ClCompile Include="source\MeshLight.cpp">
@@ -232,9 +226,6 @@
     <ClInclude Include="source\Sphere.h">
       <Filter>Source Files\Shapes</Filter>
     </ClInclude>
-    <ClInclude Include="source\Shape.h">
-      <Filter>Source Files\Shapes</Filter>
-    </ClInclude>
     <ClInclude Include="source\Primitive.h">
       <Filter>Source Files\Shapes</Filter>
     </ClInclude>
@@ -324,9 +315,6 @@
     </ClInclude>
     <ClInclude Include="source\Draw.h">
       <Filter>Source Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="source\PointLight.h">
-      <Filter>Source Files\Lights</Filter>
     </ClInclude>
     <ClInclude Include="source\KDTree.h">
       <Filter>Source Files\Renderers</Filter>

@@ -27,7 +27,6 @@ Scene::Scene(string f)
 //------------------------------------------------------------------------------
 Scene::~Scene()
 {
-
 }
 
 void Scene::AddModel(Model* s)
@@ -94,16 +93,11 @@ void Scene::Save(Bytestream& b) const
 
     camera->Save(b);
 
-    for(auto it = lights.begin(); it < lights.end(); it++)
-    {
-        Light* l = *it;
-        l->Save(b);
-    }
-    for(auto it = models.begin(); it < models.end(); it++)
-    {
-        Model* m = *it;
-        m->Save(b);
-    }
+    for(auto& light : lights)
+        light->Save(b);
+
+    for(auto& model : models)
+        model->Save(b);
 }
 
 vector<const Primitive*> Scene::GetPrimitives() const

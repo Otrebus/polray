@@ -56,7 +56,6 @@ public:
 	TriangleMesh(string, Material*);
 	~TriangleMesh();
 	void CalculateVertexNormals();
-	void RemoveDuplicateVertices(float threshold);
 	bool ReadFromFile(string, Material* mat);
 	bool ReadMaterialFile(string, map<string, Material*>&);
 

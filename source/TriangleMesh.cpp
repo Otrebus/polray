@@ -491,12 +491,10 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 					vs.pop();
 		
 					// Check if we have two triangles at a large angle sharing this vertex
-					for(vector<MeshTriangle*>::iterator it = v->triangles.begin(); it < v->triangles.end(); it++)
+					for(auto& t1 : v->triangles)
 					{
-						MeshTriangle* t1 = *it;
-						for(vector<MeshTriangle*>::iterator it2 = it;it2 < v->triangles.end(); it2++)
+						for(auto& t2 : v->triangles)
 						{
-							MeshTriangle* t2 = *it2;
 							if(t1->GetNormal() * t2->GetNormal() < 0.7f)
 							{
 								// Create two new vertices
@@ -511,9 +509,8 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 								v1->normal = t1->GetNormal(); // Just the geometric normal for now, maybe averaged is better
 								v2->normal = t2->GetNormal();
 								// Reassign the triangles that belonged to v to either v1 or v2 depending on their normal
-								for(vector<MeshTriangle*>::iterator it3 = vold->triangles.begin(); it3 < vold->triangles.end(); it3++)
+								for(auto& t3 : vold->triangles)
 								{
-									MeshTriangle* t3 = *it3;
 									if(t3->GetNormal() * v1->normal >= 0.7f)
 									{
 										// First reassign the correct vector in the triangle
@@ -599,8 +596,7 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 		{
 			string mtl;
 			ins >> mtl;
-			map<string, Material*>::iterator it = materials.begin();
-			it = materials.find(mtl);
+			auto it = materials.find(mtl);
 			if(it == materials.end())
 				curmat = 0;
 			else
@@ -608,12 +604,8 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 		}
 	}
 
-	//vector<Shape*> shapes;
-
-	for(vector<MeshTriangle*>::iterator it = triangles.begin(); it < triangles.end(); it++)
+	for(auto& t : triangles)
 	{
-        MeshTriangle* t = (*it);
-
         MeshVertex* t0v = (MeshVertex*)(t->v0);
         MeshVertex* t1v = (MeshVertex*)(t->v1);
         MeshVertex* t2v = (MeshVertex*)(t->v2);
@@ -707,57 +699,14 @@ void TriangleMesh::CalculateVertexNormals()
 	Vector3d totalnormal(0,0,0);
 	Vector3d normal(0, 0, 0);
 
-	for(vector<MeshVertex*>::iterator it = points.begin(); it < points.end(); it++)
+	for(auto& p : points)
 	{
-		for(vector<MeshTriangle*>::iterator it2 = (*it)->triangles.begin(); it2 < (*it)->triangles.end(); it2++)
-		{
-			totalnormal += (*it2)->GetNormal();
-		}
+		for(auto& t : p->triangles)
+			totalnormal += t->GetNormal();
 		totalnormal.Normalize();
-		(*it)->normal = totalnormal;
+		p->normal = totalnormal;
 		totalnormal = Vector3d(0,0,0);
 	}
-}
-
-void TriangleMesh::RemoveDuplicateVertices(float threshold)
-{
-	vector<MeshVertex*> points2 = points;
-	// This whole thing is O(n^2) and can be optimized through the use of a KD-Tree
-	for(vector<MeshVertex*>::iterator it1 = points.begin(); it1 < points.end(); it1++)
-	{
-		for(vector<MeshVertex*>::iterator it2 = points2.begin(); it2 < points2.end(); it2++)
-		{
-			MeshVertex* v1 = *it1;
-			MeshVertex* v2 = *it2;
-
-			if(abs(v1->pos.x - v2->pos.x) < threshold && abs(v1->pos.y - v2->pos.y) < threshold &&
-			   abs(v1->pos.z - v2->pos.z) < threshold && v1 != v2)
-			{
-				points2.erase(it2);
-				for(vector<MeshTriangle*>::iterator it3 = v2->triangles.begin(); it3 < v2->triangles.end(); it3++)
-				{
-					MeshTriangle* tri = *it3;
-					if(tri->v0 == v2)
-					{
-						tri->v0 = v1;
-						v1->triangles.push_back(tri);
-					}
-
-					else if(tri->v1 == v2)
-					{
-						tri->v1 = v1;
-						v1->triangles.push_back(tri);
-					}
-					else if(tri->v2 == v2)
-					{
-						tri->v2 = v1;
-						v1->triangles.push_back(tri);
-					}
-				}
-			}
-		}
-	}
-	points = points2;
 }
 
 bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
@@ -783,9 +732,8 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
 	resultbox.c1.z = numeric_limits<float>::infinity();
 	resultbox.c2.z = -numeric_limits<float>::infinity();
 
-	for(vector<Vector3d>::iterator it = points.begin(); it < points.end(); it++)
+	for(auto v : points)
 	{
-		Vector3d v = *it;
 		resultbox.c1.x = v.x < resultbox.c1.x ? v.x : resultbox.c1.x;
 		resultbox.c2.x = v.x > resultbox.c2.x ? v.x : resultbox.c2.x;
 		resultbox.c1.y = v.y < resultbox.c1.y ? v.y : resultbox.c1.y;
@@ -802,8 +750,8 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
 
 void TriangleMesh::AddToScene(Scene& scene)
 {
-	for(vector<MeshTriangle*>::iterator it = triangles.begin(); it < triangles.end(); it++)
-		Scene::PrimitiveAdder::AddPrimitive(scene, *it);
+	for(auto& t : triangles)
+		Scene::PrimitiveAdder::AddPrimitive(scene, t);
 }
 
 

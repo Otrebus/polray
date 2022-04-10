@@ -70,17 +70,15 @@ ColorBuffer Rendering::GetImage()
 
 void Rendering::Thread()
 {
-    std::cout << "hi";
-
     while(true)
     {
-        ColorBuffer temp(image->GetXRes(), image->GetYRes());
+        ColorBuffer temp(image->GetXRes(), image->GetYRes(), Color::Black);
         unsigned int nNewSamples = renderer->GetSPP();
         renderer->Render(*(renderer->GetScene()->GetCamera()), temp);
 
         if(stopping) // If we were asked to stop rendering, the latest frame 
             break;   // was not rendered entirely and should be discarded
-
+        WaitForSingleObject(bufferMutex, INFINITE);
         for(int y = 0; y < image->GetYRes(); y++)
         {
             for(int x = 0; x < image->GetXRes(); x++)			
@@ -101,7 +99,6 @@ void Rendering::Thread()
                     accumulation->SetPixel(x, y, k);
             }
         }
-        WaitForSingleObject(bufferMutex, INFINITE);
         for(int y = 0; y < image->GetYRes(); y++)
         {
             for(int x = 0; x < image->GetXRes(); x++)

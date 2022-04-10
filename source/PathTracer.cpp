@@ -252,8 +252,6 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     colBuf.SetPixel(x, y, Color(0, 0, 0));
                 else
                 {
-                    if(x == xres/2+20 && y == yres-5)
-                        x = x;
                     float q = m_random.GetFloat(0, 1);
                     float p = m_random.GetFloat(0, 1);
                     float u, v;

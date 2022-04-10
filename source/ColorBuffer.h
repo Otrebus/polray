@@ -11,6 +11,7 @@ class ColorBuffer
 {
 public:
     ColorBuffer(int sizeX, int sizeY);
+    ColorBuffer(int sizeX, int sizeY, Color c);
     ColorBuffer(const ColorBuffer& cb);
     ColorBuffer(Bytestream& b);
     ~ColorBuffer();

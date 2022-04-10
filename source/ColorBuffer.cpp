@@ -11,6 +11,16 @@ ColorBuffer::ColorBuffer(int sizeX, int sizeY) : width(sizeX), height(sizeY)
     m_buffer = new Color[sizeX*sizeY];
 }
 
+
+//------------------------------------------------------------------------------
+// Constructor.
+//------------------------------------------------------------------------------
+ColorBuffer::ColorBuffer(int sizeX, int sizeY, Color c) : width(sizeX), height(sizeY)
+{
+    m_buffer = new Color[sizeX*sizeY];
+    Clear(c);
+}
+
 //------------------------------------------------------------------------------
 // Destructor.
 //------------------------------------------------------------------------------
@@ -66,6 +76,8 @@ void ColorBuffer::Dump(std::string filename) {
 //------------------------------------------------------------------------------
 void ColorBuffer::SetPixel(int x, int y, const Color& c)
 {
+    if(y < 3)
+        x = x;
     assert(x >= 0 && y >= 0 && x < width && y < height);
     m_buffer[y*width + x] = c;
 }
@@ -75,6 +87,8 @@ void ColorBuffer::SetPixel(int x, int y, const Color& c)
 //------------------------------------------------------------------------------
 void ColorBuffer::SetPixel(int x, int y, float r, float g, float b)
 {
+    if(y < 3)
+        x = x;
     assert(x >= 0 && y >= 0 && x < width && y < height);
     m_buffer[y*width + x] = Color(r, g, b);
 }

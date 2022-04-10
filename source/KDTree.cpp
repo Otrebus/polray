@@ -141,7 +141,7 @@ bool KDNode::IsLeaf() const
 
 void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* events, vector<const Primitive*>& primitives, int depth, int badsplits)
 {
-    if(depth > 1 || primitives.size() < 2) // TODO: fix
+    if(depth > 20 || primitives.size() < 4) // TODO: fix
     {
         node->m_primitives = primitives;
         //node->m_isLeaf = true;
@@ -824,7 +824,7 @@ bool KDNode::Intersect(const Ray& _ray, float tmax) const
             return false;
         if(curnode->IsLeaf())
         {
-            for(auto& s : m_primitives)
+            for(auto& s : curnode->m_primitives)
             {
                 float t = s->Intersect(ray);
                 if(t > 0 && t < tmax)

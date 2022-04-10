@@ -136,7 +136,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
-    auto s = std::shared_ptr<Scene> (new Scene("DebugBox.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Empty-RG.obj"));
     Vector3d camPos = Vector3d(0, 1.4, 3);
     Vector3d target = Vector3d(0, 1, 0);
     Vector3d camdir = target-camPos;
@@ -149,9 +149,9 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     Random ballsC(0);
 
     //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 0.8, 0.5), 0.11, Color(500, 500, 500));
-    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
-    auto triangle = new Triangle(Vector3d(-2, 1.2, 2), Vector3d(2, 1.2, -2), Vector3d(2, 1.2, 2));
-    auto triangle2 = new Triangle(Vector3d(-2, 1.21, -2), Vector3d(-2, 1.2, 2), Vector3d(2, 1.2, -2));
+    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.98, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
+    auto triangle = new Triangle(Vector3d(1, 1.2, 1), Vector3d(-0.8, 1.2, 1), Vector3d(1, 1.2, -1));
+    auto triangle2 = new Triangle(Vector3d(1, 1.2, -1), Vector3d(-0.8, 1.2, -1), Vector3d(-0.8, 1.2, 1));
     auto lam = new LambertianMaterial();
     lam->Kd = Color(0.2, 0.2, 0.2);
     triangle->SetMaterial(lam);
@@ -174,11 +174,10 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     boxLight->AddToScene(s);
 
-    //auto sp = new BrutePartitioning();
-    //s->SetPartitioning(sp);
+    auto sp = new BrutePartitioning();
+    s->SetPartitioning(sp);
 
-    
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 

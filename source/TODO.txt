@@ -1,0 +1,4 @@
+Unify all the different intersect() methods with different tmin/tmaxes
+Modules?
+Remove sampling components
+Unify sample/sampleE

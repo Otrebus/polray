@@ -2,6 +2,7 @@
 #define KDTREE_H
 
 #include "BoundingBox.h"
+#include "SpatialPartitioning.h"
 class Primitive;
 
 #include <cmath>
@@ -38,7 +39,7 @@ public:
     int splitdir;
 };
 
-class KDTree
+class KDTree : public SpatialPartitioning
 {
 public:
     static float CalculateCost(int type, int samples);

@@ -21,7 +21,7 @@ public:
     virtual unsigned int GetType() const;
 //private:
 
-    Color TraceRayRecursive(Ray ray, int bounces, const KDTree& kdt, Primitive* ignore, float contribution) const;
+    Color TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, float contribution) const;
 
     vector<Light*> m_lights;
     vector<Primitive*> m_primitives;

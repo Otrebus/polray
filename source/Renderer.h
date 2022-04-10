@@ -36,7 +36,6 @@ public:
     static const unsigned int typeLightTracer = 2;
     static const unsigned int typeBDPT = 3;
 protected:
-    KDTree m_tree;
     std::shared_ptr<Scene> scene;
 
     bool stopping;

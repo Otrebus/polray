@@ -33,46 +33,46 @@ unsigned int PathTracer::GetSPP() const
     return m_SPP;
 }
 
-//Color PathTracer::TracePathPrimitive(const Ray& ray) const
-//{
-//	const Primitive* minprimitive;
-//	IntersectionInfo info;
-//
-//	if(m_tree.Intersect(ray, minprimitive) < 0)
-//		return Color(0, 0, 0);
-//	minprimitive->GenerateIntersectionInfo(ray, info);
-//
-//	if(m_random.GetFloat(0, 1) > 0.8f)
-//		return Color(0, 0, 0);
-//
-//    Ray out;
-//	Vector3d dir;
-//
-//    Light* l;
-//    if((l = info.GetMaterial()->GetLight()) && info.GetGeometricNormal() * info.GetDirection() < 0)
-//        return l->GetIntensity()/0.8f;
-//
-//    while(true)
-//	{
-//        Vector3d N_g = info.GetGeometricNormal();
-//        if(N_g*info.GetDirection() > 0)
-//            N_g = -N_g;
-//		dir = Vector3d(m_random.GetFloat(-1, 1), m_random.GetFloat(-1, 1), m_random.GetFloat(-1, 1));
-//
-//		out.origin = info.GetPosition() + 0.0001f*N_g;
-//		if(dir.GetLength() > 1)
-//			continue;
-//		else if(dir*N_g < 0)
-//			dir = -dir;
-//		dir.Normalize();
-//		break;
-//	}
-//    Color mod = info.GetMaterial()->BRDF(info, dir)*2*F_PI*abs(info.GetNormal()*dir);
-//
-//	out.direction = dir;
-//	Color c = mod*TracePathPrimitive(out)/0.8f;
-//	return c;
-//}
+Color PathTracer::TracePathPrimitive(const Ray& ray) const
+{
+	const Primitive* minprimitive = nullptr;
+	IntersectionInfo info;
+
+	if(scene->Intersect(ray, minprimitive) < 0)
+		return Color(0, 0, 0);
+	minprimitive->GenerateIntersectionInfo(ray, info);
+
+	if(m_random.GetFloat(0, 1) > 0.8f)
+		return Color(0, 0, 0);
+
+    Ray out;
+	Vector3d dir;
+
+    Light* l;
+    if((l = info.GetMaterial()->GetLight()) && info.GetGeometricNormal() * info.GetDirection() < 0)
+        return l->GetIntensity()/0.8f;
+
+    while(true)
+	{
+        Vector3d N_g = info.GetGeometricNormal();
+        if(N_g*info.GetDirection() > 0)
+            N_g = -N_g;
+		dir = Vector3d(m_random.GetFloat(-1, 1), m_random.GetFloat(-1, 1), m_random.GetFloat(-1, 1));
+
+		out.origin = info.GetPosition() + 0.0001f*N_g;
+		if(dir.GetLength() > 1)
+			continue;
+		else if(dir*N_g < 0)
+			dir = -dir;
+		dir.Normalize();
+		break;
+	}
+    Color mod = info.GetMaterial()->BRDF(info, dir)*2*F_PI*abs(info.GetNormal()*dir);
+
+	out.direction = dir;
+	Color c = mod*TracePath(out)/0.8f;
+	return c;
+}
 
 //Color PathTracer::TracePath(const Ray& ray) const
 //{
@@ -252,6 +252,8 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     colBuf.SetPixel(x, y, Color(0, 0, 0));
                 else
                 {
+                    if(x == xres/2+20 && y == yres-5)
+                        x = x;
                     float q = m_random.GetFloat(0, 1);
                     float p = m_random.GetFloat(0, 1);
                     float u, v;
@@ -274,7 +276,7 @@ unsigned int PathTracer::GetType() const
 
 Color PathTracer::TracePath(const Ray& ray) const
 {
-    const Primitive* minprimitive;
+    const Primitive* minprimitive = nullptr;
     IntersectionInfo info;
     Ray outRay, inRay;
     Color pathColor(1.f, 1.f, 1.f);
@@ -290,7 +292,7 @@ Color PathTracer::TracePath(const Ray& ray) const
 
     do
     {
-        if(m_tree.Intersect(inRay, minprimitive) < 0)
+        if(scene->Intersect(inRay, minprimitive) < 0)
         {
         //    if(scene->GetEnvironmentLight())
         //      return scene->GetEnvironmentLight()->GetRadiance(outRay.direction);

@@ -1,11 +1,14 @@
 #include "Renderer.h"
 #include "Primitive.h"
+#include "KDTree.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene)
 {
     stopping = false;
     this->scene = scene;
-    m_tree.Build(scene->GetPrimitives());
+    if(!scene->partitioning)
+        scene->partitioning = new KDTree();
+    scene->partitioning->Build(scene->primitives);
     vector<Light*> lights = scene->GetLights();
     lightTree = new LightNode(lights);
     m_lights = lights;
@@ -17,8 +20,8 @@ Renderer::~Renderer()
 
 bool Renderer::ShootRay(const Ray& ray, IntersectionInfo& info) const
 {
-    const Primitive* primitiveHit;
-    if(m_tree.Intersect(ray, primitiveHit) >= 0)
+    const Primitive* primitiveHit = nullptr;
+    if(scene->Intersect(ray, primitiveHit) >= 0)
     {
         primitiveHit->GenerateIntersectionInfo(ray, info);
         return true;
@@ -40,7 +43,7 @@ bool Renderer::TraceShadowRay(const Ray& ray, float tmax) const
         return false;
     return true;*/
     Ray& unconstRay = const_cast<Ray&>(ray);
-    return !m_tree.Intersect(ray, tmax);
+    return !scene->Intersect(ray, tmax);
 }
 
 std::shared_ptr<Scene> Renderer::GetScene() const

@@ -150,6 +150,7 @@
     <ClCompile Include="source\AshikhminShirley.cpp" />
     <ClCompile Include="source\BDPT.cpp" />
     <ClCompile Include="source\BoundingBox.cpp" />
+    <ClCompile Include="source\BrutePartitioning.cpp" />
     <ClCompile Include="source\Bytestream.cpp" />
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\Color.cpp" />
@@ -192,6 +193,7 @@
     <ClCompile Include="source\Renderer.cpp" />
     <ClCompile Include="source\Rendering.cpp" />
     <ClCompile Include="source\Scene.cpp" />
+    <ClCompile Include="source\SpatialPartitioning.h" />
     <ClCompile Include="source\Utils.cpp" />
     <ClCompile Include="source\Sphere.cpp" />
     <ClCompile Include="source\SphereLight.cpp" />
@@ -208,6 +210,7 @@
     <ClInclude Include="source\AshikhminShirley.h" />
     <ClInclude Include="source\BDPT.h" />
     <ClInclude Include="source\BoundingBox.h" />
+    <ClInclude Include="source\BrutePartitioning.h" />
     <ClInclude Include="source\Bytestream.h" />
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\Color.h" />
@@ -260,6 +263,9 @@
     <ClInclude Include="source\TriangleMesh.h" />
     <ClInclude Include="source\Vector3d.h" />
     <ClInclude Include="source\Vertex3d.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="source\TODO.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -51,11 +51,11 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
 
     while(depth < 3 || m_random.GetFloat(0.f, 1.f) < rr)
     {
-        const Primitive* hitPrimitive;
+        const Primitive* hitPrimitive = nullptr;
         IntersectionInfo info;
         BDVertex* lastV = path.back();
 
-        if(m_tree.Intersect(lastV->out, hitPrimitive) < 0)
+        if(scene->Intersect(lastV->out, hitPrimitive) < 0)
             break;
         hitPrimitive->GenerateIntersectionInfo(lastV->out, info);
 
@@ -110,11 +110,11 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
 
     while(depth < 3 || m_random.GetFloat(0.f, 1.f) < rr)
     {
-        const Primitive* hitPrimitive;
+        const Primitive* hitPrimitive = nullptr;
         IntersectionInfo info;
         BDVertex* lastV = path.back();
 
-        if(m_tree.Intersect(lastV->out, hitPrimitive) < 0)
+        if(scene->Intersect(lastV->out, hitPrimitive) < 0)
             break;
         hitPrimitive->GenerateIntersectionInfo(lastV->out, info);
 

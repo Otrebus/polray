@@ -1,6 +1,6 @@
-#ifndef SCENE_H
-#define SCENE_H
+#pragma once
 
+#include <type_traits>
 #include <string>
 #include <unordered_set>
 #include <Windows.h>
@@ -12,6 +12,7 @@
 #include "Bytestream.h"
 #include "Model.h"
 
+#include "SpatialPartitioning.h"
 #include "CsgIntersection.h"
 #include "CsgSphere.h"
 #include "CsgCylinder.h"
@@ -85,10 +86,6 @@ public:
     void Save(Bytestream& b) const;
 
 	void Build();
-	//void Render(ColorBuffer& colBuf);
-
-	//void SetRenderer(Renderer* rnd);
-	//Renderer* GetRenderer() const;
 
 	void AddModel(Model*);
     void AddLight(Light*);
@@ -102,18 +99,26 @@ public:
     const EnvironmentLight* GetEnvironmentLight() const;
     void SetEnvironmentLight(EnvironmentLight* light);
 
+    void SetPartitioning(SpatialPartitioning* partitioning);
+    SpatialPartitioning* GetPartitioning() const;
+
+    bool Intersect(const Ray&, float tmax) const;
+    float Intersect(const Ray&, const Primitive*&) const;
+    float Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax) const;
+
     friend class LightAdder;
     friend class PrimitiveAdder;
     friend class Renderer;
 private:
 	Camera* camera;
-	KDTree* tree;
 
 	vector<Light*> lights;
     vector<Model*> models;
     vector<const Primitive*> primitives;
     unordered_set<Material*> materials;
     EnvironmentLight* envLight;
+
+protected:
+    SpatialPartitioning* partitioning;
 };
 
-#endif

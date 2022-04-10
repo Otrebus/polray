@@ -66,12 +66,12 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
         do
         {
-            const Primitive* minprimitive;
+            const Primitive* minprimitive = nullptr;
             IntersectionInfo info;
             Ray bounceRay;
 
             // Figure out if and where the current ray segment hits something
-            if(m_tree.Intersect(ray, minprimitive) < 0.0f)
+            if(scene->Intersect(ray, minprimitive) < 0.0f)
                 break;
             minprimitive->GenerateIntersectionInfo(ray, info);
             

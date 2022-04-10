@@ -39,6 +39,9 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{dcb247f0-d5ac-43e9-8f98-53c781b0cbae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Lights\EnvironmentLights">
+      <UniqueIdentifier>{c50c8409-bdfb-4472-a2c1-56baab79e891}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="source\Bytestream.cpp">
@@ -50,13 +53,7 @@
     <ClCompile Include="source\ColorBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Cubemap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\PreethamSky.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="source\Scene.cpp">
@@ -118,9 +115,6 @@
     </ClCompile>
     <ClCompile Include="source\Sphere.cpp">
       <Filter>Source Files\Shapes</Filter>
-    </ClCompile>
-    <ClCompile Include="source\EnvironmentLight.cpp">
-      <Filter>Source Files\Lights</Filter>
     </ClCompile>
     <ClCompile Include="source\MeshLight.cpp">
       <Filter>Source Files\Lights</Filter>
@@ -208,6 +202,21 @@
     </ClCompile>
     <ClCompile Include="source\Utils.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="source\SpatialPartitioning.h">
+      <Filter>Source Files\Spatial subdivision</Filter>
+    </ClCompile>
+    <ClCompile Include="source\BrutePartitioning.cpp">
+      <Filter>Source Files\Spatial subdivision</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Cubemap.cpp">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PreethamSky.cpp">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+    </ClCompile>
+    <ClCompile Include="source\EnvironmentLight.cpp">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -316,9 +325,6 @@
     <ClInclude Include="source\Draw.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="source\KDTree.h">
-      <Filter>Source Files\Renderers</Filter>
-    </ClInclude>
     <ClInclude Include="source\Bytestream.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -328,13 +334,7 @@
     <ClInclude Include="source\ColorBuffer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\Cubemap.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\Model.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\PreethamSky.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="source\Scene.h">
@@ -361,9 +361,6 @@
     <ClInclude Include="source\Logger.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="source\EnvironmentLight.h">
-      <Filter>Source Files\Lights</Filter>
-    </ClInclude>
     <ClInclude Include="source\GeometricRoutines.h">
       <Filter>Source Files\Math</Filter>
     </ClInclude>
@@ -379,5 +376,23 @@
     <ClInclude Include="source\Utils.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="source\KDTree.h">
+      <Filter>Source Files\Spatial subdivision</Filter>
+    </ClInclude>
+    <ClInclude Include="source\BrutePartitioning.h">
+      <Filter>Source Files\Spatial subdivision</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Cubemap.h">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+    </ClInclude>
+    <ClInclude Include="source\PreethamSky.h">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+    </ClInclude>
+    <ClInclude Include="source\EnvironmentLight.h">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="source\TODO.txt" />
   </ItemGroup>
 </Project>

@@ -37,6 +37,7 @@
 #include "SphereLight.h"
 #include "PreethamSky.h"
 #include "MeshLight.h"
+#include "BrutePartitioning.h"
 
 KDTree* tree;
 Texture* normalmap;
@@ -44,12 +45,12 @@ Texture* test;
 Texture* bl;
 Cubemap* cubemap;
 
-#define BALLSBOX
+#define EMPTYBOX
+//#define BALLSBOX
 //#define CONFERENCE
 // #define BALLBOX
 //#define LEGOCAR
 //#define KITCHEN
-//#define EMPTYBOX
 //#define DODGE
 //#define TEAPOT
 //#define OCLBOX
@@ -59,6 +60,128 @@ Cubemap* cubemap;
 
 void MakeScene(std::shared_ptr<Renderer>& r)
 {
+#ifdef EMPTYBOX
+/*
+    Matrix3d rotatebunny (-1, 0, 0, 0,
+                     0, 1, 0, 0,
+                     0, 0, -1, 0,
+                     0, 0, 0, 1);
+
+    Matrix3d translatebunny (1, 0, 0, 0,
+                        0, 1, 0, -0.0f,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+
+    Matrix3d scalebunny (0.53f, 0, 0, 0,
+                    0, 0.53f, 0, 0,
+                    0, 0, 0.53f, 0,
+                    0, 0, 0, 1);*/
+    /*
+        Matrix3d rotatebunny2 (-1, 0, 0, 0,
+                     0, 1, 0, 0,
+                     0, 0, -1, 0,
+                     0, 0, 0, 1);
+
+    Matrix3d translatebunny2 (1, 0, 0, 0.5,
+                        0, 1, 0, 0,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+
+    Matrix3d scalebunny2 (0.23f, 0, 0, 0,
+                    0, 0.23f, 0, 0,
+                    0, 0, 0.23f, 0,
+                    0, 0, 0, 1);
+
+        Matrix3d rotatebunny3 (-1, 0, 0, 0,
+                     0, 1, 0, 0,
+                     0, 0, -1, 0,
+                     0, 0, 0, 1);
+
+    Matrix3d translatebunny3 (1, 0, 0, -0.5,
+                        0, 1, 0, 0,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+
+    Matrix3d scalebunny3 (0.23f, 0, 0, 0,
+                    0, 0.23f, 0, 0,
+                    0, 0, 0.23f, 0,
+                    0, 0, 0, 1);*/
+
+    //MeshLight* bunny = new MeshLight(Color(10, 10, 10), "bunny.obj");
+    //bunny->Transform(translatebunny*(scalebunny*rotatebunny));
+    /*
+        TriangleMesh* bunny2 = new TriangleMesh("bunny.obj", 0);
+        bunny2->Transform(translatebunny2*(scalebunny2*rotatebunny2));
+
+        PhongMaterial* bunmat = new PhongMaterial();
+        bunmat->alpha = 30;
+        bunmat->Kd = Color(0, 0.7, 0.1);
+        bunmat->Ks = Color(0.05, 0.05, 0.05);
+            TriangleMesh* bunny3 = new TriangleMesh("bunny.obj", bunmat);
+            bunny3->Transform(translatebunny3*(scalebunny3*rotatebunny3));*/
+
+
+
+    /*
+    Matrix3d translate (1, 0, 0, 0,
+                        0, 1, 0, -0.6f,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+
+    Matrix3d scale (0.43f, 0, 0, 0,
+                    0, 0.43f, 0, 0,
+                    0, 0, 0.43f, 0,
+                    0, 0, 0, 1);
+
+    TriangleMesh teapot("teapotwithnormals.obj", 0);
+    teapot.Transform(translate*scale);*/
+    //Renderer* boxrenderer = new RayTracer();
+    auto s = std::shared_ptr<Scene> (new Scene("DebugBox.obj"));
+    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d target = Vector3d(0, 1, 0);
+    Vector3d camdir = target-camPos;
+    camdir.Normalize();
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
+
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
+
+    //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 0.8, 0.5), 0.11, Color(500, 500, 500));
+    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
+    auto triangle = new Triangle(Vector3d(-2, 1.2, 2), Vector3d(2, 1.2, -2), Vector3d(2, 1.2, 2));
+    auto triangle2 = new Triangle(Vector3d(-2, 1.21, -2), Vector3d(-2, 1.2, 2), Vector3d(2, 1.2, -2));
+    auto lam = new LambertianMaterial();
+    lam->Kd = Color(0.2, 0.2, 0.2);
+    triangle->SetMaterial(lam);
+    triangle2->SetMaterial(lam);
+    triangle->AddToScene(*s);
+    triangle2->AddToScene(*s);
+
+    auto a = new AshikhminShirley();
+    a->Rs = Color(0.5, 0.4, 0.6);
+    a->Rd = Color(0.3, 0.4, 0.6);
+    a->n = 200;
+    Sphere* sphere = new Sphere(Vector3d(-0.8, 1.1, 0.2), 0.11);
+    sphere->SetMaterial(a);
+    //sphere->AddToScene(*s);
+    
+    auto g = new DielectricMaterial();
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.8, 0.3), 0.11);
+    sphere2->SetMaterial(g);
+    //sphere2->AddToScene(*s);
+
+    boxLight->AddToScene(s);
+
+    //auto sp = new BrutePartitioning();
+    //s->SetPartitioning(sp);
+
+    
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+
+#endif
+
 #ifdef SHINYBALL
     auto s = std::shared_ptr<Scene> (new Scene("cube.obj"));
     Vector3d camPos = Vector3d(0.9f, 0.9f, 2.5f);
@@ -321,12 +444,14 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     confcameradir.Normalize();
 
     auto s = std::shared_ptr<Scene>(new Scene("conference.obj"));
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
-    auto camera = new PinholeCamera(Vector3d(0, 0, 1.0f), Vector3d(28.3f, 3.0f, 5.8f) + confcameradir * 3, confcameradir, XRES, YRES, 65);
+
+    auto camera = new PinholeCamera(Vector3d(0, 0, 1.0f), Vector3d(20.3f, 3.0f, 5.8f) + confcameradir * 3, confcameradir, XRES, YRES, 65);
     s->SetCamera(camera);
     //PointLight* conferencelight = new PointLight(Vector3d(19.0f, 11.0f, 8.0f), Color(1000.0f, 1000.0f, 1000.0f), &conference);
-    AreaLight* conferencelight = new AreaLight(Vector3d(14.0f, 11.0f, 8.78f), Vector3d(0.0f, 3.0f, 0.0f), Vector3d(3.0f, 0.0f, 0.0f), Color(300, 300, 300), s);
+    AreaLight* conferencelight = new AreaLight(Vector3d(14.0f, 11.0f, 8.78f), Vector3d(0.0f, 3.0f, 0.0f), Vector3d(3.0f, 0.0f, 0.0f), Color(300000, 300000, 300000), s);
     conferencelight->AddToScene(s);
+
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 

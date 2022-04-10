@@ -66,7 +66,7 @@ public:
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
-protected:	
+//protected:	
 	vector<MeshTriangle*> triangles;
 	vector<MeshVertex*> points;
     vector<Material*> materials;

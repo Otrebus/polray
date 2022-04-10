@@ -48,6 +48,16 @@ void Scene::SetCamera(Camera* cam)
     camera = cam;
 }
 
+void Scene::SetPartitioning(SpatialPartitioning* partitioning)
+{
+    this->partitioning = partitioning;
+}
+
+SpatialPartitioning* Scene::GetPartitioning() const
+{
+    return partitioning;
+}
+
 Camera* Scene::GetCamera() const
 {
     return camera;
@@ -119,3 +129,19 @@ void Scene::SetEnvironmentLight(EnvironmentLight* l)
 {
     envLight = l;
 }
+
+// I wish there was some way of just forwarding these parameters,
+//   template<typename... Args> decltype(auto) Intersect(Args... args) const { return partitioning->Intersect(args...); }
+// almost works but doesn't make the ...args parameters references
+
+bool Scene::Intersect(const Ray& ray, float tmax) const {
+    return partitioning->Intersect(ray, tmax);
+};
+
+float Scene::Intersect(const Ray& ray, const Primitive*& p) const {
+    return partitioning->Intersect(ray, p);
+};
+
+float Scene::Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax) const {
+    return partitioning->Intersect(ray, primitive, tmin, tmax);
+};

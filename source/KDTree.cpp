@@ -1,5 +1,3 @@
-
-
 #ifndef KDTREE_H
 #include "kdtree.h"
 #include "trianglemesh.h"
@@ -143,7 +141,7 @@ bool KDNode::IsLeaf() const
 
 void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* events, vector<const Primitive*>& primitives, int depth, int badsplits)
 {
-    if(depth > 20 || primitives.size() < 2)
+    if(depth > 1 || primitives.size() < 2) // TODO: fix
     {
         node->m_primitives = primitives;
         //node->m_isLeaf = true;
@@ -768,12 +766,12 @@ float KDTree::Intersect(const Ray& ray, const Primitive* &primitive) const
 
 float KDTree::Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax) const
 {
-    return m_root->IntersectIter(ray, primitive, tmin, tmax);
+    return m_root->IntersectRec(ray, primitive, tmin, tmax);
 }
 
 float KDNode::Intersect(const Ray& _ray, const Primitive* &minprimitive) const
 {
-return -1.0f;
+    return -1.0f;
 }
 
 float KDNode::GetSplitPos() const

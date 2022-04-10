@@ -32,7 +32,7 @@ void RayTracer::Setup(const vector<const Primitive*>& primitives, const vector<L
 //------------------------------------------------------------------------------
 Color RayTracer::TraceRay(const Ray& ray) const
 {
-    Color c = TraceRayRecursive(ray, 50, m_tree, 0, 1.0f);
+    Color c = TraceRayRecursive(ray, 50, 0, 1.0f);
 
     return c;
 }
@@ -77,7 +77,7 @@ void RayTracer::Render(Camera& cam, ColorBuffer& colBuf)
 //------------------------------------------------------------------------------
 // Helper function for TraceRay
 //------------------------------------------------------------------------------
-Color RayTracer::TraceRayRecursive(Ray ray, int bounces, const KDTree& kdt, Primitive* ignore, float contribution) const
+Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, float contribution) const
 {
     if(contribution < 0.005f)
         return Color(0, 0, 0);
@@ -93,7 +93,7 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, const KDTree& kdt, Prim
     const Primitive* minprimitive = 0;
 
     int numint = numintersects;
-    float t = kdt.Intersect(ray, minprimitive);
+    float t = scene->Intersect(ray, minprimitive);
 
     numint = numintersects - numint;
 
@@ -173,8 +173,8 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, const KDTree& kdt, Prim
 bool RayTracer::TraceShadowRay(const Ray& ray, float tmax) const
 {
     Ray& unconstRay = const_cast<Ray&>(ray);
-    const Primitive* dummy;
-    float result = m_tree.Intersect(ray, dummy);
+    const Primitive* dummy = nullptr;
+    float result = scene->Intersect(ray, dummy);
     if(result < tmax - tmax*0.00001f)
         return false;
     return true;

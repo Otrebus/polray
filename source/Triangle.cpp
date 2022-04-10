@@ -400,8 +400,41 @@ void Triangle::ComputeTangentSpaceVectors()
 
 bool Triangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
 {
-    resultbox = GetBoundingBox();
-    return true;
+	const int positive = 1;
+	const int negative = -1;
+	vector<Vector3d> points;
+	points.push_back(v0.pos);	
+	points.push_back(v1.pos);
+	points.push_back(v2.pos);
+
+	ClipPolygonToAAP(0, positive, clipbox.c1.x, points); // Left side of the bounding box
+	ClipPolygonToAAP(0, negative, clipbox.c2.x, points); // Right
+	ClipPolygonToAAP(1, positive, clipbox.c1.y, points); // Bottom
+	ClipPolygonToAAP(1, negative, clipbox.c2.y, points); // Top
+	ClipPolygonToAAP(2, positive, clipbox.c1.z, points); // Front
+	ClipPolygonToAAP(2, negative, clipbox.c2.z, points); // Back
+
+	resultbox.c1.x = numeric_limits<float>::infinity();
+	resultbox.c2.x = -numeric_limits<float>::infinity();
+	resultbox.c1.y = numeric_limits<float>::infinity();
+	resultbox.c2.y = -numeric_limits<float>::infinity();
+	resultbox.c1.z = numeric_limits<float>::infinity();
+	resultbox.c2.z = -numeric_limits<float>::infinity();
+
+	for(auto v : points)
+	{
+		resultbox.c1.x = v.x < resultbox.c1.x ? v.x : resultbox.c1.x;
+		resultbox.c2.x = v.x > resultbox.c2.x ? v.x : resultbox.c2.x;
+		resultbox.c1.y = v.y < resultbox.c1.y ? v.y : resultbox.c1.y;
+		resultbox.c2.y = v.y > resultbox.c2.y ? v.y : resultbox.c2.y;
+		resultbox.c1.z = v.z < resultbox.c1.z ? v.z : resultbox.c1.z;
+		resultbox.c2.z = v.z > resultbox.c2.z ? v.z : resultbox.c2.z;
+	}
+
+	if(points.size() > 2)
+		return true;
+	else
+		return false;
 }
 
 void Triangle::AddToScene(Scene& scene)

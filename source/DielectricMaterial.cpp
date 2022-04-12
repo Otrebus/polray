@@ -25,27 +25,14 @@ DielectricMaterial::~DielectricMaterial()
 // cases are treated as the same component of the brdf since they are both 
 // specular and reflect the same amount of light for any given bounce.
 //------------------------------------------------------------------------------
-Color DielectricMaterial::GetSampleE(const IntersectionInfo& info, Ray& out, 
-    float& pdf, float& rpdf, unsigned char& component, bool adjoint) const
+Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-    pdf = 1;  // This is not true, of course, which is indicated by the
-    rpdf = 1; // specularity of this brdf
-    component = 1;
+    auto pdf = 1;  // This is not true, of course, which is indicated by the
+    auto rpdf = 1; // specularity of this brdf
 
-    return GetSample(info, out, adjoint); // We can just call the non-extended sampling 
-}                                         // function here
-
-//------------------------------------------------------------------------------
-// A sample is generated in either the reflected or refracted direction - both 
-// cases are treated as the same component of the brdf since they are both 
-// specular and reflect the same amount of light for any given bounce.
-//------------------------------------------------------------------------------
-Color DielectricMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const
-{
     Vector3d _normal = info.GetNormal();
     Vector3d normal;
 
-    Vector3d& wo = out.direction;
     const Vector3d& wi = info.GetDirection();
     const Vector3d& Ng = info.GetGeometricNormal();
     Vector3d& Ns = normal;
@@ -71,10 +58,13 @@ Color DielectricMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool
 
     if(d < 0) // Total internal reflection
     {
+        Ray out;
         out.direction = Reflect(info.GetDirection(), Ns);
         out.direction.Normalize();
+        auto wo = out.direction;
         out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
-        return adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
+        auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
+        return Sample(color, out, pdf, rpdf, true);
     }
     Vector3d refraction = wi*(n1/n2) + Ns*(cosi*(n1/n2) - sqrt(d));
     refraction.Normalize();
@@ -85,17 +75,23 @@ Color DielectricMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool
 
     if(m_rnd.GetFloat(0, 1) > R) // Refracted
     {
+        Ray out;
         out.direction = refraction;
         out.direction.Normalize();
+        auto wo = out.direction;
         out.origin = info.GetPosition() + 0.0002f*(wo*Ng > 0 ? Ng : -Ng);
-        return adjoint ? abs((wi*Ns/(wi*Ng))*(wo*Ng/(wo*Ns))) * Color::Identity : (n1/n2)*(n1/n2)*Color::Identity;
+        auto color = adjoint ? abs((wi*Ns/(wi*Ng))*(wo*Ng/(wo*Ns))) * Color::Identity : (n1/n2)*(n1/n2)*Color::Identity;
+        return Sample(color, out, pdf, rpdf, true);
     }
     else // Reflected
     {
+        Ray out;
         out.direction = Reflect(info.GetDirection(), Ns);
         out.direction.Normalize();
+        auto wo = out.direction;
         out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
-        return adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
+        auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
+        return Sample(color, out, pdf, rpdf, true);
     }
 }
 
@@ -111,34 +107,11 @@ Color DielectricMaterial::BRDF(const IntersectionInfo& info,
 }                          // are reflectant is 0
 
 //------------------------------------------------------------------------------
-// Returns the value of the BRDF component in the direction given in direction 
-// out relative to the given intersectioninfo. In the case of any specular 
-// material the BRDF is 0 in all directions, since it is effectively a 
-// distribution.
-//------------------------------------------------------------------------------
-Color DielectricMaterial::ComponentBRDF(const IntersectionInfo& info, 
-    const Vector3d& out, unsigned char component) const
-{
-    assert(component == 1);
-    return Color(0, 0, 0);
-}
-
-//------------------------------------------------------------------------------
 // Returns the assigned light of this material, which is always 0 (none).
 //------------------------------------------------------------------------------
 Light* DielectricMaterial::GetLight() const
 {
     return light;
-}
-
-//------------------------------------------------------------------------------
-// Only specular rays can be sampled from a dielectric material so this function
-// always returns true.
-//------------------------------------------------------------------------------
-bool DielectricMaterial::IsSpecular(unsigned char component) const
-{
-    assert(component == 1);	
-    return true;
 }
 
 //------------------------------------------------------------------------------
@@ -162,8 +135,7 @@ void DielectricMaterial::ReadProperties(stringstream& ss)
 // never be used in practice since it would only cause NaNs in any integrator.
 // Hence the actual value is returned as 1, just to avoid any potential issues.
 //------------------------------------------------------------------------------
-float DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out,
-    unsigned char component, bool adjoint) const
+float DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
     assert(component == 1);
     return 1;

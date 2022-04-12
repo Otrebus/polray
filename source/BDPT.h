@@ -31,7 +31,7 @@ private:
     float rr, pdf, rpdf, brdf, rbrdf;
     Color alpha;
     IntersectionInfo info;
-    unsigned char component;
+    bool specular;
     float camU, camV; // Only used by the eye point
 };
 

@@ -12,6 +12,7 @@
 #include <Windows.h>
 #include <math.h>
 #include "Random.h"
+#include "Sample.h"
 
 class Ray;
 
@@ -23,16 +24,13 @@ public:
     DielectricMaterial();
     ~DielectricMaterial();
 
-    Color GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const;
-    Color GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
 
     Color BRDF(const IntersectionInfo& info, const Vector3d& out) const;
-    Color ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const;
 
     Light* GetLight() const;
-    bool IsSpecular(unsigned char component) const;
     
-        virtual float PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const;
+    virtual float PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
 
     void ReadProperties(stringstream& ss);
 

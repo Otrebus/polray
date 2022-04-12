@@ -1,5 +1,6 @@
 #include "EmissiveMaterial.h"
 #include "Bytestream.h"
+#include "Sample.h"
 
 EmissiveMaterial::EmissiveMaterial()
 {
@@ -21,22 +22,13 @@ EmissiveMaterial::~EmissiveMaterial()
         delete texture;
 }
 
-Color EmissiveMaterial::GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const
+Sample EmissiveMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-    pdf = 2*F_PI;
-    rpdf = 2*F_PI;
+    auto pdf = 2*F_PI;
+    auto rpdf = 2*F_PI;
 
-    component = 1;
-
-    out = Ray(info.GetPosition(), -info.GetDirection());
-    return Color(0.0, 0.0, 0.0); // Blackbody
-}
-
-
-Color EmissiveMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const
-{
-    out = Ray(info.GetPosition(), -info.GetDirection());
-    return Color(0.0, 0.0, 0.0); // Blackbody
+    auto out = Ray(info.GetPosition(), -info.GetDirection());
+    return Sample(Color(0.0, 0.0, 0.0), out, pdf, rpdf, false); // Blackbody
 }
 
 Light* EmissiveMaterial::GetLight() const
@@ -49,22 +41,11 @@ Color EmissiveMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out) 
     return Color(0.0, 0.0, 0.0); // Blackbody
 }
 
-Color EmissiveMaterial::ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const
-{
-    return Color(0.0f, 0.0f, 0.0f);
-}
-
-bool EmissiveMaterial::IsSpecular(unsigned char component) const
-{
-    assert(component == 1);
-    return false;
-}
-
 void EmissiveMaterial::ReadProperties(stringstream& ss)
 {
 }
 
-float EmissiveMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const
+float EmissiveMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
     return 0;
 }

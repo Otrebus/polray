@@ -106,11 +106,11 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
             camRay.direction.Normalize();
             centerRay.direction.Normalize();*/
 
-            float dummy;
-            unsigned char lastSample;
-            Color c = info.GetMaterial()->GetSampleE(info, bounceRay, dummy, dummy, lastSample, true);
+            auto sample = info.GetMaterial()->GetSample(info, true);
+            auto c = sample.color;
+            bounceRay = sample.outRay;
 
-            if(TraceShadowRay(camRay, camRayLength) &&  cam.GetPixelFromRay(camRay, xpixel, ypixel, u, v))
+            if(TraceShadowRay(camRay, camRayLength) && cam.GetPixelFromRay(camRay, xpixel, ypixel, u, v))
             {
                 float camcos = abs(-camRay.direction*cam.dir);
                 float pixelArea = (float)cam.GetPixelArea();
@@ -118,7 +118,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
                 //float surfcos = info.GetNormal()*camRay.direction;
                 surfcos = abs(surfcos);
 
-                Color brdf = info.GetMaterial()->ComponentBRDF(info, camRay.direction, lastSample);
+                Color brdf = info.GetMaterial()->BRDF(info, camRay.direction);
                 // Flux to radiance and stuff involving probability and sampling of the camera
                 Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP);
                 pixelColor*=abs(info.GetDirection()*info.GetNormal())/abs(info.GetDirection()*info.GetGeometricNormal());

@@ -22,16 +22,13 @@ public:
     LambertianMaterial();
     ~LambertianMaterial();
 
-    Color GetSample(const IntersectionInfo&, Ray& out, bool adjoint) const;
-    virtual Color GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo&, bool adjoint) const;
     Color BRDF(const IntersectionInfo& info, const Vector3d& out) const;
-    virtual Color ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const;
 
     Light* GetLight() const;
-    bool IsSpecular(unsigned char component) const;
 
     void ReadProperties(stringstream& ss);	
-        virtual float PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const;
+    float PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

@@ -148,10 +148,10 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     Random ballsC(0);
 
-    //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 0.8, 0.5), 0.11, Color(500, 500, 500));
-    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.98, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
-    auto triangle = new Triangle(Vector3d(1, 1.2, 1), Vector3d(-0.8, 1.2, 1), Vector3d(1, 1.2, -1));
-    auto triangle2 = new Triangle(Vector3d(1, 1.2, -1), Vector3d(-0.8, 1.2, -1), Vector3d(-0.8, 1.2, 1));
+    SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.98, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
+    auto triangle = new Triangle(Vector3d(1, 1.2, 1.1), Vector3d(-0.8, 1.2, 1.1), Vector3d(1, 1.2, -1.1));
+    auto triangle2 = new Triangle(Vector3d(1, 1.2, -1.1), Vector3d(-0.8, 1.2, -1.1), Vector3d(-0.8, 1.2, 1.1));
     auto lam = new LambertianMaterial();
     lam->Kd = Color(0.2, 0.2, 0.2);
     triangle->SetMaterial(lam);
@@ -160,15 +160,15 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     triangle2->AddToScene(*s);
 
     auto a = new AshikhminShirley();
-    a->Rs = Color(0.5, 0.4, 0.6);
+    a->Rs = Color(0.9, 0.9, 0.9);
     a->Rd = Color(0.3, 0.4, 0.6);
     a->n = 200;
-    Sphere* sphere = new Sphere(Vector3d(-0.8, 1.1, 0.2), 0.11);
+    Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.4), 0.31);
     sphere->SetMaterial(a);
-    //sphere->AddToScene(*s);
+    sphere->AddToScene(*s);
     
     auto g = new DielectricMaterial();
-    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.8, 0.3), 0.11);
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.3), 0.11);
     sphere2->SetMaterial(g);
     //sphere2->AddToScene(*s);
 

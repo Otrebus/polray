@@ -23,9 +23,9 @@ public:
 
     float Pdf(const IntersectionInfo& info, const Vector3d& out) const;
 
-    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const;
-    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const;
-    virtual Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, unsigned int component) const;
+    Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const;
+    Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const;
+    Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo) const;
 
     Color SampleRay(Ray& ray, Vector3d& Normal, float& areaPdf, float& anglePdf) const;
     void SamplePoint(Vector3d& point, Vector3d& Normal) const;

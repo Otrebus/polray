@@ -192,6 +192,7 @@
     <ClCompile Include="source\RayTracer.cpp" />
     <ClCompile Include="source\Renderer.cpp" />
     <ClCompile Include="source\Rendering.cpp" />
+    <ClCompile Include="source\Sample.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\SpatialPartitioning.h" />
     <ClCompile Include="source\Utils.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="source\RayTracer.h" />
     <ClInclude Include="source\Renderer.h" />
     <ClInclude Include="source\Rendering.h" />
+    <ClInclude Include="source\Sample.h" />
     <ClInclude Include="source\Scene.h" />
     <ClInclude Include="source\Utils.h" />
     <ClInclude Include="source\Sphere.h" />

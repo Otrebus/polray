@@ -1,3 +1,4 @@
+Clean up Ashikhmin & other materials
 Unify all the different intersect() methods with different tmin/tmaxes
 Unify the above in KDTree
 Modules?

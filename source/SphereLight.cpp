@@ -91,7 +91,7 @@ void SphereLight::AddToScene(std::shared_ptr<Scene> scn)
     s->SetMaterial(material_);
 }
 
-Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const
+Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const
 {
     Vector3d toLight = position_ - info.GetPosition();
     Vector3d normal = info.GetNormal();
@@ -110,7 +110,7 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
             float cosphi = abs(normal*toLight);
             float costheta = abs(toLight*lightNormal);
             Color c;
-            c = info.GetMaterial()->ComponentBRDF(info, toLight, component)
+            c = info.GetMaterial()->BRDF(info, toLight)
                 *costheta*cosphi*intensity_*GetArea()/(2*d*d);
             return c;
         }
@@ -118,7 +118,7 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
     return Color(0, 0, 0);
 }
 
-Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const
+Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const
 {
     Vector3d toLight = position_ - info.GetPosition();
     Vector3d normal = info.GetNormal();
@@ -138,10 +138,8 @@ Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const Inters
             float costheta = abs(toLight*lightNormal);
             Color c;
             Material* mat = info.GetMaterial();			
-            c = mat->ComponentBRDF(info, toLight, component)
-                     *costheta*cosphi*intensity_*GetArea()/(2*d*d);
-            float brdfPdf = costheta*mat->PDF(info, toLight, 
-                                              component, false)/(d*d);
+            c = mat->BRDF(info, toLight)*costheta*cosphi*intensity_*GetArea()/(2*d*d);
+            float brdfPdf = costheta*mat->PDF(info, toLight, false)/(d*d);
             float lightPdf = 2.0f/GetArea();
             return c;
         }
@@ -152,8 +150,7 @@ Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const Inters
 
 Color SphereLight::DirectHitMIS(const Renderer* renderer, 
                                 const IntersectionInfo& lastInfo, 
-                                const IntersectionInfo& thisInfo, 
-                                unsigned int component) const
+                                const IntersectionInfo& thisInfo) const
 {
     Vector3d v = thisInfo.position - lastInfo.position;
     float d = v.GetLength();
@@ -161,6 +158,6 @@ Color SphereLight::DirectHitMIS(const Renderer* renderer,
     float costheta = abs(v*thisInfo.normal);
     float lightPdf = 2.0f/GetArea();
     Material* mat = lastInfo.GetMaterial();
-    float brdfPdf = costheta*mat->PDF(lastInfo, v, component, false)/(d*d);
+    float brdfPdf = costheta*mat->PDF(lastInfo, v, false)/(d*d);
     return intensity_/(1.0f + lightPdf*lightPdf/(brdfPdf*brdfPdf));
 }

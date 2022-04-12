@@ -41,12 +41,11 @@ public:
     virtual float Pdf(const IntersectionInfo& info, const Vector3d& out) const = 0;
     Color GetIntensity() const;
 
-    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const = 0;
-    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const = 0;
+    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const = 0;
+    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const = 0;
     virtual Color DirectHitMIS(const Renderer* renderer,
                                const IntersectionInfo& lastInfo,
-                               const IntersectionInfo& thisInfo,
-                               unsigned int component) const = 0;
+                               const IntersectionInfo& thisInfo) const = 0;
 
     //virtual Vector3d SamplePoint (Vector3d& point, Vector3d& normal) const = 0;
     virtual float GetArea() const = 0;

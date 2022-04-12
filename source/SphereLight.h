@@ -24,9 +24,9 @@ public:
 
     virtual float Pdf(const IntersectionInfo& info, const Vector3d& out) const;
 
-    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const;
-    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, unsigned int component) const;
-    virtual Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, unsigned int component) const;
+    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const;
+    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const;
+    virtual Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo) const;
 
     virtual float GetArea() const;
     virtual void AddToScene(std::shared_ptr<Scene>);

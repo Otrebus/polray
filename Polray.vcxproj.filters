@@ -218,6 +218,9 @@
     <ClCompile Include="source\EnvironmentLight.cpp">
       <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClCompile>
+    <ClCompile Include="source\Sample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -391,6 +394,7 @@
     <ClInclude Include="source\EnvironmentLight.h">
       <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClInclude>
+    <ClInclude Include="source\Sample.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="source\TODO.txt" />

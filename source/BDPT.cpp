@@ -43,7 +43,7 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     float costheta = abs(camPoint->out.direction*cam.dir);
     float lastPdf = camPoint->pdf = 
                     1/(cam.GetPixelArea()*costheta*costheta*costheta);
-    Color lastSample = costheta*Color::Identity/lastPdf;
+    Color lastSampleColor = costheta*Color::Identity/lastPdf;
     lastPdf = camPoint->pdf = 1/(4*costheta*costheta*costheta);
     path.push_back(camPoint);
 
@@ -66,12 +66,18 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
         v.Normalize();
         newV->pdf = lastPdf*(abs(info.GetGeometricNormal()
                          *info.GetDirection()))/(lSqr);
-        newV->alpha = lastV->alpha*lastSample;
+        newV->alpha = lastV->alpha*lastSampleColor;
         Material* mat = info.GetMaterial();
-        lastSample = mat->GetSampleE(info, newV->out, lastPdf, lastV->rpdf,
-                                     newV->component, false);
+
+        auto sample = mat->GetSample(info, false);
+        newV->out = sample.outRay;
+        auto lastPdf = sample.pdf;
+        lastV->rpdf = sample.rpdf;
+        newV->specular = sample.specular;
+        lastSampleColor = sample.color;
+
         newV->rr = depth < 3 ? 1 : lastV->rr*rr;
-        rr = min(lastSample.GetLuminance(), 1);
+        rr = min(lastSampleColor.GetLuminance(), 1);
         if(newV->alpha.GetLuminance() <= 0 && info.GetMaterial()->GetLight() != light)
         {
             delete newV;
@@ -97,15 +103,14 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     BDVertex* lightPoint = new BDVertex();
     float rr = 0.7f;
     float lastPdf;
-    Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal,
+    Color lastSampleColor = light->SampleRay(lightPoint->out, lightPoint->info.normal,
                      lightPoint->pdf, lastPdf);
     lightPoint->alpha = light->GetArea()*light->GetIntensity();
     lightPoint->rr = 1;
     lightPoint->info.normal = lightPoint->info.normal;
     lightPoint->info.geometricnormal = lightPoint->info.normal;
     lightPoint->info.position = lightPoint->out.origin;
-//    Color lastSample = Color::Identity*(lightPoint->info.normal
-//                                        *lightPoint->out.direction)/lastPdf;
+
     path.push_back(lightPoint);
 
     while(depth < 3 || m_random.GetFloat(0.f, 1.f) < rr)
@@ -125,13 +130,19 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
         v.Normalize();
         newV->pdf = lastPdf*(abs(info.geometricnormal
                                   *info.direction))/(lSqr);
-        newV->alpha = lastV->alpha*lastSample;
+        newV->alpha = lastV->alpha*lastSampleColor;
         Material* mat = info.material;
-        lastSample = mat->GetSampleE(info, newV->out, lastPdf, lastV->rpdf, 
-                                     newV->component, true);
+        auto sample = mat->GetSample(info, true);
+
+        newV->out = sample.outRay;
+        auto lastPdf = sample.pdf;
+        lastV->rpdf = sample.rpdf;
+        newV->specular = sample.specular;
+        lastSampleColor = sample.color;
+
         newV->rr = depth < 3 ? 1 : lastV->rr*rr;
         rr = min(newV->alpha.GetLuminance(), 1);
-        if(lastSample.GetLuminance() <= 0)
+        if(lastSampleColor.GetLuminance() <= 0)
         {
             delete newV;
             return path.size();
@@ -191,11 +202,11 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
 
     if(s > 1)
         result *= modifier*lastL->info.material->
-                  ComponentBRDF(lastL->info, -c.direction, lastL->component)
+                  BRDF(lastL->info, -c.direction)
                   /lastL->rr;
     if(t > 1)
         result *= lastE->info.material->
-                  ComponentBRDF(lastE->info, c.direction, lastE->component)
+                  BRDF(lastE->info, c.direction)
                   /lastE->rr;
     return result;
 }
@@ -208,7 +219,7 @@ float BDPT::UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
     for(auto it = lightPath.cbegin() + 1; it < lightPath.cbegin() + s; it++)
     {
         BDVertex* v = *it;
-        if(v->info.GetMaterial()->IsSpecular(v->component))
+        if(v->specular)
         {
             weight -= 1;
             wasSpec = true;
@@ -222,7 +233,7 @@ float BDPT::UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
     for(auto it = eyePath.cbegin() + (t - 1); it > eyePath.cbegin(); it--)
     {
         BDVertex* v = *it;
-        if(v->info.GetMaterial()->IsSpecular(v->component))
+        if(v->specular)
         {
             weight -= 1;
             wasSpec = true;
@@ -253,7 +264,7 @@ float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
     for(int i = 1; i < s+t-1; i++)
     {
         BDVertex* v = i < s ? lightPath[i] : eyePath[s+t-i-1];
-        if(v->info.GetMaterial()->IsSpecular(v->component))
+        if(v->specular)
             specular[i] = true;
     }
 
@@ -274,7 +285,7 @@ float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         float newPdf;
         if(s > 1)
             newPdf = lastL->info.GetMaterial()->
-                     PDF(info, out, lastL->component, true);
+                     PDF(info, out, true);
         else
             newPdf = light->Pdf(lastL->info, out);
         forwardProbs[s] = newPdf*abs(lastE->info.geometricnormal*out)/(lSqr);
@@ -302,8 +313,7 @@ float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         if(t == 1)
             newPdf = 1/(4*costheta*costheta*costheta);
         else
-            newPdf = lastE->info.GetMaterial()->PDF(info, out, 
-                                                    lastE->component, false);
+            newPdf = lastE->info.GetMaterial()->PDF(info, out, false);
         backwardProbs[s-1] = newPdf*abs(lastL->info.geometricnormal*out)/lSqr;
     }
 

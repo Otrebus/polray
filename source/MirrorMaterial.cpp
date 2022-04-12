@@ -13,22 +13,7 @@ MirrorMaterial::~MirrorMaterial()
 {
 }
 
-Color MirrorMaterial::GetSampleE(const IntersectionInfo& info, Ray& out, float& pdf, float& rpdf, unsigned char& component, bool adjoint) const
-{
-    //Vector3d normal = info.GetGeometricNormal();
-    Vector3d normal = info.GetNormal();
-    out.direction = Reflect(info.GetDirection(), normal);
-    out.origin = info.GetPosition() + normal*0.0001f;
-    out.direction.Normalize();
-
-    pdf = 1;
-    rpdf = 1;
-    component = 1;
-
-    return Color(1, 1, 1);
-}
-
-Color MirrorMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adjoint) const
+Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
     Vector3d Ng, Ns;
     const Vector3d in = info.GetDirection();
@@ -46,6 +31,7 @@ Color MirrorMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adj
 
     Vector3d normal = Ns;
 
+    Ray out;
     out.direction = Reflect(info.GetDirection(), normal);
     out.origin = info.GetPosition() + normal*0.0001f;
     out.direction.Normalize();
@@ -54,31 +40,20 @@ Color MirrorMaterial::GetSample(const IntersectionInfo& info, Ray& out, bool adj
     float fac2 = (out.direction*Ng)*(in*Ng);
 
     if(fac1 > 0 || fac2 > 0)
-        return Color(0, 0, 0);
+        return Sample(Color(0, 0, 0), out, 1, 1, true);
 
-    return (adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1);
+    auto color = (adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1);
+    return Sample(color, out, 1, 1, false);
 }
 
 Color MirrorMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out) const
 {
-    return Color(0, 0, 0); // The chance that the out, in vectors are reflecant is effectively 0
-}
-
-Color MirrorMaterial::ComponentBRDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component) const
-{
-    assert(component == 1);
-    return Color(0, 0, 0);
+    return Color(0, 0, 0); // The chance that the out, in vectors are reflectant is effectively 0
 }
 
 Light* MirrorMaterial::GetLight() const
 {
     return light;
-}
-
-bool MirrorMaterial::IsSpecular(unsigned char component) const
-{
-    assert(component == 1);	
-    return true;
 }
 
 void MirrorMaterial::ReadProperties(stringstream& ss)
@@ -92,9 +67,8 @@ void MirrorMaterial::ReadProperties(stringstream& ss)
     }
 }
 
-float MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, unsigned char component, bool adjoint) const
+float MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
-    assert(component == 1);
     return 1;
 }
 

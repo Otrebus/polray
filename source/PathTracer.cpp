@@ -282,7 +282,6 @@ Color PathTracer::TracePath(const Ray& ray) const
     bool sampledLight = false;
     inRay = ray;
     float rr = 1.0f;
-    unsigned char lastComp;
 
     float lightWeight;
     float r = m_random.GetFloat(0.0f, 1.0f);
@@ -309,16 +308,17 @@ Color PathTracer::TracePath(const Ray& ray) const
                         ? light->GetIntensity()/lightWeight : Color(0, 0, 0) );
         }
 
-        float dummy;
-        Color c = material->GetSampleE(info, outRay, dummy, dummy, lastComp, false);
+        auto sample = material->GetSample(info, false);
+        auto c = sample.color;
+        outRay = sample.outRay;
 
         // No use to sample using next event estimation if the material
         // is specular since the BRDF will be 0
-        if(material->IsSpecular(1))
+        if(sample.specular)
             sampledLight = false;
         else
         {
-            finalColor += pathColor*light->NextEventEstimation(this, info, lastComp)/lightWeight;
+            finalColor += pathColor*light->NextEventEstimation(this, info)/lightWeight;
             sampledLight = true;
         }
         pathColor *= c/0.7f;

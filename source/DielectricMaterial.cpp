@@ -137,7 +137,6 @@ void DielectricMaterial::ReadProperties(stringstream& ss)
 //------------------------------------------------------------------------------
 float DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
-    assert(component == 1);
     return 1;
 }
 

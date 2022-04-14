@@ -43,7 +43,7 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     float costheta = abs(camPoint->out.direction*cam.dir);
     float lastPdf = camPoint->pdf = 
                     1/(cam.GetPixelArea()*costheta*costheta*costheta);
-    Color lastSampleColor = costheta*Color::Identity/lastPdf;
+    Color lastSample = costheta*Color::Identity/lastPdf;
     lastPdf = camPoint->pdf = 1/(4*costheta*costheta*costheta);
     path.push_back(camPoint);
 
@@ -66,18 +66,18 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
         v.Normalize();
         newV->pdf = lastPdf*(abs(info.GetGeometricNormal()
                          *info.GetDirection()))/(lSqr);
-        newV->alpha = lastV->alpha*lastSampleColor;
+        newV->alpha = lastV->alpha*lastSample;
         Material* mat = info.GetMaterial();
 
         auto sample = mat->GetSample(info, false);
         newV->out = sample.outRay;
-        auto lastPdf = sample.pdf;
+        lastPdf = sample.pdf;
         lastV->rpdf = sample.rpdf;
         newV->specular = sample.specular;
-        lastSampleColor = sample.color;
-
         newV->rr = depth < 3 ? 1 : lastV->rr*rr;
-        rr = min(lastSampleColor.GetLuminance(), 1);
+        lastSample = sample.color;
+
+        rr = min(lastSample.GetLuminance(), 1);
         if(newV->alpha.GetLuminance() <= 0 && info.GetMaterial()->GetLight() != light)
         {
             delete newV;
@@ -103,7 +103,7 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     BDVertex* lightPoint = new BDVertex();
     float rr = 0.7f;
     float lastPdf;
-    Color lastSampleColor = light->SampleRay(lightPoint->out, lightPoint->info.normal,
+    Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal,
                      lightPoint->pdf, lastPdf);
     lightPoint->alpha = light->GetArea()*light->GetIntensity();
     lightPoint->rr = 1;
@@ -130,19 +130,19 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
         v.Normalize();
         newV->pdf = lastPdf*(abs(info.geometricnormal
                                   *info.direction))/(lSqr);
-        newV->alpha = lastV->alpha*lastSampleColor;
+        newV->alpha = lastV->alpha*lastSample;
         Material* mat = info.material;
         auto sample = mat->GetSample(info, true);
 
         newV->out = sample.outRay;
-        auto lastPdf = sample.pdf;
+        lastPdf = sample.pdf;
         lastV->rpdf = sample.rpdf;
         newV->specular = sample.specular;
-        lastSampleColor = sample.color;
+        lastSample = sample.color;
 
         newV->rr = depth < 3 ? 1 : lastV->rr*rr;
         rr = min(newV->alpha.GetLuminance(), 1);
-        if(lastSampleColor.GetLuminance() <= 0)
+        if(lastSample.GetLuminance() <= 0)
         {
             delete newV;
             return path.size();

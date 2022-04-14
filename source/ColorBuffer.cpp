@@ -76,8 +76,6 @@ void ColorBuffer::Dump(std::string filename) {
 //------------------------------------------------------------------------------
 void ColorBuffer::SetPixel(int x, int y, const Color& c)
 {
-    if(y < 3)
-        x = x;
     assert(x >= 0 && y >= 0 && x < width && y < height);
     m_buffer[y*width + x] = c;
 }

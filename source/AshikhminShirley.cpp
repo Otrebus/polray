@@ -33,20 +33,8 @@ void AshikhminShirley::ReadProperties(stringstream& ss)
 
 Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-    Vector3d wi = -info.GetDirection();
-
-    Vector3d Ng, Ns;
-    const Vector3d in = info.GetDirection();
-
-    Ng = in*info.GetGeometricNormal() < 0 ? info.GetGeometricNormal() 
-        : -info.GetGeometricNormal();
-
-    Ns = Ng*info.GetNormal() > 0 ? info.GetNormal() : -info.GetNormal();
-
-    Vector3d normal = adjoint ? Ng : Ns;
-
-    float df = (Rd*(Color(1.0f, 1.0f, 1.0f)-Rs)).GetMax()*(1-pow(1-(abs(normal*wi))/2, 5));
-    float sp = (Rs + (Color(1.0f, 1.0f, 1.0f) - Rs)*(pow(1.0f-abs(in*normal), 5.0f))).GetMax();
+    float df = Rd.GetMax();
+    float sp = Rs.GetMax();
 
     float r = rnd.GetFloat(0.0000f, df + sp);
 
@@ -72,8 +60,8 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         SampleHemisphereCos(r1, r2, N, dir);
         const Vector3d& w_o = dir;
 
-        float pdf = w_o*N/F_PI;
-        float rpdf = w_i*adjN/F_PI;
+        float pdf = w_o*N/F_PI*df/(sp+df);
+        float rpdf = w_i*adjN/F_PI*df/(sp+df);
         if(rpdf < 0)
             rpdf = 0;
         if(pdf < 0)
@@ -89,6 +77,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
             return Sample(Color(0, 0, 0), outRay, pdf, rpdf, false);
         }
 
+        // TODO: the below is just the brdf, divided by F_PI, simplify
         Color mod = (28.0f/23.0f)*Rd*(Color::Identity - Rs)*(1-pow(1-abs(N_s*w_i)/2.0f, 5.0f))*(1-pow(1-(N_s*w_o)/2.0f, 5.0f));
 
         auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0f)*mod/(df/(df+sp));
@@ -120,12 +109,8 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         outRay.direction.Normalize();
         Vector3d& w_o = outRay.direction;
 
-        float pdf = pow(N_s*hv, n)*(n + 1)/((w_i*hv)*8*F_PI);
-        float rpdf = pow(N_s*hv, n)*(n + 1)/((w_o*hv)*8*F_PI);
-        if(rpdf < 0)
-            rpdf = 0;
-        if(pdf < 0)
-            pdf = 0;
+        float pdf = pow(N_s*hv, n)*(n + 1)/((w_o*hv)*8*F_PI)*sp/(df+sp);
+        float rpdf = pdf;
         
         if(w_i*N_s < 0 || w_o*N_s < 0 || w_o*N_g < 0 || w_i*N_g < 0) 
         {
@@ -144,8 +129,6 @@ Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out) 
 {
     float df = Rd.GetMax();
     float sp = Rs.GetMax();
-
-    assert(component == 1 || component == 2);
 
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();

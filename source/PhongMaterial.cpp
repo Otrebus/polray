@@ -52,8 +52,8 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
 
         const Vector3d& w_o = dir;
 
-        auto pdf = w_o*N/F_PI;
-        auto rpdf = w_i*adjN/F_PI;
+        auto pdf = w_o*N/F_PI*df/(df+sp);
+        auto rpdf = w_i*adjN/F_PI*df/(df+sp);
         if(rpdf < 0)
             rpdf = 0;
         if(pdf < 0)
@@ -106,7 +106,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
         }
 
         // FIXME these should probably be equal
-        pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*F_PI);
+        pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*F_PI)*sp/(sp+df);
         //rpdf = pow(-info.GetDirection()*Reflect(-out.direction, N_s), alpha)*(alpha+1)/(2*F_PI);
         Color mod = abs(out.direction*N)*Ks*float(alpha + 2)/float(alpha + 1);
 
@@ -162,6 +162,9 @@ void PhongMaterial::ReadProperties(stringstream& ss)
 
 float PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
+    float df = Kd.GetMax();
+    float sp = Ks.GetMax();
+
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();
     const Vector3d& in = -info.GetDirection();
@@ -177,8 +180,11 @@ float PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool
 
     Vector3d normal = adjoint ? N_g : N_s;
 
+    auto a = out*normal/F_PI;
+
     Vector3d up = Reflect(info.GetDirection(), N_s);
-    return out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
+    auto b = out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
+    return a*df/(sp+df) + b*sp/(sp+df);
 }
 
 void PhongMaterial::Save(Bytestream& stream) const

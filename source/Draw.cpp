@@ -159,10 +159,20 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     triangle->AddToScene(*s);
     triangle2->AddToScene(*s);
 
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.9, 0.9, 0.9);
+    //a->Kd = Color(0.0, 0.0, 0.0);
+    //a->alpha = 20;
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.5, 0.5, 0.5);
+    //a->Kd = Color(0.5, 0.5, 0.5);
+    //a->alpha = 20;
+
     auto a = new AshikhminShirley();
-    a->Rs = Color(0.9, 0.9, 0.9);
-    a->Rd = Color(0.3, 0.4, 0.6);
-    a->n = 200;
+    a->Rd = Color(0, 0, 0);
+    a->Rs = Color(0.85, 0.85, 0.85);
+    a->n = 20;
     Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.4), 0.31);
     sphere->SetMaterial(a);
     sphere->AddToScene(*s);

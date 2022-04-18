@@ -44,7 +44,7 @@ extern int frames;
 
 #define MAX_DEPTH 50
 #define XRES 320
-#define YRES 200
+#define YRES 240
 //#define DETERMINISTIC
 
 LRESULT WINAPI  WndProc(HWND, UINT, WPARAM, LPARAM);

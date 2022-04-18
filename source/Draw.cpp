@@ -141,7 +141,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     Vector3d target = Vector3d(0, 1, 0);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
-    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
+    s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
     Random ballsR(47);
     Random test(1);
@@ -169,10 +170,25 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //a->Kd = Color(0.5, 0.5, 0.5);
     //a->alpha = 20;
 
-    auto a = new AshikhminShirley();
-    a->Rd = Color(0, 0, 0);
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0, 0, 0);
+    //a->Rs = Color(0.85, 0.85, 0.85);
+    //a->n = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0.85, 0.85, 0.85);
+    //a->Rs = Color(0, 0, 0);
+    /*a->Rd = Color(0, 0, 0);
     a->Rs = Color(0.85, 0.85, 0.85);
-    a->n = 20;
+    a->n = 1;*/
+
+    /*auto a = new PhongMaterial();
+    a->Ks = Color(0.5, 0.5, 0.5);
+    a->Kd = Color(0, 0, 0);
+    a->alpha = 0;*/
+    auto a = new LambertianMaterial();
+    a->Kd = Color(0.5, 0.5, 0.5);
+
     Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.4), 0.31);
     sphere->SetMaterial(a);
     sphere->AddToScene(*s);
@@ -184,10 +200,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     boxLight->AddToScene(s);
 
-    auto sp = new BrutePartitioning();
-    s->SetPartitioning(sp);
-
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 

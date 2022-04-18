@@ -21,6 +21,8 @@ public:
     Vector3d GetDirection() const;
     Vector3d GetGeometricNormal() const;
 
+    bool specular;
+
     Vector3d geometricnormal;
     Vector3d direction;
     Vector3d position;

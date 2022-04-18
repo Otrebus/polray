@@ -15,7 +15,7 @@ MirrorMaterial::~MirrorMaterial()
 
 Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-    Vector3d Ng, Ns;
+	Vector3d Ng, Ns;
     const Vector3d in = info.GetDirection();
 
     if(in*info.GetGeometricNormal() < 0)
@@ -32,18 +32,11 @@ Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) con
     Vector3d normal = Ns;
 
     Ray out;
-    out.direction = Reflect(info.GetDirection(), normal);
-    out.origin = info.GetPosition() + normal*0.0001f;
-    out.direction.Normalize();
+	out.direction = Reflect(info.GetDirection(), normal);
+	out.origin = info.GetPosition() + normal*0.0001f;
+	out.direction.Normalize();
 
-    float fac1 = (out.direction*Ns)*(in*Ns);
-    float fac2 = (out.direction*Ng)*(in*Ng);
-
-    if(fac1 > 0 || fac2 > 0)
-        return Sample(Color(0, 0, 0), out, 1, 1, true);
-
-    auto color = (adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1);
-    return Sample(color, out, 1, 1, false);
+    return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1), out, 1, 1, true);
 }
 
 Color MirrorMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out) const

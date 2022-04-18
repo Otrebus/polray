@@ -30,6 +30,7 @@ public:
     void SetLensRadius(float lensRadius);
 
     float GetPixelArea() const;
+    float GetFilmArea() const;
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

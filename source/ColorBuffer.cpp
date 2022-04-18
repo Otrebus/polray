@@ -85,8 +85,6 @@ void ColorBuffer::SetPixel(int x, int y, const Color& c)
 //------------------------------------------------------------------------------
 void ColorBuffer::SetPixel(int x, int y, float r, float g, float b)
 {
-    if(y < 3)
-        x = x;
     assert(x >= 0 && y >= 0 && x < width && y < height);
     m_buffer[y*width + x] = Color(r, g, b);
 }

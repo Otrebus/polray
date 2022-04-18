@@ -20,6 +20,7 @@ public:
     void SampleAperture(Vector3d& pos, float& u, float& v) const;
 
     float GetPixelArea() const;
+    float GetFilmArea() const;
     
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

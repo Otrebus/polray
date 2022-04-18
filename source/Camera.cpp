@@ -46,6 +46,14 @@ float Camera::GetPixelArea() const
     return halfwidth*halfwidth*4.0f*((float)yres/float(xres))/float(xres*yres);
 }
 
+//------------------------------------------------------------------------------
+// Returns the area of the film plane.
+//------------------------------------------------------------------------------
+float Camera::GetFilmArea() const
+{
+    return (float)yres/(float)xres*halfwidth*halfwidth*4.0f;
+}
+
 int Camera::GetXRes() const
 {
     return xres;

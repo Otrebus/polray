@@ -60,14 +60,13 @@ protected:
     Color EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath, 
                    int s, int t, Light* light) const;
     float WeighPath(int s, int t, vector<BDVertex*>& lightPath, 
-                    vector<BDVertex*>& eyePath, Light* light) const;
+                    vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
 
     float UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
-                      vector<BDVertex*>& eyePath, Light* light) const;
+                      vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
     float PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
-                      vector<BDVertex*>& eyePath, Light* light) const;
+                      vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
 
-    int m_weightMethod;
     int m_spp;
     mutable Random m_random;
 };

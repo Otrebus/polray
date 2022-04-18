@@ -99,7 +99,7 @@ bool ThinLensCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, float u, fl
 
 
 //------------------------------------------------------------------------------
-// Since the aperture is a finite point, this function will always return (0,0).
+// Randomly samples the camera aperture
 //------------------------------------------------------------------------------
 void ThinLensCamera::SampleAperture(Vector3d& pos, float& u, float& v) const
 {

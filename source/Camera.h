@@ -24,6 +24,7 @@ public:
     void SetFov(float fov);
 
     float GetPixelArea() const;
+    float GetFilmArea() const;
     int GetXRes() const;
     int GetYRes() const;
 

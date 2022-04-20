@@ -74,9 +74,6 @@ float Triangle::Intersect(const Ray& ray) const
     D.y = ray.direction.y;
     D.z = ray.direction.z;
 
-    // THIS IS HORRIBLE FOR MULTITHREADING
-    //numintersects++;
-
     Vector3d E1 = v1.pos-v0.pos;
     Vector3d E2 = v2.pos-v0.pos;
     Vector3d T = ray.origin - v0.pos;

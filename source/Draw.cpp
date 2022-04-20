@@ -131,7 +131,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     Matrix3d scale (0.43f, 0, 0, 0,
                     0, 0.43f, 0, 0,
                     0, 0, 0.43f, 0,
-                    0, 0, 0, 1);
+                    0, 0, 0, 1
 
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
@@ -141,7 +141,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     Vector3d target = Vector3d(0, 1, 0);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
-    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
     s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
     Random ballsR(47);
@@ -192,7 +192,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.4), 0.31);
     sphere->SetMaterial(a);
     sphere->AddToScene(*s);
-    
+
     auto g = new DielectricMaterial();
     Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.3), 0.11);
     sphere2->SetMaterial(g);
@@ -200,7 +200,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     boxLight->AddToScene(s);
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 

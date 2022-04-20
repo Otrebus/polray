@@ -22,29 +22,13 @@
         #define aGamma 0.055
         #define bGamma (1.0 + aGamma)
 
-float timer1, timer2, timer3;
-int lastframe;
-bool mouseclicked;
 bool g_isActive;
 bool g_quitting;
 Gfx* gfx;
 Input* input;
-Timer* timer;
-Rasterizer* rasterizer;
 Logger logger(LOG_FILENAME);
-bool* grid;
-int* texture;
 LPDIRECTDRAWSURFACE7 bitmapsurface;
 DDSURFACEDESC2 ddsd;
-//int* ptr;
-Timer* totaltime;
-int currenttick;
-int numintersects;
-int numcalls;
-int nodes;
-int nodetriangles;
-float rendertime;
-float setuptime;
 int maxdepth;
 //ColorBuffer* colorbuffer;
 HANDLE bufferMutex;
@@ -105,26 +89,6 @@ void radixsort(float* fnumbers, float* fsorted, int n)
         sorted[hL[numbers[i] >> 22]++] = numbers[i] ^ (((numbers[i] >> 31) - 1) | 0x80000000);
 }
 
-float GetSortTime(int n)
-{
-    Random r;
-    SAHEvent** events;
-
-        events = new SAHEvent*[n];
-
-        for(int i = 0; i < n; i++)
-        {
-            events[i] = new SAHEvent(0, r.GetFloat(-10, 10), 0);
-        }
-
-    float t = timer->GetTime();
-    
-    sort(events, events + n, [] (SAHEvent* e1, SAHEvent* e2) -> bool 
-        { return e1->position < e2->position; });
-
-    delete [] events;
-    return timer->GetTime() - t;
-}
 /*
 float GetRadixSortTime(int n)
 {
@@ -156,23 +120,11 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     const int xres = XRES;
     const int yres = YRES;
     bool windowed = true;
-    setuptime = 0;
-    rendertime = 0;
-    numintersects = 0;
-    numcalls = 0;
-    mouseclicked = false;
-    nodes = 0;
-    frames = 0;
-
-    nCurrentFrame = -1;
-    int nLastFrame = 0;
 
     bufferMutex = CreateMutex(0, false, 0);
 
     gfx = new Gfx();
     input = new Input();
-    timer = new Timer();
-    totaltime = new Timer();
 
     /*
     Scene* pScene;
@@ -282,9 +234,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         return 1;
     }
 
-    timer->Reset();
-    //int frames = 0;
-
     memset(&ddsd, 0, sizeof(ddsd));
     ddsd.dwSize = sizeof(ddsd);
     ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
@@ -298,14 +247,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         return false;
     }
 
-     //cubemap = new Cubemap((wstring)L"brightday2_positive_z.bmp", (wstring)L"brightday2_negative_z.bmp", (wstring)L"brightday2_negative_x.bmp", (wstring)L"brightday2_positive_x.bmp", (wstring)L"brightday2_positive_y.bmp", (wstring)L"brightday2_negative_y.bmp");
-
      gfx->ClearScreen(255, 255, 255);
-
-     totaltime->Reset();
-
-     //HANDLE h = CreateEvent(0, true, false, "blah");
-     //_beginthread(mainThread, 0, (void*)h);
 
      int blah;
      blah = sizeof(std::shared_ptr<Material>);
@@ -330,7 +272,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
     while(!g_quitting)
     {
-        currenttick = GetTickCount();
         if(!g_isActive && !gfx->IsWindowed())
         {
             // Sleep if alt-tabbed out from fullscreen mode
@@ -356,7 +297,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
                     }
                 }
                 ReleaseMutex(bufferMutex);
-                nLastFrame = nCurrentFrame;
             }
 
             gfx->Unlock();
@@ -365,9 +305,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
             {
                 if(msg.message == WM_QUIT)
                     g_quitting = true;
-                else if(msg.message == WM_KEYDOWN && msg.wParam == 'P') {
+                else if(msg.message == WM_KEYDOWN && msg.wParam == 'P')
                     rendering->GetImage().Dump("screenshot.bmp");
-                }
                 else if(msg.message == WM_KEYDOWN && msg.wParam == VK_ESCAPE)
                     g_quitting = true;
                 else if(msg.message == WM_KEYDOWN && msg.wParam == VK_F5)
@@ -388,41 +327,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
         Sleep(1);
     }
 
-//	WaitForSingleObject(h, INFINITE);
-
     DestroyWindow(hWnd);
-
-    float total_time = totaltime->GetTime();
-    /*
-    stringstream sstr;
-    std::string str1 = sstr.str();
-    sstr.precision(3);
-    sstr << "Total time: " << (float) total_time << "\n";
-    sstr << "Average render fps: " << ((float) frames / rendertime) << "\n";
-    sstr << "Average setup fps: " << ((float) frames / setuptime) << "\n";
-    sstr << "Meshtri intersect: " << numintersects << "\n";
-    sstr << "Rays cast: " << numcalls << "\n";
-    sstr << "Ratio: " << (float) numintersects / float (numcalls) << "\n";
-    sstr << "Nodes: " << nodes << "\n";
-    sstr << "Node triangles: " << nodetriangles << "\n";
-    sstr << "Triangles per node: " << (float)nodetriangles/(float)nodes;*/
-
-    Sleep(100);
-
-    //logger.Box(sstr.str());
-
-    stringstream sstr;
-    std::string str1 = sstr.str();
-    sstr.precision(3);
-
-    /*sstr << numintersects << " " << frames << " " << float(numintersects)/(float(XRES*YRES)*float(frames));
-    logger.Box(sstr.str());*/
-
-    delete gfx;
-    delete input;
-    delete test;
-    delete cubemap;
-    return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -457,11 +362,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     case WM_MOUSEMOVE:
     {
         input->UpdateCursorPos();
-        break;
-    }
-    case WM_LBUTTONUP:
-    {
-        mouseclicked = true;
         break;
     }
     default:

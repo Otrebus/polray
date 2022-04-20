@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef BDPT_H
 #define BDPT_H
 
@@ -5,6 +7,7 @@
 #include "Random.h"
 #include "IntersectionInfo.h"
 #include "LightTree.h"
+#include "Sample.h"
 
 #define WEIGHT_UNIFORM 1
 #define WEIGHT_POWER 2
@@ -28,8 +31,11 @@ public:
     friend class BDPT;
 private:
     Ray out;
-    float rr, pdf, rpdf, brdf, rbrdf;
-    Color alpha;
+    float rr; // The russian roulette factor
+    float pdf; // The forward area pdf
+    float rpdf; // The reverse area pdf
+    Color alpha; // The unweighted contribution/measurement (cos*brdf/pdf)
+    Sample sample; // The material sample
     IntersectionInfo info;
     bool specular;
     float camU, camV; // Only used by the eye point
@@ -52,6 +58,8 @@ protected:
     void RenderPixel(int x, int y, Camera& cam,
                      ColorBuffer& eyeImage, ColorBuffer& lightImage) const;
     void RenderPart(Camera& cam, ColorBuffer& colBuf) const;
+
+    int BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
 
     int BuildEyePath(int x, int y, vector<BDVertex*>& path, const Camera& cam,
                      vector<BDSample>& samples, Light* light) const;

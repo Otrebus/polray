@@ -72,7 +72,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
     else // Specular bounce
     {
         float r1 = rnd.GetFloat(0.0f, 2*F_PI);
-        float r2 = acos(pow(rnd.GetFloat(0.0001f, 0.9999f), 1/(alpha+1)));
+        float r2 = acos(pow(rnd.GetFloat(0.f, 1.f), 1/(alpha+1)));
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();

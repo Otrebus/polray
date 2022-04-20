@@ -5,6 +5,7 @@
 
 class Sample {
 public:
+    Sample();
     Sample(const Color&, const Ray&, float pdf, float rpdf, bool specular);
 
     Color color;

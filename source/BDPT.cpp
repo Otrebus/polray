@@ -21,13 +21,70 @@ BDPT::~BDPT()
 {
 }
 
+int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
+
+    float rr = 0.7;
+
+    while(path.size() < 3 || m_random.GetFloat(0.f, 1.f) < rr) {
+        BDVertex* lastV = path.back();
+        float lastPdf = lastV->sample.pdf;
+        auto lastSample = lastV->sample.color;
+
+        const Primitive* hitPrimitive;
+        if(scene->Intersect(lastV->out, hitPrimitive) < 0)
+            break;
+
+        IntersectionInfo info;
+        hitPrimitive->GenerateIntersectionInfo(lastV->out, info);
+
+        BDVertex* newV = new BDVertex();
+        newV->info = info;
+        Vector3d v = (info.GetPosition() - lastV->out.origin);
+        float lSqr = v.GetLengthSquared();
+        v.Normalize();
+        newV->pdf = lastPdf*(abs(info.GetGeometricNormal()*info.GetDirection()))/(lSqr);
+        newV->alpha = lastV->alpha*lastSample;
+        Material* mat = info.GetMaterial();
+
+        newV->sample = mat->GetSample(info, lightPath);
+        newV->out = newV->sample.outRay;
+        newV->rpdf = newV->sample.rpdf;
+        newV->specular = newV->sample.specular;
+        newV->rr = path.size() < 3 ? 1 : lastV->rr*rr;
+        rr = min(lastSample.GetLuminance(), 1);
+
+        if(!lightPath) {
+            if(newV->alpha.GetLuminance() <= 0 && info.GetMaterial()->GetLight() != light)
+            {
+                delete newV;
+                return path.size();
+            }
+
+            lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
+            path.push_back(newV);
+
+            if(info.material->GetLight() == light)
+            {   // Direct light hit
+                samples.push_back(BDSample(0, path.size()));
+                return path.size() - 1;
+            }
+        } else {
+            if(lastSample.GetLuminance() <= 0)
+            {
+                delete newV;
+                return path.size();
+            }
+            lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
+            path.push_back(newV);
+        }
+    }
+    return path.size();
+}
+
 int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path, 
                        const Camera& cam, vector<BDSample>& samples, 
                        Light* light) const
 {
-    int depth = 1;
-    float rr = 0.7f;
-
     BDVertex* camPoint = new BDVertex();
     Vector3d lensPoint;
     cam.SampleAperture(lensPoint, camPoint->camU, camPoint->camV);
@@ -43,56 +100,11 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     float lastPdf = 1/(cam.GetPixelArea()*costheta*costheta*costheta);
     camPoint->pdf = 1/(cam.GetPixelArea());
     Color lastSample = costheta*Color::Identity/lastPdf;
+
+    camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false);
+
     path.push_back(camPoint);
-
-    IntersectionInfo info;
-
-    while(depth < 3 || m_random.GetFloat(0.f, 1.f) < rr)
-    {
-        const Primitive* hitPrimitive;
-        IntersectionInfo info;
-        BDVertex* lastV = path.back();
-
-        if(scene->Intersect(lastV->out, hitPrimitive) < 0)
-            break;
-        hitPrimitive->GenerateIntersectionInfo(lastV->out, info);
-
-        BDVertex* newV = new BDVertex();
-        newV->info = info;
-        Vector3d v = (info.GetPosition() - lastV->out.origin);
-        float lSqr = v.GetLengthSquared();
-        v.Normalize();
-        newV->pdf = lastPdf*(abs(info.GetGeometricNormal()
-                         *info.GetDirection()))/(lSqr);
-        newV->alpha = lastV->alpha*lastSample;
-        Material* mat = info.GetMaterial();
-
-        auto sample = mat->GetSample(info, false);
-        newV->out = sample.outRay;
-        lastPdf = sample.pdf;
-        lastV->rpdf = sample.rpdf;
-        newV->specular = sample.specular;
-        lastSample = sample.color;
-        newV->rr = depth < 3 ? 1 : lastV->rr*rr;
-        rr = min(lastSample.GetLuminance(), 1);
-
-        if(newV->alpha.GetLuminance() <= 0 && info.GetMaterial()->GetLight() != light)
-        {
-            delete newV;
-            return path.size();
-        }
-        lastV->rpdf *= abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
-        path.push_back(newV);
-
-        if(info.material->GetLight() == light)
-        {   // Direct light hit
-            samples.push_back(BDSample(0, path.size()));
-            return path.size() - 1;
-        }
-
-        depth++;
-    }
-    return path.size();
+    return BuildPath(path, samples, light, false);
 }
 
 int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
@@ -108,48 +120,12 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     lightPoint->info.normal = lightPoint->info.normal;
     lightPoint->info.geometricnormal = lightPoint->info.normal;
     lightPoint->info.position = lightPoint->out.origin;
-//    Color lastSample = Color::Identity*(lightPoint->info.normal
-//                                        *lightPoint->out.direction)/lastPdf;
+
+    lightPoint->sample = Sample(lastSample, lightPoint->out, lastPdf, lightPoint->rpdf, false);
     path.push_back(lightPoint);
+    std::vector<BDSample> dummy;
 
-    while(depth < 3 || m_random.GetFloat(0.f, 1.f) < rr)
-    {
-        const Primitive* hitPrimitive;
-        IntersectionInfo info;
-        BDVertex* lastV = path.back();
-
-        if(scene->Intersect(lastV->out, hitPrimitive) < 0)
-            break;
-        hitPrimitive->GenerateIntersectionInfo(lastV->out, info);
-
-        BDVertex* newV = new BDVertex();
-        newV->info = info;
-        Vector3d v = (info.GetPosition() - lastV->out.origin);
-        float lSqr = v.GetLengthSquared();
-        v.Normalize();
-        newV->pdf = lastPdf*(abs(info.geometricnormal
-                                  *info.direction))/(lSqr);
-        newV->alpha = lastV->alpha*lastSample;
-        Material* mat = info.material;
-        auto sample = mat->GetSample(info, true);
-        lastSample = sample.color;
-        newV->out = sample.outRay;
-        lastPdf = sample.pdf;
-        lastV->rpdf = sample.rpdf;
-        newV->specular = sample.specular;
-        newV->rr = depth < 3 ? 1 : lastV->rr*rr;
-        rr = min(newV->alpha.GetLuminance(), 1);
-        if(lastSample.GetLuminance() <= 0)
-        {
-            delete newV;
-            return path.size();
-        }
-        lastV->rpdf *= abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
-
-        path.push_back(newV);
-        depth++;
-    }
-    return path.size();
+    return BuildPath(path, dummy, light, false);
 }
 
 Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
@@ -157,7 +133,7 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
 {
     Color result(1, 1, 1);
 
-    if(t == 0) // 0 eye path vertices not possibe since cam is not part of scene
+    if(t == 0) // 0 eye path vertices not possible since cam is not part of scene
         return Color(0, 0, 0);
     if(s == 0) // 0 light path vertices, we directly hit the light source
     {          // - has to be handled a little bit differently

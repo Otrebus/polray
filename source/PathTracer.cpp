@@ -258,7 +258,7 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     Vector3d pos;
                     cam.SampleAperture(pos, u, v);
                     Ray outRay = cam.GetRayFromPixel(x, y, q, p, u, v);
-                    result += TracePath(outRay);
+                    result += TracePathPrimitive(outRay);
                 }
             }
             colBuf.SetPixel(x, y, result/(float)m_SPP);

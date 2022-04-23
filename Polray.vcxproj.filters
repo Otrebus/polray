@@ -197,9 +197,6 @@
     <ClCompile Include="source\Gfx.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
-    <ClCompile Include="source\Draw.cpp">
-      <Filter>Source Files\System</Filter>
-    </ClCompile>
     <ClCompile Include="source\Utils.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
@@ -219,6 +216,9 @@
       <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClCompile>
     <ClCompile Include="source\Sample.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -325,9 +325,6 @@
     <ClInclude Include="source\Gfx.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="source\Draw.h">
-      <Filter>Source Files\System</Filter>
-    </ClInclude>
     <ClInclude Include="source\Bytestream.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -395,6 +392,9 @@
       <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClInclude>
     <ClInclude Include="source\Sample.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Draw.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

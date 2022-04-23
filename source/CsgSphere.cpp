@@ -1,6 +1,7 @@
 #include "BoundingBox.h"
 #include "CsgSphere.h"
 #include "Scene.h"
+#include "Utils.h"
 
 CsgSphere::CsgSphere(const Vector3d& position, float radius) 
     : pos_(position), radius_(radius)
@@ -75,7 +76,7 @@ float CsgSphere::Intersect(const Ray& ray) const
     float C = vec*vec - radius_*radius_;
     float D = (B*B/(4*A) - C)/A;
     if(D < 0)
-        return -1.0f;
+        return -inf;
     t = -B/(2*A) - sqrt(D);
     if(t < 0)
         t = -B/(2*A) + sqrt(D);

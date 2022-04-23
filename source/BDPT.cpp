@@ -31,8 +31,14 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         auto lastSample = lastV->sample.color;
 
         const Primitive* hitPrimitive;
-        if(scene->Intersect(lastV->out, hitPrimitive) < 0)
+        auto t = scene->Intersect(lastV->out, hitPrimitive);
+        if(t < 0)
             break;
+
+        if(t > 0 && !hitPrimitive)
+            t = t;
+
+        t = scene->Intersect(lastV->out, hitPrimitive);
 
         IntersectionInfo info;
         hitPrimitive->GenerateIntersectionInfo(lastV->out, info);

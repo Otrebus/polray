@@ -23,7 +23,6 @@ public:
     //virtual void Setup(const std::vector<Primitive*>& primitives, const std::vector<Light*>& lights) = 0;
     virtual void Render(Camera& cam, ColorBuffer& colBuf) = 0;
     virtual bool TraceShadowRay(const Ray& ray, float tmax) const;
-    virtual bool ShootRay(const Ray& ray, IntersectionInfo& info) const;
 
     virtual unsigned int GetSPP() const = 0;
     virtual void SetSPP(unsigned int) = 0;

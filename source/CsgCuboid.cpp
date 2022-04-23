@@ -2,6 +2,7 @@
 #include "CsgCuboid.h"
 #include "Scene.h"
 #include "Ray.h"
+#include "Utils.h"
 
 CsgCuboid::CsgCuboid(const Vector3d& position, const Vector3d& x, 
                      const Vector3d& y, float a, float b, float c) 
@@ -111,10 +112,10 @@ float CsgCuboid::Intersect(const Ray& inRay) const
         else if(tfar > 0)
             return tfar;
         else
-            return -1.0f;
+            return -inf;
     }
     else
-        return -1.0f;
+        return -inf;
 }
 
 bool CsgCuboid::GenerateIntersectionInfo(const Ray& inRay, 

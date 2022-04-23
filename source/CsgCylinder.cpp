@@ -1,7 +1,8 @@
 #include "BoundingBox.h"
 #include "CsgCylinder.h"
 #include "Scene.h"
-#define CHECKVALID(v) if(!( v.x > -100 || v.x < 100 || v.y > -100 || v.y < 100 || v.z > -100 || v.z < 100 || v.x < std::numeric_limits<float>::infinity() && v.x > -std::numeric_limits<float>::infinity() && v.x == v.x && v.y < std::numeric_limits<float>::infinity() && v.y > -std::numeric_limits<float>::infinity() && v.y == v.y && v.z < std::numeric_limits<float>::infinity() && v.z > -std::numeric_limits<float>::infinity() && v.z == v.z)) _asm int 3;
+#include "Utils.h"
+
 CsgCylinder::CsgCylinder(Vector3d& position, Vector3d& dir, 
                          float length, float radius) 
                          : pos_(position), length_(length), radius_(radius)
@@ -180,7 +181,7 @@ float CsgCylinder::Intersect(const Ray& inRay) const
     const float D = b*b - 4*a*c;
 
     if(D < 0)
-        return -1.0f;
+        return -inf;
 
     float tNear = (-b - sqrt(D))/(2*a);
     float tFar = (-b + sqrt(D))/(2*a);
@@ -190,7 +191,7 @@ float CsgCylinder::Intersect(const Ray& inRay) const
     if(zFar < -length_/2)
     {
         if(zNear < -length_/2)
-            return -1.0f;
+            return -inf;
         else if(zNear < length_/2)
             tFar = (-length_/2 - z_O)/z;
         else
@@ -202,7 +203,7 @@ float CsgCylinder::Intersect(const Ray& inRay) const
     else if(zFar > length_/2)
     {
         if(zNear > length_/2)
-            return -1.0f;
+            return -inf;
         else if(zNear > -length_/2)
             tFar = (length_/2 - z_O)/z;
         else
@@ -222,7 +223,7 @@ float CsgCylinder::Intersect(const Ray& inRay) const
         return tNear;
     else if(tFar > 0)
         return tFar;
-    return -1.0f;
+    return -inf;
 }
 
 bool CsgCylinder::GenerateIntersectionInfo(const Ray& inRay, IntersectionInfo& info) const

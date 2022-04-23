@@ -1,6 +1,7 @@
 #include "scene.h"
 #include "triangle.h"
 #include "Random.h"
+#include "Utils.h"
 //#include "RayFactory.h"
 
 //vector<PartRenderer*> PartRenderer::parts;
@@ -135,13 +136,10 @@ void Scene::SetEnvironmentLight(EnvironmentLight* l)
 // almost works but doesn't make the ...args parameters references
 
 bool Scene::Intersect(const Ray& ray, float tmax) const {
-    return partitioning->Intersect(ray, tmax);
+    const Primitive* dummy;
+    return partitioning->Intersect(ray, dummy, 0, tmax, false) > 0;
 };
 
 float Scene::Intersect(const Ray& ray, const Primitive*& p) const {
-    return partitioning->Intersect(ray, p);
-};
-
-float Scene::Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax) const {
-    return partitioning->Intersect(ray, primitive, tmin, tmax);
+    return partitioning->Intersect(ray, p, 0, inf, true);
 };

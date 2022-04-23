@@ -129,8 +129,10 @@ void Rendering::Start()
     assert(!running);
     running = true;
     stopping = false;
-    const auto processor_count = std::thread::hardware_concurrency();
-
+    auto processor_count = std::thread::hardware_concurrency();
+#ifdef _DEBUG
+    processor_count = 1;
+#endif
     for(int i = 0; i < processor_count; i++)
         _beginthread(Rendering::Thread, 0, (void*)this);
 }

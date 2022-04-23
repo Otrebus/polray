@@ -10,6 +10,11 @@ class Primitive;
 
 class SAHEvent;
 
+struct IntResult {
+    float t;
+    const Primitive* primitive;
+};
+
 class KDNode
 {
 public:
@@ -21,15 +26,8 @@ public:
     bool Split(int, int, float);
     float Intersect(const Ray&, const Primitive*&) const;
     static float SAHCost(int nPrimitives, float area, int nLeft, float leftarea, int nRight, float rightarea, int nPlanar, int side);
-    float IntersectIter(const Ray& ray, const Primitive* &minprimitive, float tmin, float tmax) const;
-    float IntersectRec(const Ray& ray, const Primitive* &minprimitive, float tmin, float tmax) const;
-    bool Intersect(const Ray&, float tmax) const;
+    IntResult IntersectRec(const Ray& ray, float tmin, float tmax, bool returnPrimitive) const;
     bool IsLeaf() const;
-
-    float GetSplitPos() const;
-    int GetSplitDir() const;
-    KDNode* GetLeftNode() const;
-    KDNode* GetRightNode() const;
 
     //bool m_isLeaf;
 
@@ -48,9 +46,7 @@ public:
     KDTree();
     ~KDTree();
     void Build(vector<const Primitive*>);
-    bool Intersect(const Ray&, float tmax) const;
-    float Intersect(const Ray&, const Primitive*&) const;
-    float Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax) const;
+    float Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax, bool returnPrimitive) const;
     BoundingBox CalculateExtents(vector<const Primitive*>& primitives);
     
     void BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* events, vector<const Primitive*>& primitives, int depth, int badsplits);

@@ -104,7 +104,6 @@ public:
 
     bool Intersect(const Ray&, float tmax) const;
     float Intersect(const Ray&, const Primitive*&) const;
-    float Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax) const;
 
     friend class LightAdder;
     friend class PrimitiveAdder;

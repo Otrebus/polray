@@ -1,6 +1,7 @@
 #include "BoundingBox.h"
 #include "CsgIntersection.h"
 #include "Scene.h"
+#include "Utils.h"
 
 #include <algorithm>
 
@@ -55,7 +56,7 @@ float CsgIntersection::Intersect(const Ray& ray) const
     Intersect(ray, hits);
     auto firstHit = std::find_if(hits.begin(), hits.end(), 
                     [] (CsgHit& a) { return (a.t > 0); });
-    return firstHit != hits.end() ? (*firstHit).t : -1.0f;
+    return firstHit != hits.end() ? (*firstHit).t : -inf;
 }
 
 bool CsgIntersection::GenerateIntersectionInfo(const Ray& ray, 

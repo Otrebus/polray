@@ -1,6 +1,7 @@
 #include "Triangle.h"
 #include "Scene.h"
 #include "Material.h"
+#include "Utils.h"
 
 Triangle::Triangle(float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z)
 {
@@ -46,21 +47,21 @@ float Triangle::Intersect(const Ray& ray)
 
     float det = E2*Q;
     if(det < 0.00001f && det > -0.00001f) // Ray in (almost) the same plane as the triangle
-        return -1.0f;
+        return -inf;
 
     u = D*P/det;
 
     if(u > 1 || u < 0)
-        return -1.0f;
+        return -inf;
 
     v = T*Q/det;
 
     if(u+v > 1 || u < 0 || v < 0)
-        return -1.0f;
+        return -inf;
 
     t = E1*P/det;
     if(t < 0.00001f)
-        return -1.0f;
+        return -inf;
 
 
     return t;
@@ -83,20 +84,20 @@ float Triangle::Intersect(const Ray& ray) const
 
     float det = E2*Q;
     if(det < 0.0000000001f && det > -0.0000000001f)	// Ray in (almost) the same plane as the triangle
-        return -1.0f;							// NOTE: depending on this epsilon value, extremely
+        return -inf;							// NOTE: depending on this epsilon value, extremely
     u = D*P/det;								// small triangles could be missed
 
     if(u > 1 || u < 0)
-        return -1.0f;
+        return -inf;
 
     v = T*Q/det;
 
     if(u+v > 1 || u < 0 || v < 0)
-        return -1.0f;
+        return -inf;
 
     t = E1*P/det;
     if(t < 0.0000000001f)
-        return -1.0f;
+        return -inf;
 
     return t;
 }

@@ -1,4 +1,5 @@
 #ifndef KDTREE_H
+#define NOMINMAX
 #include "kdtree.h"
 #include "trianglemesh.h"
 #include "triangle.h"
@@ -6,6 +7,7 @@
 #include <stack>
 #include "Main.h"
 #include <intrin.h>
+#include "Utils.h"
 #define CHECKVALID(v) if(!( v.x < std::numeric_limits<float>::infinity() && v.x > -std::numeric_limits<float>::infinity() && v.x == v.x && v.y < std::numeric_limits<float>::infinity() && v.y > -std::numeric_limits<float>::infinity() && v.y == v.y && v.z < std::numeric_limits<float>::infinity() && v.z > -std::numeric_limits<float>::infinity() && v.z == v.z)) _asm int 3;
 float KDTree::cost_triint;
 float KDTree::cost_trav;
@@ -565,319 +567,59 @@ void KDTree::Build(vector<const Primitive*> primitives)
             delete e;
 }
 
-float KDNode::IntersectRec(const Ray& _ray, const Primitive* &minprimitive, float tmin, float tmax) const
+IntResult KDNode::IntersectRec(const Ray& ray, float tmin, float tmax, bool returnPrimitive=false) const
 {
-    Ray& ray = const_cast<Ray&>(_ray);
     if(tmin > tmax)
-        return -1.0f;
+        return { -inf, nullptr };
 
     int a = splitdir;
     float locmint = numeric_limits<float>::infinity();
-    const Primitive* resultprimitive = 0;
-    if(!left && !right)
-    {
-        bool hit = false;
-        float t;
-        for(auto& s : m_primitives)
-        {
-            t = s->Intersect(ray);
-            if(t > 0)
-            {
-                hit = true;
+    const Primitive* minprimitive = nullptr;
+    if(!left && !right) {
+        for(auto& s : m_primitives) {
+            float t = s->Intersect(ray);
+            if(t >= tmin && t <= tmax) {
+                if(!returnPrimitive)
+                    return { t, nullptr };
                 if(t < locmint)
-                {
-                    minprimitive = s;
-                    locmint = t;
-                }
-            } 
-        }
-        if(hit == false)
-            return -1.0f;
-        else
-            return locmint;
+                    minprimitive = s, locmint = t;
+            }
+        }        
+        return minprimitive ? IntResult { locmint, minprimitive } : IntResult { -inf, nullptr };
     }
 
-    float tint = (m_splitpos - ray.origin[a]) / ray.direction[a];
+    float k = ray.direction[a];
+    float tint = (m_splitpos - ray.origin[a])/k;    
 
-    KDNode* nearnode = ray.direction[a] > 0 ? left : right;
+    KDNode* nearnode = k > 0 ? left : right;
     KDNode* farnode = nearnode == left ? right : left;
 
     if(tint <= tmin)
     {
-        float t = farnode->IntersectRec(ray, resultprimitive, tmin, tmax);
-        if(t > 0)
-        {
-            minprimitive = resultprimitive;
-            return t;
-        }
+        auto res = farnode->IntersectRec(ray, std::max(tmin, tint-eps), tmax, returnPrimitive);
+        if(res.t != -inf)
+            return res;
+    } else if(tmin <= tint) {
+        auto res = nearnode->IntersectRec(ray, tmin, std::min(tint+eps, tmax), returnPrimitive);
+        if(res.t != -inf)
+            return res;
+
+        res = farnode->IntersectRec(ray, std::max(tmin, tint-eps), tmax, returnPrimitive);
+        if(res.t != -inf)
+            return res;
     }
-    else if(tmax <= tint)
-    {
-        float t = nearnode->IntersectRec(ray, resultprimitive, tmin, tmax);
-        if(t > 0 && t < tint)
-        {
-            minprimitive = resultprimitive;
-            return t;
-        }
+    return { -inf, nullptr };
+}
+
+float KDTree::Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax, bool returnPrimitive=true) const
+{
+    auto res = m_root->IntersectRec(ray, tmin, tmax, returnPrimitive);
+    if(res.t != -inf) {
+        primitive = res.primitive;
+        return res.t;
     }
-    else if(tmin <= tint)
-    {
-        float t = nearnode->IntersectRec(ray, resultprimitive, tmin, tint);
-        if(t > 0 && t < tint)
-        {
-            minprimitive = resultprimitive;
-            return t;
-        }
-        if(tint <= tmax)
-        {
-            float t = farnode->IntersectRec(ray, resultprimitive, tint, tmax);
-            {
-                if(t > 0)
-                {
-                    minprimitive = resultprimitive;
-                    return t;
-                }
-            }
-        }
-    }
-    return -1.0f;
+    return -inf;
 }
 
-float KDNode::IntersectIter(const Ray& _ray, const Primitive* &minprimitive, float tmin, float tmax) const
-{
-    const Ray& ray = _ray;
-    minprimitive = 0;
-    float mint = numeric_limits<float>::infinity();
-    
-    int stackpos = 0;
-    struct nodestack
-    {
-        KDNode* node;
-        float min;
-        float max;
-    } nodestack[300];
 
-    const KDNode* curnode = this;
-    float curmin = tmin;
-    float curmax = tmax;
-
-    while(true)
-    {
-        if(curmin > curmax)
-        {
-
-            if(!stackpos)
-            {
-                if(minprimitive)
-                    return mint;
-                else
-                    return -1.0f;
-            }
-            curnode = nodestack[stackpos].node; curmax = nodestack[stackpos].max; curmin = nodestack[stackpos].min;
-            stackpos--;
-            continue;
-        }
-        else if(mint < curmin)
-            return mint;
-        if(curnode->IsLeaf())
-        {
-            float locmint = numeric_limits<float>::infinity();
-            const Primitive* locminprimitive = 0;
-            float t;
-            for(auto& s : curnode->m_primitives)
-            {
-                t = s->Intersect(ray);
-                if(t > 0 && t < locmint)
-                {
-                    locminprimitive = s;
-                    locmint = t;
-                }
-            }
-            if(locminprimitive && locmint < mint)
-            {
-                mint = locmint;
-                minprimitive = locminprimitive;
-            }
-
-            if(!stackpos)
-            {
-                if(minprimitive)
-                    return mint;
-                else
-                    return -1.0f;
-            }
-            curnode = nodestack[stackpos].node; curmax = nodestack[stackpos].max; curmin = nodestack[stackpos].min;
-            stackpos--;
-            continue;
-        }
-        else
-        {
-            float tmin = curmin;
-            float tmax = curmax;
-            int a = curnode->splitdir;
-            float tint = (curnode->m_splitpos - ray.origin[a]) / ray.direction[a];
-
-            if(ray.direction[a] == 0)
-            {
-                curnode = ray.origin[a] < curnode->m_splitpos ? curnode->left : curnode->right; curmin = tmin; curmax = tmax;
-                continue;
-            }
-
-            // These tests should probably be made with the real [a] coordinate instead of the t value
-            // but I'm lazy and have only slept 2 hours tonight so I'll do it sometime else
-            KDNode* nearnode = ray.direction[a] > 0 ? curnode->left : curnode->right;
-            KDNode* farnode = nearnode == curnode->left ? curnode->right : curnode->left;
-
-            if(tint <= tmin - 0.001f)
-            {
-                curnode = farnode; curmin = tmin - 0.001f; curmax = tmax + 0.001f;
-                continue;
-            }
-            else if(tmax <= tint - 0.001f)
-            {
-                curnode = nearnode; curmin = tmin - 0.001f; curmax = tmax + 0.001f;
-                continue;
-            }
-            else if(tmin <= tint + 0.001f)
-            {
-                curnode = nearnode; curmin = tmin - 0.001f; curmax = tint + 0.001f;
-                stackpos++; 
-                nodestack[stackpos].node = farnode; nodestack[stackpos].min = tint - 0.001f; nodestack[stackpos].max = tmax + 0.001f;
-            }
-            else
-                curnode = nearnode;
-        }
-    }
-}
-
-float KDTree::Intersect(const Ray& ray, const Primitive* &primitive) const
-{
-    mint = numeric_limits<float>::infinity();
-
-    float tmin, tmax;
-
-    m_bbox.Intersect(ray, tmin, tmax);
-
-    //return root->Intersect(ray, primitive);
-
-    //return root->IntersectRec(ray, primitive, tmin, tmax);
-    return m_root->IntersectIter(ray, primitive, tmin, tmax);
-}
-
-float KDTree::Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax) const
-{
-    return m_root->IntersectRec(ray, primitive, tmin, tmax);
-}
-
-float KDNode::Intersect(const Ray& _ray, const Primitive* &minprimitive) const
-{
-    return -1.0f;
-}
-
-float KDNode::GetSplitPos() const
-{
-    return m_splitpos;
-}
-
-int KDNode::GetSplitDir() const
-{
-    return splitdir;
-}
-
-KDNode* KDNode::GetLeftNode() const
-{
-    return left;
-}
-KDNode* KDNode::GetRightNode() const
-{
-    return right;
-}
-
-bool KDNode::Intersect(const Ray& _ray, float tmax) const
-{
-    Ray& ray = const_cast<Ray&>(_ray);
-    float mint = numeric_limits<float>::infinity();
-    
-    int stackpos = 0;
-    struct nodestack
-    {
-        KDNode* node;
-        float min;
-        float max;
-    } nodestack[300];
-
-    const KDNode* curnode = this;
-    float curmin = 0;
-    float curmax = tmax;
-
-    while(true)
-    {
-        if(curmin > curmax)
-        {
-            if(!stackpos)
-                return false;
-            curnode = nodestack[stackpos].node; curmax = nodestack[stackpos].max; curmin = nodestack[stackpos].min;
-            stackpos--;
-            continue;
-        }
-        else if(mint < curmin)
-            return false;
-        if(curnode->IsLeaf())
-        {
-            for(auto& s : curnode->m_primitives)
-            {
-                float t = s->Intersect(ray);
-                if(t > 0 && t < tmax)
-                    return true;
-            }
-            if(!stackpos)
-                return false;
-            curnode = nodestack[stackpos].node; curmax = nodestack[stackpos].max; curmin = nodestack[stackpos].min;
-            stackpos--;
-            continue;
-        }
-        else
-        {
-            float tmin = curmin;
-            float tmax = curmax;
-            int a = curnode->splitdir;
-            float tint = (curnode->m_splitpos - ray.origin[a]) / ray.direction[a];
-
-            if(ray.direction[a] == 0)
-            {
-                curnode = ray.origin[a] < curnode->m_splitpos ? curnode->left : curnode->right; curmin = tmin; curmax = tmax;
-                continue;
-            }
-
-            // These tests should probably be made with the real [a] coordinate instead of the t value
-            // but I'm lazy and have only slept 2 hours tonight so I'll do it sometime else
-            KDNode* nearnode = ray.direction[a] > 0 ? curnode->left : curnode->right;
-            KDNode* farnode = nearnode == curnode->left ? curnode->right : curnode->left;
-
-            if(tint <= tmin - 0.001f)
-            {
-                curnode = farnode; curmin = tmin - 0.001f; curmax = tmax + 0.001f;
-                continue;
-            }
-            else if(tmax <= tint - 0.001f)
-            {
-                curnode = nearnode; curmin = tmin - 0.001f; curmax = tmax + 0.001f;
-                continue;
-            }
-            else if(tmin <= tint + 0.001f)
-            {
-                curnode = nearnode; curmin = tmin - 0.001f; curmax = tint + 0.001f;
-                stackpos++; 
-                nodestack[stackpos].node = farnode; nodestack[stackpos].min = tint - 0.001f; nodestack[stackpos].max = tmax + 0.001f;
-            }
-            else
-                curnode = nearnode;
-        }
-    }
-}
-
-bool KDTree::Intersect(const Ray& ray, float tmax) const
-{
-    return m_root->Intersect(ray, tmax);
-}
 #endif

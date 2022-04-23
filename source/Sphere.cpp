@@ -2,6 +2,7 @@
 #include "Material.h"
 #include "BoundingBox.h"
 #include "Scene.h"
+#include "Utils.h"
 
 Sphere::Sphere(const Vector3d& v, float r) : position(v), radius(r)
 {
@@ -58,11 +59,11 @@ float Sphere::Intersect(const Ray& ray) const
         {
             if(t < 0.00001f)
             {
-                return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -1.0f;
+                return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
             }
             return t;
         }
-        return -1.0f;
+        return -inf;
 }
 
 bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const

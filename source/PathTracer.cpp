@@ -70,7 +70,7 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
     Color mod = info.GetMaterial()->BRDF(info, dir)*2*F_PI*abs(info.GetNormal()*dir);
 
 	out.direction = dir;
-	Color c = mod*TracePath(out)/0.8f;
+	Color c = mod*TracePathPrimitive(out)/0.8f;
 	return c;
 }
 
@@ -258,7 +258,7 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     Vector3d pos;
                     cam.SampleAperture(pos, u, v);
                     Ray outRay = cam.GetRayFromPixel(x, y, q, p, u, v);
-                    result += TracePathPrimitive(outRay);
+                    result += TracePath(outRay);
                 }
             }
             colBuf.SetPixel(x, y, result/(float)m_SPP);

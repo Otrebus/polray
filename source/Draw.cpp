@@ -137,6 +137,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
     auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Empty-RG.obj"));
+
     Vector3d camPos = Vector3d(0, 1.4, 3);
     Vector3d target = Vector3d(0, 1, 0);
     Vector3d camdir = target-camPos;
@@ -200,7 +201,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     boxLight->AddToScene(s);
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 
@@ -390,6 +391,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->AddToScene(*s);
 
     boxLight->AddToScene(s);
+
+    s->SetPartitioning(new BrutePartitioning());
     
     r = std::shared_ptr<PathTracer>(new PathTracer(s));
 

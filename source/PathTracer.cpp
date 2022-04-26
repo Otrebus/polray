@@ -6,7 +6,7 @@
 #include "Material.h"
 #include <intrin.h>
 
-#define CHECKVALID(v) if(!( v.x > -100 && v.x < 100 && v.y > -100 && v.y < 100 && v.z > -100 && v.z < 100 && v.x < std::numeric_limits<float>::infinity() && v.x > -std::numeric_limits<float>::infinity() && v.x == v.x && v.y < std::numeric_limits<float>::infinity() && v.y > -std::numeric_limits<float>::infinity() && v.y == v.y && v.z < std::numeric_limits<float>::infinity() && v.z > -std::numeric_limits<float>::infinity() && v.z == v.z)) __debugbreak();
+#define CHECKVALID(v) if(!( v.x > -100 && v.x < 100 && v.y > -100 && v.y < 100 && v.z > -100 && v.z < 100 && v.x < std::numeric_limits<double>::infinity() && v.x > -std::numeric_limits<double>::infinity() && v.x == v.x && v.y < std::numeric_limits<double>::infinity() && v.y > -std::numeric_limits<double>::infinity() && v.y == v.y && v.z < std::numeric_limits<double>::infinity() && v.z > -std::numeric_limits<double>::infinity() && v.z == v.z)) __debugbreak();
 
 PathTracer::PathTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
@@ -42,7 +42,7 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
 		return Color(0, 0, 0);
 	minprimitive->GenerateIntersectionInfo(ray, info);
 
-	if(m_random.GetFloat(0, 1) > 0.8f)
+	if(m_random.Getdouble(0, 1) > 0.8f)
 		return Color(0, 0, 0);
 
     Ray out;
@@ -57,7 +57,7 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
         Vector3d N_g = info.GetGeometricNormal();
         if(N_g*info.GetDirection() > 0)
             N_g = -N_g;
-		dir = Vector3d(m_random.GetFloat(-1, 1), m_random.GetFloat(-1, 1), m_random.GetFloat(-1, 1));
+		dir = Vector3d(m_random.Getdouble(-1, 1), m_random.Getdouble(-1, 1), m_random.Getdouble(-1, 1));
 
 		out.origin = info.GetPosition() + 0.0001f*N_g;
 		if(dir.GetLength() > 1)
@@ -109,8 +109,8 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
 //		// Do next event estimation (assumes a single area light for now)
 //		Material* material = info.GetMaterial();
 //		//AreaLight* light = (AreaLight*) m_lights.front();
-//        float lightWeight; // lol
-//        float r = m_random.GetFloat(0.0f, 1.0f);
+//        double lightWeight; // lol
+//        double r = m_random.Getdouble(0.0f, 1.0f);
 //        Light* light = lightTree->PickLight(r, lightWeight);
 //        Vector3d lightNormal;
 //		//Vector3d lightNormal = light->GetNormal();
@@ -132,22 +132,22 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
 //			sampledLight = false;
 //		else if(toLight*lightNormal < 0)
 //		{
-//			float d = toLight.GetLength();
+//			double d = toLight.GetLength();
 //			toLight.Normalize();
 //
 //			Ray lightRay = Ray(info.GetPosition() + normal*0.0001f, toLight); //(normal*toLight>0 ? normal*0.0001f : normal*-0.0001f), toLight);
 //
 //			if(TraceShadowRay(lightRay, d))
 //			{
-//				float cosphi = abs(normal*toLight);
-//				float costheta = abs(toLight*lightNormal);
+//				double cosphi = abs(normal*toLight);
+//				double costheta = abs(toLight*lightNormal);
 //				finalColor += (lightNormal*toLight < 0) ? pathColor*material->BRDF(info, toLight)*costheta*cosphi*light->GetIntensity()*light->GetArea()/(d*d*lightWeight) : Color(0, 0, 0);
 //				sampledLight = true;
 //			}
 //		}
 //		// GetSampleE(info, newVertex->out, lastPdf, newVertex->rpdf, newVertex->component);
-//		float dummy1;
-//		float dummy2;
+//		double dummy1;
+//		double dummy2;
 //		unsigned char blah = 1;
 //		//pathColor*=material->GetSampleE(info, outRay, dummy1, dummy2, blah, false)/0.7f;
 //		pathColor*=material->GetSample(info, outRay, false)/0.7f;
@@ -161,7 +161,7 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
 //		minprimitive->GenerateIntersectionInfo(inRay, info);
 //		
 //	}
-//	while(m_random.GetFloat(0, 1) < 0.7f);
+//	while(m_random.Getdouble(0, 1) < 0.7f);
 //	return finalColor;
 //}
 
@@ -175,15 +175,15 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
 //    Color finalColor(0, 0, 0);
 //	bool sampledLight = false;
 //	inRay = ray;
-//    float rr = 1.0f;
-//    float lastPdf;
-//    float dummy;
+//    double rr = 1.0f;
+//    double lastPdf;
+//    double dummy;
 //    unsigned char lastComp;
 //    bool firstRay = true;
 //    IntersectionInfo lastInfo;
 //
-//    float lightWeight;
-//    float r = m_random.GetFloat(0.0f, 1.0f);
+//    double lightWeight;
+//    double r = m_random.Getdouble(0.0f, 1.0f);
 //    Light* light = lightTree->PickLight(r, lightWeight);
 //
 //	do
@@ -228,7 +228,7 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
 //        firstRay = false;
 //        inRay = outRay;
 //	}
-//    while(m_random.GetFloat(0, 1) < 0.7f);
+//    while(m_random.Getdouble(0, 1) < 0.7f);
 //	
 //    if(finalColor.IsValid())
 //        return finalColor;
@@ -252,16 +252,16 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     colBuf.SetPixel(x, y, Color(0, 0, 0));
                 else
                 {
-                    float q = m_random.GetFloat(0, 1);
-                    float p = m_random.GetFloat(0, 1);
-                    float u, v;
+                    double q = m_random.Getdouble(0, 1);
+                    double p = m_random.Getdouble(0, 1);
+                    double u, v;
                     Vector3d pos;
                     cam.SampleAperture(pos, u, v);
                     Ray outRay = cam.GetRayFromPixel(x, y, q, p, u, v);
                     result += TracePath(outRay);
                 }
             }
-            colBuf.SetPixel(x, y, result/(float)m_SPP);
+            colBuf.SetPixel(x, y, result/(double)m_SPP);
         }
     }
 }
@@ -281,10 +281,10 @@ Color PathTracer::TracePath(const Ray& ray) const
     Color finalColor(0, 0, 0);
     bool sampledLight = false;
     inRay = ray;
-    float rr = 1.0f;
+    double rr = 1.0f;
 
-    float lightWeight;
-    float r = m_random.GetFloat(0.0f, 1.0f);
+    double lightWeight;
+    double r = m_random.Getdouble(0.0f, 1.0f);
     Light* light = lightTree->PickLight(r, lightWeight);
 
     do
@@ -324,7 +324,7 @@ Color PathTracer::TracePath(const Ray& ray) const
         pathColor *= c/0.7f;
         inRay = outRay;
     }   
-    while(m_random.GetFloat(0, 1) < 0.7f);
+    while(m_random.Getdouble(0, 1) < 0.7f);
     
     return finalColor;
 }

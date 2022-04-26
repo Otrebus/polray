@@ -9,10 +9,10 @@ using namespace std;
 class LightStruct
 {
 public:
-    LightStruct(Light* light, float weight);
+    LightStruct(Light* light, double weight);
     ~LightStruct();
     Light* light;
-    float weight;
+    double weight;
 };
 
 class LightNode
@@ -21,14 +21,14 @@ public:
     LightNode(vector<Light*> lights);
     ~LightNode();
     
-    Light* PickLight(float r, float& weight) const;
+    Light* PickLight(double r, double& weight) const;
 
 private:
-    LightNode(float weight, vector<LightStruct*> lightStructs);
+    LightNode(double weight, vector<LightStruct*> lightStructs);
 
     LightNode *left, *right;
     Light* light;
-    float val;
+    double val;
 };
 
 #endif

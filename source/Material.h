@@ -37,7 +37,7 @@ public:
     virtual Light* GetLight() const = 0;
 
     virtual void ReadProperties(stringstream& ss) = 0;
-    virtual float PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const = 0;
+    virtual double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const = 0;
 
     virtual void Save(Bytestream& stream) const = 0;
     virtual void Load(Bytestream& stream) = 0;

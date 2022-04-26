@@ -89,10 +89,10 @@ void Rendering::Thread()
                 if(nSamples > 0)
                 {   // Calculate the new average image based on the new samples
                     // and the number of old samples (running average)
-                    float D = float(nSamples + nNewSamples);
-                    float final_r = c.r + nNewSamples*(k.r - c.r)/D;
-                    float final_g = c.g + nNewSamples*(k.g - c.g)/D;
-                    float final_b = c.b + nNewSamples*(k.b - c.b)/D;
+                    double D = double(nSamples + nNewSamples);
+                    double final_r = c.r + nNewSamples*(k.r - c.r)/D;
+                    double final_g = c.g + nNewSamples*(k.g - c.g)/D;
+                    double final_b = c.b + nNewSamples*(k.b - c.b)/D;
                     accumulation->SetPixel(x, y, final_r, final_g, final_b);
                 }
                 else
@@ -105,7 +105,7 @@ void Rendering::Thread()
             {
                 Color c = accumulation->GetPixel(x, y);
                 
-                float exposure = 0.75;
+                double exposure = 0.75;
                 c.r = 1 - exp(-exposure*c.r);
                 c.g = 1 - exp(-exposure*c.g);
                 c.b = 1 - exp(-exposure*c.b);

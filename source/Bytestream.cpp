@@ -6,8 +6,8 @@
 //template Bytestream& Bytestream::operator>>(int& t);
 //template Bytestream& Bytestream::operator<<(const char& t);
 //template Bytestream& Bytestream::operator>>(char& t);
-//template Bytestream& Bytestream::operator<<(const float& t);
-//template Bytestream& Bytestream::operator>>(float& t);
+//template Bytestream& Bytestream::operator<<(const double& t);
+//template Bytestream& Bytestream::operator>>(double& t);
 
 //------------------------------------------------------------------------------
 // Constructor.

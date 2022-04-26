@@ -45,7 +45,7 @@ Texture* test;
 Texture* bl;
 Cubemap* cubemap;
 
-#define EMPTYBOX
+#define WINDOWBOX
 //#define BALLSBOX
 //#define CONFERENCE
 // #define BALLBOX
@@ -60,6 +60,69 @@ Cubemap* cubemap;
 
 void MakeScene(std::shared_ptr<Renderer>& r)
 {
+#ifdef WINDOWBOX
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Windows.obj"));
+
+    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d target = Vector3d(0, 1, 0);
+    Vector3d camdir = target-camPos;
+    camdir.Normalize();
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
+    s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
+
+    SphereLight* boxLight = new SphereLight(Vector3d(2, 1.0, 0), 0.11, Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.98, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.9, 0.9, 0.9);
+    //a->Kd = Color(0.0, 0.0, 0.0);
+    //a->alpha = 20;
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.5, 0.5, 0.5);
+    //a->Kd = Color(0.5, 0.5, 0.5);
+    //a->alpha = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0, 0, 0);
+    //a->Rs = Color(0.85, 0.85, 0.85);
+    //a->n = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0.85, 0.85, 0.85);
+    //a->Rs = Color(0, 0, 0);
+    /*a->Rd = Color(0, 0, 0);
+    a->Rs = Color(0.85, 0.85, 0.85);
+    a->n = 1;*/
+
+    /*auto a = new PhongMaterial();
+    a->Ks = Color(0.5, 0.5, 0.5);
+    a->Kd = Color(0, 0, 0);
+    a->alpha = 0;*/
+
+    auto a = new LambertianMaterial();
+    a->Kd = Color(0.5, 0.5, 0.5);
+
+    Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.4), 0.31);
+    sphere->SetMaterial(a);
+    sphere->AddToScene(*s);
+
+    auto g = new DielectricMaterial();
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.3), 0.11);
+    sphere2->SetMaterial(g);
+    //sphere2->AddToScene(*s);
+
+    boxLight->AddToScene(s);
+
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+
+#endif
+
 #ifdef EMPTYBOX
 /*
     Matrix3d rotatebunny (-1, 0, 0, 0,
@@ -346,7 +409,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     mat->Ks = Color(0.08, 0.08, 0.08);
     mat->alpha = 300;
   /*  TriangleMesh* ajax = new TriangleMesh("Ajax_Jotero_com.obj", mat);
-    float rt = -0.8;
+    double rt = -0.8;
     Matrix3d rot (cos(rt), 0, sin(rt), 0,
                   0, 1, 0, 0,
                   -sin(rt), 0, cos(rt), 0,

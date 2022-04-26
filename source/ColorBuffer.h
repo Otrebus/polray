@@ -19,7 +19,7 @@ public:
     Color GetPixel(int x, int y) const;
 
     void SetPixel(int x, int y, const Color& color);
-    void SetPixel(int x, int y, float r, float g, float b);
+    void SetPixel(int x, int y, double r, double g, double b);
     void AddColor(int x, int y, const Color& c);
     void Clear(const Color& c);
     void PutText(const char* const text, int x, int y);

@@ -24,14 +24,14 @@ PhongMaterial::~PhongMaterial()
 
 Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-    float df = Kd.GetMax();
-    float sp = Ks.GetMax();
+    double df = Kd.GetMax();
+    double sp = Ks.GetMax();
     
-    float r = rnd.GetFloat(0, df + sp);
+    double r = rnd.Getdouble(0, df + sp);
     if(r <= df) // Diffuse bounce
     {
-        float r1 = rnd.GetFloat(0.0001f, 2*M_PI);
-        float r2 = rnd.GetFloat(0.0001f, 0.9999f);
+        double r1 = rnd.Getdouble(0.0001f, 2*M_PI);
+        double r2 = rnd.Getdouble(0.0001f, 0.9999f);
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -71,8 +71,8 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
     }
     else // Specular bounce
     {
-        float r1 = rnd.GetFloat(0.0f, 2*F_PI);
-        float r2 = acos(pow(rnd.GetFloat(0.f, 1.f), 1/(alpha+1)));
+        double r1 = rnd.Getdouble(0.0f, 2*F_PI);
+        double r2 = acos(pow(rnd.Getdouble(0.f, 1.f), 1/(alpha+1)));
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -97,7 +97,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
         out.direction.Normalize();
         Vector3d w_o = out.direction;
 
-        float pdf, rpdf;
+        double pdf, rpdf;
 
         if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
         {
@@ -108,7 +108,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
         // FIXME these should probably be equal
         pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*F_PI)*sp/(sp+df);
         //rpdf = pow(-info.GetDirection()*Reflect(-out.direction, N_s), alpha)*(alpha+1)/(2*F_PI);
-        Color mod = abs(out.direction*N)*Ks*float(alpha + 2)/float(alpha + 1);
+        Color mod = abs(out.direction*N)*Ks*double(alpha + 2)/double(alpha + 1);
 
         auto color = (adjoint ? abs((N_s*w_i)/(N_g*w_i)) : 1)*mod/(sp/(df+sp));
         return Sample(color, out, pdf, rpdf, false);
@@ -160,10 +160,10 @@ void PhongMaterial::ReadProperties(stringstream& ss)
     }
 }
 
-float PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
-    float df = Kd.GetMax();
-    float sp = Ks.GetMax();
+    double df = Kd.GetMax();
+    double sp = Ks.GetMax();
 
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();
@@ -183,7 +183,7 @@ float PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool
     auto a = out*normal/F_PI;
 
     Vector3d up = Reflect(info.GetDirection(), N_s);
-    auto b = out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
+    auto b = out*up > 0 ? pow(out*up, alpha)*double(alpha + 1)/(2*F_PI) : 0;
     return a*df/(sp+df) + b*sp/(sp+df);
 }
 

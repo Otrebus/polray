@@ -22,7 +22,7 @@ Renderer::~Renderer()
 // Traces a ray the through scene graph and returns TRUE if ray was NOT 
 // intersected
 //------------------------------------------------------------------------------
-bool Renderer::TraceShadowRay(const Ray& ray, float tmax) const
+bool Renderer::TraceShadowRay(const Ray& ray, double tmax) const
 {
     Ray& unconstRay = const_cast<Ray&>(ray);
     return !scene->Intersect(ray, tmax);

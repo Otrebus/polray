@@ -42,7 +42,7 @@ Vector3d Ray::GetDirection() const
     return direction;
 }
 
-float Ray::GetRefractiveIndex() const
+double Ray::GetRefractiveIndex() const
 {
     return 0.0f;
 //	return refractiveindex;
@@ -62,13 +62,13 @@ LineSegment::~LineSegment()
 {
 }
 
-bool LineSegment::CutXYPlane(float z)
+bool LineSegment::CutXYPlane(double z)
 {
     if(v1.z > v0.z)
     {
         if(v0.z < z && v1.z > z)
         {
-            float t = (z - v0.z)/(v1.z - v0.z);
+            double t = (z - v0.z)/(v1.z - v0.z);
             v0 = Vector3d(v0.x + (v1.x - v0.x)*t, v0.y + (v1.y - v0.y)*t, z);
         }
         else
@@ -78,7 +78,7 @@ bool LineSegment::CutXYPlane(float z)
     {
         if(v1.z < z && v0.z > z)
         {
-            float t = (z - v1.z)/(v0.z - v1.z);
+            double t = (z - v1.z)/(v0.z - v1.z);
             v1 = Vector3d(v1.x + (v0.x - v1.x)*t, v1.y + (v0.y - v1.y)*t, z);
         }
         else
@@ -86,13 +86,13 @@ bool LineSegment::CutXYPlane(float z)
     }
 }
 
-bool LineSegment::CutYZPlane(float x)
+bool LineSegment::CutYZPlane(double x)
 {
     if(v1.x > v0.x)
     {
         if(v0.x < x && v1.x > x)
         {
-            float t = (x - v0.x)/(v1.x - v0.x);
+            double t = (x - v0.x)/(v1.x - v0.x);
             v0 = Vector3d(x, v0.y + (v1.y - v0.y)*t, v0.z + (v1.z - v0.z)*t);
         }
         else
@@ -102,7 +102,7 @@ bool LineSegment::CutYZPlane(float x)
     {
         if(v1.x < x && v0.x > x)
         {
-            float t = (x - v1.x)/(v0.x - v1.x);
+            double t = (x - v1.x)/(v0.x - v1.x);
             v1 = Vector3d(x, v1.y + (v0.y - v1.y)*t, v1.z + (v0.z - v1.z)*t);
         }
         else
@@ -110,13 +110,13 @@ bool LineSegment::CutYZPlane(float x)
     }
 }
 
-bool LineSegment::CutXZPlane(float y)
+bool LineSegment::CutXZPlane(double y)
 {
     if(v1.y > v0.y)
     {
         if(v0.y < y && v1.y > y)
         {
-            float t = (y - v0.y)/(v1.y - v0.y);
+            double t = (y - v0.y)/(v1.y - v0.y);
             v0 = Vector3d(v0.x + (v1.x - v0.x)*t, y, v0.z + (v1.z - v0.z)*t);
         }
         else
@@ -126,7 +126,7 @@ bool LineSegment::CutXZPlane(float y)
     {
         if(v1.y < y && v0.y > y)
         {
-            float t = (y - v1.y)/(v0.y - v1.y);
+            double t = (y - v1.y)/(v0.y - v1.y);
             v1 = Vector3d(v1.y + (v0.y - v1.y)*t, y, v1.z + (v0.z - v1.z)*t);
         }
         else

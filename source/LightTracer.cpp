@@ -21,11 +21,11 @@ LightTracer::~LightTracer()
 
 void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 {
-    const float xres = (float)colBuf.GetXRes();
-    const float yres = (float)colBuf.GetYRes();
+    const double xres = (double)colBuf.GetXRes();
+    const double yres = (double)colBuf.GetYRes();
 
     Vector3d dummyVector;
-    float dummyFloat;
+    double dummydouble;
 
     colBuf.Clear(0);
 
@@ -36,27 +36,27 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         int xpixel = (int)xres;
         int ypixel = (int)yres;
         //AreaLight* light = (AreaLight*)m_lights.front(); // just a single area light allowed at the moment
-        float weight;
-        Light* light = lightTree->PickLight(m_random.GetFloat(0.0f, 1.0f), weight);
+        double weight;
+        Light* light = lightTree->PickLight(m_random.Getdouble(0.0f, 1.0f), weight);
         Ray ray; 
         Vector3d lightNormal;
 
-        Color pathColor = light->SampleRay(ray, lightNormal, dummyFloat, dummyFloat)*light->GetArea()*light->GetIntensity()/weight; // First direction is from the light source
+        Color pathColor = light->SampleRay(ray, lightNormal, dummydouble, dummydouble)*light->GetArea()*light->GetIntensity()/weight; // First direction is from the light source
         ray.direction.Normalize();
 
-        float u, v;
+        double u, v;
         Vector3d lensPoint;
         cam.SampleAperture(lensPoint, u, v);
 
         // Light going straight from the surface of the light source to the camera
         Vector3d lightToCam = lensPoint - ray.origin;
         Ray lightToCamRay(ray.origin, lightToCam);
-        float camRayLength = lightToCam.GetLength();
+        double camRayLength = lightToCam.GetLength();
         lightToCamRay.direction.Normalize();
 
-        float camcos = abs(-lightToCamRay.direction*cam.dir);
-        float pixelArea = (float)cam.GetPixelArea();
-        float surfcos = abs(lightNormal*lightToCamRay.direction);
+        double camcos = abs(-lightToCamRay.direction*cam.dir);
+        double pixelArea = (double)cam.GetPixelArea();
+        double surfcos = abs(lightNormal*lightToCamRay.direction);
         surfcos = abs(surfcos);
 
         if(TraceShadowRay(lightToCamRay, camRayLength) && cam.GetPixelFromRay(lightToCamRay, xpixel, ypixel, u, v))
@@ -82,22 +82,22 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
             //xpixel = colBuf.GetXRes();
             //ypixel = colBuf.GetYRes();
 
-            float u, v;
+            double u, v;
             Vector3d lensPoint;
             cam.SampleAperture(lensPoint, u, v);
 
             Ray camRay = Ray(info.GetPosition(), lensPoint - info.GetPosition());
-            float camRayLength = camRay.direction.GetLength();
+            double camRayLength = camRay.direction.GetLength();
             camRay.direction.Normalize();
 
-            /*float u = m_random.GetFloat(0, 2*F_PI);
-            float v = sqrt(m_random.GetFloat(0, 1));
+            /*double u = m_random.Getdouble(0, 2*F_PI);
+            double v = sqrt(m_random.Getdouble(0, 1));
 
             Vector3d camLeft = cam.up^cam.dir;
             Vector3d lensPoint = cam.pos+0.15f*v*(camLeft*cos(u)+cam.up*sin(u));
 
             Vector3d toCam = lensPoint - info.GetPosition();
-            float camRayLength = toCam.GetLength();
+            double camRayLength = toCam.GetLength();
             toCam.Normalize();
             toCam *= 2.75f/(-toCam*cam.dir);
             Vector3d focalPoint = lensPoint - toCam;
@@ -112,10 +112,10 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
             if(TraceShadowRay(camRay, camRayLength) && cam.GetPixelFromRay(camRay, xpixel, ypixel, u, v))
             {
-                float camcos = abs(-camRay.direction*cam.dir);
-                float pixelArea = (float)cam.GetPixelArea();
-                float surfcos = abs(info.GetGeometricNormal()*camRay.direction);
-                //float surfcos = info.GetNormal()*camRay.direction;
+                double camcos = abs(-camRay.direction*cam.dir);
+                double pixelArea = (double)cam.GetPixelArea();
+                double surfcos = abs(info.GetGeometricNormal()*camRay.direction);
+                //double surfcos = info.GetNormal()*camRay.direction;
                 surfcos = abs(surfcos);
 
                 Color brdf = info.GetMaterial()->BRDF(info, camRay.direction);
@@ -129,7 +129,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
             pathColor*= c/0.7f;
             ray = bounceRay;
 
-        } while(m_random.GetFloat(0.f, 1.f) < 0.7f);
+        } while(m_random.Getdouble(0.f, 1.f) < 0.7f);
     }
 }
 
@@ -156,7 +156,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
     for(int i = 0; i < nCores; i++)
         for(int x = 0; x < colBuf.GetXRes(); x++)
             for(int y = 0; y < colBuf.GetYRes(); y++)
-                    colBuf.AddColor(x, y, partBuf[i]->GetPixel(x, y)/(float)nCores);
+                    colBuf.AddColor(x, y, partBuf[i]->GetPixel(x, y)/(double)nCores);
     for(int i = 0; i < nCores; i++)
         delete partBuf[i];
 }
@@ -189,8 +189,8 @@ void LightTracer::Setup(const std::vector<Shape*>& shapes, const std::vector<Lig
 
 void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 {
-    const float xres = (float)colBuf.GetXRes();
-    const float yres = (float)colBuf.GetYRes();
+    const double xres = (double)colBuf.GetXRes();
+    const double yres = (double)colBuf.GetYRes();
 
     colBuf.Clear(0);
 
@@ -207,7 +207,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         // Light going straight from the surface of the light source to the camera
         Vector3d lightToCam = cam.pos - ray.origin;
         Ray lightToCamRay(ray.origin, lightToCam);
-        float length = lightToCam.GetLength();
+        double length = lightToCam.GetLength();
         lightToCamRay.direction.Normalize();
 
         if(TraceShadowRay(lightToCamRay, length) && cam.GetPixelFromRay(lightToCamRay, xpixel, ypixel))
@@ -231,7 +231,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
             camRay.origin = info.GetPosition();// + (info.GetGeometricNormal()*camRay.direction>0 ? info.GetGeometricNormal()*0.0001f : info.GetGeometricNormal()*-0.0001f);
             camRay.direction = cam.pos - camRay.origin;
 
-            float camRayLength = camRay.GetDirection().GetLength();
+            double camRayLength = camRay.GetDirection().GetLength();
             camRay.direction.Normalize();
 
             camRay.origin += camRay.direction*0.0001f;
@@ -241,10 +241,10 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
             if(TraceShadowRay(camRay, camRayLength) && cam.GetPixelFromRay(Ray(info.GetPosition(), camRay.direction), xpixel, ypixel))
             {
-                float camcos = -camRay.direction*cam.dir;
-                float pixelArea = (float)cam.GetPixelArea(colBuf.GetXRes(), colBuf.GetYRes());
-                float surfcos = info.GetGeometricNormal()*camRay.direction;
-                //float surfcos = info.GetNormal()*camRay.direction;
+                double camcos = -camRay.direction*cam.dir;
+                double pixelArea = (double)cam.GetPixelArea(colBuf.GetXRes(), colBuf.GetYRes());
+                double surfcos = info.GetGeometricNormal()*camRay.direction;
+                //double surfcos = info.GetNormal()*camRay.direction;
                 surfcos = abs(surfcos);
 
                 Color brdf = info.GetMaterial()->BRDF(info, camRay.direction);
@@ -258,7 +258,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
             pathColor*=info.GetMaterial()->GetSample(info, bounceRay, true)/0.7f;
             ray = bounceRay;
 
-        } while(m_random.GetFloat(0.f, 1.f) < 0.7f);
+        } while(m_random.Getdouble(0.f, 1.f) < 0.7f);
     }
 }
 
@@ -281,7 +281,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf) const
     for(int i = 0; i < nCores; i++)
         for(int x = 0; x < colBuf.GetXRes(); x++)
             for(int y = 0; y < colBuf.GetYRes(); y++)
-                    colBuf.AddColor(x, y, partBuf[i]->GetPixel(x, y)/(float)nCores);
+                    colBuf.AddColor(x, y, partBuf[i]->GetPixel(x, y)/(double)nCores);
 }
 
 void LightTracer::SetSPP(int spp)

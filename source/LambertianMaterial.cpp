@@ -21,9 +21,10 @@ LambertianMaterial::~LambertianMaterial()
 
 Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-    float alpha = 5;
-    float r1 = rnd.GetFloat(0, 2*M_PI);
-    float r2 = acos(pow(rnd.GetFloat(0.f, 1.f), 1/(alpha+1)));
+    Ray out;
+
+    double r1 = rnd.Getdouble(0, 2*M_PI);
+    double r2 = rnd.Getdouble(0.0001f, 0.9999f);
 
     Vector3d N_g = info.GetGeometricNormal();
     Vector3d N_s = info.GetNormal();
@@ -37,32 +38,25 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         N_s = -N_s;
 
     Vector3d N = adjoint ? N_g : N_s;
-    Vector3d adjN = adjoint ? N_s : N_g;;
+    Vector3d adjN = adjoint ? N_s : N_g;
+    Vector3d dir;
 
-    Vector3d right, forward;
-    Vector3d up = adjoint ? N_g : N_s;
+    SampleHemisphereCos(r1, r2, N, dir);
 
-    MakeBasis(up, right, forward);
-    Vector3d base = forward*cos(r1) + right*sin(r1);
-
-    auto out = Ray(info.GetPosition(), up + base*tanf(r2));
-    out.direction.Normalize();
-
-    Vector3d dir = out.direction;
     const Vector3d& w_o = dir;
+    out.origin = info.GetPosition();
+    out.direction = dir;
 
-    auto pdf = dir*up > 0 ? pow(dir*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
-    auto rpdf = w_i*up > 0 ? pow(w_i*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
+    auto pdf = dir*N/F_PI;
+    auto rpdf = w_i*adjN/F_PI;
 
-    if(pdf < 0)
-        pdf = 0;
     if(rpdf < 0)
         rpdf = 0;
 
     if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
         return Sample(Color(0, 0, 0), out, pdf, rpdf, false);
 
-    auto color = adjoint ? (dir*up)*BRDF(info, dir)*abs(w_i*N_s)/abs(w_i*N_g)/pdf : (dir*up)*BRDF(info, dir)/pdf;
+    auto color = adjoint ? Kd*abs(w_i*N_s)/abs(w_i*N_g) : Kd;
     return Sample(color, out, pdf, rpdf, false);
 }
 
@@ -106,44 +100,24 @@ void LambertianMaterial::ReadProperties(stringstream& ss)
     }
 }
 
-float LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
-    //Vector3d N_s = info.GetNormal();
-    //Vector3d N_g = info.GetGeometricNormal();
-
-    //const Vector3d& w_i = -info.GetDirection();
-    //const Vector3d& w_o = out;
-
-    //if(w_i*N_g < 0)
-    //    N_g = -N_g;
-
-    //if(N_g*N_s < 0)
-    //    N_s = -N_s;
-
-    //if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
-    //    return 0;
-
-    //return (adjoint ? N_g : N_s)*w_o/F_PI;
-
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();
-    const Vector3d& in = -info.GetDirection();
 
-    if(in*N_g < 0)
+    const Vector3d& w_i = -info.GetDirection();
+    const Vector3d& w_o = out;
+
+    if(w_i*N_g < 0)
         N_g = -N_g;
 
     if(N_g*N_s < 0)
         N_s = -N_s;
 
-    if(in*N_g < 0 || out*N_g < 0 || in*N_s < 0 || out*N_s < 0)
+    if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
         return 0;
 
-    Vector3d normal = adjoint ? N_g : N_s;
-
-    float alpha = 5.0;
-
-    Vector3d up = N_s;
-    return out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
+    return (adjoint ? N_g : N_s)*w_o/F_PI;
 }
 
 void LambertianMaterial::Save(Bytestream& stream) const

@@ -60,7 +60,7 @@ void MirrorMaterial::ReadProperties(stringstream& ss)
     }
 }
 
-float MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
     return 1;
 }

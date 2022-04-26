@@ -15,7 +15,7 @@ public:
 
     void Setup(const std::vector<Primitive*>& primitives, const std::vector<Light*>& lights);
     Color TracePath(const Ray& ray) const;
-    //bool TraceShadowRay(const Ray& ray, float tmax) const;
+    //bool TraceShadowRay(const Ray& ray, double tmax) const;
     Color TracePathPrimitive(const Ray& ray) const;
     void SetSPP(unsigned int samplesperpixel);
     unsigned int GetSPP() const;

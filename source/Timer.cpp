@@ -34,9 +34,9 @@ void Timer::Reset()
 //------------------------------------------------------------------------------
 // Returns the time passed in seconds since the reset
 //------------------------------------------------------------------------------
-float Timer::GetTime() const
+double Timer::GetTime() const
 {
     LARGE_INTEGER thisTick;
     QueryPerformanceCounter(&thisTick);
-    return (thisTick.QuadPart - m_startTick.QuadPart)/(float)m_ticksPerSecond.QuadPart;
+    return (thisTick.QuadPart - m_startTick.QuadPart)/(double)m_ticksPerSecond.QuadPart;
 }

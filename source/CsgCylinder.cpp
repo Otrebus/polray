@@ -4,7 +4,7 @@
 #include "Utils.h"
 
 CsgCylinder::CsgCylinder(Vector3d& position, Vector3d& dir, 
-                         float length, float radius) 
+                         double length, double radius) 
                          : pos_(position), length_(length), radius_(radius)
 {
     dir.Normalize();
@@ -28,30 +28,30 @@ bool CsgCylinder::Intersect(const Ray& inRay, std::vector<CsgHit>& intersects) c
     Vector3d transOrigin = Multiply(invMatU_, invMatV_, invMatW_, inRay.origin);
     Vector3d transDir = Multiply(invMatU_, invMatV_, invMatW_, inRay.direction);
     Ray ray(transOrigin - transPos, transDir);
-    const float& x = ray.direction.x;
-    const float& y = ray.direction.y;
-    const float& z = ray.direction.z;
-    const float& x_O = ray.origin.x;
-    const float& y_O = ray.origin.y;
-    const float& z_O = ray.origin.z;
+    const double& x = ray.direction.x;
+    const double& y = ray.direction.y;
+    const double& z = ray.direction.z;
+    const double& x_O = ray.origin.x;
+    const double& y_O = ray.origin.y;
+    const double& z_O = ray.origin.z;
 
-    const float a = x*x + y*y;
-    const float b = 2*x*x_O + 2*y*y_O;
-    const float c = x_O*x_O + y_O*y_O - radius_*radius_;
-    const float D = b*b - 4*a*c;
+    const double a = x*x + y*y;
+    const double b = 2*x*x_O + 2*y*y_O;
+    const double c = x_O*x_O + y_O*y_O - radius_*radius_;
+    const double D = b*b - 4*a*c;
 
     if(D < 0)
         return false;
 
-    float tNear = (-b - sqrt(D))/(2*a);
-    float tFar = (-b + sqrt(D))/(2*a);
+    double tNear = (-b - sqrt(D))/(2*a);
+    double tFar = (-b + sqrt(D))/(2*a);
 
-    float xNear = ray.origin.x + tNear*ray.direction.x;
-    float yNear = ray.origin.y + tNear*ray.direction.y;
-    float zNear = ray.origin.z + tNear*ray.direction.z;
-    float xFar = ray.origin.x + tFar*ray.direction.x;
-    float yFar = ray.origin.y + tFar*ray.direction.y;
-    float zFar = ray.origin.z + tFar*ray.direction.z;
+    double xNear = ray.origin.x + tNear*ray.direction.x;
+    double yNear = ray.origin.y + tNear*ray.direction.y;
+    double zNear = ray.origin.z + tNear*ray.direction.z;
+    double xFar = ray.origin.x + tFar*ray.direction.x;
+    double yFar = ray.origin.y + tFar*ray.direction.y;
+    double zFar = ray.origin.z + tFar*ray.direction.z;
     IntersectionInfo nearInfo, farInfo;
     nearInfo.direction = farInfo.direction = ray.direction;
     nearInfo.material = farInfo.material = material;
@@ -161,32 +161,32 @@ bool CsgCylinder::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox&
     return true;
 }
 
-float CsgCylinder::Intersect(const Ray& inRay) const
+double CsgCylinder::Intersect(const Ray& inRay) const
 {
     Vector3d transPos = Multiply(invMatU_, invMatV_, invMatW_, pos_);    
     Vector3d transOrigin = Multiply(invMatU_, invMatV_, invMatW_, inRay.origin);
     Vector3d transDir = Multiply(invMatU_, invMatV_, invMatW_, inRay.direction);
     Ray ray(transOrigin - transPos, transDir);
 
-    const float& x = ray.direction.x;
-    const float& y = ray.direction.y;
-    const float& z = ray.direction.z;
-    const float& x_O = ray.origin.x;
-    const float& y_O = ray.origin.y;
-    const float& z_O = ray.origin.z;
+    const double& x = ray.direction.x;
+    const double& y = ray.direction.y;
+    const double& z = ray.direction.z;
+    const double& x_O = ray.origin.x;
+    const double& y_O = ray.origin.y;
+    const double& z_O = ray.origin.z;
 
-    const float a = x*x + y*y;
-    const float b = 2*x*x_O + 2*y*y_O;
-    const float c = x_O*x_O + y_O*y_O - radius_*radius_;
-    const float D = b*b - 4*a*c;
+    const double a = x*x + y*y;
+    const double b = 2*x*x_O + 2*y*y_O;
+    const double c = x_O*x_O + y_O*y_O - radius_*radius_;
+    const double D = b*b - 4*a*c;
 
     if(D < 0)
         return -inf;
 
-    float tNear = (-b - sqrt(D))/(2*a);
-    float tFar = (-b + sqrt(D))/(2*a);
-    float zNear = ray.origin.z + tNear*ray.direction.z;
-    float zFar = ray.origin.z + tFar*ray.direction.z;
+    double tNear = (-b - sqrt(D))/(2*a);
+    double tFar = (-b + sqrt(D))/(2*a);
+    double zNear = ray.origin.z + tNear*ray.direction.z;
+    double zFar = ray.origin.z + tFar*ray.direction.z;
 
     if(zFar < -length_/2)
     {
@@ -267,13 +267,13 @@ void CsgCylinder::SetMaterial(Material* mat)
     material = mat;
 }
 
-void CsgCylinder::Rotate(const Vector3d& axis, float angle)
+void CsgCylinder::Rotate(const Vector3d& axis, double angle)
 {
-    float u = axis.x;
-    float v = axis.y;
-    float w = axis.z;
-    float cosAngle = cos(angle);
-    float sinAngle = sin(angle);
+    double u = axis.x;
+    double v = axis.y;
+    double w = axis.z;
+    double cosAngle = cos(angle);
+    double sinAngle = sin(angle);
 
     Matrix3d rot(u*u + (1 - u*u)*cosAngle, u*v*(1 - cosAngle) - w*sinAngle,
                  u*w*(1 - cosAngle) + v*sinAngle, 0, 
@@ -297,7 +297,7 @@ void CsgCylinder::Translate(const Vector3d& dir)
 void CsgCylinder::Precalculate()
 {
     // This is the standard adjoint/determinant calculation of an inverse matrix
-    float det = x_*(y_^z_);
+    double det = x_*(y_^z_);
     invMatU_ = Vector3d(y_.y*z_.z - z_.y*y_.z,
                         -(x_.y*z_.z - z_.y*x_.z),
                         x_.y*y_.z - y_.y*x_.z)/det;

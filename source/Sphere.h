@@ -13,20 +13,20 @@ class Scene;
 class Sphere : public Primitive, public Model
 {
 public:
-    Sphere(const Vector3d& position, float radius);
-    Sphere(const Vector3d& position, const Vector3d& up, const Vector3d& right, float radius);
+    Sphere(const Vector3d& position, double radius);
+    Sphere(const Vector3d& position, const Vector3d& up, const Vector3d& right, double radius);
     Sphere();
     ~Sphere();
 
-    float GetRadius() const;
-    void SetRadius(float radius);
+    double GetRadius() const;
+    void SetRadius(double radius);
     Vector3d GetPosition() const;
     Vector3d SetPosition(Vector3d& position);
 
     bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
     BoundingBox GetBoundingBox() const;
 
-    float Intersect(const Ray& ray) const;
+    double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
     virtual void AddToScene(Scene& scene);
@@ -35,7 +35,7 @@ public:
     void Load(Bytestream& stream);
 
 protected:
-    float radius;
+    double radius;
     Vector3d position, up, right;
 };
 

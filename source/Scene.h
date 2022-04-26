@@ -102,8 +102,8 @@ public:
     void SetPartitioning(SpatialPartitioning* partitioning);
     SpatialPartitioning* GetPartitioning() const;
 
-    bool Intersect(const Ray&, float tmax) const;
-    float Intersect(const Ray&, const Primitive*&) const;
+    bool Intersect(const Ray&, double tmax) const;
+    double Intersect(const Ray&, const Primitive*&) const;
 
     friend class LightAdder;
     friend class PrimitiveAdder;

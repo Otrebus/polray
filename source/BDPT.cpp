@@ -23,11 +23,11 @@ BDPT::~BDPT()
 
 int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
 
-    float rr = 0.7;
+    double rr = 0.7;
 
-    while(path.size() < 3 || m_random.GetFloat(0.f, 1.f) < rr) {
+    while(path.size() < 3 || m_random.Getdouble(0.f, 1.f) < rr) {
         BDVertex* lastV = path.back();
-        float lastPdf = lastV->sample.pdf;
+        double lastPdf = lastV->sample.pdf;
         auto lastSample = lastV->sample.color;
 
         const Primitive* hitPrimitive;
@@ -46,7 +46,7 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         BDVertex* newV = new BDVertex();
         newV->info = info;
         Vector3d v = (info.GetPosition() - lastV->out.origin);
-        float lSqr = v.GetLengthSquared();
+        double lSqr = v.GetLengthSquared();
         v.Normalize();
         newV->pdf = lastPdf*(abs(info.GetGeometricNormal()*info.GetDirection()))/(lSqr);
         newV->alpha = lastV->alpha*lastSample;
@@ -94,16 +94,16 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     BDVertex* camPoint = new BDVertex();
     Vector3d lensPoint;
     cam.SampleAperture(lensPoint, camPoint->camU, camPoint->camV);
-    camPoint->out = cam.GetRayFromPixel(x, y, m_random.GetFloat(0, 1), 
-                                        m_random.GetFloat(0, 1), camPoint->camU,
+    camPoint->out = cam.GetRayFromPixel(x, y, m_random.Getdouble(0, 1), 
+                                        m_random.Getdouble(0, 1), camPoint->camU,
                                         camPoint->camV);
     camPoint->rr = 1;
     camPoint->alpha = Color::Identity;
     camPoint->info.normal = camPoint->info.geometricnormal = cam.dir;
     camPoint->info.position = camPoint->out.origin;
     camPoint->rpdf = 1;
-    float costheta = abs(camPoint->out.direction*cam.dir);
-    float lastPdf = 1/(cam.GetPixelArea()*costheta*costheta*costheta);
+    double costheta = abs(camPoint->out.direction*cam.dir);
+    double lastPdf = 1/(cam.GetPixelArea()*costheta*costheta*costheta);
     camPoint->pdf = 1/(cam.GetPixelArea());
     Color lastSample = costheta*Color::Identity/lastPdf;
 
@@ -117,8 +117,8 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
 {
     int depth = 1;
     BDVertex* lightPoint = new BDVertex();
-    float rr = 0.7f;
-    float lastPdf;
+    double rr = 0.7f;
+    double lastPdf;
     Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal,
                      lightPoint->pdf, lastPdf);
     lightPoint->alpha = light->GetArea()*light->GetIntensity();
@@ -165,7 +165,7 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     BDVertex* lastE = eyePath[t-1];
 
     Ray c = Ray(lastE->out.origin, lastL->out.origin - lastE->out.origin);
-    float r = c.direction.GetLength();
+    double r = c.direction.GetLength();
     c.direction.Normalize();
 
     if(!TraceShadowRay(c, r) || r < 0.005f)
@@ -176,7 +176,7 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     result *= lastL->alpha*lastE->alpha;
 
     // This BRDF is backwards so let's modify it 
-    float modifier = abs(lastL->info.direction*lastL->info.normal)
+    double modifier = abs(lastL->info.direction*lastL->info.normal)
                     /abs(lastL->info.direction*lastL->info.geometricnormal);
 
     if(s > 1)
@@ -190,10 +190,10 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     return result;
 }
 
-float BDPT::UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
+double BDPT::UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light*, Camera*) const
 {
-    float weight = float(s+t);
+    double weight = double(s+t);
     bool wasSpec = false;
     for(auto it = lightPath.cbegin() + 1; it < lightPath.cbegin() + s; it++)
     {
@@ -228,12 +228,12 @@ float BDPT::UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
     return 1/weight;
 }
 
-float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
+double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
                            vector<BDVertex*>& eyePath, Light* light, Camera* cam) const
 {
-    float weight = 0;
-    std::vector<float> forwardProbs(s+t);
-    std::vector<float> backwardProbs(s+t);
+    double weight = 0;
+    std::vector<double> forwardProbs(s+t);
+    std::vector<double> backwardProbs(s+t);
     std::vector<bool> specular(s+t);
 
     for(int i = 0; i < s+t; i++)
@@ -259,9 +259,9 @@ float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lightPath[s-1]->info;
         Vector3d out = lastE->info.GetPosition() - lastL->info.GetPosition();
-        float lSqr = out.GetLengthSquared();
+        double lSqr = out.GetLengthSquared();
         out.Normalize();
-        float newPdf;
+        double newPdf;
         if(s > 1)
             newPdf = lastL->info.GetMaterial()->
                      PDF(info, out, true);
@@ -285,10 +285,10 @@ float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lastE->info;
         Vector3d out = lastL->info.GetPosition()-lastE->info.GetPosition();
-        float lSqr = out.GetLengthSquared();
+        double lSqr = out.GetLengthSquared();
         out.Normalize();
-        float newPdf;
-        float costheta = abs(lastE->info.geometricnormal*out);
+        double newPdf;
+        double costheta = abs(lastE->info.geometricnormal*out);
         if(t == 1)
             newPdf = 1/(cam->GetPixelArea()*costheta*costheta*costheta);
         else
@@ -301,7 +301,7 @@ float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         backwardProbs[i] = eyePath[s+t-i-1]->pdf;
     
     // Sum the actual weights of the paths together
-    float l = 1;
+    double l = 1;
     for(int i = s; i < s+t-1; i++)
     {
         l *= forwardProbs[i]/backwardProbs[i];
@@ -322,7 +322,7 @@ float BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
     return 1.0f/(1.0f+weight);
 }
 
-float BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
+double BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
 {
     return PowerHeuristic(s, t, lightPath, eyePath, light, camera);
@@ -335,8 +335,8 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     vector<BDVertex*> eyePath;
     vector<BDVertex*> lightPath;
 
-    float lightWeight;
-    float r = m_random.GetFloat(0.0f, 1.0f);
+    double lightWeight;
+    double r = m_random.Getdouble(0.0f, 1.0f);
     Light* light = lightTree->PickLight(r, lightWeight);
 
     int lLength = BuildLightPath(lightPath, light);
@@ -350,7 +350,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     {
         BDSample sample = *it;
         const int xres = lightImage.GetXRes(), yres = lightImage.GetYRes();
-        float weight = WeighPath(sample.s, sample.t, lightPath, eyePath, light, &cam);
+        double weight = WeighPath(sample.s, sample.t, lightPath, eyePath, light, &cam);
         Color eval = EvalPath(lightPath, eyePath, sample.s, sample.t, light);
 
         if(sample.t == 1) // These samples end up on the light image
@@ -362,15 +362,15 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
             if(!cam.GetPixelFromRay(camRay, camx, camy, 
                                     eyePath[0]->camU, eyePath[0]->camV))
                 continue;
-            float costheta = abs(cam.dir*camRay.direction);
-            float mod = costheta*costheta*costheta*costheta*cam.GetFilmArea()*lightWeight;
+            double costheta = abs(cam.dir*camRay.direction);
+            double mod = costheta*costheta*costheta*costheta*cam.GetFilmArea()*lightWeight;
             Color result = weight*eval/mod;
             lightImage.AddColor(camx, camy, result);
         }
         else
         {
-            float costheta = abs(cam.dir*eyePath[0]->out.direction);
-            float mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea()/(xres*yres))*lightWeight;
+            double costheta = abs(cam.dir*eyePath[0]->out.direction);
+            double mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea()/(xres*yres))*lightWeight;
             Color result = weight*eval/mod;
             eyeImage.AddColor(x, y, result);
         }

@@ -19,7 +19,7 @@ bool BoundingBox::ContainsPoint(const Vector3d& v)
 
 bool BoundingBox::Intersects(const Ray& ray)
 {  
-    float t1, t2, tfar = numeric_limits<float>::max(), tnear = numeric_limits<float>::min();
+    double t1, t2, tfar = numeric_limits<double>::max(), tnear = numeric_limits<double>::min();
 
     // Check X slab
     for(int u = 0; u < 3; u++)
@@ -46,11 +46,11 @@ bool BoundingBox::Intersects(const Ray& ray)
     return true;  
 }
 
-bool BoundingBox::Intersect(const Ray& ray, float& tnear, float& tfar) const {  
+bool BoundingBox::Intersect(const Ray& ray, double& tnear, double& tfar) const {  
   
-    float t1, t2;
-    tfar = numeric_limits<float>::infinity();
-    tnear = -numeric_limits<float>::infinity();
+    double t1, t2;
+    tfar = numeric_limits<double>::infinity();
+    tnear = -numeric_limits<double>::infinity();
 
     for(int u = 0; u < 3; u++)
     {
@@ -83,12 +83,12 @@ BoundingBox& BoundingBox::operator=(const BoundingBox& b)
     return *this;
 }
 
-float BoundingBox::GetArea() const
+double BoundingBox::GetArea() const
 {
     return (c2.z-c1.z)*(c2.y-c1.y)*2 + (c2.x-c1.x)*(c2.z-c1.z)*2 + (c2.x-c1.x)*(c2.y-c1.y)*2;
 }
 
-float BoundingBox::GetVolume() const
+double BoundingBox::GetVolume() const
 {
     return (c2.z-c1.z)*(c2.y-c1.y)*(c2.x-c1.x);
 }

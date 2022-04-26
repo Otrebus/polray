@@ -9,7 +9,7 @@ class Matrix3d;
 class Vector3d
 {
 public:
-    Vector3d(float x, float y, float z);
+    Vector3d(double x, double y, double z);
     ~Vector3d();
     Vector3d();
 
@@ -24,28 +24,28 @@ public:
     Vector3d operator*=(const Matrix3d& m);
     bool operator!=(const Vector3d&) const;
     bool operator==(const Vector3d&) const;
-    float operator*(const Vector3d&) const;
+    double operator*(const Vector3d&) const;
     Vector3d operator^(const Vector3d&)	const;
-    Vector3d operator/(const float) const;
-    Vector3d operator/=(float);
-    Vector3d operator*=(float);
-    Vector3d operator*(const float) const;
-    float& operator[](int);
-    float operator[](int) const;
+    Vector3d operator/(const double) const;
+    Vector3d operator/=(double);
+    Vector3d operator*=(double);
+    Vector3d operator*(const double) const;
+    double& operator[](int);
+    double operator[](int) const;
     
-    float GetLength() const;
-    float GetLengthSquared() const;
+    double GetLength() const;
+    double GetLengthSquared() const;
     void Normalize();
     bool IsNull() const;
     bool IsValid() const;
 
-    float x, y, z;
+    double x, y, z;
 };
 
 class Vector2d
 {
 public:
-    Vector2d(float x, float y);
+    Vector2d(double x, double y);
     ~Vector2d();
     Vector2d();
 
@@ -53,16 +53,16 @@ public:
     Vector2d operator+(const Vector2d&) const;
     Vector2d operator-(const Vector2d&) const;
 
-    float operator*(const Vector2d&) const;
-    Vector2d operator*(const float) const;
+    double operator*(const Vector2d&) const;
+    Vector2d operator*(const double) const;
 
-    float GetLength() const;
+    double GetLength() const;
     void Normalize();
 
-    float x, y;
+    double x, y;
 };
 
-Vector3d operator*(float t, const Vector3d& v);
+Vector3d operator*(double t, const Vector3d& v);
 std::ostream& operator<<(std::ostream& str, const Vector3d& v);
 
 #endif

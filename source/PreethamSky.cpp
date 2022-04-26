@@ -4,7 +4,7 @@
 
 #include <cmath>
 
-PreethamSky::PreethamSky(float phi, float theta, float T, float divisor)
+PreethamSky::PreethamSky(double phi, double theta, double T, double divisor)
     : phi_(phi*M_PI/180.0f), theta_(theta*M_PI/180.0f), T_(T), divisor_(divisor)
 {
     Init();
@@ -16,11 +16,11 @@ PreethamSky::PreethamSky()
 
 void PreethamSky::Init()
 {
-    float t = theta_;
-    float t2 = theta_*theta_;
-    float t3 = t2*theta_;
+    double t = theta_;
+    double t2 = theta_*theta_;
+    double t3 = t2*theta_;
 
-    float xz0, xz1, xz2, yz0, yz1, yz2;
+    double xz0, xz1, xz2, yz0, yz1, yz2;
 
     dir_sun_ = Vector3d(cos(phi_), cos(theta_), sin(phi_));
     dir_sun_.Normalize();
@@ -61,11 +61,11 @@ void PreethamSky::Init()
     yDenom_ = Perez(A_y_, B_y_, C_y_, D_y_, E_y_, 0, theta_);
 }
 
-float PreethamSky::Perez(float A, float B, float C, float D, float E, 
-                   float theta, float gamma)
+double PreethamSky::Perez(double A, double B, double C, double D, double E, 
+                   double theta, double gamma)
 {
-    float cosgamma2 = cos(gamma)*cos(gamma);
-    float sdf = (1 + A*exp(B/cos(theta)))*(1 + C*exp(D*gamma) + E*cosgamma2);
+    double cosgamma2 = cos(gamma)*cos(gamma);
+    double sdf = (1 + A*exp(B/cos(theta)))*(1 + C*exp(D*gamma) + E*cosgamma2);
     return sdf;
 }
 
@@ -78,22 +78,22 @@ Color PreethamSky::GetRadiance(const Vector3d& viewDir) const
     Vector3d dir = viewDir;
     dir.Normalize();
     
-    //float phi_dir = atan2(dir.z, dir.x);
-    //float theta_dir = acos(dir.z);
-    float sdf = dir*dir_sun_;
-    float gamma = acos(dir*dir_sun_);
+    //double phi_dir = atan2(dir.z, dir.x);
+    //double theta_dir = acos(dir.z);
+    double sdf = dir*dir_sun_;
+    double gamma = acos(dir*dir_sun_);
 
-    float Y_Yxy = Y_z_*Perez(A_Y_, B_Y_, C_Y_, D_Y_, E_Y_, theta_, gamma)/YDenom_;
-    float y_Yxy = y_z_*Perez(A_y_, B_y_, C_y_, D_y_, E_y_, theta_, gamma)/yDenom_;
-    float x_Yxy = x_z_*Perez(A_x_, B_x_, C_x_, D_x_, E_x_, theta_, gamma)/xDenom_;
+    double Y_Yxy = Y_z_*Perez(A_Y_, B_Y_, C_Y_, D_Y_, E_Y_, theta_, gamma)/YDenom_;
+    double y_Yxy = y_z_*Perez(A_y_, B_y_, C_y_, D_y_, E_y_, theta_, gamma)/yDenom_;
+    double x_Yxy = x_z_*Perez(A_x_, B_x_, C_x_, D_x_, E_x_, theta_, gamma)/xDenom_;
 
-    float X_XYZ = x_Yxy*Y_Yxy/y_Yxy;
-    float Y_XYZ = Y_Yxy;
-    float Z_XYZ = (1 - x_Yxy - y_Yxy)*Y_Yxy/y_Yxy;
+    double X_XYZ = x_Yxy*Y_Yxy/y_Yxy;
+    double Y_XYZ = Y_Yxy;
+    double Z_XYZ = (1 - x_Yxy - y_Yxy)*Y_Yxy/y_Yxy;
 
-    float R = 3.240479f*X_XYZ  - 1.53715*Y_XYZ  - 0.49853*Z_XYZ;
-    float G = -0.969256f*X_XYZ + 1.875991*Y_XYZ + 0.041556*Z_XYZ;
-    float B = 0.055647f*X_XYZ  - 0.204043*Y_XYZ + 1.057311*Z_XYZ;
+    double R = 3.240479f*X_XYZ  - 1.53715*Y_XYZ  - 0.49853*Z_XYZ;
+    double G = -0.969256f*X_XYZ + 1.875991*Y_XYZ + 0.041556*Z_XYZ;
+    double B = 0.055647f*X_XYZ  - 0.204043*Y_XYZ + 1.057311*Z_XYZ;
 
     return Color(R, G, B)/divisor_;
 }

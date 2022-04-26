@@ -37,7 +37,7 @@ int nCurrentFrame;
 Rendering* rendering;
 int frames;
 
-void radixsort(float* fnumbers, float* fsorted, int n)
+void radixsort(double* fnumbers, double* fsorted, int n)
 {
     unsigned int* numbers = (unsigned int*)fnumbers;
     unsigned int* sorted = (unsigned int*)fsorted;
@@ -54,7 +54,7 @@ void radixsort(float* fnumbers, float* fsorted, int n)
     const int bitmaskR = 0x7FF;
     const int bitmaskM = bitmaskR << 11;
 
-    // First, create histograms and prepare the floats for sorting
+    // First, create histograms and prepare the doubles for sorting
     for(int i = 0; i < n; i++)
     {
         numbers[i] = numbers[i] ^ (-int(numbers[i] >> 31) | 0x80000000);
@@ -90,7 +90,7 @@ void radixsort(float* fnumbers, float* fsorted, int n)
 }
 
 /*
-float GetRadixSortTime(int n)
+double GetRadixSortTime(int n)
 {
     Random r;
     SAHEvent** events;
@@ -99,12 +99,12 @@ float GetRadixSortTime(int n)
 
         for(int i = 0; i < n; i++)
         {
-            events[i] = new SAHEvent(0, r.GetFloat(-10, 10), 0);
+            events[i] = new SAHEvent(0, r.Getdouble(-10, 10), 0);
         }
 
     KDTree blah;
     int b[3] = {n, n, n};
-    float t = timer->GetTime();
+    double t = timer->GetTime();
     blah.SortEvents(events, n);
     return timer->GetTime() - t;
 }*/

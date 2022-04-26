@@ -11,7 +11,7 @@ class BrutePartitioning : public SpatialPartitioning
 {
 public:
     void Build(std::vector<const Primitive*>);
-    float Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax, bool returnPrimitive) const;
+    double Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive) const;
 
 protected:
     std::vector<const Primitive*> primitives;

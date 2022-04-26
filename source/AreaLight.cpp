@@ -48,19 +48,19 @@ void AreaLight::AddToScene(std::shared_ptr<Scene> scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-float AreaLight::GetArea() const
+double AreaLight::GetArea() const
 {
     return abs((c1^c2).GetLength());
 }
 
-float AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
+double AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     Ray ray(info.position, out);
     if(!portals.empty())
     {   // Intersect the portal with the ray - this is almost
         // the same code as ordinary triangle intersection
         LightPortal p = portals.front();
-           float u, v, t;
+           double u, v, t;
         Vector3d D;
 
         D.x = ray.direction.x;
@@ -74,7 +74,7 @@ float AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
         Vector3d P = E2^T;
         Vector3d Q = E1^D;
 
-        float det = E2*Q;
+        double det = E2*Q;
         if(det < 0.0000000001f && det > -0.0000000001f)
             return 0;
 
@@ -96,14 +96,14 @@ float AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return ray.direction*GetNormal()/F_PI;
 }
 
-Color AreaLight::SampleRay(Ray& ray, Vector3d& n, float& areaPdf, float& anglePdf) const
+Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& anglePdf) const
 {
     Vector3d normal = c1^c2;
     normal.Normalize();
     Vector3d dir;
 
-    float x = r.GetFloat(0, 0.9999f);
-    float y = r.GetFloat(0, 0.9999f);
+    double x = r.Getdouble(0, 0.9999f);
+    double y = r.Getdouble(0, 0.9999f);
 
     ray.origin = pos + c1*x + c2*y + 0.0001f*normal;
 
@@ -118,20 +118,20 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, float& areaPdf, float& anglePd
         LightPortal p = portals.front();
         Vector3d portalNormal = p.v1^p.v2;
         portalNormal.Normalize();
-        float x = r.GetFloat(0, 0.9999f);
-        float y = r.GetFloat(0, 0.9999f);
+        double x = r.Getdouble(0, 0.9999f);
+        double y = r.Getdouble(0, 0.9999f);
 
         Vector3d portalPos = p.pos + p.v1*x + p.v2*y;
 
         ray.direction = portalPos - ray.origin;
-        float d = ray.direction.GetLength();
+        double d = ray.direction.GetLength();
         ray.direction.Normalize();
         anglePdf = (1/p.GetArea())*d*d/(abs(p.GetNormal()*ray.direction));
         return Color(1, 1, 1)*abs(ray.direction*normal)/anglePdf;
     }
 
-    float r1 = r.GetFloat(0, 2*F_PI);
-    float r2 = r.GetFloat(0, 0.9999f);
+    double r1 = r.Getdouble(0, 2*F_PI);
+    double r2 = r.Getdouble(0, 0.9999f);
      ray.direction =  forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
         + normal * sqrt(1-r2);
     anglePdf = abs(ray.direction*normal)/(F_PI);
@@ -140,14 +140,14 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, float& areaPdf, float& anglePd
 
 void AreaLight::SamplePoint(Vector3d& point, Vector3d& n) const
 {
-    float x, y;
+    double x, y;
     Vector3d normal = c1^c2;
     normal.Normalize();
     Vector3d dir;
 
-    x = r.GetFloat(0, 0.9999f);
-    y = r.GetFloat(0, 0.9999f);
-    //dir = Vector3d(r.GetFloat(-1, 1), r.GetFloat(-1, 1), r.GetFloat(-1, 1));
+    x = r.Getdouble(0, 0.9999f);
+    y = r.Getdouble(0, 0.9999f);
+    //dir = Vector3d(r.Getdouble(-1, 1), r.Getdouble(-1, 1), r.Getdouble(-1, 1));
 
     point = pos + c1*x + c2*y + 0.0001f*normal;
     n = normal;
@@ -175,20 +175,20 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
     Vector3d lightPoint, lightNormal;
     SamplePoint(lightPoint, lightNormal);
     Vector3d toLight = lightPoint - info.GetPosition();
-    float d = toLight.GetLength();
+    double d = toLight.GetLength();
     Vector3d normal = info.GetNormal();
 
     if(toLight*lightNormal < 0)
     {
-           float d = toLight.GetLength();
+           double d = toLight.GetLength();
         toLight.Normalize();
 
         Ray lightRay = Ray(info.GetPosition(), toLight);
 
         if(renderer->TraceShadowRay(lightRay, d))
         {
-            float cosphi = abs(normal*toLight);
-            float costheta = abs(toLight*lightNormal);
+            double cosphi = abs(normal*toLight);
+            double costheta = abs(toLight*lightNormal);
             Color c;
             c = info.GetMaterial()->BRDF(info, toLight)
                 *costheta*cosphi*intensity_*GetArea()/(d*d);
@@ -201,12 +201,12 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
 Color AreaLight::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo) const
 {
     Vector3d v = thisInfo.position - lastInfo.position;
-    float d = v.GetLength();
+    double d = v.GetLength();
     v.Normalize();
-    float costheta = abs(v*thisInfo.normal);
-    float lightPdf = 1.0f/GetArea();
+    double costheta = abs(v*thisInfo.normal);
+    double lightPdf = 1.0f/GetArea();
     Material* mat = lastInfo.GetMaterial();
-    float brdfPdf = costheta*mat->PDF(lastInfo, v, false)/(d*d);
+    double brdfPdf = costheta*mat->PDF(lastInfo, v, false)/(d*d);
     return intensity_/(1.0f + lightPdf*lightPdf/(brdfPdf*brdfPdf));
 }
 
@@ -219,19 +219,19 @@ Color AreaLight::NextEventEstimationMIS(const Renderer* renderer, const Intersec
 
     if(toLight*lightNormal < 0)
     {
-           float d = toLight.GetLength();
+           double d = toLight.GetLength();
         toLight.Normalize();
         Ray lightRay = Ray(info.GetPosition(), toLight);
 
         if(renderer->TraceShadowRay(lightRay, d))
         {
-            float cosphi = abs(normal*toLight);
-            float costheta = abs(toLight*lightNormal);
+            double cosphi = abs(normal*toLight);
+            double costheta = abs(toLight*lightNormal);
             Material* mat = info.GetMaterial();
             Color c = mat->BRDF(info, toLight)
                       *costheta*cosphi*intensity_*GetArea()/(d*d);
-            float brdfPdf = costheta*mat->PDF(info, toLight, false)/(d*d);
-            float lightPdf = 1.0f/GetArea();
+            double brdfPdf = costheta*mat->PDF(info, toLight, false)/(d*d);
+            double lightPdf = 1.0f/GetArea();
             return c/(1.0f + brdfPdf*brdfPdf/(lightPdf*lightPdf));
         }
     }

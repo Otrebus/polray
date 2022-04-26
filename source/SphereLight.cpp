@@ -8,7 +8,7 @@ SphereLight::SphereLight()
 {
 }
 
-SphereLight::SphereLight(Vector3d pos, float rad, Color str)
+SphereLight::SphereLight(Vector3d pos, double rad, Color str)
     : position_(pos), radius_(rad), Light(str)
 {
     r_.Seed(GetTickCount() + int(this));
@@ -21,12 +21,12 @@ SphereLight::~SphereLight()
 {
 }
 
-float SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
+double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     return abs(out*info.normal)/M_PI;
 }
 
-Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, float& areaPdf, float& pdf) const
+Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
 {
     SamplePoint(ray.origin, normal);
     Vector3d right, forward;
@@ -34,8 +34,8 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, float& areaPdf, float& 
 
     areaPdf = 1/GetArea();
 
-    float r1 = r_.GetFloat(0, 2*M_PI);
-    float r2 = r_.GetFloat(0, 0.9999f);
+    double r1 = r_.Getdouble(0, 2*M_PI);
+    double r2 = r_.Getdouble(0, 0.9999f);
     ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
                     + normal * sqrt(1 - r2);
     pdf = abs(ray.direction*normal)/M_PI;
@@ -45,9 +45,9 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, float& areaPdf, float& 
 
 void SphereLight::SamplePoint(Vector3d& point, Vector3d& normal) const
 {
-    float z = r_.GetFloat(-1, 1);
-    float r = sqrt(1 - z*z);
-    float u = r_.GetFloat(0, 2*M_PI);
+    double z = r_.Getdouble(-1, 1);
+    double r = sqrt(1 - z*z);
+    double u = r_.Getdouble(0, 2*M_PI);
     normal = Vector3d(r*cos(u), r*sin(u), z);
     point = position_ + normal*radius_*1.0001f;
 }
@@ -55,9 +55,9 @@ void SphereLight::SamplePoint(Vector3d& point, Vector3d& normal) const
 void SphereLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const
 {
     Vector3d right, forward;
-    float z = r_.GetFloat(0, 1);
-    float r = sqrt(1 - z*z);
-    float u = r_.GetFloat(0, 2*M_PI);
+    double z = r_.Getdouble(0, 1);
+    double r = sqrt(1 - z*z);
+    double u = r_.Getdouble(0, 2*M_PI);
     MakeBasis(apex, right, forward);
     normal = right*r*cos(u) + forward*r*sin(u) + apex*z;
     point = position_ + normal*radius_*1.0001f;
@@ -77,7 +77,7 @@ void SphereLight::Load(Bytestream& s)
     material_->light = this;
 }
 
-float SphereLight::GetArea() const
+double SphereLight::GetArea() const
 {
     return 4*M_PI*radius_*radius_;
 }
@@ -99,7 +99,7 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
     toLight.Normalize();
     SamplePointHemisphere(-toLight, lightPoint, lightNormal);
     toLight = lightPoint - info.GetPosition();
-    float d = toLight.GetLength();
+    double d = toLight.GetLength();
     toLight.Normalize();
     Ray lightRay = Ray(info.GetPosition(), toLight);
 
@@ -107,8 +107,8 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
     {
         if(renderer->TraceShadowRay(lightRay, d))
         {
-            float cosphi = abs(normal*toLight);
-            float costheta = abs(toLight*lightNormal);
+            double cosphi = abs(normal*toLight);
+            double costheta = abs(toLight*lightNormal);
             Color c;
             c = info.GetMaterial()->BRDF(info, toLight)
                 *costheta*cosphi*intensity_*GetArea()/(2*d*d);
@@ -126,7 +126,7 @@ Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const Inters
     toLight.Normalize();
     SamplePointHemisphere(-toLight, lightPoint, lightNormal);
     toLight = lightPoint - info.GetPosition();
-    float d = toLight.GetLength();
+    double d = toLight.GetLength();
     toLight.Normalize();
     Ray lightRay = Ray(info.GetPosition(), toLight);
 
@@ -134,13 +134,13 @@ Color SphereLight::NextEventEstimationMIS(const Renderer* renderer, const Inters
     {
         if(renderer->TraceShadowRay(lightRay, d))
         {
-            float cosphi = abs(normal*toLight);
-            float costheta = abs(toLight*lightNormal);
+            double cosphi = abs(normal*toLight);
+            double costheta = abs(toLight*lightNormal);
             Color c;
             Material* mat = info.GetMaterial();			
             c = mat->BRDF(info, toLight)*costheta*cosphi*intensity_*GetArea()/(2*d*d);
-            float brdfPdf = costheta*mat->PDF(info, toLight, false)/(d*d);
-            float lightPdf = 2.0f/GetArea();
+            double brdfPdf = costheta*mat->PDF(info, toLight, false)/(d*d);
+            double lightPdf = 2.0f/GetArea();
             return c;
         }
     }
@@ -153,11 +153,11 @@ Color SphereLight::DirectHitMIS(const Renderer* renderer,
                                 const IntersectionInfo& thisInfo) const
 {
     Vector3d v = thisInfo.position - lastInfo.position;
-    float d = v.GetLength();
+    double d = v.GetLength();
     v.Normalize();
-    float costheta = abs(v*thisInfo.normal);
-    float lightPdf = 2.0f/GetArea();
+    double costheta = abs(v*thisInfo.normal);
+    double lightPdf = 2.0f/GetArea();
     Material* mat = lastInfo.GetMaterial();
-    float brdfPdf = costheta*mat->PDF(lastInfo, v, false)/(d*d);
+    double brdfPdf = costheta*mat->PDF(lastInfo, v, false)/(d*d);
     return intensity_/(1.0f + lightPdf*lightPdf/(brdfPdf*brdfPdf));
 }

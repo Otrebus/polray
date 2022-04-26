@@ -11,7 +11,7 @@ public:
     ~Timer();
 
     void Reset();
-    float GetTime() const;
+    double GetTime() const;
 
 private:
     LARGE_INTEGER m_ticksPerSecond;

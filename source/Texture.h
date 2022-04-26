@@ -19,7 +19,7 @@ public:
     Texture(Texture&);
     Color GetTexel(int x, int y) const;
     void SetTexel(int x, int y, int color);
-    Color GetTexelBLInterp(float x, float y) const;
+    Color GetTexelBLInterp(double x, double y) const;
 
     int GetHeight() const;
     int GetWidth() const;

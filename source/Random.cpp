@@ -69,7 +69,7 @@ int Random::GetInt(int a, int b)
     return a + m_lastNumber % (1 + b - a);
 }
 
-float Random::GetFloat(float a, float b)
+double Random::Getdouble(double a, double b)
 {
     if(b-a <= 0)
         return a;
@@ -84,8 +84,8 @@ float Random::GetFloat(float a, float b)
     //number = m_lastNumber >> 16 & 0x7FFF;
     m_lastNumber = m_lastNumber * 1664525 +	1013904223;
 
-    //return a + ((float) number / (float) 0x7FFF)*(b-a);
-    return a + ((float) m_lastNumber / (float) 0xFFFFFFFF)*(b-a);
+    //return a + ((double) number / (double) 0x7FFF)*(b-a);
+    return a + ((double) m_lastNumber / (double) 0xFFFFFFFF)*(b-a);
 #endif
 }
 

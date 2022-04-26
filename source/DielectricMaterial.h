@@ -30,14 +30,14 @@ public:
 
     Light* GetLight() const;
     
-    virtual float PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
+    virtual double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
 
     void ReadProperties(stringstream& ss);
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
-    float m_ior; // Index of refraction
+    double m_ior; // Index of refraction
     mutable Random m_rnd;
 };
 

@@ -14,7 +14,7 @@ public:
     Random(unsigned int seed);
 
     void Seed(unsigned int seed);
-    float GetFloat(float a, float b);
+    double Getdouble(double a, double b);
     int GetInt(int a, int b);
     ~Random();
 #ifndef USE_MERSENNE

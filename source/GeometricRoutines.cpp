@@ -7,7 +7,7 @@ using namespace std;
 // Clips a polygon to an axis aligned plane (apparently this is the
 // Sutherman-Hodgeman algorithm)
 //-----------------------------------------------------------------------------
-void ClipPolygonToAAP(int axis, int side, float position, vector<Vector3d>& input)
+void ClipPolygonToAAP(int axis, int side, double position, vector<Vector3d>& input)
 {
     vector<Vector3d> output;
     output.reserve(6);
@@ -44,7 +44,7 @@ void ClipPolygonToAAP(int axis, int side, float position, vector<Vector3d>& inpu
                 continue; // Both are to be clipped away
 
             // The line segment is being clipped, determine which points to add to output
-            float t = (position - s[axis])/(e[axis]-s[axis]);
+            double t = (position - s[axis])/(e[axis]-s[axis]);
             Vector3d splitpoint = t*(e - s) + s;
             if(s[axis] < position)
             {
@@ -83,7 +83,7 @@ void ClipPolygonToAAP(int axis, int side, float position, vector<Vector3d>& inpu
             else if(position <= s[axis] && position < e[axis])
                 continue;
 
-            float t = (position - s[axis])/(e[axis]-s[axis]);
+            double t = (position - s[axis])/(e[axis]-s[axis]);
             Vector3d splitpoint = t*(e - s) + s;
             if(s[axis] > position)
             {
@@ -104,22 +104,22 @@ Vector3d Reflect(const Vector3d& incident, const Vector3d& normal)
     return incident - normal*(incident*normal)*2;
 }
 
-float Refract(float n1, float n2, Vector3d& _normal, Vector3d& incident, Vector3d& refraction)
+double Refract(double n1, double n2, Vector3d& _normal, Vector3d& incident, Vector3d& refraction)
 {
-    float R;
+    double R;
     Vector3d& normal = _normal;
-    float cosi = normal*incident*-1;
-    float d = 1-(n1/n2)*(n1/n2)*(1-cosi*cosi);
+    double cosi = normal*incident*-1;
+    double d = 1-(n1/n2)*(n1/n2)*(1-cosi*cosi);
     if(d < 0)
         return 1.0f;
     refraction = incident * (n1/n2) + normal * ( cosi*(n1/n2) - sqrt(d) );
-    float cost = -(refraction*(normal));
+    double cost = -(refraction*(normal));
 
     refraction.Normalize();
 
-    float Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
+    double Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
     Rs*=Rs;
-    float Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
+    double Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
     Rp*=Rp;
     R = (Rs+Rp)/2.0f;
     return R;
@@ -137,7 +137,7 @@ void MakeBasis(const Vector3d& givenVector, Vector3d& v2, Vector3d& v3)
     v3.Normalize();
 }
 
-void SampleHemisphereCos(float r1, float r2, const Vector3d& apex, Vector3d& sample)
+void SampleHemisphereCos(double r1, double r2, const Vector3d& apex, Vector3d& sample)
 {
     Vector3d right, forward;
     MakeBasis(apex, right, forward);
@@ -146,7 +146,7 @@ void SampleHemisphereCos(float r1, float r2, const Vector3d& apex, Vector3d& sam
              + apex*sqrt(1-r2);
 }
 
-void SampleHemisphereUniform(float r1, float r2, const Vector3d& apex, Vector3d& sample)
+void SampleHemisphereUniform(double r1, double r2, const Vector3d& apex, Vector3d& sample)
 {
     Vector3d right, forward;
     MakeBasis(apex, right, forward);

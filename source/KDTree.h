@@ -11,7 +11,7 @@ class Primitive;
 class SAHEvent;
 
 struct IntResult {
-    float t;
+    double t;
     const Primitive* primitive;
 };
 
@@ -23,40 +23,41 @@ public:
     void Build();
     KDNode *left, *right;
     vector<const Primitive*> m_primitives;
-    bool Split(int, int, float);
-    float Intersect(const Ray&, const Primitive*&) const;
-    static float SAHCost(int nPrimitives, float area, int nLeft, float leftarea, int nRight, float rightarea, int nPlanar, int side);
-    IntResult IntersectRec(const Ray& ray, float tmin, float tmax, bool returnPrimitive) const;
+    bool Split(int, int, double);
+    double Intersect(const Ray&, const Primitive*&) const;
+    static double SAHCost(int nPrimitives, double area, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side);
+    IntResult IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive) const;
+    double IntersectIter(const Ray& _ray, const Primitive* &minprimitive, double tmin, double tmax) const;
     bool IsLeaf() const;
 
     //bool m_isLeaf;
 
     //BoundingBox m_bbox;
-    float m_splitpos;
-    //float m_depth;
+    double m_splitpos;
+    //double m_depth;
     int splitdir;
 };
 
 class KDTree : public SpatialPartitioning
 {
 public:
-    static float CalculateCost(int type, int samples);
+    static double CalculateCost(int type, int samples);
     vector<const Primitive*> primitives;
     KDNode* m_root;
     KDTree();
     ~KDTree();
     void Build(vector<const Primitive*>);
-    float Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax, bool returnPrimitive) const;
+    double Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive) const;
     BoundingBox CalculateExtents(vector<const Primitive*>& primitives);
     
     void BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* events, vector<const Primitive*>& primitives, int depth, int badsplits);
 
     BoundingBox m_bbox;
 
-    static float mint;
-    static float cost_triint;
-    static float cost_trav;
-    static float cost_boxint;
+    static double mint;
+    static double cost_triint;
+    static double cost_trav;
+    static double cost_boxint;
     static const int yzplane = 0;
     static const int xzplane = 1;
     static const int xyplane = 2;
@@ -67,9 +68,9 @@ public:
 class SAHEvent
 {
 public:
-    SAHEvent(const Primitive*, float, int);
+    SAHEvent(const Primitive*, double, int);
     const Primitive* triangle;
-    float position;
+    double position;
     int type;
     static const char end = 0;
     static const char planar = 1;

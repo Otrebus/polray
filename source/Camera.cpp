@@ -13,7 +13,7 @@ Camera::Camera()
 //------------------------------------------------------------------------------
 // Constructor.
 //------------------------------------------------------------------------------
-Camera::Camera(Vector3d aup, Vector3d apos, Vector3d adir, int xres, int yres, float fov) 
+Camera::Camera(Vector3d aup, Vector3d apos, Vector3d adir, int xres, int yres, double fov) 
     : up(aup), pos(apos), dir(adir), xres(xres), yres(yres)
 {
     SetFov(fov);
@@ -32,7 +32,7 @@ Camera::~Camera()
 //------------------------------------------------------------------------------
 // Expands the film plane to fit the given field of view argument.
 //------------------------------------------------------------------------------
-void Camera::SetFov(float fov)
+void Camera::SetFov(double fov)
 {
     assert(fov > 0.0f && fov < 180.0f);
     halfwidth = tan(3.14159f*fov/360.0f);
@@ -41,17 +41,17 @@ void Camera::SetFov(float fov)
 //------------------------------------------------------------------------------
 // Returns the area of a pixel on the film plane.
 //------------------------------------------------------------------------------
-float Camera::GetPixelArea() const
+double Camera::GetPixelArea() const
 {
-    return halfwidth*halfwidth*4.0f*((float)yres/float(xres))/float(xres*yres);
+    return halfwidth*halfwidth*4.0f*((double)yres/double(xres))/double(xres*yres);
 }
 
 //------------------------------------------------------------------------------
 // Returns the area of the film plane.
 //------------------------------------------------------------------------------
-float Camera::GetFilmArea() const
+double Camera::GetFilmArea() const
 {
-    return (float)yres/(float)xres*halfwidth*halfwidth*4.0f;
+    return (double)yres/(double)xres*halfwidth*halfwidth*4.0f;
 }
 
 int Camera::GetXRes() const

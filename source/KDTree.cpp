@@ -8,19 +8,19 @@
 #include "Main.h"
 #include <intrin.h>
 #include "Utils.h"
-#define CHECKVALID(v) if(!( v.x < std::numeric_limits<float>::infinity() && v.x > -std::numeric_limits<float>::infinity() && v.x == v.x && v.y < std::numeric_limits<float>::infinity() && v.y > -std::numeric_limits<float>::infinity() && v.y == v.y && v.z < std::numeric_limits<float>::infinity() && v.z > -std::numeric_limits<float>::infinity() && v.z == v.z)) _asm int 3;
-float KDTree::cost_triint;
-float KDTree::cost_trav;
-float KDTree::cost_boxint;
-float KDTree::mint;
+#define CHECKVALID(v) if(!( v.x < std::numeric_limits<double>::infinity() && v.x > -std::numeric_limits<double>::infinity() && v.x == v.x && v.y < std::numeric_limits<double>::infinity() && v.y > -std::numeric_limits<double>::infinity() && v.y == v.y && v.z < std::numeric_limits<double>::infinity() && v.z > -std::numeric_limits<double>::infinity() && v.z == v.z)) _asm int 3;
+double KDTree::cost_triint;
+double KDTree::cost_trav;
+double KDTree::cost_boxint;
+double KDTree::mint;
 
-SAHEvent::SAHEvent(const Primitive* m, float p, int t) : triangle(m), position(p), type(t)
+SAHEvent::SAHEvent(const Primitive* m, double p, int t) : triangle(m), position(p), type(t)
 {
 }
 
-float KDNode::SAHCost(int nPrimitives, float area, int nLeft, float leftarea, int nRight, float rightarea, int nPlanar, int side)
+double KDNode::SAHCost(int nPrimitives, double area, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
 {
-    float cost;
+    double cost;
     if(side == KDTree::left)
     {
         cost = (nLeft + nPlanar)*leftarea + nRight*rightarea;
@@ -40,7 +40,7 @@ float KDNode::SAHCost(int nPrimitives, float area, int nLeft, float leftarea, in
     return cost;
 }
 
-float KDTree::CalculateCost(int type, int samples)
+double KDTree::CalculateCost(int type, int samples)
 {
     Timer counter = Timer();
 
@@ -49,7 +49,7 @@ float KDTree::CalculateCost(int type, int samples)
         Triangle t(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f);
         for(int i = 0; i < samples; i++)
         {
-            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(float(rand()%10000)/10000.0f, float(rand()%10000)/10000.0f, 1));
+            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(double(rand()%10000)/10000.0f, double(rand()%10000)/10000.0f, 1));
             t.Intersect(ray);
         }
     }
@@ -58,11 +58,11 @@ float KDTree::CalculateCost(int type, int samples)
         BoundingBox box(Vector3d(0, 0, 1), Vector3d(0.5, 1, 2));
         for(int i = 0; i < samples; i++)
         {
-            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(float(rand()%10000)/10000.0f, float(rand()%10000)/10000.0f, 1));
+            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(double(rand()%10000)/10000.0f, double(rand()%10000)/10000.0f, 1));
             box.Intersects(ray);
         }
     }
-    return counter.GetTime() / float(samples);
+    return counter.GetTime() / double(samples);
 }
 
 KDTree::KDTree()
@@ -103,12 +103,12 @@ void KDNode::Build()
 
 BoundingBox KDTree::CalculateExtents(vector<const Primitive*>& primitives)
 {
-    const auto inf = numeric_limits<float>::infinity();
-    float maxx = -inf, maxy = -inf, maxz = -inf, minx = inf, miny = inf, minz = inf;
+    const auto inf = numeric_limits<double>::infinity();
+    double maxx = -inf, maxy = -inf, maxz = -inf, minx = inf, miny = inf, minz = inf;
 
     for(auto& s : primitives)
     {
-        float smaxx, smaxy, smaxz, sminx, sminy, sminz;
+        double smaxx, smaxy, smaxz, sminx, sminy, sminz;
 
         smaxx = s->GetBoundingBox().c2.x;
         smaxy = s->GetBoundingBox().c2.y;
@@ -150,11 +150,11 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         return;
     }
 
-    float bestsplit;
+    double bestsplit;
     int bestsplitdir;
     char bestside;
-    float bestcost = numeric_limits<float>::infinity();
-    float boxarea = 2*(bbox.c2.z-bbox.c1.z)*(bbox.c2.y-bbox.c1.y) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.z-bbox.c1.z) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.y-bbox.c1.y);
+    double bestcost = numeric_limits<double>::infinity();
+    double boxarea = 2*(bbox.c2.z-bbox.c1.z)*(bbox.c2.y-bbox.c1.y) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.z-bbox.c1.z) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.y-bbox.c1.y);
 
     for(int u = 0; u < 3; u++)
     {
@@ -169,10 +169,10 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         int nPlanar = 0;
         int nRight = primitives.size();
         int side = 0;
-        float leftarea, rightarea;
-        float sidearea = (bbox.c2[v]-bbox.c1[v])*(bbox.c2[w]-bbox.c1[w]);
-        float height = bbox.c2[v]-bbox.c1[v];
-        float depth = bbox.c2[w]-bbox.c1[w];
+        double leftarea, rightarea;
+        double sidearea = (bbox.c2[v]-bbox.c1[v])*(bbox.c2[w]-bbox.c1[w]);
+        double height = bbox.c2[v]-bbox.c1[v];
+        double depth = bbox.c2[w]-bbox.c1[w];
         int pp = 0, pe = 0, ps = 0; // Event counters for current position
 
         // Sweep through all events
@@ -181,7 +181,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         while(it < events[u].end())
         {
             SAHEvent* e = *it;
-            float sweeppos = e->position;
+            double sweeppos = e->position;
 
             leftarea = 2*sidearea + 2*(sweeppos-bbox.c1[u])*(height + depth);
             rightarea = 2*sidearea + 2*(bbox.c2[u]-sweeppos)*(height + depth);
@@ -206,8 +206,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
             nRight -= pe;
 
             // Calculate the costs for a split at this location
-            float leftcost = KDNode::SAHCost(primitives.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::left);
-            float rightcost = KDNode::SAHCost(primitives.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::right);
+            double leftcost = KDNode::SAHCost(primitives.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::left);
+            double rightcost = KDNode::SAHCost(primitives.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::right);
 
             if(bestcost > min(leftcost, rightcost)) 
             {
@@ -228,7 +228,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     // It's not worth it to split this node, make it a leaf
     if(bestcost + boxarea*KDTree::cost_trav > KDTree::cost_triint*primitives.size()*boxarea)
     {
-        if(badsplits <= 0 || bestcost == numeric_limits<float>::infinity())
+        if(badsplits <= 0 || bestcost == numeric_limits<double>::infinity())
         {
             node->m_primitives = primitives;
             //node->m_isLeaf = true;
@@ -321,7 +321,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
             
             for(int u = 0; u < 3; u++)
             {
-                float maxpoint, minpoint;
+                double maxpoint, minpoint;
 
                 if(isinleft)
                 {
@@ -535,8 +535,8 @@ void KDTree::Build(vector<const Primitive*> primitives)
             if(!s->GetClippedBoundingBox(m_bbox, clippedbox))
                 continue;
             
-            float minpoint = clippedbox.c1[u];
-            float maxpoint = clippedbox.c2[u];
+            double minpoint = clippedbox.c1[u];
+            double maxpoint = clippedbox.c2[u];
 
             // Planar primitive - insert a planar event into the queue
             if(minpoint == maxpoint)
@@ -567,17 +567,17 @@ void KDTree::Build(vector<const Primitive*> primitives)
             delete e;
 }
 
-IntResult KDNode::IntersectRec(const Ray& ray, float tmin, float tmax, bool returnPrimitive=false) const
+IntResult KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive=false) const
 {
     if(tmin > tmax)
         return { -inf, nullptr };
 
     int a = splitdir;
-    float locmint = numeric_limits<float>::infinity();
+    double locmint = numeric_limits<double>::infinity();
     const Primitive* minprimitive = nullptr;
     if(!left && !right) {
         for(auto& s : m_primitives) {
-            float t = s->Intersect(ray);
+            double t = s->Intersect(ray);
             if(t >= tmin && t <= tmax) {
                 if(!returnPrimitive)
                     return { t, nullptr };
@@ -588,13 +588,13 @@ IntResult KDNode::IntersectRec(const Ray& ray, float tmin, float tmax, bool retu
         return minprimitive ? IntResult { locmint, minprimitive } : IntResult { -inf, nullptr };
     }
 
-    float k = ray.direction[a];
-    float tint = (m_splitpos - ray.origin[a])/k;    
+    double k = ray.direction[a];
+    double tint = (m_splitpos - ray.origin[a])/k;    
 
     KDNode* nearnode = k > 0 ? left : right;
     KDNode* farnode = nearnode == left ? right : left;
 
-    if(tint <= tmin)
+    if(tint <= tmin-eps)
     {
         auto res = farnode->IntersectRec(ray, std::max(tmin, tint-eps), tmax, returnPrimitive);
         if(res.t != -inf)
@@ -611,7 +611,7 @@ IntResult KDNode::IntersectRec(const Ray& ray, float tmin, float tmax, bool retu
     return { -inf, nullptr };
 }
 
-float KDTree::Intersect(const Ray& ray, const Primitive* &primitive, float tmin, float tmax, bool returnPrimitive=true) const
+double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const
 {
     auto res = m_root->IntersectRec(ray, tmin, tmax, returnPrimitive);
     if(res.t != -inf) {

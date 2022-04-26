@@ -45,7 +45,7 @@ void EmissiveMaterial::ReadProperties(stringstream& ss)
 {
 }
 
-float EmissiveMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double EmissiveMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
     return 0;
 }

@@ -17,26 +17,26 @@ class ThinLensCamera : public Camera
 {
 public:
     ThinLensCamera();
-    ThinLensCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, float fov, float focalLength, float lensRadius);
+    ThinLensCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, double fov, double focalLength, double lensRadius);
     ~ThinLensCamera();
     
-    Ray GetRayFromPixel(int x, int y, float a, float b, float u, float v) const;
-    bool GetPixelFromRay(const Ray& ray, int& x, int& y, float u, float v) const;
+    Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const;
+    bool GetPixelFromRay(const Ray& ray, int& x, int& y, double u, double v) const;
 
-    void SampleAperture(Vector3d& pos, float& u, float& v) const;
+    void SampleAperture(Vector3d& pos, double& u, double& v) const;
 
-    void SetFov(float fov);
-    void SetFocalLength(float focalLength);
-    void SetLensRadius(float lensRadius);
+    void SetFov(double fov);
+    void SetFocalLength(double focalLength);
+    void SetLensRadius(double lensRadius);
 
-    float GetPixelArea() const;
-    float GetFilmArea() const;
+    double GetPixelArea() const;
+    double GetFilmArea() const;
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
-    float focalLength;
-    float lensRadius;
+    double focalLength;
+    double lensRadius;
 
     mutable Random random;
 };

@@ -55,7 +55,7 @@ void RayTracer::Render(Camera& cam, ColorBuffer& colBuf)
 //------------------------------------------------------------------------------
 // Helper function for TraceRay
 //------------------------------------------------------------------------------
-Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, float contribution) const
+Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, double contribution) const
 {
     if(contribution < 0.005f)
         return Color(0, 0, 0);
@@ -70,7 +70,7 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, floa
 
     const Primitive* minprimitive = 0;
 
-    float t = scene->Intersect(ray, minprimitive);
+    double t = scene->Intersect(ray, minprimitive);
 
     if(t > 0.001f)
         objecthit = true;
@@ -88,7 +88,7 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, floa
         {
             Vector3d light(6, 13, 4);
             light.Normalize();
-            float dot = light*(info.GetNormal());
+            double dot = light*(info.GetNormal());
             if(dot > 0)
                 return 10*Color(dot, dot, dot);
             else
@@ -103,11 +103,11 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, floa
 //------------------------------------------------------------------------------
 // Traces ray with t parameter between 0..tmax and checks if occluded
 //------------------------------------------------------------------------------
-bool RayTracer::TraceShadowRay(const Ray& ray, float tmax) const
+bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
 {
     Ray& unconstRay = const_cast<Ray&>(ray);
     const Primitive* dummy = nullptr;
-    float result = scene->Intersect(ray, dummy);
+    double result = scene->Intersect(ray, dummy);
     if(result < tmax - tmax*0.00001f)
         return false;
     return true;

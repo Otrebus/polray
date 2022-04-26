@@ -30,12 +30,12 @@ Vector3d MeshTriangle::GetNormal() const
 	return normal;
 }
 
-float MeshTriangle::GetArea()
+double MeshTriangle::GetArea()
 {
 	return fabsf(((v1->pos-v0->pos)^(v2->pos-v0->pos)).GetLength())/2;
 }
 
-MeshVertex::MeshVertex(float a, float b, float c)
+MeshVertex::MeshVertex(double a, double b, double c)
 {
 	pos.x = a;
 	pos.y = b;
@@ -82,9 +82,9 @@ MeshTriangle::MeshTriangle(Material* mat)
 	material = mat;
 }*/
 
-float MeshTriangle::Intersect(const Ray& ray) const
+double MeshTriangle::Intersect(const Ray& ray) const
 {
-	float u, v, t;
+	double u, v, t;
 	Vector3d D;
 	D.x = ray.direction.x;
 	D.y = ray.direction.y;
@@ -97,7 +97,7 @@ float MeshTriangle::Intersect(const Ray& ray) const
 	Vector3d P = E2^T;
 	Vector3d Q = E1^D;
 
-	float det = E2*Q;
+	double det = E2*Q;
 	if(det < 0.0000000001f && det > -0.0000000001f)	// Ray in (almost) the same plane as the triangle
 		return -inf;							// NOTE: depending on this epsilon value, extremely
 	u = D*P/det;								// small triangles could be missed
@@ -120,7 +120,7 @@ float MeshTriangle::Intersect(const Ray& ray) const
 
 bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-	float u, v, t;
+	double u, v, t;
 	Vector3d D;
 
 	info.direction = ray.direction;
@@ -136,7 +136,7 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 	Vector3d P = E2^T;
 	Vector3d Q = E1^D;
 
-	float det = E2*Q;
+	double det = E2*Q;
 	if(det < 0.0000000001f && det > -0.0000000001f) // Ray in (almost) the same plane as the triangle
 		return false;
 
@@ -164,9 +164,9 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 		Vector2d txc = Vector2d(v0->texpos.x, v0->texpos.y) + tex1+tex2;
 		// If there's a problem with normal mapping not looking right, try normalizing this vector.
 		Color nc = material->normalmap->GetTexelBLInterp(txc.x, txc.y);
-		float nx = (nc.r - 0.5f)*2.0f;
-		float ny = (nc.g - 0.5f)*2.0f;
-		float nz = nc.b;
+		double nx = (nc.r - 0.5f)*2.0f;
+		double ny = (nc.g - 0.5f)*2.0f;
+		double nz = nc.b;
 
 		info.normal = (*tangent)*nx + (*binormal)*ny + (*normal)*nz;
 	}*/
@@ -288,7 +288,7 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 		
 		else if(a == "ka")
 		{
-			float dummy;
+			double dummy;
 			ss >> dummy >> dummy >> dummy;
 			//if(!curmat)
 			//	__debugbreak();
@@ -314,7 +314,7 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 		}
 		else if(a == "ks")
 		{
-			float dummy;
+			double dummy;
 			ss >> dummy >> dummy >> dummy;
 			/*if(!curmat)
 				__debugbreak();
@@ -328,7 +328,7 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 		}
 		else if(a == "ns")
 		{
-			float dummy;
+			double dummy;
 			ss >> dummy;
 			/*if(!curmat)
 				__debugbreak();
@@ -360,7 +360,7 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 	}
 
 	string a;
-	float x, y, z;
+	double x, y, z;
 	int v0, v1, v2;
 	int t0, t1, t2;
 	int n0, n1, n2;
@@ -733,12 +733,12 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
 	ClipPolygonToAAP(2, positive, clipbox.c1.z, points); // Front
 	ClipPolygonToAAP(2, negative, clipbox.c2.z, points); // Back
 
-	resultbox.c1.x = numeric_limits<float>::infinity();
-	resultbox.c2.x = -numeric_limits<float>::infinity();
-	resultbox.c1.y = numeric_limits<float>::infinity();
-	resultbox.c2.y = -numeric_limits<float>::infinity();
-	resultbox.c1.z = numeric_limits<float>::infinity();
-	resultbox.c2.z = -numeric_limits<float>::infinity();
+	resultbox.c1.x = numeric_limits<double>::infinity();
+	resultbox.c2.x = -numeric_limits<double>::infinity();
+	resultbox.c1.y = numeric_limits<double>::infinity();
+	resultbox.c2.y = -numeric_limits<double>::infinity();
+	resultbox.c1.z = numeric_limits<double>::infinity();
+	resultbox.c2.z = -numeric_limits<double>::infinity();
 
 	for(auto v : points)
 	{

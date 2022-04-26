@@ -2,7 +2,7 @@
 #include "Vector3d.h"
 #include <limits>
 
-Vector3d::Vector3d(float a, float b, float c) : x(a), y(b), z(c)
+Vector3d::Vector3d(double a, double b, double c) : x(a), y(b), z(c)
 {
 }
 
@@ -38,7 +38,7 @@ Vector3d Vector3d::operator-=(const Vector3d& v)
     return Vector3d(x, y, z);
 }
 
-Vector3d Vector3d::operator/(const float f) const
+Vector3d Vector3d::operator/(const double f) const
 {
     return Vector3d(x/f, y/f, z/f);
 }
@@ -53,7 +53,7 @@ Vector3d Vector3d::operator-(const Vector3d& v) const
     return Vector3d(x-v.x, y-v.y, z-v.z); 
 }
 
-float Vector3d::operator*(const Vector3d& v) const
+double Vector3d::operator*(const Vector3d& v) const
 {
     return x*v.x + y*v.y + z*v.z;
 }
@@ -62,26 +62,26 @@ Vector3d Vector3d::operator^(const Vector3d& v) const
     return Vector3d(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);
 }
 
-float Vector3d::GetLength() const
+double Vector3d::GetLength() const
 {
     return sqrt(x*x+y*y+z*z);
 }
 
 void Vector3d::Normalize()
 {
-    float l = GetLength();
+    double l = GetLength();
 
     x /= l;
     y /= l;
     z /= l;
 }
 
-Vector3d Vector3d::operator*(float t) const
+Vector3d Vector3d::operator*(double t) const
 {
     return Vector3d(t*x,t*y,t*z);
 }
 
-Vector3d Vector3d::operator/=(float t)
+Vector3d Vector3d::operator/=(double t)
 {
     x/= t;
     y/= t;
@@ -89,7 +89,7 @@ Vector3d Vector3d::operator/=(float t)
     return *this;
 }
 
-Vector3d Vector3d::operator*=(float t)
+Vector3d Vector3d::operator*=(double t)
 {
     x*= t;
     y*= t;
@@ -99,7 +99,7 @@ Vector3d Vector3d::operator*=(float t)
 
 ////////////////////////////
 
-Vector2d::Vector2d(float a, float b) : x(a), y(b)
+Vector2d::Vector2d(double a, double b) : x(a), y(b)
 {
 }
 
@@ -128,30 +128,30 @@ Vector2d Vector2d::operator-(const Vector2d& v) const
     return Vector2d(x-v.x, y-v.y); 
 }
 
-float Vector2d::operator*(const Vector2d& v) const
+double Vector2d::operator*(const Vector2d& v) const
 {
     return x*v.x + y*v.y;
 }
 
-float Vector2d::GetLength() const
+double Vector2d::GetLength() const
 {
     return sqrt(x*x+y*y);
 }
 
 void Vector2d::Normalize()
 {
-    float l = GetLength();
+    double l = GetLength();
 
     x /= l;
     y /= l;
 }
 
-Vector2d Vector2d::operator*(float t) const
+Vector2d Vector2d::operator*(double t) const
 {
     return Vector2d(t*x,t*y);
 }
 
-Vector3d operator*(float t, const Vector3d& v)
+Vector3d operator*(double t, const Vector3d& v)
 {
     return Vector3d(t*v.x, t*v.y, t*v.z);
 }
@@ -166,12 +166,12 @@ bool Vector3d::IsNull() const
     return x == 0 && y == 0 && z == 0;
 }
 
-float& Vector3d::operator[](int t)
+double& Vector3d::operator[](int t)
 {
     return (&x)[t];
 }
 
-float Vector3d::operator[](int t) const
+double Vector3d::operator[](int t) const
 {
     return (&x)[t];
 }
@@ -183,9 +183,9 @@ std::ostream& operator << (std::ostream& s , const Vector3d& v)
 
 bool Vector3d::IsValid() const
 {
-    return x < std::numeric_limits<float>::infinity() && x > -std::numeric_limits<float>::infinity() && x == x
-    && y < std::numeric_limits<float>::infinity() && y > -std::numeric_limits<float>::infinity() && y == y
-    && z < std::numeric_limits<float>::infinity() && z > -std::numeric_limits<float>::infinity() && z == z;
+    return x < std::numeric_limits<double>::infinity() && x > -std::numeric_limits<double>::infinity() && x == x
+    && y < std::numeric_limits<double>::infinity() && y > -std::numeric_limits<double>::infinity() && y == y
+    && z < std::numeric_limits<double>::infinity() && z > -std::numeric_limits<double>::infinity() && z == z;
 }
 
 bool Vector3d::operator==(const Vector3d& v) const
@@ -198,7 +198,7 @@ bool Vector3d::operator!=(const Vector3d& v) const
     return v.x != x || v.y != y || v.z != z;
 }
 
-float Vector3d::GetLengthSquared() const
+double Vector3d::GetLengthSquared() const
 {
     return x*x + y*y + z*z;
 }

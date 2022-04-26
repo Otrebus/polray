@@ -37,8 +37,8 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     const Vector3d& Ng = info.GetGeometricNormal();
     Vector3d& Ns = normal;
 
-    float cosi = _normal*wi*-1;
-    float n1, n2;
+    double cosi = _normal*wi*-1;
+    double n1, n2;
 
     if(cosi > 0) // Ray from outside the material, going in
     {
@@ -54,7 +54,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         cosi = -cosi;
     }
     
-    float d = 1-(n1/n2)*(n1/n2)*(1-cosi*cosi);
+    double d = 1-(n1/n2)*(n1/n2)*(1-cosi*cosi);
 
     if(d < 0) // Total internal reflection
     {
@@ -68,12 +68,12 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     }
     Vector3d refraction = wi*(n1/n2) + Ns*(cosi*(n1/n2) - sqrt(d));
     refraction.Normalize();
-    float cost = -refraction*normal;
-    float Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
-    float Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
-    float R = (Rs*Rs+Rp*Rp)/2.0f;
+    double cost = -refraction*normal;
+    double Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
+    double Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
+    double R = (Rs*Rs+Rp*Rp)/2.0f;
 
-    if(m_rnd.GetFloat(0, 1) > R) // Refracted
+    if(m_rnd.Getdouble(0, 1) > R) // Refracted
     {
         Ray out;
         out.direction = refraction;
@@ -135,7 +135,7 @@ void DielectricMaterial::ReadProperties(stringstream& ss)
 // never be used in practice since it would only cause NaNs in any integrator.
 // Hence the actual value is returned as 1, just to avoid any potential issues.
 //------------------------------------------------------------------------------
-float DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
 {
     return 1;
 }

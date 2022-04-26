@@ -13,7 +13,7 @@ class Scene;
 class Triangle : public Primitive, public Model
 {
 public:
-    Triangle(float, float, float, float, float, float, float, float, float);
+    Triangle(double, double, double, double, double, double, double, double, double);
     Triangle(const Vector3d&, const Vector3d&, const Vector3d&);
     Triangle(const Vertex3d&, const Vertex3d&, const Vertex3d&);
     Triangle();
@@ -22,7 +22,7 @@ public:
     BoundingBox GetBoundingBox() const;
     bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
     
-    float Intersect(const Ray& ray) const;
+    double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
     void AddToScene(Scene& scene);

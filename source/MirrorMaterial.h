@@ -28,7 +28,7 @@ public:
 
     Light* GetLight() const;
     
-    float PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
+    double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
 
     void ReadProperties(stringstream& ss);
 

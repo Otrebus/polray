@@ -50,7 +50,7 @@ bool CsgIntersection::GetClippedBoundingBox(const BoundingBox& clipbox,
     return true;
 }
 
-float CsgIntersection::Intersect(const Ray& ray) const
+double CsgIntersection::Intersect(const Ray& ray) const
 {
     CsgObject::hits hits;
     Intersect(ray, hits);
@@ -79,7 +79,7 @@ void CsgIntersection::Translate(const Vector3d& direction)
     objB_->Translate(direction);
 }
 
-void CsgIntersection::Rotate(const Vector3d& axis, float angle)
+void CsgIntersection::Rotate(const Vector3d& axis, double angle)
 {
     objA_->Rotate(axis, angle);
     objB_->Rotate(axis, angle);

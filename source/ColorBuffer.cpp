@@ -83,7 +83,7 @@ void ColorBuffer::SetPixel(int x, int y, const Color& c)
 //------------------------------------------------------------------------------
 // Sets a pixel in the color buffer to a specified color value.
 //------------------------------------------------------------------------------
-void ColorBuffer::SetPixel(int x, int y, float r, float g, float b)
+void ColorBuffer::SetPixel(int x, int y, double r, double g, double b)
 {
     assert(x >= 0 && y >= 0 && x < width && y < height);
     m_buffer[y*width + x] = Color(r, g, b);

@@ -6,10 +6,10 @@
 class Sample {
 public:
     Sample();
-    Sample(const Color&, const Ray&, float pdf, float rpdf, bool specular);
+    Sample(const Color&, const Ray&, double pdf, double rpdf, bool specular);
 
     Color color;
     Ray outRay;
-    float pdf, rpdf;
+    double pdf, rpdf;
     bool specular;
 };

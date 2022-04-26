@@ -7,7 +7,7 @@ Vertex3d::Vertex3d()
     normal.z = 0;
 }
 
-Vertex3d::Vertex3d(float x, float y, float z)
+Vertex3d::Vertex3d(double x, double y, double z)
 {
     normal.x = 0;
     normal.y = 0;
@@ -17,7 +17,7 @@ Vertex3d::Vertex3d(float x, float y, float z)
     pos.z = z;
 }
 
-Vertex3d::Vertex3d(float x, float y, float z, float nx, float ny, float nz, float u, float v)
+Vertex3d::Vertex3d(double x, double y, double z, double nx, double ny, double nz, double u, double v)
 {
     pos.x = x; pos.y = y; pos.z = z; 
     normal.x = nx; normal.y = ny; normal.z = nz; 

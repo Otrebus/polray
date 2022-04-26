@@ -5,7 +5,7 @@
 #include "Utils.h"
 
 CsgCuboid::CsgCuboid(const Vector3d& position, const Vector3d& x, 
-                     const Vector3d& y, float a, float b, float c) 
+                     const Vector3d& y, double a, double b, double c) 
                      : pos_(position), x_(x), y_(y), a_(a), b_(b), c_(c)
 {
     x_.Normalize();
@@ -19,7 +19,7 @@ CsgCuboid::CsgCuboid(const Vector3d& position, const Vector3d& x,
 bool CsgCuboid::Intersect(const Ray& inRay, 
                           std::vector<CsgHit>& intersects) const
 {
-    float tnear, tfar;
+    double tnear, tfar;
     int axisNear, axisFar, sideNear, sideFar;
     Vector3d nearNormal(0, 0, 0), farNormal(0, 0, 0);
 
@@ -58,13 +58,13 @@ bool CsgCuboid::Intersect(const Ray& inRay,
     return true;
 }
 
-void CsgCuboid::Rotate(const Vector3d& axis, float angle)
+void CsgCuboid::Rotate(const Vector3d& axis, double angle)
 {
-    float u = axis.x;
-    float v = axis.y;
-    float w = axis.z;
-    float cosAngle = cos(angle);
-    float sinAngle = sin(angle);
+    double u = axis.x;
+    double v = axis.y;
+    double w = axis.z;
+    double cosAngle = cos(angle);
+    double sinAngle = sin(angle);
 
     Matrix3d rot(u*u + (1 - u*u)*cosAngle, u*v*(1 - cosAngle) - w*sinAngle,
                  u*w*(1 - cosAngle) + v*sinAngle, 0, 
@@ -88,7 +88,7 @@ void CsgCuboid::Translate(const Vector3d& dir)
 void CsgCuboid::Precalculate()
 {
     // This is the standard adjoint/determinant calculation of an inverse matrix
-    float det = x_*(y_^z_);
+    double det = x_*(y_^z_);
     invMatU_ = Vector3d(y_.y*z_.z - z_.y*y_.z,
                         -(x_.y*z_.z - z_.y*x_.z),
                         x_.y*y_.z - y_.y*x_.z)/det;
@@ -100,9 +100,9 @@ void CsgCuboid::Precalculate()
                         x_.x*y_.y - y_.x*x_.y)/det;
 }
 
-float CsgCuboid::Intersect(const Ray& inRay) const
+double CsgCuboid::Intersect(const Ray& inRay) const
 {
-    float tnear, tfar;
+    double tnear, tfar;
     int axisNear, axisFar, sideNear, sideFar;
 
     if(SlabsTest(inRay, tnear, tfar, axisNear, axisFar, sideNear, sideFar))
@@ -121,7 +121,7 @@ float CsgCuboid::Intersect(const Ray& inRay) const
 bool CsgCuboid::GenerateIntersectionInfo(const Ray& inRay, 
                                          IntersectionInfo& info) const
 {
-    float t, tnear, tfar;
+    double t, tnear, tfar;
     int axisNear, axisFar, sideNear, sideFar, axis, side;
     
     SlabsTest(inRay, tnear, tfar, axisNear, axisFar, sideNear, sideFar);
@@ -153,9 +153,9 @@ bool CsgCuboid::GenerateIntersectionInfo(const Ray& inRay,
 
 BoundingBox CsgCuboid::GetBoundingBox() const
 {
-    float X = a_*abs(x_.x) + b_*abs(y_.x) + c_*abs(z_.x);
-    float Y = a_*abs(x_.y) + b_*abs(y_.y) + c_*abs(z_.y);
-    float Z = a_*abs(x_.z) + b_*abs(y_.z) + c_*abs(z_.z);
+    double X = a_*abs(x_.x) + b_*abs(y_.x) + c_*abs(z_.x);
+    double Y = a_*abs(x_.y) + b_*abs(y_.y) + c_*abs(z_.y);
+    double Z = a_*abs(x_.z) + b_*abs(y_.z) + c_*abs(z_.z);
     return BoundingBox(pos_ - Vector3d(X, Y, Z), pos_ + Vector3d(X, Y, Z));
 }
 
@@ -184,16 +184,16 @@ void CsgCuboid::SetMaterial(Material* mat)
     material = mat;
 }
 
-bool CsgCuboid::SlabsTest(const Ray& inRay, float& tNear, float& tFar, int& axisNear, int& axisFar, int& sideNear, int& sideFar) const
+bool CsgCuboid::SlabsTest(const Ray& inRay, double& tNear, double& tFar, int& axisNear, int& axisFar, int& sideNear, int& sideFar) const
 {
-    float x, y, z;
+    double x, y, z;
     Vector3d transPos = Multiply(invMatU_, invMatV_, invMatW_, pos_);
     Vector3d transOrigin = Multiply(invMatU_, invMatV_, invMatW_, inRay.origin);
     Vector3d transDir = Multiply(invMatU_, invMatV_, invMatW_, inRay.direction);
     Ray ray(transOrigin - transPos, transDir);
 
-    tFar = std::numeric_limits<float>::infinity();
-    tNear = -std::numeric_limits<float>::infinity();
+    tFar = std::numeric_limits<double>::infinity();
+    tNear = -std::numeric_limits<double>::infinity();
 
     Vector3d c1(-a_/2, -b_/2, -c_/2);
     Vector3d c2(a_/2, b_/2, c_/2);
@@ -207,10 +207,10 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, float& tNear, float& tFar, int& axis
         }
         else
         {  
-            float tmpSideNear = -1;
-            float tmpSideFar = 1;
-            float t1 = (c1[u] - ray.origin[u]) / ray.direction[u];
-            float t2 = (c2[u] - ray.origin[u]) / ray.direction[u];
+            double tmpSideNear = -1;
+            double tmpSideFar = 1;
+            double t1 = (c1[u] - ray.origin[u]) / ray.direction[u];
+            double t2 = (c2[u] - ray.origin[u]) / ray.direction[u];
             if (t1 > t2)
             {
                 std::swap(tmpSideNear, tmpSideFar);

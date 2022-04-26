@@ -3,7 +3,7 @@
 #include "Material.h"
 #include "Utils.h"
 
-Triangle::Triangle(float v1x, float v1y, float v1z, float v2x, float v2y, float v2z, float v3x, float v3y, float v3z)
+Triangle::Triangle(double v1x, double v1y, double v1z, double v2x, double v2y, double v2z, double v3x, double v3y, double v3z)
 {
     v0.pos.x = v1x; v0.pos.y = v1y; v0.pos.z = v1z;
     v1.pos.x = v2x; v1.pos.y = v2y; v1.pos.z = v2z;
@@ -30,9 +30,9 @@ Triangle::~Triangle()
 }
 /*
 // Möller-Trumbore triangle-ray intersection
-float Triangle::Intersect(const Ray& ray)
+double Triangle::Intersect(const Ray& ray)
 {
-    float u, v, t;
+    double u, v, t;
     Vector3d D;
     D.x = ray.direction.x;
     D.y = ray.direction.y;
@@ -45,7 +45,7 @@ float Triangle::Intersect(const Ray& ray)
     Vector3d P = E2^T;
     Vector3d Q = E1^D;
 
-    float det = E2*Q;
+    double det = E2*Q;
     if(det < 0.00001f && det > -0.00001f) // Ray in (almost) the same plane as the triangle
         return -inf;
 
@@ -67,9 +67,9 @@ float Triangle::Intersect(const Ray& ray)
     return t;
 }*/
 
-float Triangle::Intersect(const Ray& ray) const
+double Triangle::Intersect(const Ray& ray) const
 {
-    float u, v, t;
+    double u, v, t;
     Vector3d D;
     D.x = ray.direction.x;
     D.y = ray.direction.y;
@@ -82,7 +82,7 @@ float Triangle::Intersect(const Ray& ray) const
     Vector3d P = E2^T;
     Vector3d Q = E1^D;
 
-    float det = E2*Q;
+    double det = E2*Q;
     if(det < 0.0000000001f && det > -0.0000000001f)	// Ray in (almost) the same plane as the triangle
         return -inf;							// NOTE: depending on this epsilon value, extremely
     u = D*P/det;								// small triangles could be missed
@@ -104,7 +104,7 @@ float Triangle::Intersect(const Ray& ray) const
 
 bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    float u, v, t;
+    double u, v, t;
     Vector3d D;
 
     info.direction = ray.direction;
@@ -120,7 +120,7 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
     Vector3d P = E2^T;
     Vector3d Q = E1^D;
 
-    float det = E2*Q;
+    double det = E2*Q;
     if(det < 0.0000000001f && det > -0.0000000001f) // Ray in (almost) the same plane as the triangle
         return false;
 
@@ -148,9 +148,9 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
         Vector2d txc = Vector2d(v0->texpos.x, v0->texpos.y) + tex1+tex2;
         // If there's a problem with normal mapping not looking right, try normalizing this vector.
         Color nc = material->normalmap->GetTexelBLInterp(txc.x, txc.y);
-        float nx = (nc.r - 0.5f)*2.0f;
-        float ny = (nc.g - 0.5f)*2.0f;
-        float nz = nc.b;
+        double nx = (nc.r - 0.5f)*2.0f;
+        double ny = (nc.g - 0.5f)*2.0f;
+        double nz = nc.b;
 
         info.normal = (*tangent)*nx + (*binormal)*ny + (*normal)*nz;
     }*/
@@ -277,7 +277,7 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
 /*
 bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
 {
-    float u, v, t;
+    double u, v, t;
     Vector3d D;
 
     D.x = ray.direction.x;
@@ -291,7 +291,7 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
     Vector3d P = E2^T;
     Vector3d Q = E1^D;
 
-    float det = E2*Q;
+    double det = E2*Q;
     if(det < 0.00001f && det > -0.00001f) // Ray in (almost) the same plane as the triangle
         return false;
 
@@ -319,9 +319,9 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
         Vector2d txc = Vector2d(v0.texpos.x, v0.texpos.y) + tex1+tex2;
         // If there's a problem with normal mapping not looking right, try normalizing this vector.
         Color nc = material->normalmap->GetTexelBLInterp(txc.x, txc.y);
-        float nx = (nc.r - 0.5f)*2.0f;
-        float ny = (nc.g - 0.5f)*2.0f;
-        float nz = nc.b;
+        double nx = (nc.r - 0.5f)*2.0f;
+        double ny = (nc.g - 0.5f)*2.0f;
+        double nz = nc.b;
 
         info.normal = (*tangent)*nx + (*binormal)*ny + (*normal)*nz;
     }*/
@@ -343,7 +343,7 @@ int Triangle::GetType()
     return type_triangle;
 }*/
 /*
-Color Triangle::GetTextureColor(float u, float v) const
+Color Triangle::GetTextureColor(double u, double v) const
 {
     assert(material);
     Vector2d tv0 = (v1.texpos - v0.texpos) * u;
@@ -370,15 +370,15 @@ void Triangle::ComputeTangentSpaceVectors()
     Vector3d Q1 = v1.pos-v0.pos;
     Vector3d Q2 = v2.pos-v0.pos;
 
-    float s1 = v1.normal.x - v0.normal.x;
-    float s2 = v2.normal.x - v0.normal.x;
+    double s1 = v1.normal.x - v0.normal.x;
+    double s2 = v2.normal.x - v0.normal.x;
 
-    float t1 = v1.normal.y - v0.normal.y;
-    float t2 = v2.normal.y - v0.normal.y;
+    double t1 = v1.normal.y - v0.normal.y;
+    double t2 = v2.normal.y - v0.normal.y;
 
-    float det = 1.0f/(s1*t2-t1*s2);
+    double det = 1.0f/(s1*t2-t1*s2);
 
-    float tx, ty, tz, bx, by, bz;
+    double tx, ty, tz, bx, by, bz;
 
     tx = t2*Q1.x - t1*Q2.x;
     ty = t2*Q1.y - t1*Q2.y;
@@ -412,12 +412,12 @@ bool Triangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& re
 	ClipPolygonToAAP(2, positive, clipbox.c1.z, points); // Front
 	ClipPolygonToAAP(2, negative, clipbox.c2.z, points); // Back
 
-	resultbox.c1.x = numeric_limits<float>::infinity();
-	resultbox.c2.x = -numeric_limits<float>::infinity();
-	resultbox.c1.y = numeric_limits<float>::infinity();
-	resultbox.c2.y = -numeric_limits<float>::infinity();
-	resultbox.c1.z = numeric_limits<float>::infinity();
-	resultbox.c2.z = -numeric_limits<float>::infinity();
+	resultbox.c1.x = numeric_limits<double>::infinity();
+	resultbox.c2.x = -numeric_limits<double>::infinity();
+	resultbox.c1.y = numeric_limits<double>::infinity();
+	resultbox.c2.y = -numeric_limits<double>::infinity();
+	resultbox.c1.z = numeric_limits<double>::infinity();
+	resultbox.c2.z = -numeric_limits<double>::infinity();
 
 	for(auto v : points)
 	{

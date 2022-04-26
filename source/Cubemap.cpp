@@ -59,12 +59,12 @@ int Cubemap::GetTexel(const Vector3d& v) const
     }
     
     // Project the vector onto the plane z = -0.5 and then read the coordinates directly from w.x and w.y
-    float t = -0.5f/w.z;
+    double t = -0.5f/w.z;
     w = w*t;
-    float X = 0.5f + w.x;
-    float Y = 0.5f - w.y;
-    //return face->GetTexel((int)(X*float(face->GetWidth())), (int)(Y*float(face->GetHeight()))).GetInt();
-    Color c = face->GetTexelBLInterp((X*float(face->GetWidth() - 1)), (Y*float(face->GetHeight() - 1)));
+    double X = 0.5f + w.x;
+    double Y = 0.5f - w.y;
+    //return face->GetTexel((int)(X*double(face->GetWidth())), (int)(Y*double(face->GetHeight()))).GetInt();
+    Color c = face->GetTexelBLInterp((X*double(face->GetWidth() - 1)), (Y*double(face->GetHeight() - 1)));
     return c.GetInt();
 }
 

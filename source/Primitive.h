@@ -22,7 +22,7 @@ public:
     virtual BoundingBox GetBoundingBox() const = 0;
     virtual bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const = 0;
 
-    virtual float Intersect(const Ray& ray) const = 0;
+    virtual double Intersect(const Ray& ray) const = 0;
     virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
 
     void SetMaterial(Material* material);

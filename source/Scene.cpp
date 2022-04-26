@@ -135,11 +135,11 @@ void Scene::SetEnvironmentLight(EnvironmentLight* l)
 //   template<typename... Args> decltype(auto) Intersect(Args... args) const { return partitioning->Intersect(args...); }
 // almost works but doesn't make the ...args parameters references
 
-bool Scene::Intersect(const Ray& ray, float tmax) const {
+bool Scene::Intersect(const Ray& ray, double tmax) const {
     const Primitive* dummy;
     return partitioning->Intersect(ray, dummy, 0, tmax, false) > 0;
 };
 
-float Scene::Intersect(const Ray& ray, const Primitive*& p) const {
+double Scene::Intersect(const Ray& ray, const Primitive*& p) const {
     return partitioning->Intersect(ray, p, 0, inf, true);
 };

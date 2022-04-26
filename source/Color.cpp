@@ -9,13 +9,13 @@ Color::Color()
 
 Color::Color(int c)
 {
-    r = (float)((c >> 16) & 0xFF) / 255.0f;
-    g = (float)((c >> 8) & 0xFF) / 255.0f;
-    b = (float)(c & 0xFF) / 255.0f;
+    r = (double)((c >> 16) & 0xFF) / 255.0f;
+    g = (double)((c >> 8) & 0xFF) / 255.0f;
+    b = (double)(c & 0xFF) / 255.0f;
     assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
 }
 
-Color::Color(float f)
+Color::Color(double f)
 {
 }
 
@@ -25,7 +25,7 @@ int Color::GetInt() const
 }
 
 
-Color::Color(float _r, float _g, float _b) : r(_r), g(_g), b(_b)
+Color::Color(double _r, double _g, double _b) : r(_r), g(_g), b(_b)
 {
     assert(IsValid());
 }
@@ -44,34 +44,34 @@ Color Color::operator-(const Color& v) const
     return Color(r-v.r, g-v.g, b-v.b);
 }
 
-Color Color::operator*(float t) const
+Color Color::operator*(double t) const
 {
     return Color(r*t, g*t, b*t);
 }
 
 Color Color::operator*(int t) const
 {
-    return Color(r*float(t), g*float(t), b*float(t));
+    return Color(r*double(t), g*double(t), b*double(t));
 }
 
-Color operator*(float t, const Color& c)
+Color operator*(double t, const Color& c)
 {
     return Color(c.r*t, c.g*t, c.b*t);
 }
 
 Color operator*(int t, const Color& c)
 {
-    return Color(c.r*float(t), c.g*float(t), c.b*float(t));
+    return Color(c.r*double(t), c.g*double(t), c.b*double(t));
 }
 
-Color Color::operator/(float t) const
+Color Color::operator/(double t) const
 {
     return Color(r/t, g/t, b/t);
 }
 
 Color Color::operator/(int t) const
 {
-    return Color(r/float(t), g/float(t), b/float(t));
+    return Color(r/double(t), g/double(t), b/double(t));
 }
 
 Color Color::operator*(const Color& v) const
@@ -95,13 +95,13 @@ Color Color::operator*=(const Color& c)
     return Color(r, g, b);
 }
 
-Color Color::operator*=(float f)
+Color Color::operator*=(double f)
 {
     r *= f; g *= f;	b *= f;
     return Color(r, g, b);
 }
 
-Color Color::operator/=(float t)
+Color Color::operator/=(double t)
 {
     r /= t;	g /= t;	b /= t;
     return Color(r, g, b);
@@ -112,35 +112,35 @@ bool Color::operator!() const
     return (r == 0 && g == 0 && b == 0);
 }
 
-float Color::GetIntensity() const
+double Color::GetIntensity() const
 {
     return sqrt(r*r + g*g + b*b);
 }
 
-float Color::GetMax() const
+double Color::GetMax() const
 {
     return __max(r, __max(g, b));
 }
 
-float Color::GetAverage() const
+double Color::GetAverage() const
 {
     return (r + g + b)/3.0f;
 }
 
-float Color::GetSum() const
+double Color::GetSum() const
 {
     return r + g + b;
 }
 
-float Color::GetLuminance() const
+double Color::GetLuminance() const
 {
     // Rec. 709 would be 0.2126f*r + 0.7152f*g + 0.0722f*b, below is Rec. 601
     return 0.2989f*r + 0.5866f*g + 0.1145f*b;
 }
 
-void Color::SetLuminance(float L)
+void Color::SetLuminance(double L)
 {
-    float x = L / (0.2989f*r + 0.5866f*g + 0.1145f*b);
+    double x = L / (0.2989f*r + 0.5866f*g + 0.1145f*b);
     r = r*x; g = g*x; b = b*x;
 }
 
@@ -154,7 +154,7 @@ std::ostream& operator << (std::ostream& s , const Color& v)
     return(s << "(" << v.r << "," << v.g << "," << v.b << ")");
 }
 
-float& Color::operator[](int t)
+double& Color::operator[](int t)
 {
     return (&r)[t];
 }

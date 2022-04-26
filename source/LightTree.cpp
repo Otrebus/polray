@@ -1,6 +1,6 @@
 #include "LightTree.h"
 
-LightStruct::LightStruct(Light* light, float weight) : light(light), weight(weight)
+LightStruct::LightStruct(Light* light, double weight) : light(light), weight(weight)
 {
 }
 
@@ -12,7 +12,7 @@ LightNode::LightNode(vector<Light*> lights)
 {
     vector<LightStruct*> lsLeft;
     vector<LightStruct*> lsRight;
-    float total = 0.0f;
+    double total = 0.0f;
 
     // First, calculate the total sum of weights
     for(auto it = lights.begin(); it < lights.end(); it++)
@@ -23,7 +23,7 @@ LightNode::LightNode(vector<Light*> lights)
 
     // Create the lightstructs, and fill them with the normalized weights
     auto it = lights.begin();
-    float rightWeight = 0.0f;
+    double rightWeight = 0.0f;
     int index = 0;
     for(; it < lights.end(); it++)
     {
@@ -53,7 +53,7 @@ LightNode::LightNode(vector<Light*> lights)
     val = rightWeight;
 }
 
-LightNode::LightNode(float weight, vector<LightStruct*> lightStructs)
+LightNode::LightNode(double weight, vector<LightStruct*> lightStructs)
 {
     if(lightStructs.size() == 1)
     {
@@ -67,7 +67,7 @@ LightNode::LightNode(float weight, vector<LightStruct*> lightStructs)
     vector<LightStruct*> lsLeft;
     vector<LightStruct*> lsRight;
     auto it = lightStructs.begin();
-    float rightWeight = weight;
+    double rightWeight = weight;
     int index = 0;
     for(; it < lightStructs.end(); it++)
     {
@@ -92,7 +92,7 @@ LightNode::~LightNode()
 {
 }
 
-Light* LightNode::PickLight(float r, float& weight) const
+Light* LightNode::PickLight(double r, double& weight) const
 {
     if(!left)
     {

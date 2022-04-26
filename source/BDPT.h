@@ -31,14 +31,14 @@ public:
     friend class BDPT;
 private:
     Ray out;
-    float rr; // The russian roulette factor
-    float pdf; // The forward area pdf
-    float rpdf; // The reverse area pdf
+    double rr; // The russian roulette factor
+    double pdf; // The forward area pdf
+    double rpdf; // The reverse area pdf
     Color alpha; // The unweighted contribution/measurement (cos*brdf/pdf)
     Sample sample; // The material sample
     IntersectionInfo info;
     bool specular;
-    float camU, camV; // Only used by the eye point
+    double camU, camV; // Only used by the eye point
 };
 
 class BDPT : public Renderer
@@ -67,12 +67,12 @@ protected:
 
     Color EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath, 
                    int s, int t, Light* light) const;
-    float WeighPath(int s, int t, vector<BDVertex*>& lightPath, 
+    double WeighPath(int s, int t, vector<BDVertex*>& lightPath, 
                     vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
 
-    float UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
+    double UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
-    float PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
+    double PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
 
     int m_spp;

@@ -12,10 +12,10 @@ Matrix3d::Matrix3d()
 //------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------
-Matrix3d::Matrix3d(float m00, float m01, float m02, float m03,
-             float m10, float m11, float m12, float m13,
-             float m20, float m21, float m22, float m23,
-             float m30, float m31, float m32, float m33)
+Matrix3d::Matrix3d(double m00, double m01, double m02, double m03,
+             double m10, double m11, double m12, double m13,
+             double m20, double m21, double m22, double m23,
+             double m30, double m31, double m32, double m33)
 {
     m_val[0][0] = m00; m_val[0][1] = m01; m_val[0][2] = m02; m_val[0][3] = m03;
     m_val[1][0] = m10; m_val[1][1] = m11; m_val[1][2] = m12; m_val[1][3] = m13;
@@ -26,7 +26,7 @@ Matrix3d::Matrix3d(float m00, float m01, float m02, float m03,
 //-----------------------------------------------------------------------------
 // Returns a reference to the value stored in matrix position (row,col)
 //-----------------------------------------------------------------------------
-float& Matrix3d::operator() (unsigned char i, unsigned char j)
+double& Matrix3d::operator() (unsigned char i, unsigned char j)
 {
     assert(i >= 0 && j <= 3 && j >= 0 && j <= 3);
     return m_val[i][j];
@@ -35,7 +35,7 @@ float& Matrix3d::operator() (unsigned char i, unsigned char j)
 //-----------------------------------------------------------------------------
 // Returns a reference to the value stored in matrix position (row,col)
 //-----------------------------------------------------------------------------
-float Matrix3d::operator() (unsigned char i, unsigned char j) const
+double Matrix3d::operator() (unsigned char i, unsigned char j) const
 {
     assert(i >= 0 && j <= 3 && j >= 0 && j <= 3);
     return m_val[i][j];

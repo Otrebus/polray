@@ -14,17 +14,17 @@ class Camera
 {
 public:
     Camera();
-    Camera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, float fov);
+    Camera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, double fov);
     virtual ~Camera();
     
-    virtual Ray GetRayFromPixel(int x, int y, float a, float b, float u, float v) const = 0;
-    virtual bool GetPixelFromRay(const Ray& ray, int& x, int& y, float u, float v) const = 0;
-    virtual void SampleAperture(Vector3d& pos, float& u, float& v) const = 0;
+    virtual Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const = 0;
+    virtual bool GetPixelFromRay(const Ray& ray, int& x, int& y, double u, double v) const = 0;
+    virtual void SampleAperture(Vector3d& pos, double& u, double& v) const = 0;
 
-    void SetFov(float fov);
+    void SetFov(double fov);
 
-    float GetPixelArea() const;
-    float GetFilmArea() const;
+    double GetPixelArea() const;
+    double GetFilmArea() const;
     int GetXRes() const;
     int GetYRes() const;
 
@@ -34,7 +34,7 @@ public:
     virtual void Load(Bytestream& stream) = 0;
 
     Vector3d up, pos, dir;  // Orientation of the camera
-    float halfwidth;        // Size of the film plane (plane is always 1 unit behind the camera)
+    double halfwidth;        // Size of the film plane (plane is always 1 unit behind the camera)
     int xres, yres;         // Pixel resolution of the film plane
 };
 

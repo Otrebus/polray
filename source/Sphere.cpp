@@ -4,11 +4,11 @@
 #include "Scene.h"
 #include "Utils.h"
 
-Sphere::Sphere(const Vector3d& v, float r) : position(v), radius(r)
+Sphere::Sphere(const Vector3d& v, double r) : position(v), radius(r)
 {
 }
 
-Sphere::Sphere(const Vector3d& pos, const Vector3d& u, const Vector3d& ri, float r) : position(pos), up(u), right(ri), radius(r)
+Sphere::Sphere(const Vector3d& pos, const Vector3d& u, const Vector3d& ri, double r) : position(pos), up(u), right(ri), radius(r)
 {
     up.Normalize();
     right = (up^right)^up;
@@ -26,12 +26,12 @@ Sphere::~Sphere()
 {
 }
 
-float Sphere::GetRadius() const
+double Sphere::GetRadius() const
 {
     return radius;
 }
 
-void Sphere::SetRadius(float r)
+void Sphere::SetRadius(double r)
 {
     radius = r;
 }
@@ -41,17 +41,17 @@ Vector3d Sphere::GetPosition() const
     return position;
 }
 
-float Sphere::Intersect(const Ray& ray) const
+double Sphere::Intersect(const Ray& ray) const
 {
-        float t;
+        double t;
         Vector3d dir(ray.direction);
         Vector3d vec = ray.origin - position;
 
-        float C = vec*vec - radius*radius;
-        float B = 2*(vec*dir);
-        float A = dir*dir;
+        double C = vec*vec - radius*radius;
+        double B = 2*(vec*dir);
+        double A = dir*dir;
 
-        float D = (B*B/(4*A) - C)/A;
+        double D = (B*B/(4*A) - C)/A;
 
         t = -B/(2*A) - sqrt(D);
             
@@ -68,7 +68,7 @@ float Sphere::Intersect(const Ray& ray) const
 
 bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    float t;
+    double t;
     Vector3d dir(ray.direction);
     Vector3d vec = ray.origin - position;
 
@@ -76,11 +76,11 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
 
     info.material = 0;
 
-    float C = vec*vec - radius*radius;
-    float B = 2*(vec*dir);
-    float A = dir*dir;
+    double C = vec*vec - radius*radius;
+    double B = 2*(vec*dir);
+    double A = dir*dir;
 
-    float D = (B*B/(4*A) - C)/A;
+    double D = (B*B/(4*A) - C)/A;
 
     t = -B/(2*A) - sqrt(D);
 
@@ -104,11 +104,11 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
         w.Normalize();
         forward.Normalize();
 
-        float vcoord = acosf(up*v) / 3.14159265f;
-        float ucoord;
+        double vcoord = acosf(up*v) / 3.14159265f;
+        double ucoord;
 
         // Clamp the coordinates to prevent NaNs, which is one of the reasons this method is inferior
-        float wright = w*right > 1 ? 1 : w*right < -1 ? -1 : w*right;
+        double wright = w*right > 1 ? 1 : w*right < -1 ? -1 : w*right;
 
         if(w*forward >= 0)
             ucoord = acos(wright) / (2.0f*3.14159265f);
@@ -132,9 +132,9 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
             Color nc = bl->GetTexelBLInterp(ucoord*(bl->GetWidth()-1), vcoord*(bl->GetHeight()-1));
 
             //nc.Normalize();
-            float nx = (nc.r - 0.5f)*2.0f;
-            float ny = (nc.g - 0.5f)*2.0f;
-            float nz = nc.b;
+            double nx = (nc.r - 0.5f)*2.0f;
+            double ny = (nc.g - 0.5f)*2.0f;
+            double nz = nc.b;
 
             info.normal = tangent*nx + binormal*ny + normal*nz;
             info.normal.Normalize();
@@ -152,7 +152,7 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
     return type_sphere;
 }
 
-Color Sphere::GetTextureColor(float u, float v) const
+Color Sphere::GetTextureColor(double u, double v) const
 {
     return 0;
 }*/

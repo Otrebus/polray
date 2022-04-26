@@ -15,12 +15,12 @@ public:
     Ray& operator=(const Ray& r);
     ~Ray();
 
-    float GetRefractiveIndex() const;
+    double GetRefractiveIndex() const;
     Vector3d GetDirection() const;
 
     Vector3d origin;
     Vector3d direction;
-    //float refractiveindex;
+    //double refractiveindex;
     //IntersectionInfo* previousintersect;
 };
 
@@ -30,9 +30,9 @@ public:
     LineSegment(Vector3d&, Vector3d&);
     ~LineSegment();
 
-    bool CutXYPlane(float);
-    bool CutYZPlane(float);
-    bool CutXZPlane(float);
+    bool CutXYPlane(double);
+    bool CutYZPlane(double);
+    bool CutXZPlane(double);
 
     Vector3d v0, v1;
 };

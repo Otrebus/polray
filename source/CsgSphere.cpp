@@ -3,21 +3,21 @@
 #include "Scene.h"
 #include "Utils.h"
 
-CsgSphere::CsgSphere(const Vector3d& position, float radius) 
+CsgSphere::CsgSphere(const Vector3d& position, double radius) 
     : pos_(position), radius_(radius)
 {
 }
 
 bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
 {
-    float tNear, tFar;
+    double tNear, tFar;
     Vector3d dir(ray.direction);
     Vector3d vec = ray.origin - pos_;
 
-    float A = dir*dir;
-    float B = 2*(vec*dir);
-    float C = vec*vec - radius_*radius_;
-    float D = (B*B/(4*A) - C)/A;
+    double A = dir*dir;
+    double B = 2*(vec*dir);
+    double C = vec*vec - radius_*radius_;
+    double D = (B*B/(4*A) - C)/A;
 
     
     if(D < 0)
@@ -66,15 +66,15 @@ bool CsgSphere::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& r
     return true;
 }
 
-float CsgSphere::Intersect(const Ray& ray) const
+double CsgSphere::Intersect(const Ray& ray) const
 {
-    float t;
+    double t;
     Vector3d dir(ray.direction);
     Vector3d vec = ray.origin - pos_;
-    float A = dir*dir;
-    float B = 2*(vec*dir);
-    float C = vec*vec - radius_*radius_;
-    float D = (B*B/(4*A) - C)/A;
+    double A = dir*dir;
+    double B = 2*(vec*dir);
+    double C = vec*vec - radius_*radius_;
+    double D = (B*B/(4*A) - C)/A;
     if(D < 0)
         return -inf;
     t = -B/(2*A) - sqrt(D);
@@ -112,13 +112,13 @@ void CsgSphere::Translate(const Vector3d& direction)
     pos_ += direction;
 }
 
-void CsgSphere::Rotate(const Vector3d& axis, float angle)
+void CsgSphere::Rotate(const Vector3d& axis, double angle)
 {
-    float u = axis.x;
-    float v = axis.y;
-    float w = axis.z;
-    float cosAngle = cos(angle);
-    float sinAngle = sin(angle);
+    double u = axis.x;
+    double v = axis.y;
+    double w = axis.z;
+    double cosAngle = cos(angle);
+    double sinAngle = sin(angle);
 
     Matrix3d rot(u*u + (1 - u*u)*cosAngle, u*v*(1 - cosAngle) - w*sinAngle,
                  u*w*(1 - cosAngle) + v*sinAngle, 0, 

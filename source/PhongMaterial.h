@@ -29,7 +29,7 @@ public:
 
     Light* GetLight() const;
     
-    virtual float PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
+    virtual double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
 
     void ReadProperties(stringstream& ss);
 
@@ -43,7 +43,7 @@ public:
 
     // Variables for phong lighting
     Color Ka, Kd, Ks;
-    float alpha;
+    double alpha;
 };
 
 #endif

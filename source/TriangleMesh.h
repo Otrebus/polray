@@ -18,7 +18,7 @@ class MeshVertex : public Vertex3d
 {
 public:
 	MeshVertex(const Vector3d& vec);
-	MeshVertex(float, float, float);
+	MeshVertex(double, double, double);
 	~MeshVertex();
 
 	vector<MeshTriangle*> triangles;
@@ -36,12 +36,12 @@ public:
     bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
 	BoundingBox GetBoundingBox() const;
 
-    float Intersect(const Ray& ray) const;
+    double Intersect(const Ray& ray) const;
 	bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
     void Transform(const Matrix3d& m);
 
-	float GetArea();
+	double GetArea();
 	Vector3d GetNormal() const;
 
     Vertex3d* v0, *v1, *v2;

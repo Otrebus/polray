@@ -173,6 +173,7 @@
     <ClCompile Include="source\KDTree.cpp" />
     <ClCompile Include="source\LambertianMaterial.cpp" />
     <ClCompile Include="source\Light.cpp" />
+    <ClCompile Include="source\LightPortal.cpp" />
     <ClCompile Include="source\LightTracer.cpp" />
     <ClCompile Include="source\LightTree.cpp" />
     <ClCompile Include="source\Logger.cpp" />
@@ -234,6 +235,7 @@
     <ClInclude Include="source\KDTree.h" />
     <ClInclude Include="source\LambertianMaterial.h" />
     <ClInclude Include="source\Light.h" />
+    <ClInclude Include="source\LightPortal.h" />
     <ClInclude Include="source\LightTracer.h" />
     <ClInclude Include="source\LightTree.h" />
     <ClInclude Include="source\Logger.h" />

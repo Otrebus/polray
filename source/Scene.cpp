@@ -121,25 +121,25 @@ vector<Light*> Scene::GetLights() const
     return lights;
 }
 
-const EnvironmentLight* Scene::GetEnvironmentLight() const
-{
-    return envLight;
-}
-
-void Scene::SetEnvironmentLight(EnvironmentLight* l)
-{
-    envLight = l;
-}
-
-// I wish there was some way of just forwarding these parameters,
-//   template<typename... Args> decltype(auto) Intersect(Args... args) const { return partitioning->Intersect(args...); }
-// almost works but doesn't make the ...args parameters references
-
 bool Scene::Intersect(const Ray& ray, double tmax) const {
     const Primitive* dummy;
     return partitioning->Intersect(ray, dummy, 0, tmax, false) > 0;
 };
 
-double Scene::Intersect(const Ray& ray, const Primitive*& p) const {
-    return partitioning->Intersect(ray, p, 0, inf, true);
+double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const {
+    p = nullptr;
+    l = nullptr;
+    auto t = partitioning->Intersect(ray, p, 0, inf, true);
+    if(t > 0)
+        return t;
+    else {
+        for(auto& light : lights) {
+            auto t = light->Intersect(ray);
+            if(t != -inf) {
+                l = light;
+                return t;
+            }
+        }
+    }
+    return -inf;
 };

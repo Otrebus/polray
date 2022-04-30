@@ -28,12 +28,15 @@ public:
     MeshLight(Color intensity, std::string fileName);
     ~MeshLight();
     virtual Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const;
-    double SamplePoint(Vector3d& point, Vector3d& Normal) const;
+    void SamplePoint(Vector3d& point, Vector3d& Normal) const;
+
+    double Intersect(const Ray& ray) const;
+    bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
     virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
     Color GetIntensity() const;
 
-    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const;
+    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal) const;
     virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const;
     virtual Color DirectHitMIS(const Renderer* renderer, 
                                const IntersectionInfo& lastInfo, 
@@ -56,7 +59,6 @@ protected:
     MeshTriangle* PickRandomTriangle() const;
     double area_;
     TriangleMesh* mesh_;
-    Material* mat_;
     mutable Random r;
     TriangleNode* triangleTree_;
 };

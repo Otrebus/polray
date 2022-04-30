@@ -36,13 +36,17 @@ unsigned int PathTracer::GetSPP() const
 Color PathTracer::TracePathPrimitive(const Ray& ray) const
 {
 	const Primitive* minprimitive = nullptr;
+    const Light* minlight = nullptr;
 	IntersectionInfo info;
 
-	if(scene->Intersect(ray, minprimitive) < 0)
+	if(scene->Intersect(ray, minprimitive, minlight) < 0)
 		return Color(0, 0, 0);
-	minprimitive->GenerateIntersectionInfo(ray, info);
+    if(minprimitive)
+	    minprimitive->GenerateIntersectionInfo(ray, info);
+    else
+        minlight->GenerateIntersectionInfo(ray, info);
 
-	if(m_random.Getdouble(0, 1) > 0.8f)
+	if(m_random.GetDouble(0, 1) > 0.8f)
 		return Color(0, 0, 0);
 
     Ray out;
@@ -57,7 +61,7 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
         Vector3d N_g = info.GetGeometricNormal();
         if(N_g*info.GetDirection() > 0)
             N_g = -N_g;
-		dir = Vector3d(m_random.Getdouble(-1, 1), m_random.Getdouble(-1, 1), m_random.Getdouble(-1, 1));
+		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
 
 		out.origin = info.GetPosition() + 0.0001f*N_g;
 		if(dir.GetLength() > 1)
@@ -73,168 +77,6 @@ Color PathTracer::TracePathPrimitive(const Ray& ray) const
 	Color c = mod*TracePathPrimitive(out)/0.8f;
 	return c;
 }
-
-//Color PathTracer::TracePath(const Ray& ray) const
-//{
-//	// First, shoot a single primary ray (treated separately just to
-//	// make the light to eye case simpler)
-//	const Primitive* minprimitive;
-//	IntersectionInfo info;
-//	Ray outRay, inRay;
-//	Color pathColor(1.f, 1.f, 1.f);
-//	Color finalColor(0, 0, 0);
-//
-//	bool sampledLight = true;
-//
-//	if(m_tree.Intersect(ray, minprimitive) < 0)
-//        return Color(0, 0, 0);
-//		//return 3*Color(0.9, 1.2, 1.5); // - or the environment map for this direction
-//	minprimitive->GenerateIntersectionInfo(ray, info);
-//
-//	//		if(info.material->IsSpecular(1))
-//	//		_asm int 3;
-//
-//	//if(minshape->material->GetEmissivity().GetIntensity() > 0) 
-//    Light* light = minprimitive->GetMaterial()->GetLight();
-//    if(light)
-//		return (info.GetNormal()*info.GetDirection() < 0 ) ? light->GetIntensity() : 0; // Primary camera ray hit a light, just return intensity
-//
-//	inRay = ray;
-//
-//	do
-//	{
-//
-//		// temporary testing stuff
-//
-//		// Do next event estimation (assumes a single area light for now)
-//		Material* material = info.GetMaterial();
-//		//AreaLight* light = (AreaLight*) m_lights.front();
-//        double lightWeight; // lol
-//        double r = m_random.Getdouble(0.0f, 1.0f);
-//        Light* light = lightTree->PickLight(r, lightWeight);
-//        Vector3d lightNormal;
-//		//Vector3d lightNormal = light->GetNormal();
-//		//Vector3d normal = info.GetGeometricNormal();
-//        Vector3d normal = info.GetNormal();
-//        
-//		if(info.GetMaterial()->GetLight() == light)
-//		{
-//			if(sampledLight)
-//				return finalColor;
-//			else return pathColor*((info.GetNormal()*info.GetDirection() < 0 ) ? light->GetIntensity()/lightWeight : Color(0, 0, 0));
-//		}
-//
-//        Vector3d lightPoint;
-//        light->SamplePoint(lightPoint, lightNormal);
-//		Vector3d toLight = lightPoint-info.GetPosition();
-//
-//		if(material->IsSpecular(1))
-//			sampledLight = false;
-//		else if(toLight*lightNormal < 0)
-//		{
-//			double d = toLight.GetLength();
-//			toLight.Normalize();
-//
-//			Ray lightRay = Ray(info.GetPosition() + normal*0.0001f, toLight); //(normal*toLight>0 ? normal*0.0001f : normal*-0.0001f), toLight);
-//
-//			if(TraceShadowRay(lightRay, d))
-//			{
-//				double cosphi = abs(normal*toLight);
-//				double costheta = abs(toLight*lightNormal);
-//				finalColor += (lightNormal*toLight < 0) ? pathColor*material->BRDF(info, toLight)*costheta*cosphi*light->GetIntensity()*light->GetArea()/(d*d*lightWeight) : Color(0, 0, 0);
-//				sampledLight = true;
-//			}
-//		}
-//		// GetSampleE(info, newVertex->out, lastPdf, newVertex->rpdf, newVertex->component);
-//		double dummy1;
-//		double dummy2;
-//		unsigned char blah = 1;
-//		//pathColor*=material->GetSampleE(info, outRay, dummy1, dummy2, blah, false)/0.7f;
-//		pathColor*=material->GetSample(info, outRay, false)/0.7f;
-//		inRay = outRay;
-//
-//		if(m_tree.Intersect(inRay, minprimitive) < 0)
-//        {
-//            //finalColor += pathColor*3*Color(0.9, 1.2, 1.5);
-//			break;
-//        }
-//		minprimitive->GenerateIntersectionInfo(inRay, info);
-//		
-//	}
-//	while(m_random.Getdouble(0, 1) < 0.7f);
-//	return finalColor;
-//}
-
-
-//Color PathTracer::TracePath(const Ray& ray) const
-//{
-//    const Primitive* minprimitive;
-//    IntersectionInfo info;
-//    Ray outRay, inRay;
-//    Color pathColor(1.f, 1.f, 1.f);
-//    Color finalColor(0, 0, 0);
-//	bool sampledLight = false;
-//	inRay = ray;
-//    double rr = 1.0f;
-//    double lastPdf;
-//    double dummy;
-//    unsigned char lastComp;
-//    bool firstRay = true;
-//    IntersectionInfo lastInfo;
-//
-//    double lightWeight;
-//    double r = m_random.Getdouble(0.0f, 1.0f);
-//    Light* light = lightTree->PickLight(r, lightWeight);
-//
-//	do
-//	{
-//        //CHECKVALID(inRay.origin);
-//        CHECKVALID(inRay.direction);
-//        if(m_tree.Intersect(inRay, minprimitive) < 0)
-//        {
-//            if(scene->GetEnvironmentLight())
-//              return finalColor + pathColor*scene->GetEnvironmentLight()->GetRadiance(outRay.direction);
-//			return Color(0, 0, 0);
-//        }
-//		minprimitive->GenerateIntersectionInfo(inRay, info);
-//		Material* material = info.GetMaterial();
-//
-//        // Randomly interesected a light source
-//		if(info.GetMaterial()->GetLight() == light)
-//		{
-//			if(!firstRay)
-//                if(sampledLight)
-//                    return info.GetNormal()*info.GetDirection() < 0 ? finalColor + pathColor*light->DirectHitMIS(this, lastInfo, info, lastComp)/lightWeight : finalColor;
-//                else
-//                    return info.GetNormal()*info.GetDirection() < 0 ? finalColor + pathColor*light->GetIntensity()/lightWeight : finalColor;
-//            else
-//                return info.GetNormal()*info.GetDirection() < 0 
-//                       ? light->GetIntensity()/lightWeight : Color(0, 0, 0);
-//		}
-//
-//        Color sample = material->GetSampleE(info, outRay, lastPdf, dummy, lastComp, false);
-//        // No use to sample using next event estimation if the material
-//        // is specular since the BRDF will be 0
-//        if(material->IsSpecular(lastComp))
-//			sampledLight = false;
-//		else
-//        {
-//            finalColor += pathColor*light->NextEventEstimationMIS(this, info, lastComp)/lightWeight;
-//            //finalColor += pathColor*light->NextEventEstimation(this, info, lastComp)/lightWeight;
-//            sampledLight = true;
-//        }
-//        lastInfo = info;
-//        pathColor *= sample/0.7f;
-//        firstRay = false;
-//        inRay = outRay;
-//	}
-//    while(m_random.Getdouble(0, 1) < 0.7f);
-//	
-//    if(finalColor.IsValid())
-//        return finalColor;
-//    else
-//        return Color(0, 0, 0);
-//}
 
 void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
@@ -252,8 +94,8 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     colBuf.SetPixel(x, y, Color(0, 0, 0));
                 else
                 {
-                    double q = m_random.Getdouble(0, 1);
-                    double p = m_random.Getdouble(0, 1);
+                    double q = m_random.GetDouble(0, 1);
+                    double p = m_random.GetDouble(0, 1);
                     double u, v;
                     Vector3d pos;
                     cam.SampleAperture(pos, u, v);
@@ -275,6 +117,7 @@ unsigned int PathTracer::GetType() const
 Color PathTracer::TracePath(const Ray& ray) const
 {
     const Primitive* minprimitive = nullptr;
+    const Light* minlight = nullptr;
     IntersectionInfo info;
     Ray outRay, inRay;
     Color pathColor(1.f, 1.f, 1.f);
@@ -284,19 +127,22 @@ Color PathTracer::TracePath(const Ray& ray) const
     double rr = 1.0f;
 
     double lightWeight;
-    double r = m_random.Getdouble(0.0f, 1.0f);
+    double r = m_random.GetDouble(0.0f, 1.0f);
     Light* light = lightTree->PickLight(r, lightWeight);
 
     do
     {
-        if(scene->Intersect(inRay, minprimitive) < 0)
+        if(scene->Intersect(inRay, minprimitive, minlight) < 0)
         {
         //    if(scene->GetEnvironmentLight())
         //      return scene->GetEnvironmentLight()->GetRadiance(outRay.direction);
         //    3*Color(0.9, 1.2, 1.5) was the original sky color
             break;
         }
-        minprimitive->GenerateIntersectionInfo(inRay, info);
+        if(minprimitive)
+            minprimitive->GenerateIntersectionInfo(inRay, info);
+        else
+            minlight->GenerateIntersectionInfo(inRay, info);
         Material* material = info.GetMaterial();
        
         // Randomly interesected a light source
@@ -318,13 +164,14 @@ Color PathTracer::TracePath(const Ray& ray) const
             sampledLight = false;
         else
         {
-            finalColor += pathColor*light->NextEventEstimation(this, info)/lightWeight;
+            Vector3d dummy;
+            finalColor += pathColor*light->NextEventEstimation(this, info, dummy, dummy)/lightWeight;
             sampledLight = true;
         }
         pathColor *= c/0.7f;
         inRay = outRay;
     }   
-    while(m_random.Getdouble(0, 1) < 0.7f);
+    while(m_random.GetDouble(0, 1) < 0.7f);
     
     return finalColor;
 }

@@ -23,8 +23,7 @@
 #include "SphereLight.h"
 #include "AreaLight.h"
 #include "MeshLight.h"
-
-using namespace std;
+#include "LightPortal.h"
 
 class MeshLight;
 class EnvironmentLight;
@@ -63,6 +62,7 @@ public:
         friend void AreaLight::AddToScene(std::shared_ptr<Scene>);
         friend void SphereLight::AddToScene(std::shared_ptr<Scene>);
         friend void MeshLight::AddToScene(std::shared_ptr<Scene>);
+        friend void LightPortal::AddToScene(std::shared_ptr<Scene>);
     };
 
     // And a last one, for materials
@@ -96,14 +96,11 @@ public:
     vector<const Primitive*> GetPrimitives() const;
     vector<Light*> GetLights() const;
 
-    const EnvironmentLight* GetEnvironmentLight() const;
-    void SetEnvironmentLight(EnvironmentLight* light);
-
     void SetPartitioning(SpatialPartitioning* partitioning);
     SpatialPartitioning* GetPartitioning() const;
 
     bool Intersect(const Ray&, double tmax) const;
-    double Intersect(const Ray&, const Primitive*&) const;
+    double Intersect(const Ray&, const Primitive*&, const Light*&) const;
 
     friend class LightAdder;
     friend class PrimitiveAdder;
@@ -111,11 +108,10 @@ public:
 private:
 	Camera* camera;
 
-	vector<Light*> lights;
-    vector<Model*> models;
-    vector<const Primitive*> primitives;
-    unordered_set<Material*> materials;
-    EnvironmentLight* envLight;
+	std::vector<Light*> lights;
+    std::vector<Model*> models;
+    std::vector<const Primitive*> primitives;
+    std::unordered_set<Material*> materials;
 
 protected:
     SpatialPartitioning* partitioning;

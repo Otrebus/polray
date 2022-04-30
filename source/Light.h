@@ -4,6 +4,7 @@
 #include "vector3d.h"
 #include "color.h"
 #include "intersectioninfo.h"
+#include "EmissiveMaterial.h"
 #include <memory>
 #include <vector>
 
@@ -16,18 +17,6 @@ class Ray;
 class Color;
 class Renderer;
 
-class LightPortal
-{
-    LightPortal(Vector3d pos, Vector3d v1, Vector3d v2) : pos(pos), v1(v1), v2(v2) {}
-    double GetArea() const { return (v1 ^ v2).GetLength(); }
-    Vector3d GetNormal() const { Vector3d n = v1 ^ v2; n.Normalize(); return n; }
-    Vector3d pos, v1, v2;
-    friend class Light;
-    friend class AreaLight;
-    friend class SphereLight;
-    friend class MeshLight;
-};
-
 class Light
 {
 public:
@@ -38,16 +27,19 @@ public:
     virtual Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const = 0;
     //  virtual void SamplePoint(Vector3d& point, Vector3d& Normal) const = 0;
 
-    virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const = 0;
-    Color GetIntensity() const;
+    virtual double Intersect(const Ray& ray) const = 0;
+    virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
 
-    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const = 0;
+    virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const = 0;
+    virtual Color GetIntensity() const;
+
+    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal) const = 0;
     virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const = 0;
     virtual Color DirectHitMIS(const Renderer* renderer,
                                const IntersectionInfo& lastInfo,
                                const IntersectionInfo& thisInfo) const = 0;
 
-    //virtual Vector3d SamplePoint (Vector3d& point, Vector3d& normal) const = 0;
+    virtual void SamplePoint (Vector3d& point, Vector3d& normal) const = 0;
     virtual double GetArea() const = 0;
     virtual void AddToScene(std::shared_ptr<Scene>) = 0;
 
@@ -56,11 +48,9 @@ public:
 
     static Light* Create(unsigned char);
 
-    void AddPortal(const Vector3d& pos, const Vector3d& v1, const Vector3d& v2);
-
+    EmissiveMaterial* material;
 protected:
     Color intensity_;
-    std::vector<LightPortal> portals;
 };
 
 #endif

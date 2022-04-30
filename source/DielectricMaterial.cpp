@@ -73,7 +73,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     double Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
     double R = (Rs*Rs+Rp*Rp)/2.0f;
 
-    if(m_rnd.Getdouble(0, 1) > R) // Refracted
+    if(m_rnd.GetDouble(0, 1) > R) // Refracted
     {
         Ray out;
         out.direction = refraction;

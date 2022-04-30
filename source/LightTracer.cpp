@@ -37,7 +37,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         int ypixel = (int)yres;
         //AreaLight* light = (AreaLight*)m_lights.front(); // just a single area light allowed at the moment
         double weight;
-        Light* light = lightTree->PickLight(m_random.Getdouble(0.0f, 1.0f), weight);
+        Light* light = lightTree->PickLight(m_random.GetDouble(0.0f, 1.0f), weight);
         Ray ray; 
         Vector3d lightNormal;
 
@@ -67,13 +67,17 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         do
         {
             const Primitive* minprimitive = nullptr;
+            const Light* minlight = nullptr;
             IntersectionInfo info;
             Ray bounceRay;
 
             // Figure out if and where the current ray segment hits something
-            if(scene->Intersect(ray, minprimitive) < 0.0f)
+            if(scene->Intersect(ray, minprimitive, minlight) < 0.0f)
                 break;
-            minprimitive->GenerateIntersectionInfo(ray, info);
+            if(minprimitive)
+                minprimitive->GenerateIntersectionInfo(ray, info);
+            else
+                minlight->GenerateIntersectionInfo(ray, info);
             
             // Next event estimation
 
@@ -124,12 +128,12 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
                 pixelColor*=abs(info.GetDirection()*info.GetNormal())/abs(info.GetDirection()*info.GetGeometricNormal());
                 colBuf.AddColor(xpixel, ypixel, pixelColor);
             }
-
+            
             // Bounce a new ray
             pathColor*= c/0.7f;
             ray = bounceRay;
 
-        } while(m_random.Getdouble(0.f, 1.f) < 0.7f);
+        } while(m_random.GetDouble(0.f, 1.f) < 0.7f);
     }
 }
 

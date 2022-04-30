@@ -15,10 +15,6 @@ Color::Color(int c)
     assert(r >= 0 && g >= 0 && b >= 0 && r == r && g == g && b == b);
 }
 
-Color::Color(double f)
-{
-}
-
 int Color::GetInt() const
 {
     return (int)(b*255) | (int)(g*255) << 8 | (int)(r*255) << 16;

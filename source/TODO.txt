@@ -1,8 +1,11 @@
 Constexpr template intpow
 Clean up Ashikhmin & other materials
 Read light sources from .mtl files
-Unify all the different intersect() methods with different tmin/tmaxes
-Unify the above in KDTree
+Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Modules?
+Replace the .0000001s with eps
+Add lightportal/serialize (save)
+- Unify all the different intersect() methods with different tmin/tmaxes
+-= Unify the above in KDTree
 - Remove sampling components
 - Unify sample/sampleE

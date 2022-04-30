@@ -11,6 +11,7 @@ class Color
 {
 public:
     Color(double, double, double);
+    Color(double) = delete;
     //Color(const Vector3d&);
     Color(int);
     Color();
@@ -45,12 +46,7 @@ public:
 
     const static Color Identity;
     const static Color Black;
-
-private:
-    Color(double); // "Color(double) = delete" in public if using more C++11
-};                // compliant compiler. This is to avoid accidentally 
-                  // initializing a color with a double, which never makes
-                  // sense. Maybe I should remove the int constructor too
+};
 
 Color operator*(double, const Color&);
 Color operator*(int, const Color&);

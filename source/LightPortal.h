@@ -1,5 +1,4 @@
-#ifndef SPHERELIGHT_H
-#define SPHERELIGHT_H
+#pragma once
 
 #include "Light.h"
 #include "Ray.h"
@@ -12,12 +11,25 @@ class Renderer;
 class Scene;
 class EmissiveMaterial;
 
-class SphereLight : public Light
+class Portal
 {
 public:
-    SphereLight();
-    SphereLight(Vector3d position, double radius, Color intensity);
-    ~SphereLight();
+    Portal() {}
+    Portal(Vector3d pos, Vector3d v1, Vector3d v2) : pos(pos), v1(v1), v2(v2) {}
+    double GetArea() const { return (v1 ^ v2).GetLength(); }
+    double Intersect(const Ray& ray) const;
+    Vector3d GetNormal() const { Vector3d n = v1 ^ v2; n.Normalize(); return n; }
+    Vector3d pos, v1, v2;
+};
+
+class LightPortal : public Light
+{
+public:
+    LightPortal();
+    ~LightPortal();
+
+    void AddPortal(Vector3d pos, Vector3d v1, Vector3d v2);
+    void SetLight(Light* light);
 
     Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& pdf) const;
     void SamplePoint(Vector3d& point, Vector3d& Normal) const;
@@ -31,6 +43,8 @@ public:
     Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const;
     Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo) const;
 
+    Color GetIntensity() const;
+
     double GetArea() const;
     void AddToScene(std::shared_ptr<Scene>);
 
@@ -40,12 +54,8 @@ public:
     static Light* Create(unsigned char);
 
 protected:
-    virtual void SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& Normal) const;
-
-    Vector3d position_;
-    double radius_;
+    Light* light;
+    std::vector<Portal> portals;
     std::shared_ptr<Scene> scene_;
-    mutable Random r_;
+    mutable Random r;
 };
-
-#endif

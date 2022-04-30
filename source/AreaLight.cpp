@@ -3,6 +3,7 @@
 #include "EmissiveMaterial.h"
 #include "Renderer.h"
 #include "Triangle.h"
+#include "Utils.h"
 #include "Scene.h"
 
 AreaLight::AreaLight()
@@ -10,7 +11,7 @@ AreaLight::AreaLight()
     material = new EmissiveMaterial();
 }
 
-AreaLight::AreaLight(const Vector3d& position, const Vector3d& corner1, const Vector3d& corner2, const Color& color, shared_ptr<Scene> scn) : pos(position), c1(corner1), c2(corner2), scene(scn)
+AreaLight::AreaLight(const Vector3d& position, const Vector3d& corner1, const Vector3d& corner2, const Color& color) : pos(position), c1(corner1), c2(corner2)
 {
     material = new EmissiveMaterial();
     intensity_ = color;
@@ -53,46 +54,76 @@ double AreaLight::GetArea() const
     return abs((c1^c2).GetLength());
 }
 
+double AreaLight::Intersect(const Ray& ray) const {
+    double u, v, t;
+    Vector3d D = ray.direction;
+
+    Vector3d E1 = c1;
+    Vector3d E2 = c2;
+    Vector3d T = ray.origin - pos;
+
+    Vector3d P = E2^T;
+    Vector3d Q = E1^D;
+
+    double det = E2*Q;
+    if(det < 0.0000000001f && det > -0.0000000001f)
+        return -inf;
+
+    u = D*P/det;
+
+    if(u > 1 || u < 0)
+        return -inf;
+
+    v = T*Q/det;
+
+    if(v > 1 || v < 0)
+        return -inf;
+
+    t = E1*P/det;
+    return t < 0 ? -inf : t;
+}
+
+bool AreaLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const {
+    double u, v, t;
+    Vector3d D = ray.direction;
+
+    Vector3d E1 = c1;
+    Vector3d E2 = c2;
+    Vector3d T = ray.origin - pos;
+
+    Vector3d P = E2^T;
+    Vector3d Q = E1^D;
+
+    double det = E2*Q;
+    if(det < 0.0000000001f && det > -0.0000000001f)
+        return 0;
+
+    u = D*P/det;
+
+    if(u > 1 || u < 0)
+        return false;
+
+    v = T*Q/det;
+
+    if(v > 1 || v < 0)
+        return false;
+
+    t = E1*P/det;
+    if(t < 0)
+        return false;
+
+    info.normal = info.geometricnormal = (c1^c2).Normalized();
+	info.position = pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*0.0001f : -info.geometricnormal*0.0001f);
+	info.texpos.x = u;
+	info.texpos.y = v;
+	info.material = material;
+
+	return true;
+}
+
 double AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     Ray ray(info.position, out);
-    if(!portals.empty())
-    {   // Intersect the portal with the ray - this is almost
-        // the same code as ordinary triangle intersection
-        LightPortal p = portals.front();
-           double u, v, t;
-        Vector3d D;
-
-        D.x = ray.direction.x;
-        D.y = ray.direction.y;
-        D.z = ray.direction.z;
-
-        Vector3d E1 = p.v1;
-        Vector3d E2 = p.v2;
-        Vector3d T = ray.origin - p.pos;
-
-        Vector3d P = E2^T;
-        Vector3d Q = E1^D;
-
-        double det = E2*Q;
-        if(det < 0.0000000001f && det > -0.0000000001f)
-            return 0;
-
-        u = D*P/det;
-
-        if(u > 1 || u < 0)
-            return 0;
-
-        v = T*Q/det;
-
-        if(v > 1 || v < 0)
-            return 0;
-
-        t = E1*P/det;
-        if(t < 0)
-            return 0;
-        return (1/p.GetArea())*t*t/(abs(p.GetNormal()*ray.direction));
-    }
     return ray.direction*GetNormal()/F_PI;
 }
 
@@ -102,8 +133,8 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& angle
     normal.Normalize();
     Vector3d dir;
 
-    double x = r.Getdouble(0, 0.9999f);
-    double y = r.Getdouble(0, 0.9999f);
+    double x = r.GetDouble(0, 0.9999f);
+    double y = r.GetDouble(0, 0.9999f);
 
     ray.origin = pos + c1*x + c2*y + 0.0001f*normal;
 
@@ -113,27 +144,9 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& angle
     n = normal;
     areaPdf = 1.0f/GetArea();
 
-    if(!portals.empty())
-    {
-        LightPortal p = portals.front();
-        Vector3d portalNormal = p.v1^p.v2;
-        portalNormal.Normalize();
-        double x = r.Getdouble(0, 0.9999f);
-        double y = r.Getdouble(0, 0.9999f);
-
-        Vector3d portalPos = p.pos + p.v1*x + p.v2*y;
-
-        ray.direction = portalPos - ray.origin;
-        double d = ray.direction.GetLength();
-        ray.direction.Normalize();
-        anglePdf = (1/p.GetArea())*d*d/(abs(p.GetNormal()*ray.direction));
-        return Color(1, 1, 1)*abs(ray.direction*normal)/anglePdf;
-    }
-
-    double r1 = r.Getdouble(0, 2*F_PI);
-    double r2 = r.Getdouble(0, 0.9999f);
-     ray.direction =  forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
-        + normal * sqrt(1-r2);
+    double r1 = r.GetDouble(0, 2*F_PI);
+    double r2 = r.GetDouble(0, 0.9999f);
+    ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) + normal*sqrt(1-r2);
     anglePdf = abs(ray.direction*normal)/(F_PI);
     return Color(1, 1, 1)*(F_PI);
 }
@@ -145,8 +158,8 @@ void AreaLight::SamplePoint(Vector3d& point, Vector3d& n) const
     normal.Normalize();
     Vector3d dir;
 
-    x = r.Getdouble(0, 0.9999f);
-    y = r.Getdouble(0, 0.9999f);
+    x = r.GetDouble(0, 0.9999f);
+    y = r.GetDouble(0, 0.9999f);
     //dir = Vector3d(r.Getdouble(-1, 1), r.Getdouble(-1, 1), r.Getdouble(-1, 1));
 
     point = pos + c1*x + c2*y + 0.0001f*normal;
@@ -170,17 +183,20 @@ void AreaLight::Load(Bytestream& stream)
     stream >> pos >> c1 >> c2 >> intensity_;
 }
 
-Color AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const
+Color AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln) const
 {
     Vector3d lightPoint, lightNormal;
     SamplePoint(lightPoint, lightNormal);
+    lp = lightPoint;
+    ln = lightNormal;
+
     Vector3d toLight = lightPoint - info.GetPosition();
     double d = toLight.GetLength();
     Vector3d normal = info.GetNormal();
 
     if(toLight*lightNormal < 0)
     {
-           double d = toLight.GetLength();
+        double d = toLight.GetLength();
         toLight.Normalize();
 
         Ray lightRay = Ray(info.GetPosition(), toLight);
@@ -219,7 +235,7 @@ Color AreaLight::NextEventEstimationMIS(const Renderer* renderer, const Intersec
 
     if(toLight*lightNormal < 0)
     {
-           double d = toLight.GetLength();
+        double d = toLight.GetLength();
         toLight.Normalize();
         Ray lightRay = Ray(info.GetPosition(), toLight);
 
@@ -236,9 +252,4 @@ Color AreaLight::NextEventEstimationMIS(const Renderer* renderer, const Intersec
         }
     }
     return Color(0, 0, 0);
-}
-
-void AreaLight::AddPortal(const Vector3d& pos, const Vector3d& v1, const Vector3d& v2)
-{
-    portals.push_back(LightPortal(pos, v1, v2));
 }

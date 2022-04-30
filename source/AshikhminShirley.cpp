@@ -36,7 +36,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
     double df = Rd.GetMax();
     double sp = Rs.GetMax();
 
-    double r = rnd.Getdouble(0.0000f, df + sp);
+    double r = rnd.GetDouble(0.0000f, df + sp);
 
     if(r <= df) // Diffuse bounce
     {
@@ -44,8 +44,8 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         Vector3d N_s = info.GetNormal();
         Vector3d w_i = -info.GetDirection();
 
-        double r1 = rnd.Getdouble(0, 2*F_PI);
-        double r2 = rnd.Getdouble(0, 0.9999f);
+        double r1 = rnd.GetDouble(0, 2*F_PI);
+        double r2 = rnd.GetDouble(0, 0.9999f);
 
         if(w_i*N_g < 0)
             N_g = -N_g;
@@ -85,8 +85,8 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
     }
     else // Specular bounce
     {
-        double r1 = rnd.Getdouble(0.0f, 2*F_PI);
-        double r2 = acos(pow(rnd.Getdouble(0.0001f, 0.9999f), 1/double(n+1)));
+        double r1 = rnd.GetDouble(0.0f, 2*F_PI);
+        double r2 = acos(pow(rnd.GetDouble(0.0001f, 0.9999f), 1/double(n+1)));
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();

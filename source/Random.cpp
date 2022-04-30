@@ -69,7 +69,7 @@ int Random::GetInt(int a, int b)
     return a + m_lastNumber % (1 + b - a);
 }
 
-double Random::Getdouble(double a, double b)
+double Random::GetDouble(double a, double b)
 {
     if(b-a <= 0)
         return a;

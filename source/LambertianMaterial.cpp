@@ -23,8 +23,8 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
 {
     Ray out;
 
-    double r1 = rnd.Getdouble(0, 2*M_PI);
-    double r2 = rnd.Getdouble(0.0001f, 0.9999f);
+    double r1 = rnd.GetDouble(0, 2*M_PI);
+    double r2 = rnd.GetDouble(0.0001f, 0.9999f);
 
     Vector3d N_g = info.GetGeometricNormal();
     Vector3d N_s = info.GetNormal();

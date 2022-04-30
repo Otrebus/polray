@@ -76,6 +76,12 @@ void Vector3d::Normalize()
     z /= l;
 }
 
+Vector3d Vector3d::Normalized() const
+{
+    double l = GetLength();
+    return { x/l, y/l, z/l };
+}
+
 Vector3d Vector3d::operator*(double t) const
 {
     return Vector3d(t*x,t*y,t*z);

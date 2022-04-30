@@ -103,8 +103,8 @@ bool ThinLensCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, double u, d
 //------------------------------------------------------------------------------
 void ThinLensCamera::SampleAperture(Vector3d& pos, double& u, double& v) const
 {
-    u = random.Getdouble(0, 2*F_PI);
-    v = sqrt(random.Getdouble(0, 1));
+    u = random.GetDouble(0, 2*F_PI);
+    v = sqrt(random.GetDouble(0, 1));
 
     pos = this->pos + lensRadius*v*(up*sin(u) + (dir^up)*cos(u));
 }

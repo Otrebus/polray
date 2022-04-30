@@ -68,9 +68,10 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, doub
     if(bounces < 1)
         return Color(1, 0, 0);
 
-    const Primitive* minprimitive = 0;
+    const Primitive* minprimitive = nullptr;
+    const Light* minlight = nullptr;
 
-    double t = scene->Intersect(ray, minprimitive);
+    double t = scene->Intersect(ray, minprimitive, minlight);
 
     if(t > 0.001f)
         objecthit = true;
@@ -78,13 +79,16 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, doub
     if(objecthit)
     {
         IntersectionInfo info;
-        minprimitive->GenerateIntersectionInfo(ray, info);
+        if(minprimitive)
+            minprimitive->GenerateIntersectionInfo(ray, info);
+        else
+            minlight->GenerateIntersectionInfo(ray, info);
 
         Vector3d intersection = info.GetPosition();
         Vector3d normal = info.GetNormal();
         normal.Normalize();
 
-        if(minprimitive->GetMaterial())
+        if(info.GetMaterial())
         {
             Vector3d light(6, 13, 4);
             light.Normalize();
@@ -107,7 +111,8 @@ bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
 {
     Ray& unconstRay = const_cast<Ray&>(ray);
     const Primitive* dummy = nullptr;
-    double result = scene->Intersect(ray, dummy);
+    const Light* dummy2 = nullptr;
+    double result = scene->Intersect(ray, dummy, dummy2);
     if(result < tmax - tmax*0.00001f)
         return false;
     return true;

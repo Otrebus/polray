@@ -221,6 +221,9 @@
     <ClCompile Include="source\Draw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\LightPortal.cpp">
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -396,6 +399,9 @@
     </ClInclude>
     <ClInclude Include="source\Draw.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\LightPortal.h">
+      <Filter>Source Files\Lights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -36,6 +36,7 @@ public:
     double GetLength() const;
     double GetLengthSquared() const;
     void Normalize();
+    Vector3d Normalized() const;
     bool IsNull() const;
     bool IsValid() const;
 

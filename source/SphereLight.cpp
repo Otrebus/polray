@@ -3,6 +3,7 @@
 #include "GeometricRoutines.h"
 #include "Scene.h"
 #include "SphereLight.h"
+#include "Utils.h"
 
 SphereLight::SphereLight()
 {
@@ -12,13 +13,75 @@ SphereLight::SphereLight(Vector3d pos, double rad, Color str)
     : position_(pos), radius_(rad), Light(str)
 {
     r_.Seed(GetTickCount() + int(this));
-    material_ = new EmissiveMaterial();
-    material_->emissivity = str;
-    material_->light = this;
+    material = new EmissiveMaterial();
+    material->emissivity = str;
+    material->light = this;
 }
 
 SphereLight::~SphereLight()
 {
+}
+
+double SphereLight::Intersect(const Ray& ray) const
+{
+        double t;
+        Vector3d dir(ray.direction);
+        Vector3d vec = ray.origin - position_;
+
+        double C = vec*vec - radius_*radius_;
+        double B = 2*(vec*dir);
+        double A = dir*dir;
+
+        double D = (B*B/(4*A) - C)/A;
+
+        t = -B/(2*A) - sqrt(D);
+            
+        if(D > 0)
+        {
+            if(t < 0.00001f)
+            {
+                return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
+            }
+            return t;
+        }
+        return -inf;
+}
+
+bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
+{
+    double t;
+    Vector3d dir(ray.direction);
+    Vector3d vec = ray.origin - position_;
+
+    info.direction = ray.direction;
+
+    info.material = 0;
+
+    double C = vec*vec - radius_*radius_;
+    double B = 2*(vec*dir);
+    double A = dir*dir;
+
+    double D = (B*B/(4*A) - C)/A;
+
+    t = -B/(2*A) - sqrt(D);
+
+    if(D >= 0)
+    {
+        if(t < 0.00001f)
+        {
+            t = -B/(2*A) + sqrt(D);
+            if(t < 0)
+                return false;
+        }
+        info.normal = (ray.origin + ray.direction*t) - position_;
+        info.normal.Normalize();
+        info.position = ray.origin + ray.direction*(t - 0.0001f);
+
+        info.material = material;
+        info.geometricnormal = info.normal;
+        return true;
+    }
+    return false;
 }
 
 double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
@@ -34,8 +97,8 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
 
     areaPdf = 1/GetArea();
 
-    double r1 = r_.Getdouble(0, 2*M_PI);
-    double r2 = r_.Getdouble(0, 0.9999f);
+    double r1 = r_.GetDouble(0, 2*M_PI);
+    double r2 = r_.GetDouble(0, 0.9999f);
     ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
                     + normal * sqrt(1 - r2);
     pdf = abs(ray.direction*normal)/M_PI;
@@ -45,9 +108,9 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
 
 void SphereLight::SamplePoint(Vector3d& point, Vector3d& normal) const
 {
-    double z = r_.Getdouble(-1, 1);
+    double z = r_.GetDouble(-1, 1);
     double r = sqrt(1 - z*z);
-    double u = r_.Getdouble(0, 2*M_PI);
+    double u = r_.GetDouble(0, 2*M_PI);
     normal = Vector3d(r*cos(u), r*sin(u), z);
     point = position_ + normal*radius_*1.0001f;
 }
@@ -55,9 +118,9 @@ void SphereLight::SamplePoint(Vector3d& point, Vector3d& normal) const
 void SphereLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const
 {
     Vector3d right, forward;
-    double z = r_.Getdouble(0, 1);
+    double z = r_.GetDouble(0, 1);
     double r = sqrt(1 - z*z);
-    double u = r_.Getdouble(0, 2*M_PI);
+    double u = r_.GetDouble(0, 2*M_PI);
     MakeBasis(apex, right, forward);
     normal = right*r*cos(u) + forward*r*sin(u) + apex*z;
     point = position_ + normal*radius_*1.0001f;
@@ -72,9 +135,9 @@ void SphereLight::Load(Bytestream& s)
 {
     s >> position_.x >> position_.y >> position_.z 
       >> radius_ >> intensity_;
-    material_ = new EmissiveMaterial();
-    material_->emissivity = intensity_;
-    material_->light = this;
+    material = new EmissiveMaterial();
+    material->emissivity = intensity_;
+    material->light = this;
 }
 
 double SphereLight::GetArea() const
@@ -88,14 +151,13 @@ void SphereLight::AddToScene(std::shared_ptr<Scene> scn)
                            Vector3d(0, 0, 1), radius_);
     Scene::LightAdder::AddLight(*scn, this);
     scn->AddModel(s);
-    s->SetMaterial(material_);
+    s->SetMaterial(material);
 }
 
-Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const
+Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal) const
 {
     Vector3d toLight = position_ - info.GetPosition();
     Vector3d normal = info.GetNormal();
-    Vector3d lightPoint, lightNormal;
     toLight.Normalize();
     SamplePointHemisphere(-toLight, lightPoint, lightNormal);
     toLight = lightPoint - info.GetPosition();

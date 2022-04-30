@@ -27,11 +27,11 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
     double df = Kd.GetMax();
     double sp = Ks.GetMax();
     
-    double r = rnd.Getdouble(0, df + sp);
+    double r = rnd.GetDouble(0, df + sp);
     if(r <= df) // Diffuse bounce
     {
-        double r1 = rnd.Getdouble(0.0001f, 2*M_PI);
-        double r2 = rnd.Getdouble(0.0001f, 0.9999f);
+        double r1 = rnd.GetDouble(0.0001f, 2*M_PI);
+        double r2 = rnd.GetDouble(0.0001f, 0.9999f);
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -71,8 +71,8 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
     }
     else // Specular bounce
     {
-        double r1 = rnd.Getdouble(0.0f, 2*F_PI);
-        double r2 = acos(pow(rnd.Getdouble(0.f, 1.f), 1/(alpha+1)));
+        double r1 = rnd.GetDouble(0.0f, 2*F_PI);
+        double r2 = acos(pow(rnd.GetDouble(0.f, 1.f), 1/(alpha+1)));
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();

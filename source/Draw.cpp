@@ -4,6 +4,7 @@
 #include "CsgCuboid.h"
 #include "Random.h"
 #include "LightTracer.h"
+#include "LightPortal.h"
 #include "Color.h"
 #include "draw.h"
 #include "main.h"
@@ -75,8 +76,20 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     Random ballsC(0);
 
-    SphereLight* boxLight = new SphereLight(Vector3d(2, 1.0, 0), 0.11, Color(500, 500, 500));
-    //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.98, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
+    //SphereLight* boxLight = new SphereLight(Vector3d(2, 1.0, 0), 0.11, Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500), s);
+    //boxLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
+    //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
+
+    /*auto portalLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500));*/
+
+    LightPortal* portalLight = new LightPortal();
+    portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500));
+    portalLight->SetLight(boxLight);
+
+    portalLight->AddToScene(s);
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -117,9 +130,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     //sphere2->AddToScene(*s);
 
-    boxLight->AddToScene(s);
-
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 

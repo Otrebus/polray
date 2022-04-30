@@ -3,15 +3,16 @@
 #include "MeshLight.h"
 #include "Renderer.h"
 #include "TriangleMesh.h"
+#include "Utils.h"
 #include <string>
 #include <vector>
 
 MeshLight::MeshLight(Color intensity, std::string fileName)
 {
     r.Seed(GetTickCount() + (int) this);
-    mat_ = new EmissiveMaterial();
-    mat_->light = this;
-    mesh_ = new TriangleMesh(fileName, mat_);
+    material = new EmissiveMaterial();
+    material->light = this;
+    mesh_ = new TriangleMesh(fileName, material);
     intensity_ = intensity;
 
     area_ = 0;
@@ -23,7 +24,7 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
 
 MeshTriangle* MeshLight::PickRandomTriangle() const
 {
-    double f = r.Getdouble(0, area_);
+    double f = r.GetDouble(0, area_);
     TriangleNode* node = triangleTree_;
     while(true)
         if(node->triangle)
@@ -76,25 +77,8 @@ Color MeshLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& 
 
     areaPdf = 1.0f/GetArea();
 
-    if(!portals.empty())
-    {
-        LightPortal p = portals.front();
-        Vector3d portalNormal = p.v1^p.v2;
-        portalNormal.Normalize();
-        double x = r.Getdouble(0, 0.9999f);
-        double y = r.Getdouble(0, 0.9999f);
-
-        Vector3d portalPos = p.pos + p.v1*x + p.v2*y;
-
-        ray.direction = portalPos - ray.origin;
-        double d = ray.direction.GetLength();
-        ray.direction.Normalize();
-        anglePdf = (1/p.GetArea())*d*d/(abs(p.GetNormal()*ray.direction));
-        return Color(1, 1, 1)*abs(ray.direction*normal)/anglePdf;
-    }
-
-    double r1 = r.Getdouble(0, 2*F_PI);
-    double r2 = r.Getdouble(0, 0.9999f);
+    double r1 = r.GetDouble(0, 2*F_PI);
+    double r2 = r.GetDouble(0, 0.9999f);
     ray.direction =  forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
         + normal * sqrt(1-r2);
     anglePdf = abs(ray.direction*normal)/(F_PI);
@@ -106,59 +90,33 @@ MeshLight::~MeshLight()
 {
 }
 
+double MeshLight::Intersect(const Ray& ray) const
+{
+    // Not implemented
+    return -inf;
+}
+
+bool MeshLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
+{
+    // Not implemented
+    return false;
+}
+
 double MeshLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     Ray ray(info.position, out);
-    if(!portals.empty())
-    {   // Intersect the portal with the ray - this is almost
-        // the same code as ordinary triangle intersection
-        LightPortal p = portals.front();
-        double u, v, t;
-        Vector3d D;
-
-        D.x = ray.direction.x;
-        D.y = ray.direction.y;
-        D.z = ray.direction.z;
-
-        Vector3d E1 = p.v1;
-        Vector3d E2 = p.v2;
-        Vector3d T = ray.origin - p.pos;
-
-        Vector3d P = E2^T;
-        Vector3d Q = E1^D;
-
-        double det = E2*Q;
-        if(det < 0.0000000001f && det > -0.0000000001f)
-            return 0;
-
-        u = D*P/det;
-
-        if(u > 1 || u < 0)
-            return 0;
-
-        v = T*Q/det;
-
-        if(v > 1 || v < 0)
-            return 0;
-
-        t = E1*P/det;
-        if(t < 0)
-            return 0;
-        return (1/p.GetArea())*t*t/(abs(p.GetNormal()*ray.direction));
-    }
     return ray.direction*info.geometricnormal/F_PI;
 }
 
-double MeshLight::SamplePoint(Vector3d& point, Vector3d& normal) const
+void MeshLight::SamplePoint(Vector3d& point, Vector3d& normal) const
 {
     MeshTriangle* t = PickRandomTriangle();
-    double u = sqrt(r.Getdouble(0, 1));
-    double v = r.Getdouble(0, 1);
+    double u = sqrt(r.GetDouble(0, 1));
+    double v = r.GetDouble(0, 1);
     Vector3d e1 = t->v1->pos - t->v0->pos;
     Vector3d e2 = t->v2->pos - t->v0->pos;
     normal = t->GetNormal();
     point = t->v0->pos + u*(e1 + v*(e2-e1)) + 0.0001f*normal;
-    return t->GetArea()/area_;
 }
 
 void MeshLight::Transform(const Matrix3d& m)
@@ -186,9 +144,8 @@ void MeshLight::AddToScene(std::shared_ptr<Scene> scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info) const
+Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal) const
 {
-    Vector3d lightPoint, lightNormal;
     SamplePoint(lightPoint, lightNormal);
     Vector3d toLight = lightPoint - info.GetPosition();
     double d = toLight.GetLength();
@@ -217,7 +174,14 @@ Color MeshLight::NextEventEstimation(const Renderer* renderer, const Intersectio
 Color MeshLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const
 {
     Vector3d lightPoint, lightNormal;
-    double weight = SamplePoint(lightPoint, lightNormal);
+    MeshTriangle* t = PickRandomTriangle();
+    double u = sqrt(r.GetDouble(0, 1));
+    double v = r.GetDouble(0, 1);
+    Vector3d e1 = t->v1->pos - t->v0->pos;
+    Vector3d e2 = t->v2->pos - t->v0->pos;
+    auto nr = t->GetNormal();
+    auto point = t->v0->pos + u*(e1 + v*(e2-e1)) + 0.0001f*nr;
+    auto weight = t->GetArea()/area_;
     Vector3d toLight = lightPoint - info.GetPosition();
     Vector3d normal = info.GetNormal();
 
@@ -242,6 +206,11 @@ Color MeshLight::NextEventEstimationMIS(const Renderer* renderer, const Intersec
     return Color(0, 0, 0);
 }
 
+
+Color MeshLight::GetIntensity() const
+{
+    return intensity_;
+}
 
 Color MeshLight::DirectHitMIS(const Renderer* renderer, 
                                 const IntersectionInfo& lastInfo, 

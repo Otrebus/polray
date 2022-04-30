@@ -25,23 +25,22 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
 
     double rr = 0.7;
 
-    while(path.size() < 3 || m_random.Getdouble(0.f, 1.f) < rr) {
+    while(path.size() < 3 || m_random.GetDouble(0.f, 1.f) < rr) {
         BDVertex* lastV = path.back();
         double lastPdf = lastV->sample.pdf;
         auto lastSample = lastV->sample.color;
 
         const Primitive* hitPrimitive;
-        auto t = scene->Intersect(lastV->out, hitPrimitive);
+        const Light* hitLight;
+        auto t = scene->Intersect(lastV->out, hitPrimitive, hitLight);
         if(t < 0)
             break;
 
-        if(t > 0 && !hitPrimitive)
-            t = t;
-
-        t = scene->Intersect(lastV->out, hitPrimitive);
-
         IntersectionInfo info;
-        hitPrimitive->GenerateIntersectionInfo(lastV->out, info);
+        if(hitPrimitive)
+            hitPrimitive->GenerateIntersectionInfo(lastV->out, info);
+        else
+            hitLight->GenerateIntersectionInfo(lastV->out, info);
 
         BDVertex* newV = new BDVertex();
         newV->info = info;
@@ -94,8 +93,8 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     BDVertex* camPoint = new BDVertex();
     Vector3d lensPoint;
     cam.SampleAperture(lensPoint, camPoint->camU, camPoint->camV);
-    camPoint->out = cam.GetRayFromPixel(x, y, m_random.Getdouble(0, 1), 
-                                        m_random.Getdouble(0, 1), camPoint->camU,
+    camPoint->out = cam.GetRayFromPixel(x, y, m_random.GetDouble(0, 1), 
+                                        m_random.GetDouble(0, 1), camPoint->camU,
                                         camPoint->camV);
     camPoint->rr = 1;
     camPoint->alpha = Color::Identity;
@@ -119,8 +118,7 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     BDVertex* lightPoint = new BDVertex();
     double rr = 0.7f;
     double lastPdf;
-    Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal,
-                     lightPoint->pdf, lastPdf);
+    Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal, lightPoint->pdf, lastPdf);
     lightPoint->alpha = light->GetArea()*light->GetIntensity();
     lightPoint->rr = 1;
     lightPoint->info.normal = lightPoint->info.normal;
@@ -325,7 +323,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
 double BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
 {
-    return PowerHeuristic(s, t, lightPath, eyePath, light, camera);
+    return UniformWeight(s, t, lightPath, eyePath, light, camera);
 }
 
 void BDPT::RenderPixel(int x, int y, Camera& cam, 
@@ -336,7 +334,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     vector<BDVertex*> lightPath;
 
     double lightWeight;
-    double r = m_random.Getdouble(0.0f, 1.0f);
+    double r = m_random.GetDouble(0.0f, 1.0f);
     Light* light = lightTree->PickLight(r, lightWeight);
 
     int lLength = BuildLightPath(lightPath, light);

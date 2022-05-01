@@ -47,8 +47,8 @@ Texture* bl;
 Cubemap* cubemap;
 
 //#define ROOM
-//#define WINDOWBOX
-#define BALLSBOX
+#define WINDOWBOX
+//#define BALLSBOX
 //#define CONFERENCE
 // #define BALLBOX
 //#define LEGOCAR
@@ -142,7 +142,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
     //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
 
-    auto portalLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.1), Vector3d(0.0, 0.1, 0.0), Color(3500*16, 3500*16, 3500*16));
+    auto portalLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
     portalLight->AddToScene(s);
 
     //LightPortal* portalLight = new LightPortal();
@@ -194,7 +194,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     sphere2->AddToScene(*s);
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 
@@ -532,7 +532,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     s->SetPartitioning(new BrutePartitioning());
     
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
     PhongMaterial* m = new PhongMaterial();
     m->alpha = 100;

@@ -102,8 +102,8 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     camPoint->info.position = camPoint->out.origin;
     camPoint->rpdf = 1;
     double costheta = abs(camPoint->out.direction*cam.dir);
-    double lastPdf = 1/(cam.GetPixelArea()*costheta*costheta*costheta);
-    camPoint->pdf = 1/(cam.GetPixelArea());
+    double lastPdf = 1/(cam.GetFilmArea()*costheta*costheta*costheta);
+    camPoint->pdf = 1/(cam.GetFilmArea());
     Color lastSample = costheta*Color::Identity/lastPdf;
 
     camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false);
@@ -288,7 +288,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         double newPdf;
         double costheta = abs(lastE->info.geometricnormal*out);
         if(t == 1)
-            newPdf = 1/(cam->GetPixelArea()*costheta*costheta*costheta);
+            newPdf = 1/(cam->GetFilmArea()*costheta*costheta*costheta);
         else
             newPdf = lastE->info.GetMaterial()->PDF(info, out, false);
         backwardProbs[s-1] = newPdf*abs(lastL->info.geometricnormal*out)/lSqr;
@@ -368,7 +368,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
         else
         {
             double costheta = abs(cam.dir*eyePath[0]->out.direction);
-            double mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea()/(xres*yres))*lightWeight;
+            double mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea())*lightWeight;
             Color result = weight*eval/mod;
             eyeImage.AddColor(x, y, result);
         }

@@ -51,7 +51,8 @@ void AreaLight::AddToScene(std::shared_ptr<Scene> scn)
 
 double AreaLight::GetArea() const
 {
-    return abs((c1^c2).GetLength());
+    auto area = abs((c1^c2).GetLength());
+    return area;
 }
 
 double AreaLight::Intersect(const Ray& ray) const {

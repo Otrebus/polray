@@ -46,8 +46,9 @@ Texture* test;
 Texture* bl;
 Cubemap* cubemap;
 
-#define WINDOWBOX
-//#define BALLSBOX
+//#define ROOM
+//#define WINDOWBOX
+#define BALLSBOX
 //#define CONFERENCE
 // #define BALLBOX
 //#define LEGOCAR
@@ -61,11 +62,11 @@ Cubemap* cubemap;
 
 void MakeScene(std::shared_ptr<Renderer>& r)
 {
-#ifdef WINDOWBOX
-    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Windows.obj"));
+#ifdef ROOM
+    auto s = std::shared_ptr<Scene> (new Scene("Room.obj"));
 
-    Vector3d camPos = Vector3d(0, 1.4, 3);
-    Vector3d target = Vector3d(0, 1, 0);
+    Vector3d camPos = Vector3d(-59.5, 18.8, 384.6);
+    Vector3d target = Vector3d(-85.1, -31.4, 172.1);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
     //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
@@ -81,16 +82,9 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
     //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
 
-    auto portalLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
+    auto portalLight = new AreaLight(Vector3d(-60, 113, 60), Vector3d(10.0, 0.0, 0.0), Vector3d(0.0, 0.0, 10.0), Color(1500, 1500, 1500));
     portalLight->AddToScene(s);
 
-    /*LightPortal* portalLight = new LightPortal();
-    portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
-    portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
-    auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
-    portalLight->SetLight(boxLight);
-
-    portalLight->AddToScene(s);*/
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -119,15 +113,84 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     a->Kd = Color(0, 0, 0);
     a->alpha = 0;*/
 
+    //s->SetPartitioning(new BrutePartitioning());
+
     auto a = new LambertianMaterial();
     a->Kd = Color(0.5, 0.5, 0.5);
 
-    Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.4), 0.31);
+
+    r = std::shared_ptr<BDPT>(new BDPT(s));
+#endif
+
+#ifdef WINDOWBOX
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Windows.obj"));
+
+    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d target = Vector3d(0, 1, 0);
+    Vector3d camdir = target-camPos;
+    camdir.Normalize();
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
+    s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
+
+    //SphereLight* boxLight = new SphereLight(Vector3d(2, 1.0, 0), 0.11, Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500), s);
+    //boxLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
+    //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
+
+    auto portalLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.1), Vector3d(0.0, 0.1, 0.0), Color(3500*16, 3500*16, 3500*16));
+    portalLight->AddToScene(s);
+
+    //LightPortal* portalLight = new LightPortal();
+    //portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    //portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    //auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
+    //portalLight->SetLight(boxLight);
+
+    //portalLight->AddToScene(s);
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.9, 0.9, 0.9);
+    //a->Kd = Color(0.0, 0.0, 0.0);
+    //a->alpha = 20;
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.5, 0.5, 0.5);
+    //a->Kd = Color(0.5, 0.5, 0.5);
+    //a->alpha = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0, 0, 0);
+    //a->Rs = Color(0.85, 0.85, 0.85);
+    //a->n = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0.85, 0.85, 0.85);
+    //a->Rs = Color(0, 0, 0);
+    /*a->Rd = Color(0, 0, 0);
+    a->Rs = Color(0.85, 0.85, 0.85);
+    a->n = 1;*/
+
+    /*auto a = new PhongMaterial();
+    a->Ks = Color(0.5, 0.5, 0.5);
+    a->Kd = Color(0, 0, 0);
+    a->alpha = 0;*/
+
+    s->SetPartitioning(new BrutePartitioning());
+
+    auto a = new LambertianMaterial();
+    a->Kd = Color(0.5, 0.5, 0.5);
+
+    Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.2), 0.31);
     sphere->SetMaterial(a);
     sphere->AddToScene(*s);
 
     auto g = new DielectricMaterial();
-    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.3), 0.51);
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.5), 0.51);
     sphere2->SetMaterial(g);
     sphere2->AddToScene(*s);
 
@@ -461,7 +524,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere->AddToScene(*s);
     
     auto g = new DielectricMaterial();
-    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.8, 0.3), 0.11);
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.5, 0.3), 0.21);
     sphere2->SetMaterial(g);
     sphere2->AddToScene(*s);
 
@@ -469,7 +532,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     s->SetPartitioning(new BrutePartitioning());
     
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
     PhongMaterial* m = new PhongMaterial();
     m->alpha = 100;

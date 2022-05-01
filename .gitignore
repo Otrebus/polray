@@ -6,7 +6,8 @@
 
 # THE STUFF I ADDED OK
 *.bmp
-
+*.obj
+*.mtl
 
 # User-specific files
 *.rsuser

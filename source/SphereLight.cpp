@@ -154,12 +154,15 @@ void SphereLight::AddToScene(std::shared_ptr<Scene> scn)
     s->SetMaterial(material);
 }
 
-Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal) const
+Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln) const
 {
+    Vector3d lightPoint, lightNormal;
     Vector3d toLight = position_ - info.GetPosition();
     Vector3d normal = info.GetNormal();
     toLight.Normalize();
     SamplePointHemisphere(-toLight, lightPoint, lightNormal);
+    lp = lightPoint;
+    ln = lightNormal;
     toLight = lightPoint - info.GetPosition();
     double d = toLight.GetLength();
     toLight.Normalize();

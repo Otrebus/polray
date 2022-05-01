@@ -323,7 +323,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
 double BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
 {
-    return UniformWeight(s, t, lightPath, eyePath, light, camera);
+    return PowerHeuristic(s, t, lightPath, eyePath, light, camera);
 }
 
 void BDPT::RenderPixel(int x, int y, Camera& cam, 

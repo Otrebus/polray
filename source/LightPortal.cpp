@@ -71,10 +71,25 @@ bool LightPortal::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& inf
 
 double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
-    Ray r(info.position, out);
-    if(Intersect(r) == -inf)
-        return 0;
-    return light->Pdf(info, out);
+    Ray ray(info.position, out);
+    for(auto p : portals) {
+        auto t = p.Intersect(ray);
+        if(t != -inf) {
+            auto portalNormal = p.GetNormal();
+            auto lightNormal = info.GetNormal();
+
+            auto portalPoint = ray.origin + t*ray.direction;
+            auto lightPoint = info.position;
+
+            double areaSum = 0;
+            for(auto p : portals)
+                areaSum += p.GetArea();
+
+            auto d = (lightPoint - portalPoint).GetLength();
+            return d*d/(std::abs(portalNormal*ray.direction)*areaSum);
+        }
+    }
+    return 0;
 }
 
 Color LightPortal::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
@@ -111,10 +126,11 @@ Color LightPortal::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
 
     // TODO: this pdf calculation might want to be different for different lights
     // TODO: we're essentially undoing the sampling of the light source here
-    pdf = areaSum*(lightNormal*ray.direction)/(M_PI*M_PI)*std::abs(portalNormal*ray.direction)/(d*d);
+    auto dirPdf = d*d/(std::abs(portalNormal*ray.direction)*areaSum);
     areaPdf = lightAreaPdf;
     normal = lightNormal;
-    return color/pdf;
+    pdf = dirPdf;
+    return std::abs(lightNormal*ray.direction)*Color(1, 1, 1)/dirPdf;
 }
 
 void LightPortal::SamplePoint(Vector3d& point, Vector3d& normal) const

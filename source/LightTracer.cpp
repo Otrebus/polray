@@ -35,7 +35,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
             return;
         int xpixel = (int)xres;
         int ypixel = (int)yres;
-        //AreaLight* light = (AreaLight*)m_lights.front(); // just a single area light allowed at the moment
+
         double weight;
         Light* light = lightTree->PickLight(m_random.GetDouble(0.0f, 1.0f), weight);
         Ray ray; 

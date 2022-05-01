@@ -81,15 +81,16 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
     //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
 
-    /*auto portalLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500));*/
+    auto portalLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
+    portalLight->AddToScene(s);
 
-    LightPortal* portalLight = new LightPortal();
+    /*LightPortal* portalLight = new LightPortal();
     portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
     portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
-    auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500));
+    auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
     portalLight->SetLight(boxLight);
 
-    portalLight->AddToScene(s);
+    portalLight->AddToScene(s);*/
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -126,9 +127,9 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere->AddToScene(*s);
 
     auto g = new DielectricMaterial();
-    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.3), 0.11);
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.3), 0.51);
     sphere2->SetMaterial(g);
-    //sphere2->AddToScene(*s);
+    sphere2->AddToScene(*s);
 
     r = std::shared_ptr<BDPT>(new BDPT(s));
 

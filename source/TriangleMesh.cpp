@@ -98,9 +98,9 @@ double MeshTriangle::Intersect(const Ray& ray) const
 	Vector3d Q = E1^D;
 
 	double det = E2*Q;
-	if(det < 0.0000000001f && det > -0.0000000001f)	// Ray in (almost) the same plane as the triangle
-		return -inf;							// NOTE: depending on this epsilon value, extremely
-	u = D*P/det;								// small triangles could be missed
+	if(!det)
+		return -inf;
+	u = D*P/det;
 
 	if(u > 1 || u < 0)
 		return -inf;
@@ -111,10 +111,8 @@ double MeshTriangle::Intersect(const Ray& ray) const
 		return -inf;
 
 	t = E1*P/det;
-	if(t < 0.0000000001f)
-		return -inf;
 
-	return t;
+	return t <= 0 ? -inf : t;
 }
 
 
@@ -137,7 +135,7 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 	Vector3d Q = E1^D;
 
 	double det = E2*Q;
-	if(det < 0.0000000001f && det > -0.0000000001f) // Ray in (almost) the same plane as the triangle
+	if(!det) // Ray in (almost) the same plane as the triangle
 		return false;
 
 	u = D*P/det;
@@ -151,7 +149,7 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 		return false;
 
 	t = E1*P/det;
-	if(t < 0.0000000001f)
+	if(t <= 0)
 		return false;
 
 /*	if(material && material->normalmap)
@@ -182,7 +180,7 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 	info.geometricnormal = GetNormal();
 	info.normal.Normalize();
 
-	info.position = v0->pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*0.0001f : -info.geometricnormal*0.0001f);
+	info.position = v0->pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
 	info.texpos.x = u;
 	info.texpos.y = v;
 	info.material = material;

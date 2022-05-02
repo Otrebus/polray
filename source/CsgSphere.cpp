@@ -32,13 +32,13 @@ bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
     nearInfo.position = ray.origin + ray.direction*tNear;
     nearInfo.normal = nearInfo.position - pos_;
     nearInfo.normal.Normalize();
-    nearInfo.position += nearInfo.normal*0.0001f;
+    nearInfo.position += nearInfo.normal*eps;
     nearInfo.geometricnormal = nearInfo.normal;
     farInfo.position = ray.origin + ray.direction*tFar;
     farInfo.normal = farInfo.position - pos_;
     farInfo.normal.Normalize();
     farInfo.geometricnormal = farInfo.normal;
-    farInfo.position += farInfo.normal*0.0001f;
+    farInfo.position += farInfo.normal*eps;
 
     CsgHit nearI, farI;
     nearI.info = nearInfo;

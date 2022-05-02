@@ -18,7 +18,7 @@ double Portal::Intersect(const Ray& ray) const
     Vector3d Q = E1^D;
 
     double det = E2*Q;
-    if(det < 0.0000000001f && det > -0.0000000001f)
+    if(!det)
         return -inf;
 
     u = D*P/det;
@@ -32,7 +32,7 @@ double Portal::Intersect(const Ray& ray) const
         return -inf;
 
     t = E1*P/det;
-    return t < 0 ? -inf : t;
+    return t <= 0 ? -inf : t;
 }
 
 LightPortal::LightPortal()

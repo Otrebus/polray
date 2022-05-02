@@ -1,6 +1,7 @@
 #include "Bytestream.h"
 #include "DielectricMaterial.h"
 #include <sstream>
+#include "Utils.h"
 
 using namespace std;
 
@@ -62,7 +63,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         out.direction = Reflect(info.GetDirection(), Ns);
         out.direction.Normalize();
         auto wo = out.direction;
-        out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.GetPosition() + eps*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
         return Sample(color, out, pdf, rpdf, true);
     }
@@ -79,7 +80,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         out.direction = refraction;
         out.direction.Normalize();
         auto wo = out.direction;
-        out.origin = info.GetPosition() + 0.0002f*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((wi*Ns/(wi*Ng))*(wo*Ng/(wo*Ns))) * Color::Identity : (n1/n2)*(n1/n2)*Color::Identity;
         return Sample(color, out, pdf, rpdf, true);
     }
@@ -89,7 +90,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         out.direction = Reflect(info.GetDirection(), Ns);
         out.direction.Normalize();
         auto wo = out.direction;
-        out.origin = info.GetPosition() + 0.0001f*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.GetPosition() + eps*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
         return Sample(color, out, pdf, rpdf, true);
     }

@@ -11,7 +11,7 @@ CsgCylinder::CsgCylinder(Vector3d& position, Vector3d& dir,
     z_ = dir;
     y_ = Vector3d(1, 0, 0);
     y_ = (z_^y_)^z_; // Ensure orthogonality
-    if(y_.GetLength() < 0.0001f)
+    if(y_.GetLength() < eps)
     {
         y_ = Vector3d(0, 1, 0);
         y_ = (z_^y_)^z_;

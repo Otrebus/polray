@@ -47,8 +47,8 @@ Texture* bl;
 Cubemap* cubemap;
 
 //#define ROOM
-#define WINDOWBOX
-//#define BALLSBOX
+//#define WINDOWBOX
+#define BALLSBOX
 //#define CONFERENCE
 // #define BALLBOX
 //#define LEGOCAR
@@ -529,10 +529,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->AddToScene(*s);
 
     boxLight->AddToScene(s);
-
-    s->SetPartitioning(new BrutePartitioning());
     
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
     PhongMaterial* m = new PhongMaterial();
     m->alpha = 100;

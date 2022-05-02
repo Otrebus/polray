@@ -55,12 +55,9 @@ double Sphere::Intersect(const Ray& ray) const
 
         t = -B/(2*A) - sqrt(D);
             
-        if(D > 0)
-        {
-            if(t < 0.00001f)
-            {
+        if(D > 0) {
+            if(t < eps)
                 return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
-            }
             return t;
         }
         return -inf;
@@ -86,15 +83,15 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
 
     if(D >= 0)
     {
-        if(t < 0.00001f)
+        if(t < eps)
         {
             t = -B/(2*A) + sqrt(D);
-            if(t < 0)
+            if(t < eps)
                 return false;
         }
         info.normal = (ray.origin + ray.direction*t) - position;
         info.normal.Normalize();
-        info.position = ray.origin + ray.direction*(t - 0.0001f);
+        info.position = ray.origin + ray.direction*(t - eps);
 
         // Texture coordinates - there are probably better methods than this one
         Vector3d v = info.position - position;
@@ -119,43 +116,11 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
         info.texpos.y = vcoord;
 
         info.material = material;
-
-/*		if(material && material->normalmap)
-        {
-            Vector3d normal = v;
-            Vector3d tangent = up^normal;
-            Vector3d binormal = normal^tangent;
-            normal.Normalize();
-            binormal.Normalize();
-            tangent.Normalize();
-
-            Color nc = bl->GetTexelBLInterp(ucoord*(bl->GetWidth()-1), vcoord*(bl->GetHeight()-1));
-
-            //nc.Normalize();
-            double nx = (nc.r - 0.5f)*2.0f;
-            double ny = (nc.g - 0.5f)*2.0f;
-            double nz = nc.b;
-
-            info.normal = tangent*nx + binormal*ny + normal*nz;
-            info.normal.Normalize();
-            //v.Normalize();
-            //info.normal = v;
-        }*/
         info.geometricnormal = info.normal;
         return true;
     }
     return false;
 }
-
-/*int Sphere::GetType()
-{
-    return type_sphere;
-}
-
-Color Sphere::GetTextureColor(double u, double v) const
-{
-    return 0;
-}*/
 
 BoundingBox Sphere::GetBoundingBox() const
 {
@@ -163,11 +128,6 @@ BoundingBox Sphere::GetBoundingBox() const
     Vector3d c2 = Vector3d(position.x+radius, position.y+radius, position.z+radius);
     return BoundingBox(c1, c2);
 }
-/*
-void Sphere::ComputeTangentSpaceVectors()
-{
-    // We already have these so no computation needed
-}*/
 
 bool Sphere::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
 {

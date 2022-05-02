@@ -38,7 +38,7 @@ double SphereLight::Intersect(const Ray& ray) const
             
         if(D > 0)
         {
-            if(t < 0.00001f)
+            if(t < eps)
             {
                 return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
             }
@@ -67,7 +67,7 @@ bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& inf
 
     if(D >= 0)
     {
-        if(t < 0.00001f)
+        if(t < eps)
         {
             t = -B/(2*A) + sqrt(D);
             if(t < 0)
@@ -75,7 +75,7 @@ bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& inf
         }
         info.normal = (ray.origin + ray.direction*t) - position_;
         info.normal.Normalize();
-        info.position = ray.origin + ray.direction*(t - 0.0001f);
+        info.position = ray.origin + ray.direction*(t - eps);
 
         info.material = material;
         info.geometricnormal = info.normal;

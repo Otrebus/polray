@@ -35,14 +35,14 @@ bool CsgCuboid::Intersect(const Ray& inRay,
                    = Multiply(x_, y_, z_, nearNormal);
     nearHit.direction = inRay.direction;
     nearHit.position = inRay.origin + inRay.direction*tnear 
-                     + nearHit.normal*0.0001f;
+                     + nearHit.normal*eps;
     nearHit.material = material;
 
     farHit.normal = farHit.geometricnormal 
                    = Multiply(x_, y_, z_, farNormal);
     farHit.direction = inRay.direction;
     farHit.position = inRay.origin + inRay.direction*tfar 
-                    + farHit.normal*0.0001f;
+                    + farHit.normal*eps;
     farHit.material = material;
 
     CsgHit nearI, farI;
@@ -146,7 +146,7 @@ bool CsgCuboid::GenerateIntersectionInfo(const Ray& inRay,
     info.normal = info.geometricnormal 
                 = Multiply(x_, y_, z_, normal);
     info.direction = inRay.direction;
-    info.position = inRay.origin + inRay.direction*t + info.normal*0.0001f;
+    info.position = inRay.origin + inRay.direction*t + info.normal*eps;
     info.material = material;
     return true;
 }

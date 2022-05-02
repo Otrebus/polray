@@ -29,7 +29,6 @@ Input* input;
 Logger logger(LOG_FILENAME);
 LPDIRECTDRAWSURFACE7 bitmapsurface;
 DDSURFACEDESC2 ddsd;
-int maxdepth;
 //ColorBuffer* colorbuffer;
 HANDLE bufferMutex;
 HANDLE workingMutex;

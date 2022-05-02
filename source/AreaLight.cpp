@@ -67,7 +67,7 @@ double AreaLight::Intersect(const Ray& ray) const {
     Vector3d Q = E1^D;
 
     double det = E2*Q;
-    if(det < 0.0000000001f && det > -0.0000000001f)
+    if(!det)
         return -inf;
 
     u = D*P/det;
@@ -97,8 +97,8 @@ bool AreaLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
     Vector3d Q = E1^D;
 
     double det = E2*Q;
-    if(det < 0.0000000001f && det > -0.0000000001f)
-        return 0;
+    if(!det)
+        return false;
 
     u = D*P/det;
 
@@ -115,7 +115,7 @@ bool AreaLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
         return false;
 
     info.normal = info.geometricnormal = (c1^c2).Normalized();
-	info.position = pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*0.0001f : -info.geometricnormal*0.0001f);
+	info.position = pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
 	info.texpos.x = u;
 	info.texpos.y = v;
 	info.material = material;
@@ -135,10 +135,10 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& angle
     normal.Normalize();
     Vector3d dir;
 
-    double x = r.GetDouble(0, 0.9999f);
-    double y = r.GetDouble(0, 0.9999f);
+    double x = r.GetDouble(0, 1);
+    double y = r.GetDouble(0, 1);
 
-    ray.origin = pos + c1*x + c2*y + 0.0001f*normal;
+    ray.origin = pos + c1*x + c2*y + eps*normal;
 
     Vector3d right, forward;
     MakeBasis(normal, right, forward);
@@ -147,7 +147,7 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& angle
     areaPdf = 1.0f/GetArea();
 
     double r1 = r.GetDouble(0, 2*F_PI);
-    double r2 = r.GetDouble(0, 0.9999f);
+    double r2 = r.GetDouble(0, 1.0);
     ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) + normal*sqrt(1-r2);
     anglePdf = abs(ray.direction*normal)/(F_PI);
     return Color(1, 1, 1)*(F_PI);
@@ -164,7 +164,7 @@ void AreaLight::SamplePoint(Vector3d& point, Vector3d& n) const
     y = r.GetDouble(0, 0.9999f);
     //dir = Vector3d(r.Getdouble(-1, 1), r.Getdouble(-1, 1), r.Getdouble(-1, 1));
 
-    point = pos + c1*x + c2*y + 0.0001f*normal;
+    point = pos + c1*x + c2*y + eps*normal;
     n = normal;
 }
 

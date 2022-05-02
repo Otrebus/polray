@@ -22,15 +22,11 @@ extern bool* grid;
 extern LPDIRECTDRAWSURFACE7 bitmapsurface;
 extern DDSURFACEDESC2 ddsd;
 
-extern int nodes;
-extern int nodetriangles;
-extern int maxdepth;
 extern HANDLE bufferMutex;
 extern HANDLE workingMutex;
 extern int nCurrentFrame;
 extern int frames;
 
-#define MAX_DEPTH 50
 #define XRES 320
 #define YRES 200
 //#define DETERMINISTIC

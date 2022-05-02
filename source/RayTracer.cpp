@@ -3,6 +3,7 @@
 #include "Logger.h"
 #include "Main.h"
 #include <intrin.h>
+#include "Utils.h"
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -113,7 +114,7 @@ bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
     const Primitive* dummy = nullptr;
     const Light* dummy2 = nullptr;
     double result = scene->Intersect(ray, dummy, dummy2);
-    if(result < tmax - tmax*0.00001f)
+    if(result < tmax*(1-eps))
         return false;
     return true;
 }

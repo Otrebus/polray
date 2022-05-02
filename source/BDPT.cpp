@@ -3,6 +3,7 @@
 #include "AreaLight.h"
 #include "Primitive.h"
 #include "Material.h"
+#include "Utils.h"
 
 BDSample::BDSample(int a, int b) : s(a), t(b)
 {
@@ -166,7 +167,7 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     double r = c.direction.GetLength();
     c.direction.Normalize();
 
-    if(!TraceShadowRay(c, r) || r < 0.005f)
+    if(!TraceShadowRay(c, r) || r < eps)
         return Color(0, 0, 0);
 
     result*= abs(lastL->info.GetGeometricNormal()*c.direction)

@@ -429,8 +429,19 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 						mv->normal = normals[n-1];
 					}
 					points.push_back(mv);
-				} else
+				} else { // This vertex is already among the parsed vertices in this group so use that particular one
 					mv = it->second;
+					if(n)
+					{
+						normalInterp = false;
+						if(mv->normal != normals[n-1])  // A different normal was given though, so we still need
+						{                                 // to create an entirely new vertex
+							mv = new MeshVertex(*mv); 
+							points.push_back(mv);
+						}
+						mv->normal = normals[n-1];
+					}  
+				}
 				face.push_back(mv);
 				ns.push_back(n);
 				ts.push_back(t);

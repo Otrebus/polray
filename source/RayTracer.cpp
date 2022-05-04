@@ -91,13 +91,13 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, doub
 
         if(info.GetMaterial())
         {
-            Vector3d light(6, 13, 4);
+            Vector3d light(1, 1, 1);
             light.Normalize();
             double dot = light*(info.GetNormal());
             if(dot > 0)
-                return 10*Color(dot, dot, dot);
+                return 10*Color(0, 0, dot);
             else
-                return 10*Color(-dot, -dot, -dot);
+                return Color(0.0, 0.0, 0.3);
         }
         return Color(0, 0, 0);
     }

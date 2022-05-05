@@ -481,6 +481,7 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 					LambertianMaterial* mat = new LambertianMaterial();
 					mat->Kd = Color(0.7f, 0.7f, 0.7f);
 					tri->SetMaterial(mat);
+					this->materials.push_back(mat);
 				}
 				if (curmat && !meshMat)
 					tri->SetMaterial(curmat);
@@ -653,8 +654,6 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
         }
         else
             t->v2 = t2v->replacement;
-
-	//	shapes.push_back((Shape*)*it);
 	}
 
     for(auto it = points.begin(); it < points.end(); it++)
@@ -665,17 +664,9 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
             (*it) = (MeshVertex*) (new Vertex3d((*it)->pos, (*it)->normal, (*it)->texpos));
     }
 
-
-
-	//points = vectors;
-	
-	//vectors.clear();
-
     for(auto it = materials.begin(); it != materials.end(); it++)
-    {
         this->materials.push_back((*it).second);
-    }
-	
+
 	myfile.close();
 	return true;
 }
@@ -799,9 +790,9 @@ void TriangleMesh::Save(Bytestream& stream) const
     map<Material*, unsigned int> materialMemToIndex;
 
     stream << (unsigned char)ID_TRIANGLEMESH; 
-    stream << (unsigned int)materials.size();
-    stream << (unsigned int)points.size();
-    stream << (unsigned int)triangles.size();
+    stream << materials.size();
+    stream << points.size();
+    stream << triangles.size();
 
     for(unsigned int i = 0; i < materials.size(); i++)
     {
@@ -829,7 +820,7 @@ void TriangleMesh::Save(Bytestream& stream) const
 
 void TriangleMesh::Load(Bytestream& stream)
 {
-    unsigned int nMats, nPoints, nTriangles;
+    size_t nMats, nPoints, nTriangles;
     stream >> nMats >> nPoints >> nTriangles;
 
     materials.clear(); points.clear(); triangles.clear();

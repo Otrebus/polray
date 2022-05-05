@@ -43,7 +43,6 @@ void Scene::AddLight(Light* l)
     l->AddToScene(shared_from_this());
 }
 
-
 void Scene::SetCamera(Camera* cam)
 {
     camera = cam;
@@ -66,8 +65,8 @@ Camera* Scene::GetCamera() const
 
 void Scene::Load(Bytestream& b)
 {
-    unsigned int nLights;
-    unsigned int nModels;
+    size_t nLights;
+    size_t nModels;
 
     // Theoretically, all the base classes implementing Save/Load/Create could
     // implement some common interface called Streamable or something, and I

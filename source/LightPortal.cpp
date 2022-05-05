@@ -138,14 +138,29 @@ void LightPortal::SamplePoint(Vector3d& point, Vector3d& normal) const
     // Seems not to be used by any other light
 }
 
-void LightPortal::Save(Bytestream& s) const
+void LightPortal::Save(Bytestream& stream) const
 {
-    s << ""; // TODO: implement
+    stream << ID_LIGHTPORTAL;
+    stream << portals.size();
+    for(auto portal : portals)
+        stream << portal.pos << portal.v1 << portal.v2;
+    light->Save(stream);
 }
 
-void LightPortal::Load(Bytestream& s)
+void LightPortal::Load(Bytestream& stream)
 {
-    // TODO: implement
+    size_t portalSize;
+    stream >> portalSize;
+    for(int i = 0; i < portalSize; i++) {
+        Portal portal;
+        stream >> portal.pos >> portal.v1 >> portal.v2;
+        portals.push_back(portal);
+    }
+    
+    unsigned char id;
+    stream >> id;
+    light = Light::Create(id);
+    light->Load(stream);
 }
 
 double LightPortal::GetArea() const

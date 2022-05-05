@@ -29,12 +29,12 @@ public:
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
-    virtual void AddToScene(Scene& scene);
-
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
 protected:
+    friend class Scene;
+    virtual void AddToScene(Scene& scene);
     double radius;
     Vector3d position, up, right;
 };

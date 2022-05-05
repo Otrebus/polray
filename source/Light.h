@@ -10,6 +10,7 @@
 
 #define ID_AREALIGHT ((unsigned char)200)
 #define ID_SPHERELIGHT ((unsigned char)201)
+#define ID_LIGHTPORTAL ((unsigned char)202)
 
 class Bytestream;
 class Scene;

@@ -70,8 +70,7 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
     Vector3d vec = ray.origin - position;
 
     info.direction = ray.direction;
-
-    info.material = 0;
+    info.material = material;
 
     double C = vec*vec - radius*radius;
     double B = 2*(vec*dir);
@@ -115,7 +114,6 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
         info.texpos.x = ucoord;
         info.texpos.y = vcoord;
 
-        info.material = material;
         info.geometricnormal = info.normal;
         return true;
     }

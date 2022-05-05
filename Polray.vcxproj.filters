@@ -53,9 +53,6 @@
     <ClCompile Include="source\ColorBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="source\Model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -224,6 +221,9 @@
     <ClCompile Include="source\LightPortal.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
+    <ClCompile Include="source\Model.cpp">
+      <Filter>Source Files\Shapes</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -337,9 +337,6 @@
     <ClInclude Include="source\ColorBuffer.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="source\Model.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\Scene.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -402,6 +399,9 @@
     </ClInclude>
     <ClInclude Include="source\LightPortal.h">
       <Filter>Source Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Model.h">
+      <Filter>Source Files\Shapes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

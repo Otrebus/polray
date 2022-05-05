@@ -132,6 +132,8 @@ Color PathTracer::TracePath(const Ray& ray) const
 
     do
     {
+        minprimitive = nullptr;
+        minlight = nullptr;
         if(scene->Intersect(inRay, minprimitive, minlight) < 0)
         {
         //    if(scene->GetEnvironmentLight())
@@ -144,6 +146,8 @@ Color PathTracer::TracePath(const Ray& ray) const
         else
             minlight->GenerateIntersectionInfo(inRay, info);
         Material* material = info.GetMaterial();
+        //if(!info.GetMaterial())
+        //    break;
        
         // Randomly interesected a light source
         if(info.GetMaterial()->GetLight() == light)

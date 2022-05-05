@@ -25,12 +25,13 @@ public:
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
-    void AddToScene(Scene& scene);
-
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
     Vertex3d v0, v1, v2;
+protected:
+    friend class Scene;
+    void AddToScene(Scene& scene);
 };
 
 #endif

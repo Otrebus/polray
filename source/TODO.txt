@@ -1,11 +1,14 @@
+Debug SphereLight + LightPortal
+Make TraceShadowRay account for light portals
 Unhardcode light area sampling in light portal
 Constexpr template intpow
 Clean up Ashikhmin & other materials
 Read light sources from .mtl files
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Modules?
-Replace the .0000001s with eps
 Add lightportal/serialize (save)
+Fix the friend/attourney etc relationships and private fields in general
+- Replace the .0000001s with eps
 - Add physical camera to bdpt
 - Unify all the different intersect() methods with different tmin/tmaxes
 -= Unify the above in KDTree

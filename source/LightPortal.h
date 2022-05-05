@@ -46,7 +46,6 @@ public:
     Color GetIntensity() const;
 
     double GetArea() const;
-    void AddToScene(std::shared_ptr<Scene>);
 
     void Save(Bytestream& s) const;
     void Load(Bytestream& s);
@@ -54,6 +53,8 @@ public:
     static Light* Create(unsigned char);
 
 protected:
+    friend class Scene;
+    void AddToScene(std::shared_ptr<Scene>);
     Light* light;
     std::vector<Portal> portals;
     std::shared_ptr<Scene> scene_;

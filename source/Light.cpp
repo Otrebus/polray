@@ -1,4 +1,5 @@
 #include "AreaLight.h"
+#include "LightPortal.h"
 #include "Light.h"
 #include "SphereLight.h"
 #include <intrin.h>
@@ -17,6 +18,8 @@ Light* Light::Create(unsigned char c)
         return new AreaLight;
     else if(c == ID_SPHERELIGHT)
         return new SphereLight;
+    else if(c == ID_LIGHTPORTAL)
+        return new LightPortal;
     else {
         __debugbreak();
         return new AreaLight; // To satisfy the compiler who thinks the function otherwise might return null

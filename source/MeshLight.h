@@ -43,7 +43,6 @@ public:
                                const IntersectionInfo& thisInfo) const;
 
     virtual double GetArea() const;
-    virtual void AddToScene(std::shared_ptr<Scene>);
 
     virtual void Save(Bytestream& s) const;
     virtual void Load(Bytestream& s);
@@ -55,6 +54,9 @@ public:
     void AddPortal(const Vector3d& pos, const Vector3d& v1, const Vector3d& v2);
 
 protected:
+    friend class Scene;
+    virtual void AddToScene(std::shared_ptr<Scene>);
+
     TriangleNode* BuildTree(int from, int to, double area, double cutoff);
     MeshTriangle* PickRandomTriangle() const;
     double area_;

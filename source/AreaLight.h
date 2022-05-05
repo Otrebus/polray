@@ -37,8 +37,9 @@ public:
     void Load(Bytestream& s);
 
     double GetArea() const;
-    void AddToScene(std::shared_ptr<Scene> scn);
 protected:
+    friend class Scene;
+    void AddToScene(std::shared_ptr<Scene> scn);
     Vector3d pos, c1, c2;
     std::shared_ptr<Scene> scene;
     mutable Random r;

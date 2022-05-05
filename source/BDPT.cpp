@@ -167,7 +167,7 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     double r = c.direction.GetLength();
     c.direction.Normalize();
 
-    if(!TraceShadowRay(c, r) || r < eps)
+    if(!TraceShadowRay(c, (1-eps)*r) || r < eps)
         return Color(0, 0, 0);
 
     result*= abs(lastL->info.GetGeometricNormal()*c.direction)

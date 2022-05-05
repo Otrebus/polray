@@ -203,7 +203,7 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
 
         Ray lightRay = Ray(info.GetPosition(), toLight);
 
-        if(renderer->TraceShadowRay(lightRay, d))
+        if(renderer->TraceShadowRay(lightRay, d*(1-eps)))
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);

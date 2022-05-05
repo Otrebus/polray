@@ -161,6 +161,7 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
     Vector3d normal = info.GetNormal();
     toLight.Normalize();
     SamplePointHemisphere(-toLight, lightPoint, lightNormal);
+    lightPoint = lightPoint + lightNormal*eps;
     lp = lightPoint;
     ln = lightNormal;
     toLight = lightPoint - info.GetPosition();
@@ -170,7 +171,7 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
 
     if(toLight*lightNormal < 0)
     {
-        if(renderer->TraceShadowRay(lightRay, d))
+        if(renderer->TraceShadowRay(lightRay, (1-1e-6)*d))
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);

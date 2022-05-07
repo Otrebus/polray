@@ -8,6 +8,7 @@ Instead of intersect -> generateintersectioninfo just add a boolean to generate 
 Modules?
 Add lightportal/serialize (save)
 Fix the friend/attourney etc relationships and private fields in general
+Check that materials can be assigned to different faces (e.g. the microwave in interior.obj)
 - Replace the .0000001s with eps
 - Add physical camera to bdpt
 - Unify all the different intersect() methods with different tmin/tmaxes

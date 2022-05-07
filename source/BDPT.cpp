@@ -101,6 +101,7 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     camPoint->alpha = Color::Identity;
     camPoint->info.normal = camPoint->info.geometricnormal = cam.dir;
     camPoint->info.position = camPoint->out.origin;
+    camPoint->specular = true;
     camPoint->rpdf = 1;
     double costheta = abs(camPoint->out.direction*cam.dir);
     double lastPdf = 1/(cam.GetFilmArea()*costheta*costheta*costheta);
@@ -130,7 +131,7 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     path.push_back(lightPoint);
     std::vector<BDSample> dummy;
 
-    return BuildPath(path, dummy, light, false);
+    return BuildPath(path, dummy, light, true);
 }
 
 Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
@@ -140,23 +141,23 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
 
     if(t == 0) // 0 eye path vertices not possible since cam is not part of scene
         return Color(0, 0, 0);
+
     if(s == 0) // 0 light path vertices, we directly hit the light source
     {          // - has to be handled a little bit differently
         BDVertex* prevE = eyePath[t-1];
         Vector3d lightNormal = eyePath[t-1]->info.normal;
         if(t == 1) // Direct light hit
+        {
             if(eyePath[0]->out.direction*lightNormal < 0) 
                 return light->GetIntensity();
             else 
                 return Color(0, 0, 0);
-        else
-        {
-            BDVertex* lastE = eyePath[t-2]; 
-            if(lastE->out.direction*lightNormal < 0)
-                return light->GetIntensity()*prevE->alpha/prevE->rr;
-            else 
-                return Color(0, 0, 0);
         }
+        BDVertex* lastE = eyePath[t-2]; 
+		if(lastE->out.direction*lightNormal < 0)
+            return light->GetIntensity()*prevE->alpha/prevE->rr;
+		else 
+            return Color(0, 0, 0);
     }
 
     // Build the connecting vertex
@@ -186,6 +187,7 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
         result *= lastE->info.material->
                   BRDF(lastE->info, c.direction)
                   /lastE->rr;
+
     return result;
 }
 

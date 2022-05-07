@@ -110,7 +110,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         outRay.direction.Normalize();
         Vector3d& w_o = outRay.direction;
 
-        double pdf = pow(N_s*hv, n)*(n + 1)/((w_o*hv)*8*F_PI)*sp/(df+sp);
+        double pdf = pow(N_s*hv, n)*(n + 1)/((w_i*hv)*8*F_PI)*sp/(df+sp);
         double rpdf = pdf;
         
         if(w_i*N_s < 0 || w_o*N_s < 0 || w_o*N_g < 0 || w_i*N_g < 0) 

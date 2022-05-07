@@ -46,10 +46,10 @@ Texture* test;
 Texture* bl;
 Cubemap* cubemap;
 
-#define INTERIOR
+//#define INTERIOR
 //#define ROOM
 //#define WINDOWBOX
-//#define BALLSBOX
+#define BALLSBOX
 //#define CONFERENCE
 // #define BALLBOX
 //#define LEGOCAR
@@ -145,7 +145,6 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     auto portalLight = new AreaLight(Vector3d(44.0, 1.0, -40), Vector3d(5.0, 0.0, 0.0), Vector3d(0.0, 0.0, 5.0), Color(7500, 7500, 7500));
     portalLight->AddToScene(s);
-
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -510,7 +509,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
-    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
     Vector3d camPos = Vector3d(0, 1.4, 3);
@@ -574,7 +573,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     Random ballsC(0);
 
-    SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
+    //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
+    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
 
     auto a = new AshikhminShirley();
     a->Rs = Color(0.5, 0.4, 0.6);
@@ -585,16 +585,16 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //sphere->AddToScene(*s);
     s->AddModel(sphere);
     
-    auto g = new DielectricMaterial();
+    /*auto g = new DielectricMaterial();
     Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.5, 0.3), 0.21);
-    sphere2->SetMaterial(g);
+    sphere2->SetMaterial(g);*/
     //sphere2->AddToScene(*s);
-    s->AddModel(sphere2);
+    //s->AddModel(sphere2);
 
     //boxLight->AddToScene(s);
     s->AddLight(boxLight);
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<LightTracer>(new LightTracer(s));
 
 #endif
 #ifdef BALLBOX

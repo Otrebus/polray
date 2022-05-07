@@ -63,10 +63,14 @@ Random::Random(unsigned int seed)
 
 int Random::GetInt(int a, int b)
 {
+#ifndef USE_MERSENNE
     if(b-a <= 0)
         return a;
     m_lastNumber = m_lastNumber * 1664525 +	1013904223;
     return a + m_lastNumber % (1 + b - a);
+#else
+    return a + genrand_int31() % (1 + b - a);
+#endif
 }
 
 double Random::GetDouble(double a, double b)

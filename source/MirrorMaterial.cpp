@@ -36,10 +36,10 @@ Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) con
 	out.origin = info.GetPosition() + normal*0.0001f;
 	out.direction.Normalize();
 
-    return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1), out, 1, 1, true);
+    return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1), out, 1, 1, true, 1);
 }
 
-Color MirrorMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out) const
+Color MirrorMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int sample) const
 {
     return Color(0, 0, 0); // The chance that the out, in vectors are reflectant is effectively 0
 }
@@ -60,7 +60,7 @@ void MirrorMaterial::ReadProperties(stringstream& ss)
     }
 }
 
-double MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int sample) const
 {
     return 1;
 }

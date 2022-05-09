@@ -65,7 +65,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         auto wo = out.direction;
         out.origin = info.GetPosition() + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
-        return Sample(color, out, pdf, rpdf, true);
+        return Sample(color, out, pdf, rpdf, true, 1);
     }
     Vector3d refraction = wi*(n1/n2) + Ns*(cosi*(n1/n2) - sqrt(d));
     refraction.Normalize();
@@ -82,7 +82,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         auto wo = out.direction;
         out.origin = info.GetPosition() + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((wi*Ns/(wi*Ng))*(wo*Ng/(wo*Ns))) * Color::Identity : (n1/n2)*(n1/n2)*Color::Identity;
-        return Sample(color, out, pdf, rpdf, true);
+        return Sample(color, out, pdf, rpdf, true, 1);
     }
     else // Reflected
     {
@@ -92,7 +92,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         auto wo = out.direction;
         out.origin = info.GetPosition() + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
-        return Sample(color, out, pdf, rpdf, true);
+        return Sample(color, out, pdf, rpdf, true, 1);
     }
 }
 
@@ -101,8 +101,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
 // relative to the given intersectioninfo. In the case of any specular material
 // the BRDF is 0 in all directions, since it is effectively a distribution.
 //------------------------------------------------------------------------------
-Color DielectricMaterial::BRDF(const IntersectionInfo& info, 
-    const Vector3d& out) const
+Color DielectricMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
 {
     return Color(0, 0, 0); // The chance that the out, in vectors 
 }                          // are reflectant is 0
@@ -136,7 +135,7 @@ void DielectricMaterial::ReadProperties(stringstream& ss)
 // never be used in practice since it would only cause NaNs in any integrator.
 // Hence the actual value is returned as 1, just to avoid any potential issues.
 //------------------------------------------------------------------------------
-double DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const
 {
     return 1;
 }

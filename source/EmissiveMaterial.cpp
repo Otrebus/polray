@@ -28,7 +28,7 @@ Sample EmissiveMaterial::GetSample(const IntersectionInfo& info, bool adjoint) c
     auto rpdf = 2*F_PI;
 
     auto out = Ray(info.GetPosition(), -info.GetDirection());
-    return Sample(Color(0.0, 0.0, 0.0), out, pdf, rpdf, false); // Blackbody
+    return Sample(Color(0.0, 0.0, 0.0), out, pdf, rpdf, false, 1); // Blackbody
 }
 
 Light* EmissiveMaterial::GetLight() const
@@ -36,7 +36,7 @@ Light* EmissiveMaterial::GetLight() const
     return light;
 }
 
-Color EmissiveMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out) const
+Color EmissiveMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int sample) const
 {
     return Color(0.0, 0.0, 0.0); // Blackbody
 }
@@ -45,7 +45,7 @@ void EmissiveMaterial::ReadProperties(stringstream& ss)
 {
 }
 
-double EmissiveMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double EmissiveMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int sample) const
 {
     return 0;
 }

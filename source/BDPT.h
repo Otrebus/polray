@@ -36,6 +36,7 @@ private:
     double rpdf; // The area pdf of this vertex as if sampled from the next
     Color alpha; // The unweighted contribution/measurement (cos*brdf/pdf)
     Sample sample; // The material sample
+    int component;
     IntersectionInfo info;
     bool specular;
     double camU, camV; // Only used by the eye point

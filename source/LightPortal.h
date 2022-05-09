@@ -39,9 +39,9 @@ public:
 
     double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
 
-    Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal) const;
-    Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const;
-    Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo) const;
+    Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const;
+    Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const;
+    Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const;
 
     Color GetIntensity() const;
 

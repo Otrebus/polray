@@ -187,10 +187,10 @@ void LightPortal::AddToScene(std::shared_ptr<Scene> scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-Color LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln) const
+Color LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
 {
     Vector3d lightPoint, lightNormal;
-    auto color = light->NextEventEstimation(renderer, info, lightPoint, lightNormal);
+    auto color = light->NextEventEstimation(renderer, info, lightPoint, lightNormal, component);
     lp = lightPoint;
     ln = lightNormal;
     Ray ray(info.position, (lightPoint-info.position).Normalized());
@@ -203,13 +203,13 @@ Color LightPortal::NextEventEstimation(const Renderer* renderer, const Intersect
     return t == -inf ? Color(0, 0, 0) : color;
 }
 
-Color LightPortal::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const
+Color LightPortal::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     return Color(0, 0, 0); // TODO: implement
 }
 
 
-Color LightPortal::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo) const
+Color LightPortal::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const
 {
     return 0; // TODO: implement
 }

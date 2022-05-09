@@ -46,11 +46,11 @@ Texture* test;
 Texture* bl;
 Cubemap* cubemap;
 
-//#define INTERIOR
+#define INTERIOR
 //#define ROOM
 //#define EMPTYBOX
 //#define WINDOWBOX
-#define BALLSBOX
+//#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
 //#define LEGOCAR
@@ -122,7 +122,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef ROOM
     auto s = std::shared_ptr<Scene> (new Scene("Room.obj"));

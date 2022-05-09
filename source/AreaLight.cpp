@@ -185,7 +185,7 @@ void AreaLight::Load(Bytestream& stream)
     stream >> pos >> c1 >> c2 >> intensity_;
 }
 
-Color AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln) const
+Color AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
 {
     Vector3d lightPoint, lightNormal;
     SamplePoint(lightPoint, lightNormal);
@@ -208,7 +208,7 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
             Color c;
-            c = info.GetMaterial()->BRDF(info, toLight)
+            c = info.GetMaterial()->BRDF(info, toLight, component)
                 *costheta*cosphi*intensity_*GetArea()/(d*d);
             return c;
         }
@@ -216,7 +216,7 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
     return Color(0, 0, 0);
 }
 
-Color AreaLight::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo) const
+Color AreaLight::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const
 {
     Vector3d v = thisInfo.position - lastInfo.position;
     double d = v.GetLength();
@@ -224,11 +224,11 @@ Color AreaLight::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& 
     double costheta = abs(v*thisInfo.normal);
     double lightPdf = 1.0f/GetArea();
     Material* mat = lastInfo.GetMaterial();
-    double brdfPdf = costheta*mat->PDF(lastInfo, v, false)/(d*d);
+    double brdfPdf = costheta*mat->PDF(lastInfo, v, false, component)/(d*d);
     return intensity_/(1.0f + lightPdf*lightPdf/(brdfPdf*brdfPdf));
 }
 
-Color AreaLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const
+Color AreaLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     Vector3d lightPoint, lightNormal;
     SamplePoint(lightPoint, lightNormal);
@@ -246,9 +246,9 @@ Color AreaLight::NextEventEstimationMIS(const Renderer* renderer, const Intersec
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
             Material* mat = info.GetMaterial();
-            Color c = mat->BRDF(info, toLight)
+            Color c = mat->BRDF(info, toLight, component)
                       *costheta*cosphi*intensity_*GetArea()/(d*d);
-            double brdfPdf = costheta*mat->PDF(info, toLight, false)/(d*d);
+            double brdfPdf = costheta*mat->PDF(info, toLight, false, component)/(d*d);
             double lightPdf = 1.0f/GetArea();
             return c/(1.0f + brdfPdf*brdfPdf/(lightPdf*lightPdf));
         }

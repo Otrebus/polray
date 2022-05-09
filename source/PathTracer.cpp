@@ -33,50 +33,50 @@ unsigned int PathTracer::GetSPP() const
     return m_SPP;
 }
 
-Color PathTracer::TracePathPrimitive(const Ray& ray) const
-{
-	const Primitive* minprimitive = nullptr;
-    const Light* minlight = nullptr;
-	IntersectionInfo info;
-
-	if(scene->Intersect(ray, minprimitive, minlight) < 0)
-		return Color(0, 0, 0);
-    if(minprimitive)
-	    minprimitive->GenerateIntersectionInfo(ray, info);
-    else
-        minlight->GenerateIntersectionInfo(ray, info);
-
-	if(m_random.GetDouble(0, 1) > 0.8f)
-		return Color(0, 0, 0);
-
-    Ray out;
-	Vector3d dir;
-
-    Light* l;
-    if((l = info.GetMaterial()->GetLight()) && info.GetGeometricNormal() * info.GetDirection() < 0)
-        return l->GetIntensity()/0.8f;
-
-    while(true)
-	{
-        Vector3d N_g = info.GetGeometricNormal();
-        if(N_g*info.GetDirection() > 0)
-            N_g = -N_g;
-		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
-
-		out.origin = info.GetPosition() + 0.0001f*N_g;
-		if(dir.GetLength() > 1)
-			continue;
-		else if(dir*N_g < 0)
-			dir = -dir;
-		dir.Normalize();
-		break;
-	}
-    Color mod = info.GetMaterial()->BRDF(info, dir)*2*F_PI*abs(info.GetNormal()*dir);
-
-	out.direction = dir;
-	Color c = mod*TracePathPrimitive(out)/0.8f;
-	return c;
-}
+//Color PathTracer::TracePathPrimitive(const Ray& ray) const
+//{
+//	const Primitive* minprimitive = nullptr;
+//    const Light* minlight = nullptr;
+//	IntersectionInfo info;
+//
+//	if(scene->Intersect(ray, minprimitive, minlight) < 0)
+//		return Color(0, 0, 0);
+//    if(minprimitive)
+//	    minprimitive->GenerateIntersectionInfo(ray, info);
+//    else
+//        minlight->GenerateIntersectionInfo(ray, info);
+//
+//	if(m_random.GetDouble(0, 1) > 0.8f)
+//		return Color(0, 0, 0);
+//
+//    Ray out;
+//	Vector3d dir;
+//
+//    Light* l;
+//    if((l = info.GetMaterial()->GetLight()) && info.GetGeometricNormal() * info.GetDirection() < 0)
+//        return l->GetIntensity()/0.8f;
+//
+//    while(true)
+//	{
+//        Vector3d N_g = info.GetGeometricNormal();
+//        if(N_g*info.GetDirection() > 0)
+//            N_g = -N_g;
+//		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
+//
+//		out.origin = info.GetPosition() + 0.0001f*N_g;
+//		if(dir.GetLength() > 1)
+//			continue;
+//		else if(dir*N_g < 0)
+//			dir = -dir;
+//		dir.Normalize();
+//		break;
+//	}
+//    Color mod = info.GetMaterial()->BRDF(info, dir)*2*F_PI*abs(info.GetNormal()*dir);
+//
+//	out.direction = dir;
+//	Color c = mod*TracePathPrimitive(out)/0.8f;
+//	return c;
+//}
 
 void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
@@ -169,7 +169,7 @@ Color PathTracer::TracePath(const Ray& ray) const
         else
         {
             Vector3d dummy;
-            finalColor += pathColor*light->NextEventEstimation(this, info, dummy, dummy)/lightWeight;
+            finalColor += pathColor*light->NextEventEstimation(this, info, dummy, dummy, sample.component)/lightWeight;
             sampledLight = true;
         }
         pathColor *= c/0.7f;

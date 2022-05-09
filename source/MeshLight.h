@@ -36,11 +36,11 @@ public:
     virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
     Color GetIntensity() const;
 
-    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal) const;
-    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info) const;
+    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const;
+    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const;
     virtual Color DirectHitMIS(const Renderer* renderer, 
                                const IntersectionInfo& lastInfo, 
-                               const IntersectionInfo& thisInfo) const;
+                               const IntersectionInfo& thisInfo, int component) const;
 
     virtual double GetArea() const;
 

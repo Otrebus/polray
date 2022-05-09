@@ -123,7 +123,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
                 //double surfcos = info.GetNormal()*camRay.direction;
                 surfcos = abs(surfcos);
 
-                Color brdf = info.GetMaterial()->BRDF(info, camRay.direction);
+                Color brdf = info.GetMaterial()->BRDF(info, camRay.direction, sample.component);
                 // Flux to radiance and stuff involving probability and sampling of the camera
                 Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP);
                 pixelColor*=abs(info.GetDirection()*info.GetNormal())/abs(info.GetDirection()*info.GetGeometricNormal());

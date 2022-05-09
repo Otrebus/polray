@@ -106,7 +106,7 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     camPoint->pdf = 1/(cam.GetFilmArea());
     Color lastSample = costheta*Color::Identity/lastPdf;
 
-    camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false);
+    camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false, 1);
 
     path.push_back(camPoint);
     return BuildPath(path, samples, light, false);
@@ -125,7 +125,7 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     lightPoint->info.geometricnormal = lightPoint->info.normal;
     lightPoint->info.position = lightPoint->out.origin;
 
-    lightPoint->sample = Sample(lastSample, lightPoint->out, lastPdf, lightPoint->rpdf, false);
+    lightPoint->sample = Sample(lastSample, lightPoint->out, lastPdf, lightPoint->rpdf, false, 1);
     path.push_back(lightPoint);
     std::vector<BDSample> dummy;
 
@@ -179,11 +179,11 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
 
     if(s > 1)
         result *= modifier*lastL->info.material->
-                  BRDF(lastL->info, -c.direction)
+                  BRDF(lastL->info, -c.direction, lastL->sample.component)
                   /lastL->rr;
     if(t > 1)
         result *= lastE->info.material->
-                  BRDF(lastE->info, c.direction)
+                  BRDF(lastE->info, c.direction, lastE->sample.component)
                   /lastE->rr;
 
     return result;
@@ -262,7 +262,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         out.Normalize();
         double newPdf;
         if(s > 1)
-            newPdf = lastL->info.GetMaterial()->PDF(info, out, true);
+            newPdf = lastL->info.GetMaterial()->PDF(info, out, true, lastL->sample.component);
         else
             newPdf = light->Pdf(lastL->info, out);
         forwardProbs[s] = newPdf*abs(lastE->info.geometricnormal*out)/(lSqr);
@@ -290,7 +290,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         if(t == 1)
             newPdf = 1/(cam->GetFilmArea()*costheta*costheta*costheta);
         else
-            newPdf = lastE->info.GetMaterial()->PDF(info, out, false);
+            newPdf = lastE->info.GetMaterial()->PDF(info, out, false, lastE->sample.component);
         backwardProbs[s-1] = newPdf*abs(lastL->info.geometricnormal*out)/lSqr;
     }
 

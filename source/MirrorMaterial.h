@@ -24,11 +24,11 @@ public:
 
     Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
 
-    Color BRDF(const IntersectionInfo& info, const Vector3d& out) const;
+    Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
 
     Light* GetLight() const;
     
-    double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const;
+    double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const;
 
     void ReadProperties(stringstream& ss);
 

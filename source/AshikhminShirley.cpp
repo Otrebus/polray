@@ -75,14 +75,14 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
         {
             pdf = rpdf = 0;
-            return Sample(Color(0, 0, 0), outRay, pdf, rpdf, false);
+            return Sample(Color(0, 0, 0), outRay, pdf, rpdf, false, 1);
         }
 
         // TODO: the below is just the brdf, divided by F_PI, simplify
         Color mod = (28.0f/23.0f)*Rd*(Color::Identity - Rs)*(1-pow(1-abs(N_s*w_i)/2.0f, 5.0f))*(1-pow(1-(N_s*w_o)/2.0f, 5.0f));
 
         auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0f)*mod/(df/(df+sp));
-        return Sample(color, outRay, pdf, rpdf, false);
+        return Sample(color, outRay, pdf, rpdf, false, 1);
     }
     else // Specular bounce
     {
@@ -116,17 +116,17 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         if(w_i*N_s < 0 || w_o*N_s < 0 || w_o*N_g < 0 || w_i*N_g < 0) 
         {
             pdf = rpdf = 0;
-            return Sample(Color(0, 0, 0), outRay, pdf, rpdf, false);
+            return Sample(Color(0, 0, 0), outRay, pdf, rpdf, false, 2);
         }
 
         Color fresnel = Rs + (Color::Identity - Rs)*(pow(1-w_o*hv, 5.0f));
         Color mod = abs(N*w_o)*fresnel/(max(N_s*w_i, N_s*w_o));
         auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0f)*mod/(sp/(df+sp));
-        return Sample(color, outRay, pdf, rpdf, false);
+        return Sample(color, outRay, pdf, rpdf, false, 2);
     }
 }
 
-Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out) const
+Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
 {
     double df = Rd.GetMax();
     double sp = Rs.GetMax();
@@ -148,9 +148,10 @@ Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out) 
     Vector3d h = (wi + out);
     h.Normalize();
 
-    auto a = Rd*(28.0f/(23.0f*F_PI))*(Color::Identity-Rs)*(1-pow(1-abs(N_s*out)/2, 5.0f))*(1-pow(1-(abs(N_s*wi))/2, 5.0f));
-    auto b = (Rs + (Color::Identity - Rs)*pow(1-out*h, 5.0f))*pow(N_s*h, double(n))*(double(n + 1)/(8*F_PI))/( (h*out)*max(N_s*wi, N_s*out) );
-    return a + b;
+    if(component == 1)
+        return Rd*(28.0f/(23.0f*F_PI))*(Color::Identity-Rs)*(1-pow(1-abs(N_s*out)/2, 5.0f))*(1-pow(1-(abs(N_s*wi))/2, 5.0f))/(df/(df+sp));
+    else
+        return (Rs + (Color::Identity - Rs)*pow(1-out*h, 5.0f))*pow(N_s*h, double(n))*(double(n + 1)/(8*F_PI))/( (h*out)*max(N_s*wi, N_s*out) )/(sp/(df+sp));
 }
 
 Light* AshikhminShirley::GetLight() const
@@ -158,7 +159,7 @@ Light* AshikhminShirley::GetLight() const
     return 0;
 }
 
-double AshikhminShirley::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint) const
+double AshikhminShirley::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const
 {
     double df = Rd.GetMax();
     double sp = Rs.GetMax();
@@ -180,7 +181,10 @@ double AshikhminShirley::PDF(const IntersectionInfo& info, const Vector3d& out, 
 
     Vector3d normal = adjoint ? N_g : N_s;
 
-    return out*normal/F_PI*df/(df+sp) + pow(N_s*hv, n)*(n + 1)/((in*hv)*8*F_PI)*sp/(df+sp);
+    if(component == 1)
+        return out*normal/F_PI;
+    else
+        return pow(N_s*hv, n)*(n + 1)/((in*hv)*8*F_PI);
 }
 
 void AshikhminShirley::Save(Bytestream& stream) const

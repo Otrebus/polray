@@ -594,12 +594,12 @@ IntResult KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool re
     KDNode* nearnode = k > 0 ? left : right;
     KDNode* farnode = nearnode == left ? right : left;
 
-    if(tint <= tmin-eps)
+    if(tint <= tmin)
     {
         auto res = farnode->IntersectRec(ray, std::max(tmin, tint-eps), tmax, returnPrimitive);
         if(res.t != -inf)
             return res;
-    } else if(tmin <= tint) {
+    } else {
         auto res = nearnode->IntersectRec(ray, tmin, std::min(tint+eps, tmax), returnPrimitive);
         if(res.t != -inf)
             return res;

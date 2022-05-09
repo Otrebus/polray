@@ -48,10 +48,11 @@ Cubemap* cubemap;
 
 //#define INTERIOR
 //#define ROOM
+//#define EMPTYBOX
 //#define WINDOWBOX
 #define BALLSBOX
 //#define CONFERENCE
-// #define BALLBOX
+//#define BALLBOX
 //#define LEGOCAR
 //#define KITCHEN
 //#define DODGE
@@ -208,7 +209,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     LightPortal* portalLight = new LightPortal();
     portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
     portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
-    auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
+    auto boxLight = new SphereLight(Vector3d(4, 1.0, 0), 0.4, Color(2000, 2000, 2000));
+    //auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
     portalLight->SetLight(boxLight);
 
     s->AddLight(portalLight);
@@ -254,7 +256,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     s->AddModel(sphere2);
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 
@@ -348,7 +350,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     Random ballsC(0);
 
-    SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
+    
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.98, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500), s);
     auto triangle = new Triangle(Vector3d(1, 1.2, 1.1), Vector3d(-0.8, 1.2, 1.1), Vector3d(1, 1.2, -1.1));
     auto triangle2 = new Triangle(Vector3d(1, 1.2, -1.1), Vector3d(-0.8, 1.2, -1.1), Vector3d(-0.8, 1.2, 1.1));
@@ -356,8 +358,9 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     lam->Kd = Color(0.2, 0.2, 0.2);
     triangle->SetMaterial(lam);
     triangle2->SetMaterial(lam);
-    triangle->AddToScene(*s);
-    triangle2->AddToScene(*s);
+    s->AddModel(triangle);
+    s->AddModel(triangle2);
+
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -385,21 +388,25 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     a->Ks = Color(0.5, 0.5, 0.5);
     a->Kd = Color(0, 0, 0);
     a->alpha = 0;*/
+    //s->SetPartitioning(new BrutePartitioning());
     auto a = new LambertianMaterial();
     a->Kd = Color(0.5, 0.5, 0.5);
 
     Sphere* sphere = new Sphere(Vector3d(-0.6, 0.5, 0.4), 0.31);
     sphere->SetMaterial(a);
-    sphere->AddToScene(*s);
+    s->AddModel(sphere);
 
     auto g = new DielectricMaterial();
     Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.3), 0.11);
     sphere2->SetMaterial(g);
     //sphere2->AddToScene(*s);
 
-    boxLight->AddToScene(s);
+    SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(0.25, 0.0, 0.0), Vector3d(0.0, 0, 0.25), Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(1.5, 0.0, 0.0), Vector3d(0.0, 0, 0.1), Color(200, 200, 200));
+    s->AddLight(boxLight);
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 
@@ -518,7 +525,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     camdir.Normalize();
     //box.camera = new Camera(Vector3d(0, 1, 0), camPos, camdir);
     s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
-    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 65));
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
     
     //box.camera->SetFov(75);
     //AreaLight* cubearealight = new AreaLight(Vector3d(-.65, 0.99, 1.35), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(20, 200, 50), &box);
@@ -573,6 +580,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     Random ballsC(0);
 
+    s->SetPartitioning(new BrutePartitioning());
+
     //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
     AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
 
@@ -594,7 +603,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     s->AddLight(boxLight);
 
-    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 #ifdef BALLBOX

@@ -32,8 +32,8 @@ public:
 private:
     Ray out;
     double rr; // The russian roulette factor
-    double pdf; // The forward area pdf
-    double rpdf; // The reverse area pdf
+    double pdf; // The area pdf of this vertex as if sampled from the previous
+    double rpdf; // The area pdf of this vertex as if sampled from the next
     Color alpha; // The unweighted contribution/measurement (cos*brdf/pdf)
     Sample sample; // The material sample
     IntersectionInfo info;

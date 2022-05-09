@@ -56,8 +56,11 @@ double LightPortal::Intersect(const Ray& ray) const
     for(auto p : portals) {
         auto t = p.Intersect(ray);
         if(t != -inf) {
+            // This doesn't take into account which side of the portal the light is
+            // which helps to calculate self-intersections of a light outside the scene.
+            // However, if you put the portals + light inside the scene this wouldn't give the correct result
             auto s = light->Intersect(ray);
-            if(s > t)
+            if(s != -inf)
                 return s;
         }
     }
@@ -130,6 +133,11 @@ Color LightPortal::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
     areaPdf = lightAreaPdf;
     normal = lightNormal;
     pdf = dirPdf;
+    /*if(lightNormal*ray.direction < 0) {
+        pdf = 0;
+        areaPdf = 0;
+        return Color(0, 0, 0);
+    }*/
     return std::abs(lightNormal*ray.direction)*Color(1, 1, 1)/dirPdf;
 }
 

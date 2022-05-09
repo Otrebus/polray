@@ -54,7 +54,6 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
 
         newV->sample = mat->GetSample(info, lightPath);
         newV->out = newV->sample.outRay;
-        newV->rpdf = newV->sample.rpdf;
         newV->specular = newV->sample.specular;
         newV->rr = path.size() < 3 ? 1 : lastV->rr*rr;
         rr = min(lastSample.GetLuminance(), 1);
@@ -101,7 +100,6 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     camPoint->alpha = Color::Identity;
     camPoint->info.normal = camPoint->info.geometricnormal = cam.dir;
     camPoint->info.position = camPoint->out.origin;
-    camPoint->specular = true;
     camPoint->rpdf = 1;
     double costheta = abs(camPoint->out.direction*cam.dir);
     double lastPdf = 1/(cam.GetFilmArea()*costheta*costheta*costheta);
@@ -264,8 +262,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         out.Normalize();
         double newPdf;
         if(s > 1)
-            newPdf = lastL->info.GetMaterial()->
-                     PDF(info, out, true);
+            newPdf = lastL->info.GetMaterial()->PDF(info, out, true);
         else
             newPdf = light->Pdf(lastL->info, out);
         forwardProbs[s] = newPdf*abs(lastE->info.geometricnormal*out)/(lSqr);
@@ -347,12 +344,10 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
         for(int t = 1; t <= eLength; t++)
             samples.push_back(BDSample(s, t));
 
-    for(auto it = samples.cbegin(); it < samples.end(); it++)
+    for(auto sample : samples)
     {
-        BDSample sample = *it;
-        const int xres = lightImage.GetXRes(), yres = lightImage.GetYRes();
-        double weight = WeighPath(sample.s, sample.t, lightPath, eyePath, light, &cam);
         Color eval = EvalPath(lightPath, eyePath, sample.s, sample.t, light);
+        double weight = WeighPath(sample.s, sample.t, lightPath, eyePath, light, &cam);
 
         if(sample.t == 1) // These samples end up on the light image
         {
@@ -360,8 +355,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
             Ray camRay(lightPath[sample.s-1]->out.origin, 
                        cam.pos - lightPath[sample.s-1]->out.origin);
             camRay.direction.Normalize();
-            if(!cam.GetPixelFromRay(camRay, camx, camy, 
-                                    eyePath[0]->camU, eyePath[0]->camV))
+            if(!cam.GetPixelFromRay(camRay, camx, camy, eyePath[0]->camU, eyePath[0]->camV))
                 continue;
             double costheta = abs(cam.dir*camRay.direction);
             double mod = costheta*costheta*costheta*costheta*cam.GetFilmArea()*lightWeight;

@@ -1,4 +1,3 @@
-Debug SphereLight + LightPortal
 Make TraceShadowRay account for light portals
 Unhardcode light area sampling in light portal
 Constexpr template intpow
@@ -9,6 +8,8 @@ Modules?
 Add lightportal/serialize (save)
 Fix the friend/attourney etc relationships and private fields in general
 Check that materials can be assigned to different faces (e.g. the microwave in interior.obj)
+(mostly for "fun") Make light portals work inside scenes
+- Debug SphereLight + LightPortal (the spherelight didn't self-intersect)
 - Replace the .0000001s with eps
 - Add physical camera to bdpt
 - Unify all the different intersect() methods with different tmin/tmaxes

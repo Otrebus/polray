@@ -38,6 +38,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
         double weight;
         Light* light = lightTree->PickLight(m_random.GetDouble(0.0f, 1.0f), weight);
+        weight = 1;
         Ray ray; 
         Vector3d lightNormal;
 

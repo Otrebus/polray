@@ -30,8 +30,8 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
     double r = rnd.GetDouble(0, df + sp);
     if(r <= df) // Diffuse bounce
     {
-        double r1 = rnd.GetDouble(0.0001f, 2*M_PI);
-        double r2 = rnd.GetDouble(0.0001f, 0.9999f);
+        double r1 = rnd.GetDouble(0.0000f, 2*M_PI);
+        double r2 = rnd.GetDouble(0.0000f, 1);
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -67,7 +67,9 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
             return Sample(Color(0, 0, 0), out, pdf, rpdf, false);
 
         Color ret = adjoint ? Kd*abs(w_i*N_s)/abs(w_i*N_g) : Kd;
-        return Sample(ret/(df/(df+sp)), out, pdf, rpdf, false);
+        auto infor = info;
+        infor.direction = -out.direction;
+        return Sample(ret/(df/(df+sp)), out, PDF(info, out.direction, adjoint), PDF(infor, -info.direction, adjoint), false);
     }
     else // Specular bounce
     {
@@ -105,13 +107,13 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
             return Sample(Color(0, 0, 0), out, pdf, rpdf, false);
         }
 
-        // FIXME these should probably be equal
         pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*F_PI)*sp/(sp+df);
-        //rpdf = pow(-info.GetDirection()*Reflect(-out.direction, N_s), alpha)*(alpha+1)/(2*F_PI);
         Color mod = abs(out.direction*N)*Ks*double(alpha + 2)/double(alpha + 1);
 
         auto color = (adjoint ? abs((N_s*w_i)/(N_g*w_i)) : 1)*mod/(sp/(df+sp));
-        return Sample(color, out, pdf, rpdf, false);
+        auto infor = info;
+        infor.direction = -out.direction;
+        return Sample(color, out, PDF(info, out.direction, adjoint), PDF(infor, -info.direction, adjoint), false);
     }
 }
 

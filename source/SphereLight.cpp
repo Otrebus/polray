@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "Bytestream.h"
 #include "EmissiveMaterial.h"
 #include "GeometricRoutines.h"
@@ -86,7 +87,7 @@ bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& inf
 
 double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
-    return abs(out*info.normal)/M_PI;
+    return std::max(0.0, (out*info.normal)/M_PI);
 }
 
 Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
@@ -98,9 +99,9 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
     areaPdf = 1/GetArea();
 
     double r1 = r_.GetDouble(0, 2*M_PI);
-    double r2 = r_.GetDouble(0, 0.9999f);
+    double r2 = r_.GetDouble(0, 1);
     ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
-                    + normal * sqrt(1 - r2);
+                    + normal * sqrt(1-r2);
     pdf = abs(ray.direction*normal)/M_PI;
 
     return Color::Identity*F_PI;

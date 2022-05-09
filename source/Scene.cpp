@@ -128,17 +128,27 @@ bool Scene::Intersect(const Ray& ray, double tmax) const {
 double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const {
     p = nullptr;
     l = nullptr;
-    auto t = partitioning->Intersect(ray, p, 0, inf, true);
-    if(t > 0)
-        return t;
-    else {
-        for(auto& light : lights) {
-            auto t = light->Intersect(ray);
-            if(t != -inf) {
-                l = light;
-                return t;
-            }
+    auto primT = partitioning->Intersect(ray, p, 0, inf, true);
+    double lightT = -inf;
+    double minLightT = inf;
+
+    for(auto& light : lights) {
+        auto t = light->Intersect(ray);
+        if(t != -inf && t < minLightT) {
+            minLightT = t;
+            l = light;
         }
     }
+    if(minLightT != inf)
+        lightT = minLightT;
+    if(primT != -inf && (lightT == -inf || primT < lightT)) {
+        l = nullptr;
+        return primT;
+    } else if(lightT != -inf) {
+        p = nullptr;
+        return lightT;
+    }
+    p = nullptr;
+    l = nullptr;
     return -inf;
 };

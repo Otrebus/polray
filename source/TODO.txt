@@ -5,10 +5,11 @@ Clean up Ashikhmin & other materials
 Read light sources from .mtl files
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Modules?
-Add lightportal/serialize (save)
 Fix the friend/attourney etc relationships and private fields in general
 Check that materials can be assigned to different faces (e.g. the microwave in interior.obj)
 (mostly for "fun") Make light portals work inside scenes
+Try including rr with mis o
+- Add lightportal/serialize (save)
 - Debug SphereLight + LightPortal (the spherelight didn't self-intersect)
 - Replace the .0000001s with eps
 - Add physical camera to bdpt

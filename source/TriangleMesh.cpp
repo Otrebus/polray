@@ -207,7 +207,7 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 	}
 
 	Material* curmat = 0;
-	LambertianMaterial* phongmat = 0;
+	PhongMaterial* phongmat = 0;
 	bool phong = false;
 	while(!matfile.eof())
 	{
@@ -277,8 +277,7 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 			}
 			else
 			{
-				//curmat = new PhongMaterial;
-				curmat = new LambertianMaterial;
+				curmat = new PhongMaterial;
 				materials[a] = curmat;
 				phong = true;
 			}
@@ -288,23 +287,21 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 		{
 			double dummy;
 			ss >> dummy >> dummy >> dummy;
-			//if(!curmat)
-			//	__debugbreak();
-			//if(phong)
-			//{
-			//	phongmat = (PhongMaterial*) curmat;
-			//	ss >> phongmat->Ka.r >> phongmat->Ka.g >> phongmat->Ka.b;
-			//}
-		}
-		else if(a == "kd")
-		{
-			auto lambmat = (LambertianMaterial*) curmat;
-			ss >> lambmat->Kd.r >> lambmat->Kd.g >> lambmat->Kd.b;
 			if(!curmat)
 				__debugbreak();
 			if(phong)
 			{
-				phongmat = (LambertianMaterial*) curmat;
+				phongmat = (PhongMaterial*) curmat;
+				ss >> phongmat->Ka.r >> phongmat->Ka.g >> phongmat->Ka.b;
+			}
+		}
+		else if(a == "kd")
+		{
+			if(!curmat)
+				__debugbreak();
+			if(phong)
+			{
+				phongmat = (PhongMaterial*) curmat;
 				ss >> phongmat->Kd.r >> phongmat->Kd.g >> phongmat->Kd.b;
 			}
 			else
@@ -312,9 +309,7 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 		}
 		else if(a == "ks")
 		{
-			double dummy;
-			ss >> dummy >> dummy >> dummy;
-			/*if(!curmat)
+			if(!curmat)
 				__debugbreak();
 			if(phong)
 			{
@@ -322,13 +317,11 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 				ss >> phongmat->Ks.r >> phongmat->Ks.g >> phongmat->Ks.b;
 			}
 			else
-				__debugbreak();*/
+				__debugbreak();
 		}
 		else if(a == "ns")
 		{
-			double dummy;
-			ss >> dummy;
-			/*if(!curmat)
+			if(!curmat)
 				__debugbreak();
 			if(phong)
 			{
@@ -336,7 +329,7 @@ bool TriangleMesh::ReadMaterialFile(string matfilestr, map<string, Material*>& m
 				ss >> phongmat->alpha;
 			}
 			else
-				__debugbreak();*/
+				__debugbreak();
 		}
 	}
 	return true;

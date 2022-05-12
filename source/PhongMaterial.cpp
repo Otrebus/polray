@@ -18,13 +18,59 @@ PhongMaterial::PhongMaterial()
 #endif
 }
 
+double arvo_m(Vector3d N, Vector3d w_i, int n) {
+    double c = std::abs(N*w_i);
+    double s = std::sqrt(1-c*c);
+    double k = 0;
+    double T_k, A;
+    if(n%2 == 0) {
+        A = M_PI/2;
+        k = 0;
+        T_k = M_PI/2;
+    } else {
+        A = M_PI - std::acos(c);
+        k = 1;
+        T_k = s;
+    }
+    double t = 0;
+    while(k <= n-2) {
+        t += T_k;
+        k += 2;
+        T_k = s*s*((k-1)/k)*T_k;
+    }
+    return 2*(T_k + A*c + c*c*t)/(n+2);
+}
+
+double arvo_p(Vector3d N, Vector3d w_i, int n) {
+    auto c = std::abs(N*w_i);
+    auto s = std::sqrt(1-c*c);
+    double k = 0;
+    double T_k, A;
+    if(n%2 == 0) {
+        A = M_PI - std::acos(c);
+        k = 1;
+        T_k = s;
+    } else {
+        A = M_PI/2;
+        k = 0;
+        T_k = M_PI/2;
+    }
+    double t = 0;
+    while(k <= n-1) {
+        t += T_k;
+        k += 2;
+        T_k = s*s*((k-1)/k)*T_k;
+    }
+    return 2*(A + c*t)/(n+1);
+}
+
 PhongMaterial::~PhongMaterial()
 {
 }
 
 Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-float df = Kd.GetMax();
+    float df = Kd.GetMax();
     float sp = Ks.GetMax();
     
     float r = rnd.GetDouble(0, df + sp);
@@ -32,8 +78,8 @@ float df = Kd.GetMax();
     {
         int component = 1;
 
-        float r1 = rnd.GetDouble(0.0001f, 2*M_PI);
-        float r2 = rnd.GetDouble(0.0000f, 1.0f);
+        float r1 = rnd.GetDouble(0, 2*M_PI);
+        float r2 = rnd.GetDouble(0, 1);
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -104,13 +150,13 @@ float df = Kd.GetMax();
         {
             double pdf = 0, rpdf = 0;
             return Sample(Color(0, 0, 0), out, 0, 0, false, 2);
-        }
+        } 
 
-        // FIXME these should probably be equal
         double pdf, rpdf;
-        pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*F_PI);
-        //rpdf = pow(-info.GetDirection()*Reflect(-out.direction, N_s), alpha)*(alpha+1)/(2*F_PI);
-        Color mod = abs(out.direction*N)*Ks*float(alpha + 2)/float(alpha + 1);
+        pdf = pow(out.direction*up, alpha)/arvo_p(N, w_i, alpha);
+        rpdf = pow(out.direction*up, alpha)/arvo_p(N, w_o, alpha);
+
+        Color mod = Ks*abs(out.direction*N)*float(alpha + 2)/(2*F_PI)*arvo_p(N, w_i, alpha);
 
         return Sample((adjoint ? abs((N_s*w_i)/(N_g*w_i)) : 1)*mod/(sp/(df+sp)), out, pdf, rpdf, false, 2);
     }
@@ -148,7 +194,7 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
         if(reflection*out < 0)
             return Color(0, 0, 0);
 
-        return Ks*((alpha + 2)/(2*F_PI))*pow(out*reflection, alpha)/(sp/(df+sp));
+        return Ks*float(alpha + 2)/(2*F_PI)*pow(out*reflection, alpha)/(sp/(df+sp));
     }
 }
 
@@ -201,7 +247,7 @@ double PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, boo
     {
         Vector3d up = Reflect(info.GetDirection(), N_s);
         float asdf = out*up;
-        return out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
+        return out*up > 0 ? pow(out*up, alpha)/arvo_p(N_s, info.GetDirection(), alpha) : 0;
     }
 }
 

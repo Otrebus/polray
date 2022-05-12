@@ -3,7 +3,7 @@
 //#include <stdlib.h>
 #include <Windows.h>
 
-//#define USE_MERSENNE
+#define USE_MERSENNE
 
 /* Period parameters */  
 

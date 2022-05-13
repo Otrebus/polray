@@ -21,6 +21,7 @@ class Bytestream;
 #define ID_PHONGMATERIAL ((unsigned char)101)
 #define ID_LAMBERTIANMATERIAL ((unsigned char)100)
 #define ID_EMISSIVEMATERIAL ((unsigned char)105)
+#define ID_COOKTORRANCEMATERIAL ((unsigned char)106)
 
 class ShadingState;
 

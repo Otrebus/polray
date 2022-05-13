@@ -224,6 +224,9 @@
     <ClCompile Include="source\Model.cpp">
       <Filter>Source Files\Shapes</Filter>
     </ClCompile>
+    <ClCompile Include="source\CookTorrance.cpp">
+      <Filter>Source Files\Materials</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -402,6 +405,9 @@
     </ClInclude>
     <ClInclude Include="source\Model.h">
       <Filter>Source Files\Shapes</Filter>
+    </ClInclude>
+    <ClInclude Include="source\CookTorrance.h">
+      <Filter>Source Files\Materials</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

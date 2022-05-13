@@ -155,6 +155,7 @@
     <ClCompile Include="source\Camera.cpp" />
     <ClCompile Include="source\Color.cpp" />
     <ClCompile Include="source\ColorBuffer.cpp" />
+    <ClCompile Include="source\CookTorrance.cpp" />
     <ClCompile Include="source\CsgCuboid.cpp" />
     <ClCompile Include="source\CsgCylinder.cpp" />
     <ClCompile Include="source\CsgDifference.cpp" />
@@ -217,6 +218,7 @@
     <ClInclude Include="source\Camera.h" />
     <ClInclude Include="source\Color.h" />
     <ClInclude Include="source\ColorBuffer.h" />
+    <ClInclude Include="source\CookTorrance.h" />
     <ClInclude Include="source\CsgCuboid.h" />
     <ClInclude Include="source\CsgCylinder.h" />
     <ClInclude Include="source\CsgDifference.h" />

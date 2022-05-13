@@ -34,6 +34,7 @@
 #include "ThinLensCamera.h"
 #include "PinholeCamera.h"
 #include "AshikhminShirley.h"
+#include "CookTorrance.h"
 #include "LambertianMaterial.h"
 #include "SphereLight.h"
 #include "PreethamSky.h"
@@ -516,10 +517,10 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
-    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats5.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
-    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d camPos = Vector3d(0, 1.4, 2);
     Vector3d target = Vector3d(0, 1, 0);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
@@ -582,27 +583,29 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     s->SetPartitioning(new BrutePartitioning());
 
-    //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
-    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
+    SphereLight* boxLight = new SphereLight(Vector3d(-.1, 1.3, 0.8), 0.11, Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
 
-    //auto a = new AshikhminShirley();
-    //a->Rs = Color(0.5, 0.4, 0.6);
-    //a->Rd = Color(0.3, 0.4, 0.6);
-    //a->n = 200;
-    //Sphere* sphere = new Sphere(Vector3d(-0.1, 1.1, 0.3), 0.11);
-    //sphere->SetMaterial(a);
-    //s->AddModel(sphere);
+    auto a = new CookTorrance();
+    a->Ks = Color(0.7, 0.7, 0.7);
+    a->alpha = 0.9;
+    auto triangle = new Triangle(Vector3d(1, 1.2, 1.1), Vector3d(-0.8, 1.2, 1.1), Vector3d(1, 1.2, -1.1));
+    triangle->SetMaterial(a);
+    s->AddModel(sphere);
+    /*Sphere* sphere = new Sphere(Vector3d(0.4, 1.1, 0.3), 0.31);
+    sphere->SetMaterial(a);
+    s->AddModel(sphere);*/
     
-    /*auto g = new DielectricMaterial();
-    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.5, 0.3), 0.21);
-    sphere2->SetMaterial(g);*/
-    /*sphere2->AddToScene(*s);
-    s->AddModel(sphere2);*/
+    //auto g = new DielectricMaterial();
+    //Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.5, 0.3), 0.21);
+    //sphere2->SetMaterial(g);
+    //sphere2->AddToScene(*s);
+    //s->AddModel(sphere2);
 
     //boxLight->AddToScene(s);
     s->AddLight(boxLight);
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 #ifdef BALLBOX

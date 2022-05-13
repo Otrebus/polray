@@ -106,7 +106,7 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     camPoint->pdf = 1/(cam.GetFilmArea());
     Color lastSample = costheta*Color::Identity/lastPdf;
 
-    camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false, 1);
+    camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false, 0);
 
     path.push_back(camPoint);
     return BuildPath(path, samples, light, false);
@@ -125,7 +125,7 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     lightPoint->info.geometricnormal = lightPoint->info.normal;
     lightPoint->info.position = lightPoint->out.origin;
 
-    lightPoint->sample = Sample(lastSample, lightPoint->out, lastPdf, lightPoint->rpdf, false, 1);
+    lightPoint->sample = Sample(lastSample, lightPoint->out, lastPdf, 0, false, 0);
     path.push_back(lightPoint);
     std::vector<BDSample> dummy;
 

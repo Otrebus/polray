@@ -516,7 +516,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
-    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats5.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
     Vector3d camPos = Vector3d(0, 1.4, 3);
@@ -602,7 +602,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     s->AddLight(boxLight);
 
-    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 #ifdef BALLBOX

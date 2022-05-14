@@ -136,46 +136,6 @@ double arvo_p_2(Vector3d N, Vector3d w_i, int n) {
 //-----------------------------------------------------------------------------
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-#define NO_TEST_BLAH
-#ifndef NO_TEST_BLAH
-    Random rnd;
-
-    int alpha = 1;
-    double result = 0;
-
-    Vector3d w_i(rnd.GetDouble(-1, 1), rnd.GetDouble(-1, 1), rnd.GetDouble(-1, 0));
-    w_i.Normalize();
-    Vector3d N_s(0, 0, 1);
-    int N = 10000000;
-
-    for(int i = 0; i < N; i++) {
-        //float r1 = rnd.GetDouble(0.0f, 2*F_PI);
-        //float r2 = acos(pow(rnd.GetDouble(0, 1), 1/(alpha+1)));
-
-        double r1 = rnd.GetDouble(0.0f, 2*F_PI);
-        double r2 = rnd.GetDouble(0, 1);
-
-
-
-        Vector3d right, forward;
-        Vector3d out(cos(r1)*std::sqrt(1-r2*r2), sin(r1)*std::sqrt(1-r2*r2), r2);
-        Vector3d up = Reflect(w_i, N_s);
-
-        if(out*up < 0)
-            continue;
-
-        //auto out = cos(r2)*up + base*sin(r2);
-
-        auto res = pow(out*up, alpha);
-        //auto norm = arvo_p_2(N_s, w_i, alpha);
-        result += res;
-    }
-
-    auto out = 2*M_PI*result/N/arvo_p_2(N_s, w_i, alpha);
-    return 0;
-#endif
-
-
     WNDCLASSEX  wc;
     HWND	    hWnd;
     MSG         msg;

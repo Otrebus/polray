@@ -32,8 +32,8 @@ double G_p(Vector3d h, Vector3d w, double alpha) {
     return 1.0/(1.0+l);
 }
 
-double D_p(double alpha, double cosh) {
-    return sq(alpha)/(M_PI*sq((sq(alpha)-1)*cosh*cosh+1));
+double D_p(double alpha, double cosn) {
+    return sq(alpha)/(M_PI*sq((sq(alpha)-1)*cosn*cosn+1));
 }
 
 Sample CookTorrance::GetSample(const IntersectionInfo& info, bool adjoint) const
@@ -43,7 +43,7 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool adjoint) const
 
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();
-    const Vector3d& in = -info.GetDirection();
+    Vector3d in = -info.GetDirection();
 
     if(in*N_g < 0)
         N_g = -N_g;
@@ -55,8 +55,6 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool adjoint) const
 
     Vector3d right, forward;
     MakeBasis(N_s, right, forward);
-
-    Vector3d w_o = -N_s;
 
     float r1 = rnd.GetDouble(0.0f, 2*F_PI);
     float r2 = rnd.GetDouble(0.0f, 1);
@@ -79,7 +77,7 @@ Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int 
 
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();
-    const Vector3d& in = -info.GetDirection();
+    Vector3d in = -info.GetDirection();
 
     auto h = ((in+out)/2).Normalized();
 
@@ -96,13 +94,14 @@ Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int 
 
     if(component == 1)
     {
-        auto cosh = h*out;
+        auto cosn = h*N;
+        auto cosv = h*in;
         auto F_0 = sq((1-ior)/(1+ior));
-        auto D = D_p(alpha, cosh);
+        auto D = D_p(alpha, cosn);
         auto G = 1.0/(1.0 + G_p(h, in, alpha) + G_p(h, out, alpha));
-        auto F = F_0 + (1-F_0)*(std::pow(1-cosh, 5));
+        auto F = F_0 + (1-F_0)*(std::pow(1-cosv, 5));
 
-        return Ks*D*F*G/(4*(out*N)*(in*N));
+        return Ks*D*G*F/(4*(out*N)*(in*N));
     }
 }
 

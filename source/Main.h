@@ -27,8 +27,8 @@ extern HANDLE workingMutex;
 extern int nCurrentFrame;
 extern int frames;
 
-#define XRES 640
-#define YRES 480
+#define XRES 1920
+#define YRES 1080
 //#define DETERMINISTIC
 
 LRESULT WINAPI  WndProc(HWND, UINT, WPARAM, LPARAM);

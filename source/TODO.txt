@@ -1,3 +1,4 @@
+Add light source resampling to BDPT
 Copy to clipboard feature
 Make TraceShadowRay account for light portals
 Unhardcode light area sampling in light portal

@@ -24,9 +24,9 @@ BDPT::~BDPT()
 
 int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
 
-    double rr = 0.7;
+    double rr = 0.5;
 
-    while(path.size() < 3 || m_random.GetDouble(0.f, 1.f) < rr) {
+    while(path.size() < 2 || m_random.GetDouble(0.f, 1.f) < rr) {
         BDVertex* lastV = path.back();
         double lastPdf = lastV->sample.pdf;
         auto lastSample = lastV->sample.color;
@@ -55,11 +55,10 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         newV->sample = mat->GetSample(info, lightPath);
         newV->out = newV->sample.outRay;
         newV->specular = newV->sample.specular;
-        newV->rr = path.size() < 3 ? 1 : lastV->rr*rr;
-        rr = min(lastSample.GetLuminance(), 1);
+        newV->rr = path.size() < 2 ? 1 : lastV->rr*rr;
 
         if(!lightPath) {
-            if(newV->alpha.GetLuminance() <= 0 && info.GetMaterial()->GetLight() != light)
+            if(!newV->alpha && info.GetMaterial()->GetLight() != light)
             {
                 delete newV;
                 return path.size();
@@ -70,13 +69,14 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
 
             if(info.material->GetLight() == light)
             {   // Direct light hit
-                samples.push_back(BDSample(0, path.size()));
-                return path.size() - 1;
+                //samples.push_back(BDSample(0, path.size()));
+                return path.size();
             }
         } else {
-            if(lastSample.GetLuminance() <= 0)
+            if(!newV->sample.color)
             {
-                delete newV;
+                lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
+                path.push_back(newV);
                 return path.size();
             }
             lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
@@ -253,7 +253,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
 
     // The forward pdf value of the connecting edge is calculated next
     // Basically, just project the angle pdf to area pdf at the next surface
-    if(s > 0)
+    if(true)
     {
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lightPath[s-1]->info;
@@ -266,10 +266,21 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         else
             newPdf = light->Pdf(lastL->info, out);
         forwardProbs[s] = newPdf*abs(lastE->info.geometricnormal*out)/(lSqr);
+
+        if(t > 2) {
+            auto info = eyePath[t-1]->info;
+            info.direction = out;
+            auto out2 = eyePath[t-2]->info.position - lastE->info.position;
+            lSqr = out2.GetLengthSquared();
+            out2.Normalize();
+            newPdf = lastE->info.GetMaterial()->PDF(info, out2, true, lastE->sample.component);
+        
+            forwardProbs[s+1] = newPdf*abs(eyePath[t-2]->info.geometricnormal*out2)/(lSqr);
+        }
     }
 
     // The last forward pdfs are the backward pdfs of the eye path
-    for(int i = s+1; i < s+t; i++)
+    for(int i = s+2; i < s+t; i++)
         forwardProbs[i] = eyePath[s+t-i-1]->rpdf;
 
     // Next, calculate all the backward (eye to light) going pdf values
@@ -278,7 +289,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         backwardProbs[i] = lightPath[i]->rpdf;
 
     // Calculate the backwards pdf value of the connecting edge
-    if(s > 0)
+    if(true)
     {
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lastE->info;
@@ -292,6 +303,16 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         else
             newPdf = lastE->info.GetMaterial()->PDF(info, out, false, lastE->sample.component);
         backwardProbs[s-1] = newPdf*abs(lastL->info.geometricnormal*out)/lSqr;
+        if(s > 1) {
+            auto info = lightPath[s-1]->info;
+            info.direction = out;
+            auto out2 = lightPath[s-2]->info.position - lastL->info.position;
+            lSqr = out2.GetLengthSquared();
+            out2.Normalize();
+            newPdf = lastL->info.GetMaterial()->PDF(info, out2, false, lastL->sample.component);
+
+            backwardProbs[s-2] = newPdf*abs(lightPath[s-2]->info.geometricnormal*out2)/(lSqr);
+        }
     }
 
     // The last backward pdf values are just the forward pdf values of eye path
@@ -340,8 +361,8 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     int lLength = BuildLightPath(lightPath, light);
     int eLength = BuildEyePath(x, y, eyePath, cam, samples, light);
 
-    for(int s = 1; s <= lLength; s++)
-        for(int t = 1; t <= eLength; t++)
+    for(int s = 1; s <= lightPath.size(); s++)
+        for(int t = 1; t <= eyePath.size(); t++)
             samples.push_back(BDSample(s, t));
 
     for(auto sample : samples)

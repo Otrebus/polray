@@ -160,8 +160,8 @@ void AreaLight::SamplePoint(Vector3d& point, Vector3d& n) const
     normal.Normalize();
     Vector3d dir;
 
-    x = r.GetDouble(0, 0.9999f);
-    y = r.GetDouble(0, 0.9999f);
+    x = r.GetDouble(0, 1);
+    y = r.GetDouble(0, 1);
     //dir = Vector3d(r.Getdouble(-1, 1), r.Getdouble(-1, 1), r.Getdouble(-1, 1));
 
     point = pos + c1*x + c2*y + eps*normal;

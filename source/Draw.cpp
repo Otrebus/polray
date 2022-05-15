@@ -65,7 +65,7 @@ Cubemap* cubemap;
 void MakeScene(std::shared_ptr<Renderer>& r)
 {
  #ifdef INTERIOR
-    auto s = std::shared_ptr<Scene> (new Scene("interior.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("interior-open.obj"));
 
     Vector3d camPos = Vector3d(-118, 254.8, 544);
     Vector3d target = Vector3d(157, 159, -209);
@@ -209,8 +209,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     LightPortal* portalLight = new LightPortal();
     portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
     portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
-    auto boxLight = new SphereLight(Vector3d(4, 1.0, 0), 0.4, Color(2000, 2000, 2000));
-    //auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
+    //auto boxLight = new SphereLight(Vector3d(4, 1.0, 0), 0.4, Color(2000, 2000, 2000));
+    auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
     portalLight->SetLight(boxLight);
 
     s->AddLight(portalLight);

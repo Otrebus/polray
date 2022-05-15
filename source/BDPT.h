@@ -8,12 +8,30 @@
 #include "IntersectionInfo.h"
 #include "LightTree.h"
 #include "Sample.h"
+#include <mutex>
 
 #define WEIGHT_UNIFORM 1
 #define WEIGHT_POWER 2
 
 class Ray;
 class Primitive;
+
+class Roulette {
+public:
+    Roulette();
+    ~Roulette();
+    void AddSample(double sample, int rays);
+    double GetThreshold() const;
+    
+private:
+    std::mutex* m;
+    std::list<double> samples;
+    std::list<double> samplesSq;
+    std::list<int> rays;
+
+    double sum, sumSq;
+    int sumRays;
+};
 
 class BDSample
 {
@@ -56,14 +74,14 @@ public:
 
 protected:
     void RenderPixel(int x, int y, Camera& cam,
-                     ColorBuffer& eyeImage, ColorBuffer& lightImage) const;
+                     ColorBuffer& eyeImage, ColorBuffer& lightImage);
     void RenderPart(Camera& cam, ColorBuffer& colBuf) const;
 
-    int BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
+    int BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
 
     int BuildEyePath(int x, int y, vector<BDVertex*>& path, const Camera& cam,
                      vector<BDSample>& samples, Light* light) const;
-    int BuildLightPath(vector<BDVertex*>& path, Light* light) const;
+    int BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) const;
 
     Color EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath, 
                    int s, int t, Light* light) const;
@@ -75,6 +93,8 @@ protected:
     double PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
 
+    Roulette* roulette;
+    
     int m_spp;
     mutable Random m_random;
 };

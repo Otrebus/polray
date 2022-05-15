@@ -1,9 +1,12 @@
+#define NOMINMAX
 #include "BDPT.h"
 #include <vector>
 #include "AreaLight.h"
 #include "Primitive.h"
 #include "Material.h"
 #include "Utils.h"
+
+const int N = 20; // Number of samples per ray to be saved for optimized russian roulette
 
 BDSample::BDSample(int a, int b) : s(a), t(b)
 {
@@ -15,6 +18,7 @@ BDSample::~BDSample()
 
 BDPT::BDPT(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
+    roulette = new Roulette[XRES*YRES]; //std::vector(XRES, std::vector(YRES, Roulette()));
     m_spp = 1;
 }
 
@@ -22,11 +26,49 @@ BDPT::~BDPT()
 {
 }
 
-int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
+Roulette::Roulette() : sum(0), sumSq(0), sumRays(0) {
+    m = new std::mutex();
+}
 
-    double rr = 0.5;
+Roulette::~Roulette() {
+    delete m;
+}
 
-    while(path.size() < 2 || m_random.GetDouble(0.f, 1.f) < rr) {
+void Roulette::AddSample(double sample, int nrays) {
+    std::lock_guard<std::mutex> lock(*m);
+
+    sum += sample;
+    sumSq += sample*sample;
+    sumRays += nrays;
+    samples.push_back(sample);
+    samplesSq.push_back(sample*sample);
+    rays.push_back(nrays);
+
+    if(samples.size() > N) {
+        sum -= samples.front();
+        sumSq -= samplesSq.front();
+        sumRays -= rays.front();
+
+        samples.pop_front();
+        samplesSq.pop_front();
+        rays.pop_front();
+    }
+}
+
+
+double Roulette::GetThreshold() const {
+    std::lock_guard<std::mutex> lock(*m);
+    int size = samples.size();
+    auto ret = std::sqrt((sumSq - 1/double(size)*sum*sum)/double(sumRays));
+    return std::isfinite(ret) ? std::abs(ret) : 1;
+}
+
+
+int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
+
+    double rr = 0.7;
+
+    while(path.size() < 3 || m_random.GetDouble(0.f, 1.f) < rr) {
         BDVertex* lastV = path.back();
         double lastPdf = lastV->sample.pdf;
         auto lastSample = lastV->sample.color;
@@ -55,7 +97,9 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         newV->sample = mat->GetSample(info, lightPath);
         newV->out = newV->sample.outRay;
         newV->specular = newV->sample.specular;
-        newV->rr = path.size() < 2 ? 1 : lastV->rr*rr;
+
+        newV->rr = path.size() < 3 ? 1 : lastV->rr*rr;
+        rr = std::min(1.0, newV->alpha.GetLuminance()/newV->rr/roulette[x+y*XRES].GetThreshold());
 
         if(!lightPath) {
             if(!newV->alpha && info.GetMaterial()->GetLight() != light)
@@ -69,8 +113,9 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
 
             if(info.material->GetLight() == light)
             {   // Direct light hit
-                //samples.push_back(BDSample(0, path.size()));
-                return path.size();
+                lastV->rpdf = newV->info.GetMaterial()->GetLight()->Pdf(info, -v)*(abs(info.GetGeometricNormal()*info.GetDirection()))/(lSqr);
+                samples.push_back(BDSample(0, path.size()));
+                return path.size() - 1;
             }
         } else {
             if(!newV->sample.color)
@@ -109,10 +154,10 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false, 0);
 
     path.push_back(camPoint);
-    return BuildPath(path, samples, light, false);
+    return BuildPath(x, y, path, samples, light, false);
 }
 
-int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
+int BDPT::BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) const
 {
     int depth = 1;
     BDVertex* lightPoint = new BDVertex();
@@ -129,7 +174,7 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     path.push_back(lightPoint);
     std::vector<BDSample> dummy;
 
-    return BuildPath(path, dummy, light, true);
+    return BuildPath(x, y, path, dummy, light, true);
 }
 
 Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
@@ -166,16 +211,11 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     double r = c.direction.GetLength();
     c.direction.Normalize();
 
-    if(!TraceShadowRay(c, (1-eps)*r) || r < eps)
-        return Color(0, 0, 0);
-
-    result*= abs(lastL->info.GetGeometricNormal()*c.direction)
-            *abs(lastE->info.GetNormal()*c.direction)/(r*r);
+    result *= abs(lastL->info.GetGeometricNormal()*c.direction)*abs(lastE->info.GetNormal()*c.direction)/(r*r);
     result *= lastL->alpha*lastE->alpha;
 
     // This BRDF is backwards so let's modify it 
-    double modifier = abs(lastL->info.direction*lastL->info.normal)
-                    /abs(lastL->info.direction*lastL->info.geometricnormal);
+    double modifier = c.direction*lastL->info.geometricnormal > 0 ? abs(c.direction*lastL->info.normal)/abs(c.direction*lastL->info.geometricnormal) : 1;
 
     if(s > 1)
         result *= modifier*lastL->info.material->
@@ -251,9 +291,13 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
     for(int i = 0; i < s; i++) // The first part is readily available
         forwardProbs[i] = lightPath[i]->pdf;
 
+    // The last forward pdfs are the backward pdfs of the eye path
+    for(int i = s+1; i < s+t; i++)
+        forwardProbs[i] = eyePath[s+t-i-1]->rpdf;
+
     // The forward pdf value of the connecting edge is calculated next
     // Basically, just project the angle pdf to area pdf at the next surface
-    if(true)
+    if(s > 0)
     {
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lightPath[s-1]->info;
@@ -279,17 +323,17 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         }
     }
 
-    // The last forward pdfs are the backward pdfs of the eye path
-    for(int i = s+2; i < s+t; i++)
-        forwardProbs[i] = eyePath[s+t-i-1]->rpdf;
-
     // Next, calculate all the backward (eye to light) going pdf values
     // The backwards pdf of the light path are readily available
     for(int i = 0; i < s-1; i++)
         backwardProbs[i] = lightPath[i]->rpdf;
 
+    // The last backward pdf values are just the forward pdf values of eye path
+    for(int i = s; i < s+t; i++)
+        backwardProbs[i] = eyePath[s+t-i-1]->pdf;
+
     // Calculate the backwards pdf value of the connecting edge
-    if(true)
+    if(s > 0)
     {
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lastE->info;
@@ -314,10 +358,6 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
             backwardProbs[s-2] = newPdf*abs(lightPath[s-2]->info.geometricnormal*out2)/(lSqr);
         }
     }
-
-    // The last backward pdf values are just the forward pdf values of eye path
-    for(int i = s; i < s+t; i++)
-        backwardProbs[i] = eyePath[s+t-i-1]->pdf;
     
     // Sum the actual weights of the paths together
     double l = 1;
@@ -335,8 +375,8 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
             weight += l*l;
     }
 
-    if(weight!=weight) // In case we ever get a stray 0/0 for whatever reason
-        return 0;
+    //if(weight!=weight) // In case we ever get a stray 0/0 for whatever reason
+    //    return 0;
 
     return 1.0f/(1.0f+weight);
 }
@@ -344,11 +384,13 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
 double BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
 {
+    if(s == 0)
+        s = 0;
     return PowerHeuristic(s, t, lightPath, eyePath, light, camera);
 }
 
 void BDPT::RenderPixel(int x, int y, Camera& cam, 
-                       ColorBuffer& eyeImage, ColorBuffer& lightImage) const
+                       ColorBuffer& eyeImage, ColorBuffer& lightImage)
 {
     vector<BDSample> samples;
     vector<BDVertex*> eyePath;
@@ -358,17 +400,42 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     double r = m_random.GetDouble(0.0f, 1.0f);
     Light* light = lightTree->PickLight(r, lightWeight);
 
-    int lLength = BuildLightPath(lightPath, light);
+    int lLength = BuildLightPath(x, y, lightPath, light);
     int eLength = BuildEyePath(x, y, eyePath, cam, samples, light);
 
-    for(int s = 1; s <= lightPath.size(); s++)
-        for(int t = 1; t <= eyePath.size(); t++)
+    int rays = lLength + eLength;
+
+    for(int s = 1; s <= lLength; s++)
+        for(int t = 1; t <= eLength; t++)
             samples.push_back(BDSample(s, t));
 
     for(auto sample : samples)
     {
         Color eval = EvalPath(lightPath, eyePath, sample.s, sample.t, light);
         double weight = WeighPath(sample.s, sample.t, lightPath, eyePath, light, &cam);
+        eval *= weight;
+
+        int s = sample.s, t = sample.t;
+        // Build the connecting vertex
+        if(s > 0) {
+            BDVertex* lastL = lightPath[s-1];
+            BDVertex* lastE = eyePath[t-1];
+
+            Ray c = Ray(lastE->out.origin, lastL->out.origin - lastE->out.origin);
+            double r = c.direction.GetLength();
+            c.direction.Normalize();
+
+            auto q = std::min(1.0, eval.GetLuminance()/roulette[x+y*XRES].GetThreshold());
+
+            if(m_random.GetDouble(0, 1) > q)
+                continue;
+            eval /= q;
+
+            if(!TraceShadowRay(c, (1-eps)*r) || r < eps)
+                continue;
+        }
+
+        rays++;
 
         if(sample.t == 1) // These samples end up on the light image
         {
@@ -380,17 +447,20 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
                 continue;
             double costheta = abs(cam.dir*camRay.direction);
             double mod = costheta*costheta*costheta*costheta*cam.GetFilmArea()*lightWeight;
-            Color result = weight*eval/mod;
+            Color result = eval/mod;
             lightImage.AddColor(camx, camy, result);
         }
         else
         {
             double costheta = abs(cam.dir*eyePath[0]->out.direction);
             double mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea())*lightWeight;
-            Color result = weight*eval/mod;
+            Color result = eval/mod;
             eyeImage.AddColor(x, y, result);
         }
     }
+
+    roulette[x+y*XRES].AddSample((eyeImage.GetPixel(x, y) + lightImage.GetPixel(x, y)).GetLuminance(), rays);
+
     for(unsigned int s = 1; s < lightPath.size() + 1; s++)
         delete lightPath[s-1];
     for(unsigned int t = 1; t < eyePath.size() + 1; t++)

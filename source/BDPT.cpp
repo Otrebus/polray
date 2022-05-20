@@ -55,14 +55,12 @@ void Roulette::AddSample(double sample, int nrays) {
     }
 }
 
-
 double Roulette::GetThreshold() const {
     std::lock_guard<std::mutex> lock(*m);
     int size = samples.size();
-    auto ret = std::sqrt((sumSq - 1/double(size)*sum*sum)/double(sumRays));
+    auto ret = std::sqrt((sumSq - (1/double(size))*sum*sum)/double(sumRays));
     return std::isfinite(ret) ? std::abs(ret) : 1;
 }
-
 
 int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
 
@@ -99,7 +97,7 @@ int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSa
         newV->specular = newV->sample.specular;
 
         newV->rr = path.size() < 3 ? 1 : lastV->rr*rr;
-        rr = std::min(1.0, newV->alpha.GetLuminance()/newV->rr/roulette[x+y*XRES].GetThreshold());
+        rr = std::min(1.0, newV->alpha.GetLuminance()/roulette[x+y*XRES].GetThreshold());
 
         if(!lightPath) {
             if(!newV->alpha && info.GetMaterial()->GetLight() != light)
@@ -384,8 +382,6 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
 double BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
 {
-    if(s == 0)
-        s = 0;
     return PowerHeuristic(s, t, lightPath, eyePath, light, camera);
 }
 
@@ -435,7 +431,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
                 continue;
         }
 
-        rays++;
+        rays += 1;
 
         if(sample.t == 1) // These samples end up on the light image
         {
@@ -469,10 +465,9 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
 
 void BDPT::Render(Camera& cam, ColorBuffer& colBuf)	
 {	
-    ColorBuffer lightImage = colBuf;	
-    ColorBuffer eyeImage = colBuf;	
-    lightImage.Clear(0);	
-    eyeImage.Clear(0);	
+    ColorBuffer lightImage(colBuf.GetXRes(), colBuf.GetYRes(), 0);
+    ColorBuffer eyeImage(colBuf.GetXRes(), colBuf.GetYRes(), 0);
+
     for(int i = 0; i < m_spp; i++)	
     {	
         for(int x = 0; x < colBuf.GetXRes(); x++)	

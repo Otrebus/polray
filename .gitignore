@@ -8,6 +8,7 @@
 *.bmp
 *.obj
 *.mtl
+btstrout
 
 # User-specific files
 *.rsuser

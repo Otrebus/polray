@@ -1,3 +1,4 @@
+Fix rendering exposure to use luminance as input for exp
 Add light source resampling to BDPT
 Copy to clipboard feature
 Make TraceShadowRay account for light portals
@@ -8,11 +9,12 @@ Read light sources from .mtl files
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Modules?
 Fix the friend/attourney etc relationships and private fields in general
-Check that materials can be assigned to different faces (e.g. the microwave in interior.obj)
 (mostly for "fun") Make light portals work inside scenes
 Try including rr with mis o
 Use more modern threads
 Add physical camera to bdpt
+Add support for proper environment light sources
+- Check that materials can be assigned to different faces (e.g. the microwave in interior.obj)
 - Add lightportal/serialize (save)
 - Debug SphereLight + LightPortal (the spherelight didn't self-intersect)
 - Replace the .0000001s with eps

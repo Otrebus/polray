@@ -227,6 +227,9 @@
     <ClCompile Include="source\CookTorrance.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="source\UniformEnvironmentLight.cpp">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -408,6 +411,9 @@
     </ClInclude>
     <ClInclude Include="source\CookTorrance.h">
       <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="source\UniformEnvironmentLight.h">
+      <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

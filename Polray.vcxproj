@@ -197,6 +197,7 @@
     <ClCompile Include="source\Sample.cpp" />
     <ClCompile Include="source\Scene.cpp" />
     <ClCompile Include="source\SpatialPartitioning.h" />
+    <ClCompile Include="source\UniformEnvironmentLight.cpp" />
     <ClCompile Include="source\Utils.cpp" />
     <ClCompile Include="source\Sphere.cpp" />
     <ClCompile Include="source\SphereLight.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="source\Rendering.h" />
     <ClInclude Include="source\Sample.h" />
     <ClInclude Include="source\Scene.h" />
+    <ClInclude Include="source\UniformEnvironmentLight.h" />
     <ClInclude Include="source\Utils.h" />
     <ClInclude Include="source\Sphere.h" />
     <ClInclude Include="source\SphereLight.h" />

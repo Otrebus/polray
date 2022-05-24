@@ -97,7 +97,8 @@ int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSa
         newV->specular = newV->sample.specular;
 
         newV->rr = path.size() < 3 ? 1 : lastV->rr*rr;
-        rr = std::min(1.0, newV->alpha.GetLuminance()/roulette[x+y*XRES].GetThreshold());
+        //rr = std::min(1.0, newV->alpha.GetLuminance()/roulette[x+y*XRES].GetThreshold());
+        rr = 0.7;
 
         if(!lightPath) {
             if(!newV->alpha && info.GetMaterial()->GetLight() != light)
@@ -288,7 +289,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
     forwardProbs[0] = 1/light->GetArea(); // (For direct light hit, s == 0)
     for(int i = 0; i < s; i++) // The first part is readily available
         forwardProbs[i] = lightPath[i]->pdf;
-
+     
     // The last forward pdfs are the backward pdfs of the eye path
     for(int i = s+1; i < s+t; i++)
         forwardProbs[i] = eyePath[s+t-i-1]->rpdf;
@@ -373,8 +374,8 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
             weight += l*l;
     }
 
-    //if(weight!=weight) // In case we ever get a stray 0/0 for whatever reason
-    //    return 0;
+    if(!std::isfinite(weight)) // In case we ever get a stray 0/0 for whatever reason
+        return 0;
 
     return 1.0f/(1.0f+weight);
 }
@@ -421,11 +422,11 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
             double r = c.direction.GetLength();
             c.direction.Normalize();
 
-            auto q = std::min(1.0, eval.GetLuminance()/roulette[x+y*XRES].GetThreshold());
+            /*auto q = std::min(1.0, eval.GetLuminance()/roulette[x+y*XRES].GetThreshold());
 
             if(m_random.GetDouble(0, 1) > q)
                 continue;
-            eval /= q;
+            eval /= q;*/
 
             if(!TraceShadowRay(c, (1-eps)*r) || r < eps)
                 continue;

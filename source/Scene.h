@@ -21,11 +21,13 @@
 #include "TriangleMesh.h"
 #include "Triangle.h"
 #include "SphereLight.h"
+#include "UniformEnvironmentLight.h"
 #include "AreaLight.h"
 #include "MeshLight.h"
 #include "LightPortal.h"
 
 class MeshLight;
+class UniformEnvironmentLight;
 class EnvironmentLight;
 class SphereLight;
 class Light;
@@ -63,6 +65,7 @@ public:
         friend void SphereLight::AddToScene(std::shared_ptr<Scene>);
         friend void MeshLight::AddToScene(std::shared_ptr<Scene>);
         friend void LightPortal::AddToScene(std::shared_ptr<Scene>);
+        friend void UniformEnvironmentLight::AddToScene(std::shared_ptr<Scene>);
     };
 
     // And a last one, for materials

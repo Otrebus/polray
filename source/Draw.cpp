@@ -74,6 +74,16 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).GetLength(), 10.15));
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
+
+    // tmp
+    //Vector3d camPos = Vector3d(-43.9, 293.8, 43);
+    //Vector3d target = Vector3d(8.6, 230, -301);
+    ///*Vector3d camPos = Vector3d(-150, 184, -760);
+    //Vector3d target = Vector3d(-119, 139, -914);*/
+    //Vector3d camdir = target-camPos;
+    //camdir.Normalize();
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
+
     Random ballsR(47);
     Random test(1);
 
@@ -83,15 +93,19 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));
     //auto portalLight = new SphereLight(Vector3d(3854, 1750, -1770), 30.11, Color(5000000, 5000000, 5000000));
 
+    //auto boxLight = new SphereLight(Vector3d(3854, 1750, -1770)*100, 550.11, Color(50000000, 50000000, 50000000));
+
+    //////
     LightPortal* portalLight = new LightPortal();
     portalLight->AddPortal(Vector3d(500, 800, -1050), Vector3d(0, -800, 0), Vector3d(0, 0, 1600));
-    //auto boxLight = new SphereLight(Vector3d(3854, 1750, -1770)*100, 550.11, Color(50000000, 50000000, 50000000));
     auto boxLight = new AreaLight(Vector3d(3854, 1750, -1770)*100, Vector3d(0.0, 0.0, 5050), Vector3d(0.0, 5050, 0.0), Color(130000000/25, 130000000/25, 130000000/25));
     portalLight->SetLight(boxLight);
-    /*auto boxLight = new SphereLight(Vector3d(3854, 1750, -1770)*100, 550.11, Color(50000000, 50000000, 50000000));
-    boxLight->AddToScene(s);*/
-
     s->AddLight(portalLight);
+    ////
+    /*auto boxLight = new SphereLight(Vector3d(-43.9, 292, 43.4), 1.11, Color(500000, 500000, 500000));
+    boxLight->AddToScene(s);
+
+    s->AddLight(boxLight);*/
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);

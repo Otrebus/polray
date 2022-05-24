@@ -2,6 +2,7 @@
 #define ENVIRONMENT_LIGHT
 
 #include "Vector3d.h"
+#include "Light.h"
 
 #define ID_PREETHAMSKY ((unsigned char)50)
 

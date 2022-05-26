@@ -1,150 +1,184 @@
-//#include "AreaLight.h"
-//#include "Windows.h"
-//#include "EmissiveMaterial.h"
-//#include "Renderer.h"
-//#include "Triangle.h"
-//#include "Utils.h"
-//#include "Scene.h"
-//#include "UniformEnvironmentLight.h"
-//
-//UniformEnvironmentLight::UniformEnvironmentLight()
-//{
-//    material = new EmissiveMaterial();
-//}
-//
-//UniformEnvironmentLight::UniformEnvironmentLight(const Vector3d& position, const Vector3d& corner1, const Vector3d& corner2, const Color& color) : pos(position), c1(corner1), c2(corner2)
-//{
-//    material = new EmissiveMaterial();
-//    intensity_ = color;
-//#ifdef DETERMINISTIC
-//    r.Seed(0);
-//#else
-//    r.Seed(GetTickCount() + int(this));
-//#endif
-//}
-//
-//void UniformEnvironmentLight::AddToScene(std::shared_ptr<Scene> scn)
-//{
-//    Scene::LightAdder::AddLight(*scn, this);
-//}
-//
-//double UniformEnvironmentLight::GetArea() const
-//{
-//    return radius*radius*4*M_PI;
-//}
-//
-//double UniformEnvironmentLight::Intersect(const Ray& ray) const
-//{
-//    double t;
-//    Vector3d dir(ray.direction);
-//    Vector3d vec = ray.origin - position;
-//
-//    double C = vec*vec - radius*radius;
-//    double B = 2*(vec*dir);
-//    double A = dir*dir;
-//
-//    double D = (B*B/(4*A) - C)/A;
-//
-//    t = -B/(2*A) - sqrt(D);
-//            
-//    if(D > 0) {
-//        if(t < eps)
-//            return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
-//        return t;
-//    }
-//    return -inf;
-//}
-//
-//bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
-//{
-//    double t;
-//    Vector3d dir(ray.direction);
-//    Vector3d vec = ray.origin - position;
-//
-//    info.direction = ray.direction;
-//    info.material = material;
-//
-//    double C = vec*vec - radius*radius;
-//    double B = 2*(vec*dir);
-//    double A = dir*dir;
-//
-//    double D = (B*B/(4*A) - C)/A;
-//
-//    t = -B/(2*A) - sqrt(D);
-//
-//    if(D >= 0)
-//    {
-//        if(t < eps)
-//        {
-//            t = -B/(2*A) + sqrt(D);
-//            if(t < eps)
-//                return false;
-//        }
-//        info.normal = (ray.origin + ray.direction*t) - position;
-//        info.normal.Normalize();
-//        info.position = ray.origin + ray.direction*(t - eps);
-//
-//        // Texture coordinates - there are probably better methods than this one
-//        Vector3d v = info.position - position;
-//        Vector3d w = (up^v)^up;
-//        Vector3d forward = up^right;
-//        v.Normalize();
-//        w.Normalize();
-//        forward.Normalize();
-//
-//        double vcoord = acosf(up*v) / 3.14159265f;
-//        double ucoord;
-//
-//        // Clamp the coordinates to prevent NaNs, which is one of the reasons this method is inferior
-//        double wright = w*right > 1 ? 1 : w*right < -1 ? -1 : w*right;
-//
-//        if(w*forward >= 0)
-//            ucoord = acos(wright) / (2.0f*3.14159265f);
-//        else
-//            ucoord = 1.0f - acos(wright) / (2.0f*3.14159265f);
-//        
-//        info.texpos.x = ucoord;
-//        info.texpos.y = vcoord;
-//
-//        info.geometricnormal = info.normal;
-//        return true;
-//    }
-//    return false;
-//}
-//
-//double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
-//{
-//
-//}
-//
-//Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& anglePdf) const
-//{
-//}
-//
-//void UniformEnvironmentLight::SamplePoint(Vector3d& point, Vector3d& n) const
-//{
-//}
-//
-//Vector3d UniformEnvironmentLight::GetNormal() const
-//{
-//}
-//
-//void UniformEnvironmentLight::Save(Bytestream& stream) const
-//{
-//}
-//
-//void AreaLight::Load(Bytestream& stream)
-//{
-//}
-//
-//Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
-//{
-//}
-//
-//Color UniformEnvironmentLight::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const
-//{
-//}
-//
-//Color UniformEnvironmentLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const
-//{
-//}
+#define NOMINMAX
+#include "AreaLight.h"
+#include "Windows.h"
+#include "EmissiveMaterial.h"
+#include "Renderer.h"
+#include "Triangle.h"
+#include "Utils.h"
+#include "Scene.h"
+#include "UniformEnvironmentLight.h"
+
+UniformEnvironmentLight::UniformEnvironmentLight()
+{
+    material = new EmissiveMaterial();
+}
+
+UniformEnvironmentLight::UniformEnvironmentLight(const Vector3d& position, double radius, const Color& color) : position(position), radius(radius), intensity(color)
+{
+    material = new EmissiveMaterial();
+    intensity = color;
+#ifdef DETERMINISTIC
+    r.Seed(0);
+#else
+    random.Seed(GetTickCount() + int(this));
+#endif
+}
+
+void UniformEnvironmentLight::AddToScene(std::shared_ptr<Scene> scn)
+{
+    material->light = this;
+    material->emissivity = intensity;
+    Scene::LightAdder::AddLight(*scn, this);
+}
+
+double UniformEnvironmentLight::GetArea() const
+{
+    return radius*radius*4*M_PI;
+}
+
+double UniformEnvironmentLight::Intersect(const Ray& ray) const
+{
+    double t;
+    Vector3d dir(ray.direction);
+    Vector3d vec = ray.origin - position;
+
+    double C = vec*vec - radius*radius;
+    double B = 2*(vec*dir);
+    double A = dir*dir;
+
+    double D = (B*B/(4*A) - C)/A;
+
+    t = -B/(2*A) - sqrt(D);
+
+    if(D > 0) {
+        if(t < eps)
+            return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
+        return t;
+    }
+    return -inf;
+}
+
+bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
+{
+    double t;
+    Vector3d dir(ray.direction);
+    Vector3d vec = ray.origin - position;
+
+    info.direction = ray.direction;
+    info.material = material;
+
+    double C = vec*vec - radius*radius;
+    double B = 2*(vec*dir);
+    double A = dir*dir;
+
+    double D = (B*B/(4*A) - C)/A;
+
+    t = -B/(2*A) - sqrt(D);
+
+    if(D >= 0)
+    {
+        if(t < eps)
+        {
+            t = -B/(2*A) + sqrt(D);
+            if(t < eps)
+                return false;
+        }
+        info.normal = position - (ray.origin + ray.direction*t);
+        info.normal.Normalize();
+        info.position = ray.origin + ray.direction*(t - eps);
+        info.geometricnormal = info.normal;
+        return true;
+    }
+    return false;
+}
+
+double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
+{
+    return std::max(0.0, (out*info.normal)/M_PI);
+}
+
+Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
+{
+    SamplePoint(ray.origin, normal);
+    Vector3d right, forward;
+    MakeBasis(normal, right, forward);
+
+    areaPdf = 1/GetArea();
+
+    double r1 = random.GetDouble(0, 2*M_PI);
+    double r2 = random.GetDouble(0, 1);
+    ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
+                    + normal * sqrt(1-r2);
+    pdf = abs(ray.direction*normal)/M_PI;
+
+    return Color::Identity*F_PI;
+}
+
+void UniformEnvironmentLight::SamplePoint(Vector3d& point, Vector3d& normal) const
+{
+    double z = random.GetDouble(-1, 1);
+    double r = sqrt(1 - z*z);
+    double u = random.GetDouble(0, 2*M_PI);
+    normal = -Vector3d(r*cos(u), r*sin(u), z);
+    point = position - normal*radius*(1.0f-0.001);
+}
+
+Color UniformEnvironmentLight::GetIntensity() const 
+{
+    return intensity;
+}
+
+void UniformEnvironmentLight::Save(Bytestream& stream) const
+{
+}
+
+void UniformEnvironmentLight::Load(Bytestream& stream)
+{
+}
+
+void UniformEnvironmentLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const
+{
+    Vector3d right, forward;
+    double z = random.GetDouble(0, 1);
+    double r = sqrt(1 - z*z);
+    double u = random.GetDouble(0, 2*M_PI);
+    MakeBasis(apex, right, forward);
+    normal = right*r*cos(u) + forward*r*sin(u) + apex*z;
+    point = position + normal*radius*1.0001f;
+}
+
+Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
+{
+    Vector3d lightPoint, lightNormal;
+    SamplePoint(lightPoint, lightNormal);
+    auto toLight = lightPoint - info.GetPosition();
+    Ray lightRay = Ray(info.GetPosition(), toLight);
+    double d = toLight.GetLength();
+    toLight.Normalize();
+
+    if(toLight*lightNormal < 0)
+    {
+        if(renderer->TraceShadowRay(lightRay, d))
+        {
+            double cosphi = abs(info.GetNormal()*toLight);
+            double costheta = abs(toLight*lightNormal);
+            Color c;
+            Material* mat = info.GetMaterial();			
+            c = mat->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d);
+            double brdfPdf = costheta*mat->PDF(info, toLight, false, component)/(d*d);
+            double lightPdf = 1.0f/GetArea();
+            return c;
+        }
+    }
+    return Color(0, 0, 0);
+}
+
+Color UniformEnvironmentLight::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const
+{
+    return Color(0, 0, 0);
+}
+
+Color UniformEnvironmentLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const
+{
+    return Color(0, 0, 0);
+}

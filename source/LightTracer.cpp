@@ -61,7 +61,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         surfcos = abs(surfcos);
 
         if(TraceShadowRay(lightToCamRay, camRayLength) && cam.GetPixelFromRay(lightToCamRay, xpixel, ypixel, u, v))
-            colBuf.AddColor(xpixel, ypixel, light->GetIntensity()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP));
+            colBuf.AddColor(xpixel, ypixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP));
 
         // pathColor*=abs(ray.direction*light->GetNormal());
 

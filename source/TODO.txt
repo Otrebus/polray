@@ -14,6 +14,7 @@ Try including rr with mis o
 Use more modern threads
 Add physical camera to bdpt
 Add support for proper environment light sources
+Investigate BDPT fireflies
 - Check that materials can be assigned to different faces (e.g. the microwave in interior.obj)
 - Add lightportal/serialize (save)
 - Debug SphereLight + LightPortal (the spherelight didn't self-intersect)

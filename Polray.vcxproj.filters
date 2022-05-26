@@ -419,4 +419,7 @@
   <ItemGroup>
     <Text Include="source\TODO.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="README.md" />
+  </ItemGroup>
 </Project>

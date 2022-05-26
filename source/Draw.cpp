@@ -39,6 +39,7 @@
 #include "PreethamSky.h"
 #include "MeshLight.h"
 #include "BrutePartitioning.h"
+#include "UniformEnvironmentLight.h"
 
 KDTree* tree;
 Texture* normalmap;
@@ -46,9 +47,9 @@ Texture* test;
 Texture* bl;
 Cubemap* cubemap;
 
-#define INTERIOR
+//#define INTERIOR
 //#define ROOM
-//#define EMPTYBOX
+#define EMPTYBOX
 //#define WINDOWBOX
 //#define BALLSBOX
 //#define CONFERENCE
@@ -392,7 +393,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     a->Ks = Color(0.5, 0.5, 0.5);
     a->Kd = Color(0, 0, 0);
     a->alpha = 0;*/
-    //s->SetPartitioning(new BrutePartitioning());
+    s->SetPartitioning(new BrutePartitioning());
     auto a = new LambertianMaterial();
     a->Kd = Color(0.5, 0.5, 0.5);
 
@@ -405,12 +406,13 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     //sphere2->AddToScene(*s);
 
-    SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
+    auto boxLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 10, 3*Color(0.9, 1.2, 1.5));
+    //SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(0.25, 0.0, 0.0), Vector3d(0.0, 0, 0.25), Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(1.5, 0.0, 0.0), Vector3d(0.0, 0, 0.1), Color(200, 200, 200));
     s->AddLight(boxLight);
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 

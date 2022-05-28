@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "UniformEnvironmentLight.h"
 
+
 UniformEnvironmentLight::UniformEnvironmentLight()
 {
     material = new EmissiveMaterial();
@@ -29,6 +30,7 @@ void UniformEnvironmentLight::AddToScene(std::shared_ptr<Scene> scn)
     material->light = this;
     material->emissivity = intensity;
     Scene::LightAdder::AddLight(*scn, this);
+    scene = scn;
 }
 
 double UniformEnvironmentLight::GetArea() const
@@ -105,11 +107,59 @@ Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& are
 
     areaPdf = 1/GetArea();
 
-    double r1 = random.GetDouble(0, 2*M_PI);
+    auto bb = scene->GetBoundingBox();
+
+    Vector3d p[8] = {
+        { bb.c2.x, bb.c1.y, bb.c2.z },
+        { bb.c1.x, bb.c1.y, bb.c2.z },
+        { bb.c1.x, bb.c1.y, bb.c1.z },
+        { bb.c2.x, bb.c1.y, bb.c1.z },
+        { bb.c2.x, bb.c2.y, bb.c2.z },
+        { bb.c1.x, bb.c2.y, bb.c2.z },
+        { bb.c1.x, bb.c2.y, bb.c1.z },
+        { bb.c2.x, bb.c2.y, bb.c1.z }
+    };
+
+    std::vector<Vector2d> q;
+    for(int i = 0; i < 8; i++) {
+        auto u = p[i] - ray.origin;
+        auto x = (u*right)/right.GetLengthSquared();
+        auto y = (u*forward)/forward.GetLengthSquared();
+        q.push_back({ x, y });
+    }
+
+    auto h = convexHull(q);
+
+
+
+    /*std::vector<std::vector<Vector3d>> f {
+        { p[0], p[3], p[2], p[1] },
+        { p[2], p[6], p[5], p[1] },
+        { p[1], p[5], p[4], p[0] },
+        { p[0], p[4], p[7], p[3] },
+        { p[4], p[5], p[6], p[7] },
+        { p[3], p[7], p[6], p[2] },
+    };
+
+    std::vector<int> fis;
+    for(int i = 0; i < 6; i++) {
+        auto w = (f[i][1] - f[i][0]) ^ (f[i][2] - f[i][0]);
+        auto c = (bb.c2 + bb.c1)/2;
+        if((c - ray.origin) * w < 0) {
+            fis.push_back(i);
+        }
+    }
+
+    for(auto fi : fis) {
+        auto face = f[fi];
+
+    }*/
+
+    /*double r1 = random.GetDouble(0, 2*M_PI);
     double r2 = random.GetDouble(0, 1);
     ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
                     + normal * sqrt(1-r2);
-    pdf = abs(ray.direction*normal)/M_PI;
+    pdf = abs(ray.direction*normal)/M_PI;*/
 
     return Color::Identity*F_PI;
 }

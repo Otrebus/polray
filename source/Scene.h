@@ -105,11 +105,15 @@ public:
     bool Intersect(const Ray&, double tmax) const;
     double Intersect(const Ray&, const Primitive*&, const Light*&) const;
 
+    BoundingBox GetBoundingBox();
+
     friend class LightAdder;
     friend class PrimitiveAdder;
     friend class Renderer;
 private:
 	Camera* camera;
+    BoundingBox boundingBox;
+    bool calculatedBoundingBox;
 
 	std::vector<Light*> lights;
     std::vector<Model*> models;

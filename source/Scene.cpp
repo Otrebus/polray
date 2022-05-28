@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include "scene.h"
 #include "triangle.h"
 #include "Random.h"
@@ -11,6 +12,7 @@
 //------------------------------------------------------------------------------
 Scene::Scene()
 {
+    calculatedBoundingBox = false;
 }
 
 //------------------------------------------------------------------------------
@@ -28,6 +30,24 @@ Scene::Scene(string f)
 //------------------------------------------------------------------------------
 Scene::~Scene()
 {
+}
+
+BoundingBox Scene::GetBoundingBox() {
+    if(calculatedBoundingBox)
+        return boundingBox;
+    else {
+        Vector3d m(inf, inf, inf);
+        Vector3d M(-inf, -inf, -inf);
+        for(auto& p : primitives) {
+            for(int i = 0; i < 3; i++) {
+                auto bb = p->GetBoundingBox();
+                m[i] = std::min(bb.c1[i], m[i]);
+                M[i] = std::max(bb.c2[i], m[i]);
+            }
+        }
+        calculatedBoundingBox = true;
+        return boundingBox;
+    }
 }
 
 void Scene::AddModel(Model* s)

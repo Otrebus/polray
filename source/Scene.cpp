@@ -42,10 +42,11 @@ BoundingBox Scene::GetBoundingBox() {
             for(int i = 0; i < 3; i++) {
                 auto bb = p->GetBoundingBox();
                 m[i] = std::min(bb.c1[i], m[i]);
-                M[i] = std::max(bb.c2[i], m[i]);
+                M[i] = std::max(bb.c2[i], M[i]);
             }
         }
         calculatedBoundingBox = true;
+        boundingBox = BoundingBox(m, M);
         return boundingBox;
     }
 }

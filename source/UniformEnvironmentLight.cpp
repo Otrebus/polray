@@ -94,11 +94,6 @@ bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, Intersect
     return false;
 }
 
-double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
-{
-    return std::max(0.0, (out*info.normal)/M_PI);
-}
-
 Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
 {
     SamplePoint(ray.origin, normal);
@@ -120,48 +115,101 @@ Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& are
         { bb.c2.x, bb.c2.y, bb.c1.z }
     };
 
+    auto c = (bb.c2 + bb.c1)/2;
+    auto cv = c - ray.origin;
+    auto n = normal;
+
     std::vector<Vector2d> q;
     for(int i = 0; i < 8; i++) {
         auto u = p[i] - ray.origin;
-        auto x = (u*right)/right.GetLengthSquared();
-        auto y = (u*forward)/forward.GetLengthSquared();
-        q.push_back({ x, y });
+        auto x = (u*right);
+        auto y = (u*forward);
+
+        auto vp = n*(n*u);
+
+        auto rp = cv.GetLength()/vp.GetLength();
+
+        q.push_back({ rp*x, rp*y });
     }
 
     auto h = convexHull(q);
 
+    double A = 0;
+    for(int i = 0; i < h.size(); i++)
+        A += h[i].x*h[(i+1)%h.size()].y - h[i].y*h[(i+1)%h.size()].x;
+    A *= 0.5;
 
+    double a = random.GetDouble(0, A);
+    double aSum = 0;
 
-    /*std::vector<std::vector<Vector3d>> f {
-        { p[0], p[3], p[2], p[1] },
-        { p[2], p[6], p[5], p[1] },
-        { p[1], p[5], p[4], p[0] },
-        { p[0], p[4], p[7], p[3] },
-        { p[4], p[5], p[6], p[7] },
-        { p[3], p[7], p[6], p[2] },
-    };
+    auto pp = ray.origin + n*(cv*n);
 
-    std::vector<int> fis;
-    for(int i = 0; i < 6; i++) {
-        auto w = (f[i][1] - f[i][0]) ^ (f[i][2] - f[i][0]);
-        auto c = (bb.c2 + bb.c1)/2;
-        if((c - ray.origin) * w < 0) {
-            fis.push_back(i);
+    for(int i = 0; i < h.size()-2; i++) {
+        aSum += std::abs((h[i+1]-h[0])^(h[i+2]-h[0]))/2;
+        if(aSum > a) {
+            double u = sqrt(random.GetDouble(0, 1));
+            double v = random.GetDouble(0, 1);
+            auto e1 = h[i+1] - h[0];
+            auto e2 = h[i+2] - h[0];
+
+            auto p = h[0] + u*(e1 + v*(e2-e1));
+            auto p3 = right*p.x + forward*p.y + pp;
+            auto dir = (p3-ray.origin);
+            ray.direction = dir.Normalized();
+            pdf = dir.GetLengthSquared()/(ray.direction*n)/A;
+            return (ray.direction*n)*Color::Identity/pdf;
         }
     }
+}
 
-    for(auto fi : fis) {
-        auto face = f[fi];
+double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
+{
+    auto normal = info.normal;
+    Vector3d right, forward;
+    MakeBasis(normal, right, forward);
 
-    }*/
+    auto bb = scene->GetBoundingBox();
 
-    /*double r1 = random.GetDouble(0, 2*M_PI);
-    double r2 = random.GetDouble(0, 1);
-    ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
-                    + normal * sqrt(1-r2);
-    pdf = abs(ray.direction*normal)/M_PI;*/
+    Vector3d p[8] = {
+        { bb.c2.x, bb.c1.y, bb.c2.z },
+        { bb.c1.x, bb.c1.y, bb.c2.z },
+        { bb.c1.x, bb.c1.y, bb.c1.z },
+        { bb.c2.x, bb.c1.y, bb.c1.z },
+        { bb.c2.x, bb.c2.y, bb.c2.z },
+        { bb.c1.x, bb.c2.y, bb.c2.z },
+        { bb.c1.x, bb.c2.y, bb.c1.z },
+        { bb.c2.x, bb.c2.y, bb.c1.z }
+    };
 
-    return Color::Identity*F_PI;
+    auto c = (bb.c2 + bb.c1)/2;
+    auto cv = c - info.position;
+    auto n = normal;
+
+    std::vector<Vector2d> q;
+    for(int i = 0; i < 8; i++) {
+        auto u = p[i] - info.position;
+        auto x = (u*right);
+        auto y = (u*forward);
+
+        auto vp = n*(n*u);
+
+        auto rp = cv.GetLength()/vp.GetLength();
+
+        q.push_back({ rp*x, rp*y });
+    }
+
+    auto h = convexHull(q);
+
+    double A = 0;
+    for(int i = 0; i < h.size(); i++)
+        A += h[i].x*h[(i+1)%h.size()].y - h[i].y*h[(i+1)%h.size()].x;
+    A *= 0.5;
+
+    double a = random.GetDouble(0, A);
+
+    auto v = n*(cv*n);
+    auto r = v.GetLengthSquared()/std::abs(v.Normalized()*out);
+    return r*r/(out*n)/A;
 }
 
 void UniformEnvironmentLight::SamplePoint(Vector3d& point, Vector3d& normal) const

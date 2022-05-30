@@ -412,7 +412,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(1.5, 0.0, 0.0), Vector3d(0.0, 0, 0.1), Color(200, 200, 200));
     s->AddLight(boxLight);
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<LightTracer>(new LightTracer(s));
 
 #endif
 

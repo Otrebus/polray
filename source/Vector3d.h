@@ -53,9 +53,10 @@ public:
     Vector2d& operator=(const Vector2d&);
     Vector2d operator+(const Vector2d&) const;
     Vector2d operator-(const Vector2d&) const;
+    Vector2d operator*(double) const;
+    double operator^(const Vector2d&) const;
 
     double operator*(const Vector2d&) const;
-    Vector2d operator*(const double) const;
 
     double GetLength() const;
     void Normalize();
@@ -64,6 +65,7 @@ public:
 };
 
 Vector3d operator*(double t, const Vector3d& v);
+Vector2d operator*(double t, const Vector2d& v);
 std::ostream& operator<<(std::ostream& str, const Vector3d& v);
 
 #endif

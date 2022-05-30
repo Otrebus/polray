@@ -19,7 +19,9 @@ bool turnsRight(Vector2d a, Vector2d b, Vector2d c) {
 std::vector<Vector2d> convexHull(std::vector<Vector2d> v) {
     std::vector<Vector2d> ps, ps2, ps3; // Partial and full convex hulls and the output
 
-    std::sort(v.begin(), v.end());
+    auto sortFn = [] (const Vector2d& a, const Vector2d& b) { return std::make_pair(a.x, a.y) < std::make_pair(b.x, b.y); };
+
+    std::sort(v.begin(), v.end(), sortFn);
 
     for(auto it = v.begin(); it < v.end(); ps.push_back(*it), it++) // Lower hull part
         for(int i = ps.size() - 2; i >= 0 && turnsRight(ps[i], ps[i+1], *it); i--)
@@ -30,6 +32,6 @@ std::vector<Vector2d> convexHull(std::vector<Vector2d> v) {
             ps2.pop_back();
 
     // Merge the convex hull parts
-    std::merge(ps.begin(), ps.end(), ps2.rbegin(), ps2.rend(), std::back_inserter(ps3));
-    return ps3;
+    ps.insert(ps.end(), ps2.begin()+1, ps2.end()-1);
+    return ps;
 }

@@ -144,6 +144,10 @@ double Vector2d::GetLength() const
     return sqrt(x*x+y*y);
 }
 
+double Vector2d::operator^(const Vector2d& v) const {
+    return x*v.y - y*v.x;
+}
+
 void Vector2d::Normalize()
 {
     double l = GetLength();
@@ -180,6 +184,11 @@ double& Vector3d::operator[](int t)
 double Vector3d::operator[](int t) const
 {
     return (&x)[t];
+}
+
+Vector2d operator*(double t, const Vector2d& v)
+{
+    return Vector2d(t*v.x, t*v.y);
 }
 
 std::ostream& operator << (std::ostream& s , const Vector3d& v)

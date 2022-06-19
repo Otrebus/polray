@@ -122,14 +122,18 @@ Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& are
     std::vector<Vector2d> q;
     for(int i = 0; i < 8; i++) {
         auto u = p[i] - ray.origin;
-        auto x = (u*right);
-        auto y = (u*forward);
-
+        Vector2d w = Vector2d(u * right, u * forward).Normalized();
+        auto r1 = (u - n*(u*n)).GetLength();
+        auto r2 = Vector2d(u * right, u * forward).GetLength();
         auto vp = n*(n*u);
+        auto v = n*(cv*n);
 
-        auto rp = cv.GetLength()/vp.GetLength();
+        auto l1 = v.GetLength();
+        auto l2 = u * n;
 
-        q.push_back({ rp*x, rp*y });
+        auto rp = ((v.GetLength() / (u*n)) * (u - n*(u*n)).GetLength());
+
+        q.push_back(rp*w);
     }
 
     auto h = convexHull(q);
@@ -164,6 +168,9 @@ Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& are
 
 double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
+    assert(std::abs(out.GetLength() - 1) < 0.0005f);
+    assert(std::abs(info.normal.GetLength() - 1) < 0.0005f);
+    assert(info.normal * out > 0);
     auto normal = info.normal;
     Vector3d right, forward;
     MakeBasis(normal, right, forward);
@@ -188,14 +195,13 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
     std::vector<Vector2d> q;
     for(int i = 0; i < 8; i++) {
         auto u = p[i] - info.position;
-        auto x = (u*right);
-        auto y = (u*forward);
+        Vector2d w = Vector2d(u * right, u * forward).Normalized();
 
-        auto vp = n*(n*u);
+        auto v = n * (cv * n);
 
-        auto rp = cv.GetLength()/vp.GetLength();
+        auto rp = ((v.GetLength() / (u * n)) * (u - n*(u * n)).GetLength());
 
-        q.push_back({ rp*x, rp*y });
+        q.push_back(rp*w);
     }
 
     auto h = convexHull(q);
@@ -205,11 +211,9 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
         A += h[i].x*h[(i+1)%h.size()].y - h[i].y*h[(i+1)%h.size()].x;
     A *= 0.5;
 
-    double a = random.GetDouble(0, A);
-
     auto v = n*(cv*n);
-    auto r = v.GetLengthSquared()/std::abs(v.Normalized()*out);
-    return r*r/(out*n)/A;
+    auto r = v.GetLength()/std::abs(out*n);
+    return r*r/std::abs(out*n)/A;
 }
 
 void UniformEnvironmentLight::SamplePoint(Vector3d& point, Vector3d& normal) const

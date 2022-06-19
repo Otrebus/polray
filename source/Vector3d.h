@@ -60,6 +60,7 @@ public:
 
     double GetLength() const;
     void Normalize();
+    Vector2d Normalized() const;
 
     double x, y;
 };

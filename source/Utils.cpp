@@ -1,6 +1,7 @@
 #include "Utils.h"
 #include "Vector3d.h"
 #include <algorithm>
+#include <cassert>
 
 std::vector<std::string> split(const std::string& s, char delim) {
     std::vector<std::string> ret;
@@ -33,5 +34,6 @@ std::vector<Vector2d> convexHull(std::vector<Vector2d> v) {
 
     // Merge the convex hull parts
     ps.insert(ps.end(), ps2.begin()+1, ps2.end()-1);
+
     return ps;
 }

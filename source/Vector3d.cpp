@@ -156,6 +156,12 @@ void Vector2d::Normalize()
     y /= l;
 }
 
+Vector2d Vector2d::Normalized() const
+{
+    double l = GetLength();
+    return { x/l, y/l };
+}
+
 Vector2d Vector2d::operator*(double t) const
 {
     return Vector2d(t*x,t*y);

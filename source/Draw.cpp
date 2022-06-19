@@ -407,12 +407,15 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //sphere2->AddToScene(*s);
 
     auto boxLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 10, 3*Color(0.9, 1.2, 1.5));
+    
+    //AreaLight* boxLight = new AreaLight(Vector3d(0, 1.4, 40), Vector3d(0, 250, 0.0), Vector3d(250, 0, 0), Color(50.5, 50.5, 50.5));
+
     //SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(0.25, 0.0, 0.0), Vector3d(0.0, 0, 0.25), Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(1.5, 0.0, 0.0), Vector3d(0.0, 0, 0.1), Color(200, 200, 200));
     s->AddLight(boxLight);
 
-    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 

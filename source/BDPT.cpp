@@ -112,6 +112,8 @@ int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSa
 
             if(info.material->GetLight() == light)
             {   // Direct light hit
+                if (path.size() > 4)
+                    auto x = 1;
                 lastV->rpdf = newV->info.GetMaterial()->GetLight()->Pdf(info, -v)*(abs(info.GetGeometricNormal()*info.GetDirection()))/(lSqr);
                 samples.push_back(BDSample(0, path.size()));
                 return path.size() - 1;
@@ -163,6 +165,17 @@ int BDPT::BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) co
     double rr = 0.7f;
     double lastPdf;
     Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal, lightPoint->pdf, lastPdf);
+
+    // remove
+    IntersectionInfo info;
+    info = lightPoint->info;
+    info.position = lightPoint->out.origin;
+    Vector3d out = lightPoint->out.direction;
+    auto pdf = light->Pdf(info, out);
+    assert(std::abs(lastPdf - pdf) < 0.001);
+    // 
+
+
     lightPoint->alpha = light->GetArea()*light->GetIntensity();
     lightPoint->rr = 1;
     lightPoint->info.normal = lightPoint->info.normal;
@@ -409,6 +422,8 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     for(auto sample : samples)
     {
         Color eval = EvalPath(lightPath, eyePath, sample.s, sample.t, light);
+        // TODO: break early if zero eval
+
         double weight = WeighPath(sample.s, sample.t, lightPath, eyePath, light, &cam);
         eval *= weight;
 

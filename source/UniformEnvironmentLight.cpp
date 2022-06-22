@@ -87,7 +87,7 @@ bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, Intersect
         }
         info.normal = position - (ray.origin + ray.direction*t);
         info.normal.Normalize();
-        info.position = ray.origin + ray.direction*(t - eps);
+        info.position = ray.origin + ray.direction*t + info.normal*eps;
         info.geometricnormal = info.normal;
         return true;
     }
@@ -168,9 +168,6 @@ Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& are
 
 double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
-    assert(std::abs(out.GetLength() - 1) < 0.0005f);
-    assert(std::abs(info.normal.GetLength() - 1) < 0.0005f);
-    assert(info.normal * out > 0);
     auto normal = info.normal;
     Vector3d right, forward;
     MakeBasis(normal, right, forward);
@@ -193,15 +190,20 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
     auto n = normal;
 
     std::vector<Vector2d> q;
-    for(int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i++) {
         auto u = p[i] - info.position;
         Vector2d w = Vector2d(u * right, u * forward).Normalized();
-
+        auto r1 = (u - n * (u * n)).GetLength();
+        auto r2 = Vector2d(u * right, u * forward).GetLength();
+        auto vp = n * (n * u);
         auto v = n * (cv * n);
 
-        auto rp = ((v.GetLength() / (u * n)) * (u - n*(u * n)).GetLength());
+        auto l1 = v.GetLength();
+        auto l2 = u * n;
 
-        q.push_back(rp*w);
+        auto rp = ((v.GetLength() / (u * n)) * (u - n * (u * n)).GetLength());
+
+        q.push_back(rp * w);
     }
 
     auto h = convexHull(q);
@@ -236,17 +238,6 @@ void UniformEnvironmentLight::Save(Bytestream& stream) const
 
 void UniformEnvironmentLight::Load(Bytestream& stream)
 {
-}
-
-void UniformEnvironmentLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const
-{
-    Vector3d right, forward;
-    double z = random.GetDouble(0, 1);
-    double r = sqrt(1 - z*z);
-    double u = random.GetDouble(0, 2*M_PI);
-    MakeBasis(apex, right, forward);
-    normal = right*r*cos(u) + forward*r*sin(u) + apex*z;
-    point = position + normal*radius*1.0001f;
 }
 
 Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const

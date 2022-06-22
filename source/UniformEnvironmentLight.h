@@ -18,10 +18,9 @@ public:
     virtual ~UniformEnvironmentLight() {}
     UniformEnvironmentLight(const Vector3d& position, double radius, const Color& color);
 
-    //virtual Color CalculateSurfaceRadiance(const Vector3d&, const IntersectionInfo&) = 0;
     Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const;
-    //  virtual void SamplePoint(Vector3d& point, Vector3d& Normal) const = 0;
-
+     
+    Vector2d point_on_triangle(Vector2d, Vector2d, Vector2d) const;
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
@@ -34,7 +33,6 @@ public:
                                const IntersectionInfo& lastInfo,
                                const IntersectionInfo& thisInfo, int component) const;
 
-    void SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const;
 
     void SamplePoint (Vector3d& point, Vector3d& normal) const;
     double GetArea() const;

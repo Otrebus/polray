@@ -155,6 +155,7 @@ double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) co
 
     for(auto& light : lights) {
         auto t = light->Intersect(ray);
+
         if(t != -inf && t < minLightT) {
             minLightT = t;
             l = light;

@@ -1,7 +1,6 @@
 #include "Utils.h"
 #include "Vector3d.h"
 #include <algorithm>
-#include <cassert>
 
 std::vector<std::string> split(const std::string& s, char delim) {
     std::vector<std::string> ret;
@@ -18,7 +17,7 @@ bool turnsRight(Vector2d a, Vector2d b, Vector2d c) {
 }
 
 std::vector<Vector2d> convexHull(std::vector<Vector2d> v) {
-    std::vector<Vector2d> ps, ps2, ps3; // Partial and full convex hulls and the output
+    std::vector<Vector2d> ps, ps2; // Partial and full convex hulls and the output
 
     auto sortFn = [] (const Vector2d& a, const Vector2d& b) { return std::make_pair(a.x, a.y) < std::make_pair(b.x, b.y); };
 

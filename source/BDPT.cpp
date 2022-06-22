@@ -101,7 +101,7 @@ int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSa
         rr = 0.7;
 
         if(!lightPath) {
-            if(!newV->alpha && info.GetMaterial()->GetLight() != light)
+            if(!newV->alpha && hitLight != light)
             {
                 delete newV;
                 return path.size();
@@ -110,11 +110,9 @@ int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSa
             lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
             path.push_back(newV);
 
-            if(info.material->GetLight() == light)
+            if(hitLight == light)
             {   // Direct light hit
-                if (path.size() > 4)
-                    auto x = 1;
-                lastV->rpdf = newV->info.GetMaterial()->GetLight()->Pdf(info, -v)*(abs(info.GetGeometricNormal()*info.GetDirection()))/(lSqr);
+                lastV->rpdf = hitLight->Pdf(info, -v)*(abs(lastV->info.GetGeometricNormal()*v))/(lSqr);
                 samples.push_back(BDSample(0, path.size()));
                 return path.size() - 1;
             }
@@ -165,16 +163,6 @@ int BDPT::BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) co
     double rr = 0.7f;
     double lastPdf;
     Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal, lightPoint->pdf, lastPdf);
-
-    // remove
-    IntersectionInfo info;
-    info = lightPoint->info;
-    info.position = lightPoint->out.origin;
-    Vector3d out = lightPoint->out.direction;
-    auto pdf = light->Pdf(info, out);
-    assert(std::abs(lastPdf - pdf) < 0.001);
-    // 
-
 
     lightPoint->alpha = light->GetArea()*light->GetIntensity();
     lightPoint->rr = 1;

@@ -410,6 +410,13 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     
     //AreaLight* boxLight = new AreaLight(Vector3d(0, 1.4, 40), Vector3d(0, 250, 0.0), Vector3d(250, 0, 0), Color(50.5, 50.5, 50.5));
 
+    //LightPortal* portalLight = new LightPortal();
+    //portalLight->AddPortal(Vector3d(-4, -4, 1.1), Vector3d(0, 8, 0), Vector3d(8, 0, 0));
+
+    //AreaLight* boxLight = new AreaLight(Vector3d(-125, 1.4, 40+125), Vector3d(0, 250/std::sqrt(2), 250 / std::sqrt(2)), Vector3d(250, 0, 0), Color(50.5, 50.5, 50.5));
+    //portalLight->SetLight(boxLight);
+
+
     //SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(0.25, 0.0, 0.0), Vector3d(0.0, 0, 0.25), Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(1.5, 0.0, 0.0), Vector3d(0.0, 0, 0.1), Color(200, 200, 200));

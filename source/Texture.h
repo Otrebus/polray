@@ -26,8 +26,8 @@ public:
     static HINSTANCE hInstance;
 
 protected:
-    int*		texture;
-    int			height, width;
+    int* texture;
+    int height, width;
 };
 
 #endif

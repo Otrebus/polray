@@ -6,11 +6,11 @@
 
 std::vector<std::string> split(const std::string& s, char delim);
 
-const auto inf = std::numeric_limits<double>::infinity();
+const double inf = std::numeric_limits<double>::infinity();
+const double pi = 3.141592653589793238462643383279502884;
 const double eps = 1e-9;
 
 template<typename T> T sgn(T s) {
     return s > 0 ? 1 : s < 0 ? -1 : 0;
 }
 
-std::vector<Vector2d> convexHull(std::vector<Vector2d> v);

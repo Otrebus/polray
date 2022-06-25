@@ -120,12 +120,8 @@ int ColorBuffer::GetYRes() const
 void ColorBuffer::Clear(const Color& c)
 {
     for(int y = 0; y < height ; y++)
-    {
         for(int x = 0; x < width; x++)
-        {
             m_buffer[y*width + x] = c;
-        }
-    }
 }
 
 //------------------------------------------------------------------------------

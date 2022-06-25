@@ -173,9 +173,6 @@
     <ClCompile Include="source\IntersectionInfo.cpp">
       <Filter>Source Files\Math</Filter>
     </ClCompile>
-    <ClCompile Include="source\GeometricRoutines.cpp">
-      <Filter>Source Files\Math</Filter>
-    </ClCompile>
     <ClCompile Include="source\Material.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
@@ -228,7 +225,10 @@
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
     <ClCompile Include="source\UniformEnvironmentLight.cpp">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+      <Filter>Source Files\Lights</Filter>
+    </ClCompile>
+    <ClCompile Include="source\GeometricRoutines.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -367,9 +367,6 @@
     <ClInclude Include="source\Logger.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="source\GeometricRoutines.h">
-      <Filter>Source Files\Math</Filter>
-    </ClInclude>
     <ClInclude Include="source\Main.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
@@ -413,7 +410,10 @@
       <Filter>Source Files\Materials</Filter>
     </ClInclude>
     <ClInclude Include="source\UniformEnvironmentLight.h">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
+      <Filter>Source Files\Lights</Filter>
+    </ClInclude>
+    <ClInclude Include="source\GeometricRoutines.h">
+      <Filter>Source Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

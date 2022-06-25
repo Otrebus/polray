@@ -5,7 +5,7 @@
 #include "Ray.h"
 #include "Random.h"
 #include <memory>
-
+#include <tuple>
 
 class Renderer;
 class Scene;
@@ -43,6 +43,8 @@ public:
 
     static UniformEnvironmentLight* Create(unsigned char);
 protected:
+
+    std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> GetProjectedSceneHull(Ray& ray, Vector3d normal) const;
     friend class Scene;
     double radius;
     Color intensity;

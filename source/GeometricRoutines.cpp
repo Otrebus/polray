@@ -1,5 +1,9 @@
 #include "geometricroutines.h"
+#include "Ray.h"
+#include "Utils.h"
+#include <cmath>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -153,4 +157,58 @@ void SampleHemisphereUniform(double r1, double r2, const Vector3d& apex, Vector3
 
     sample = forward*cos(r1)*sqrt(1-r2*r2) + right*sin(r1)*sqrt(1-r2*r2) 
              + apex*r2;
+}
+
+Vector3d SampleSphereUniform(double r1, double r2)
+{
+    auto z = (r1 - 0.5)*2;
+    double r = sqrt(1 - z*z);
+    double u = r2*2*pi;
+    return Vector3d(r*cos(u), r*sin(u), z);
+}
+
+double IntersectSphere(const Vector3d& position, double radius, const Ray& ray) {
+    double t;
+    Vector3d dir(ray.direction);
+    Vector3d vec = ray.origin - position;
+
+    double C = vec*vec - radius*radius;
+    double B = 2*(vec*dir);
+    double A = dir*dir;
+
+    double D = (B*B/(4*A) - C)/A;
+
+    t = -B/(2*A) - sqrt(D);
+
+    if(D > 0) {
+        if(t < eps)
+            return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
+        return t;
+    }
+    return -inf;
+}
+
+bool turnsRight(Vector2d a, Vector2d b, Vector2d c) {
+    return (b.x-a.x)*(c.y-a.y) - (c.x-a.x)*(b.y-a.y) < 0;
+}
+
+std::vector<Vector2d> convexHull(std::vector<Vector2d> v) {
+    std::vector<Vector2d> ps, ps2; // Partial and full convex hulls and the output
+
+    auto sortFn = [] (const Vector2d& a, const Vector2d& b) { return std::make_pair(a.x, a.y) < std::make_pair(b.x, b.y); };
+
+    std::sort(v.begin(), v.end(), sortFn);
+
+    for(auto it = v.begin(); it < v.end(); ps.push_back(*it), it++) // Lower hull part
+        for(int i = ps.size() - 2; i >= 0 && turnsRight(ps[i], ps[i+1], *it); i--)
+            ps.pop_back();
+
+    for(auto it = v.rbegin(); it < v.rend(); ps2.push_back(*it), it++) // Upper hull part
+        for(int i = ps2.size() - 2; i >= 0 && turnsRight(ps2[i], ps2[i+1], *it); i--)
+            ps2.pop_back();
+
+    // Merge the convex hull parts
+    ps.insert(ps.end(), ps2.begin()+1, ps2.end()-1);
+
+    return ps;
 }

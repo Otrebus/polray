@@ -116,9 +116,6 @@
     <ClCompile Include="source\MeshLight.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
-    <ClCompile Include="source\LightTree.cpp">
-      <Filter>Source Files\Lights</Filter>
-    </ClCompile>
     <ClCompile Include="source\AreaLight.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
@@ -369,9 +366,6 @@
     </ClInclude>
     <ClInclude Include="source\Main.h">
       <Filter>Source Files\System</Filter>
-    </ClInclude>
-    <ClInclude Include="source\LightTree.h">
-      <Filter>Source Files\Lights</Filter>
     </ClInclude>
     <ClInclude Include="source\IntersectionInfo.h">
       <Filter>Source Files\Math</Filter>

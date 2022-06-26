@@ -32,7 +32,7 @@ public:
     Color DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const;
 
     double GetArea() const;
-    void AddToScene(std::shared_ptr<Scene>);
+    void AddToScene(Scene*);
 
     void Save(Bytestream& s) const;
     void Load(Bytestream& s);
@@ -44,7 +44,6 @@ protected:
 
     Vector3d position_;
     double radius_;
-    std::shared_ptr<Scene> scene_;
     mutable Random r_;
 };
 

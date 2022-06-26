@@ -6,7 +6,6 @@
 #include "Renderer.h"
 #include "Random.h"
 #include "IntersectionInfo.h"
-#include "LightTree.h"
 #include "Sample.h"
 #include <mutex>
 

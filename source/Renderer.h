@@ -6,7 +6,6 @@
 #include "ColorBuffer.h"
 #include "Camera.h"
 #include "Scene.h"
-#include "LightTree.h"
 
 class Ray;
 class Primitive;
@@ -42,7 +41,6 @@ protected:
     int m_SPP;
     mutable Random m_random;
     vector<Light*> m_lights;
-    LightNode* lightTree;
 };
 
 #endif

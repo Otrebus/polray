@@ -176,7 +176,6 @@
     <ClCompile Include="source\Light.cpp" />
     <ClCompile Include="source\LightPortal.cpp" />
     <ClCompile Include="source\LightTracer.cpp" />
-    <ClCompile Include="source\LightTree.cpp" />
     <ClCompile Include="source\Logger.cpp" />
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\Material.cpp" />
@@ -240,7 +239,6 @@
     <ClInclude Include="source\Light.h" />
     <ClInclude Include="source\LightPortal.h" />
     <ClInclude Include="source\LightTracer.h" />
-    <ClInclude Include="source\LightTree.h" />
     <ClInclude Include="source\Logger.h" />
     <ClInclude Include="source\Main.h" />
     <ClInclude Include="source\Material.h" />

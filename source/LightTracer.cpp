@@ -29,13 +29,11 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         int xpixel = (int)xres;
         int ypixel = (int)yres;
 
-        double weight;
-        Light* light = lightTree->PickLight(m_random.GetDouble(0.0f, 1.0f), weight);
-        weight = 1;
+        auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
         Ray ray; 
         Vector3d lightNormal;
 
-        Color pathColor = light->SampleRay(ray, lightNormal, dummydouble, dummydouble)*light->GetArea()*light->GetIntensity()/weight; // First direction is from the light source
+        Color pathColor = light->SampleRay(ray, lightNormal, dummydouble, dummydouble)*light->GetArea()*light->GetIntensity(); // First direction is from the light source
         ray.direction.Normalize();
 
         double u, v;
@@ -54,7 +52,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         surfcos = abs(surfcos);
 
         if(TraceShadowRay(lightToCamRay, camRayLength) && cam.GetPixelFromRay(lightToCamRay, xpixel, ypixel, u, v))
-            colBuf.AddColor(xpixel, ypixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP));
+            colBuf.AddColor(xpixel, ypixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP)/lightWeight);
 
         do
         {
@@ -92,7 +90,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
                 Color brdf = info.GetMaterial()->BRDF(info, camRay.direction, sample.component);
                 // Flux to radiance and stuff involving probability and sampling of the camera
-                Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP);
+                Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP)/lightWeight;
                 pixelColor*=abs(info.GetDirection()*info.GetNormal())/abs(info.GetDirection()*info.GetGeometricNormal());
                 colBuf.AddColor(xpixel, ypixel, pixelColor);
             }

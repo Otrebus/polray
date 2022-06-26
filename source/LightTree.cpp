@@ -18,7 +18,7 @@ LightNode::LightNode(vector<Light*> lights)
     for(auto it = lights.begin(); it < lights.end(); it++)
     {
         Light* light = *it;
-        total += light->GetIntensity().GetMax()*light->GetArea();
+        total += 1;
     }
 
     // Create the lightstructs, and fill them with the normalized weights
@@ -28,7 +28,7 @@ LightNode::LightNode(vector<Light*> lights)
     for(; it < lights.end(); it++)
     {
         Light* light = *it;
-        LightStruct* s = new LightStruct(light, light->GetIntensity().GetMax()*light->GetArea()/total);
+        LightStruct* s = new LightStruct(light, 1);
         lsLeft.push_back(s);
         rightWeight += s->weight;
         if(++index >= lights.size()/2)
@@ -43,7 +43,7 @@ LightNode::LightNode(vector<Light*> lights)
     for(; it < lights.end(); it++)
     {
         Light* light = *it;
-        LightStruct* s = new LightStruct(light, light->GetIntensity().GetMax()*light->GetArea()/total);
+        LightStruct* s = new LightStruct(light, 1);
         lsRight.push_back(s);
     }
     if(lsRight.size() > 0)

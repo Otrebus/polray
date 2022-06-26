@@ -25,64 +25,22 @@ SphereLight::~SphereLight()
 
 double SphereLight::Intersect(const Ray& ray) const
 {
-        double t;
-        Vector3d dir(ray.direction);
-        Vector3d vec = ray.origin - position_;
-
-        double C = vec*vec - radius_*radius_;
-        double B = 2*(vec*dir);
-        double A = dir*dir;
-
-        double D = (B*B/(4*A) - C)/A;
-
-        t = -B/(2*A) - sqrt(D);
-            
-        if(D > 0)
-        {
-            if(t < eps)
-            {
-                return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
-            }
-            return t;
-        }
-        return -inf;
+    return IntersectSphere(position_, radius_, ray);
 }
 
 bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    double t;
-    Vector3d dir(ray.direction);
-    Vector3d vec = ray.origin - position_;
+    double t = IntersectSphere(position_, radius_, ray);
+    if(t == -inf)
+        return false;
 
     info.direction = ray.direction;
-
-    info.material = 0;
-
-    double C = vec*vec - radius_*radius_;
-    double B = 2*(vec*dir);
-    double A = dir*dir;
-
-    double D = (B*B/(4*A) - C)/A;
-
-    t = -B/(2*A) - sqrt(D);
-
-    if(D >= 0)
-    {
-        if(t < eps)
-        {
-            t = -B/(2*A) + sqrt(D);
-            if(t < 0)
-                return false;
-        }
-        info.normal = (ray.origin + ray.direction*t) - position_;
-        info.normal.Normalize();
-        info.position = ray.origin + ray.direction*(t - eps);
-
-        info.material = material;
-        info.geometricnormal = info.normal;
-        return true;
-    }
-    return false;
+    info.material = material;
+    info.normal = position_ - (ray.origin + ray.direction*t);
+    info.normal.Normalize();
+    info.position = ray.origin + ray.direction*t + info.normal*eps;
+    info.geometricnormal = info.normal;
+    return true;
 }
 
 double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
@@ -98,10 +56,8 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
 
     areaPdf = 1/GetArea();
 
-    double r1 = r_.GetDouble(0, 2*M_PI);
-    double r2 = r_.GetDouble(0, 1);
-    ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
-                    + normal * sqrt(1-r2);
+    double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
+    SampleHemisphereCos(r1, r2, normal, ray.direction);
     pdf = abs(ray.direction*normal)/M_PI;
 
     return Color::Identity*F_PI;
@@ -109,22 +65,20 @@ Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
 
 void SphereLight::SamplePoint(Vector3d& point, Vector3d& normal) const
 {
-    double z = r_.GetDouble(-1, 1);
-    double r = sqrt(1 - z*z);
-    double u = r_.GetDouble(0, 2*M_PI);
-    normal = Vector3d(r*cos(u), r*sin(u), z);
-    point = position_ + normal*radius_*1.0001f;
+    auto r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
+    auto pos = SampleSphereUniform(r1, r2);
+    normal = pos;
+    point = position_ + pos*radius_ + normal*eps;
 }
 
 void SphereLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const
 {
     Vector3d right, forward;
-    double z = r_.GetDouble(0, 1);
-    double r = sqrt(1 - z*z);
-    double u = r_.GetDouble(0, 2*M_PI);
-    MakeBasis(apex, right, forward);
-    normal = right*r*cos(u) + forward*r*sin(u) + apex*z;
-    point = position_ + normal*radius_*1.0001f;
+    double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
+    Vector3d pos;
+    pos = SampleHemisphereUniform(r1, r2, apex);
+    normal = pos;
+    point = position_ + pos*radius_ + normal*eps;
 }
 
 void SphereLight::Save(Bytestream& s) const
@@ -146,12 +100,12 @@ double SphereLight::GetArea() const
     return 4*M_PI*radius_*radius_;
 }
 
-void SphereLight::AddToScene(std::shared_ptr<Scene> scn)
+void SphereLight::AddToScene(Scene* scene)
 {
     Sphere* s = new Sphere(position_, Vector3d(0, 1, 0), 
                            Vector3d(0, 0, 1), radius_);
-    Scene::LightAdder::AddLight(*scn, this);
-    scn->AddModel(s);
+    Scene::LightAdder::AddLight(*scene, this);
+    scene->AddModel(s);
     s->SetMaterial(material);
 }
 

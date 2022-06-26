@@ -133,11 +133,11 @@ Color LightPortal::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
     areaPdf = lightAreaPdf;
     normal = lightNormal;
     pdf = dirPdf;
-    /*if(lightNormal*ray.direction < 0) {
+    if(lightNormal*ray.direction < 0) {
         pdf = 0;
         areaPdf = 0;
         return Color(0, 0, 0);
-    }*/
+    }
     return std::abs(lightNormal*ray.direction)*Color(1, 1, 1)/dirPdf;
 }
 
@@ -181,10 +181,11 @@ Color LightPortal::GetIntensity() const
     return light->GetIntensity();
 }
 
-void LightPortal::AddToScene(std::shared_ptr<Scene> scn)
+void LightPortal::AddToScene(Scene* scene)
 {
     light->material->light = this;
-    Scene::LightAdder::AddLight(*scn, this);
+    Scene::LightAdder::AddLight(*scene, this);
+    light->scene = scene;
 }
 
 Color LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const

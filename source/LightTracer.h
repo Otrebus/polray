@@ -6,7 +6,6 @@
 #include "Primitive.h"
 #include "Renderer.h"
 #include "Random.h"
-#include "LightTree.h"
 
 class LightTracer : public Renderer
 {

@@ -50,6 +50,7 @@ Cubemap* cubemap;
 //#define INTERIOR
 //#define ROOM
 #define EMPTYBOX
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define BALLSBOX
 //#define CONFERENCE
@@ -61,10 +62,46 @@ Cubemap* cubemap;
 //#define OCLBOX
 //#define SHINYBALL
 //#define CSGTEST
-#define SAMPLES_PER_PIXEL 1
+//#define SAMPLES_PER_PIXEL 1
 
 void MakeScene(std::shared_ptr<Renderer>& r)
 {
+    #ifdef KITCHEN2
+    auto s = std::shared_ptr<Scene> (new Scene("Morning Apartment.obj"));
+
+    Vector3d camPos = Vector3d(2.9, 2.7, 6.3);
+    Vector3d target = Vector3d(-1.1, 2.6, -3.7);
+    Vector3d camdir = target-camPos;
+    camdir.Normalize();
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).GetLength(), 10.15));
+    s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+
+
+    // tmp
+    //Vector3d camPos = Vector3d(-43.9, 293.8, 43);
+    //Vector3d target = Vector3d(8.6, 230, -301);
+    ///*Vector3d camPos = Vector3d(-150, 184, -760);
+    //Vector3d target = Vector3d(-119, 139, -914);*/
+    //Vector3d camdir = target-camPos;
+    //camdir.Normalize();
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
+
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
+
+    //auto portalLight = new AreaLight(Vector3d(-79, 387, 263), Vector3d(0, 15.0, 0.0), Vector3d(0.0, 0.0, 15.0), Color(7500, 7500, 7500));
+    //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));
+    //auto portalLight = new SphereLight(Vector3d(3854, 1750, -1770), 30.11, Color(5000000, 5000000, 5000000));
+
+    auto boxLight = new SphereLight(Vector3d(1.5, 2.2, -0.9), 0.2, Color(1000, 1000, 1000));
+
+    //////
+    s->AddLight(boxLight);
+
+    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+#endif
  #ifdef INTERIOR
     auto s = std::shared_ptr<Scene> (new Scene("interior-open.obj"));
 
@@ -142,8 +179,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 #ifdef ROOM
     auto s = std::shared_ptr<Scene> (new Scene("Room.obj"));
 
-    Vector3d camPos = Vector3d(-59.5, 18.8, 384.6);
-    Vector3d target = Vector3d(-85.1, -31.4, 172.1);
+    Vector3d camPos = Vector3d(-29.5, 0.8, 324.6);
+    Vector3d target = Vector3d(-60.1, -30.8, 172.1);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
     //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
@@ -159,8 +196,26 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
     //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
 
-    auto portalLight = new AreaLight(Vector3d(44.0, 1.0, -40), Vector3d(5.0, 0.0, 0.0), Vector3d(0.0, 0.0, 5.0), Color(7500, 7500, 7500));
-    portalLight->AddToScene(s);
+    auto skyLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 10000, 2.5*Color(0.9, 1.2, 1.5));
+    auto sunLight = new SphereLight(Vector3d(-40, 16, 18)*20, 100, Color(550, 500, 480));
+    //auto sunLight = new SphereLight(Vector3d(-80, -25, 90), 10, Color(5000, 5000, 5000));
+
+    auto triangle1 = new Triangle(Vector3d(-180, -115, 350), Vector3d(250, 115, 350), Vector3d(250, -115, 350));
+    auto triangle2 = new Triangle(Vector3d(-180, 115, 350), Vector3d(250, 115, 350), Vector3d(250, -115, 350));
+
+    //AreaLight* sunLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 10), Vector3d(10, 0.0, 0.0), Color(4000, 4000, 4000));
+    LightPortal* portalLight = new LightPortal();
+    portalLight->AddPortal(Vector3d(-270, 87, -106), Vector3d(0, -120, 0), Vector3d(0, 0, 120));
+    portalLight->AddPortal(Vector3d(-270, 87, 80), Vector3d(0, -120, 0), Vector3d(0, 0, 120));
+    portalLight->SetLight(sunLight);
+
+    LightPortal* portalLight2 = new LightPortal();
+    portalLight2->AddPortal(Vector3d(-270, 87, -106), Vector3d(0, -120, 0), Vector3d(0, 0, 120));
+    portalLight2->AddPortal(Vector3d(-270, 87, 80), Vector3d(0, -120, 0), Vector3d(0, 0, 120));
+    portalLight2->SetLight(skyLight);
+
+    s->AddLight(portalLight);
+    s->AddLight(portalLight2);
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -191,11 +246,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    auto a = new LambertianMaterial();
-    a->Kd = Color(0.5, 0.5, 0.5);
-
-
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 
 #ifdef WINDOWBOX
@@ -222,13 +273,13 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     portalLight->AddToScene(s);*/
 
     LightPortal* portalLight = new LightPortal();
-    portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
-    portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
-    //auto boxLight = new SphereLight(Vector3d(4, 1.0, 0), 0.4, Color(2000, 2000, 2000));
-    auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
-    portalLight->SetLight(boxLight);
+    //portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    //portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    auto boxLight = new SphereLight(Vector3d(4, 1.0, 0), 0.4, Color(2000, 2000, 2000));
+    //auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
+    //portalLight->SetLight(boxLight);
 
-    s->AddLight(portalLight);
+    s->AddLight(boxLight);
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -266,12 +317,12 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere->SetMaterial(a);
     s->AddModel(sphere);
 
-    auto g = new DielectricMaterial();
+    /*auto g = new DielectricMaterial();
     Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.0, 0.5), 0.51);
     sphere2->SetMaterial(g);
-    s->AddModel(sphere2);
+    s->AddModel(sphere2);*/
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 
@@ -406,8 +457,18 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     //sphere2->AddToScene(*s);
 
-    auto boxLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 10, 3*Color(0.9, 1.2, 1.5));
-    
+    auto skyLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 100, 3*Color(0.9, 1.2, 1.5));
+    auto sunLight = new SphereLight(Vector3d(1, 1, 1).Normalized()*8, 1, Color(500, 500, 500));
+    //AreaLight* sunLight = new AreaLight(Vector3d(1, 1, 1).Normalized()*8, Vector3d(0, 2, 0.0), Vector3d(2, 0, 0), Color(500, 500, 500));
+
+    LightPortal* portalLight = new LightPortal();
+    portalLight->AddPortal(Vector3d(-1.5, -0.5, 1.0), Vector3d(0, 3, 0), Vector3d(3, 0, 0));
+    portalLight->SetLight(sunLight);
+
+    LightPortal* portalLight2 = new LightPortal();
+    portalLight2->AddPortal(Vector3d(-1.5, -0.5, 1.0), Vector3d(0, 3, 0), Vector3d(3, 0, 0));
+    portalLight2->SetLight(skyLight);
+
     //AreaLight* boxLight = new AreaLight(Vector3d(0, 1.4, 40), Vector3d(0, 250, 0.0), Vector3d(250, 0, 0), Color(50.5, 50.5, 50.5));
 
     //LightPortal* portalLight = new LightPortal();
@@ -420,7 +481,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //SphereLight* boxLight = new SphereLight(Vector3d(-0.45, 1.0, 0.4), 0.11, Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(0.25, 0.0, 0.0), Vector3d(0.0, 0, 0.25), Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.7, 1.199, 0.4), Vector3d(1.5, 0.0, 0.0), Vector3d(0.0, 0, 0.1), Color(200, 200, 200));
-    s->AddLight(boxLight);
+    s->AddLight(portalLight2);
+    s->AddLight(portalLight);
 
     r = std::shared_ptr<BDPT>(new BDPT(s));
 

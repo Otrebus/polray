@@ -36,7 +36,7 @@ public:
 
     void SamplePoint (Vector3d& point, Vector3d& normal) const;
     double GetArea() const;
-    void AddToScene(std::shared_ptr<Scene>);
+    void AddToScene(Scene*);
 
     void Save(Bytestream& s) const;
     void Load(Bytestream& s);
@@ -49,7 +49,6 @@ protected:
     double radius;
     Color intensity;
     Vector3d position;
-    std::shared_ptr<Scene> scene;
     mutable Random random;
 };
 

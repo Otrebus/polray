@@ -394,9 +394,8 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     vector<BDVertex*> eyePath;
     vector<BDVertex*> lightPath;
 
-    double lightWeight;
     double r = m_random.GetDouble(0.0f, 1.0f);
-    Light* light = lightTree->PickLight(r, lightWeight);
+    auto [light, lightWeight] = scene->PickLight(r);
 
     int lLength = BuildLightPath(x, y, lightPath, light);
     int eLength = BuildEyePath(x, y, eyePath, cam, samples, light);
@@ -446,15 +445,15 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
             if(!cam.GetPixelFromRay(camRay, camx, camy, eyePath[0]->camU, eyePath[0]->camV))
                 continue;
             double costheta = abs(cam.dir*camRay.direction);
-            double mod = costheta*costheta*costheta*costheta*cam.GetFilmArea()*lightWeight;
-            Color result = eval/mod;
+            double mod = costheta*costheta*costheta*costheta*cam.GetFilmArea();
+            Color result = eval/mod/lightWeight;
             lightImage.AddColor(camx, camy, result);
         }
         else
         {
             double costheta = abs(cam.dir*eyePath[0]->out.direction);
-            double mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea())*lightWeight;
-            Color result = eval/mod;
+            double mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea());
+            Color result = eval/mod/lightWeight;
             eyeImage.AddColor(x, y, result);
         }
     }

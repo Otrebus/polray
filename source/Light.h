@@ -42,7 +42,7 @@ public:
 
     virtual void SamplePoint (Vector3d& point, Vector3d& normal) const = 0;
     virtual double GetArea() const = 0;
-    virtual void AddToScene(std::shared_ptr<Scene>) = 0;
+    virtual void AddToScene(Scene* scene) = 0;
 
     virtual void Save(Bytestream& s) const = 0;
     virtual void Load(Bytestream& s) = 0;
@@ -50,6 +50,7 @@ public:
     static Light* Create(unsigned char);
 
     EmissiveMaterial* material;
+    Scene* scene;
 protected:
     Color intensity_;
 };

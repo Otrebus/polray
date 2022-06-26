@@ -21,7 +21,7 @@ UniformEnvironmentLight::UniformEnvironmentLight(const Vector3d& position, doubl
 #endif
 }
 
-void UniformEnvironmentLight::AddToScene(std::shared_ptr<Scene> scn)
+void UniformEnvironmentLight::AddToScene(Scene* scn)
 {
     material->light = this;
     material->emissivity = intensity;
@@ -136,6 +136,8 @@ Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, con
             c = mat->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d);
             double brdfPdf = costheta*mat->PDF(info, toLight, false, component)/(d*d);
             double lightPdf = 1.0f/GetArea();
+            lp = lightPoint;
+            ln = lightNormal;
             return c;
         }
     }

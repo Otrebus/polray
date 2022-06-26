@@ -138,10 +138,10 @@ double MeshLight::GetArea() const
     return area_;
 }
 
-void MeshLight::AddToScene(std::shared_ptr<Scene> scn)
+void MeshLight::AddToScene(Scene* scene)
 {
-    mesh_->AddToScene(*scn);
-    Scene::LightAdder::AddLight(*scn, this);
+    mesh_->AddToScene(*scene);
+    Scene::LightAdder::AddLight(*scene, this);
 }
 
 Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const

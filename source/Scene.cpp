@@ -61,7 +61,7 @@ void Scene::AddModel(Model* s)
 
 void Scene::AddLight(Light* l)
 {
-    l->AddToScene(shared_from_this());
+    l->AddToScene(this);
 }
 
 void Scene::SetCamera(Camera* cam)
@@ -174,3 +174,14 @@ double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) co
     l = nullptr;
     return -inf;
 };
+
+std::pair<Light*, double> Scene::PickLight(double r1) const
+{
+    auto p = 1.0/lights.size() + eps;
+    auto sum = 0.0;
+    for(auto light : lights) {
+        sum += p;
+        if(sum > r1)
+            return { light, p };
+    }
+}

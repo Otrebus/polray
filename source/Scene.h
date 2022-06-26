@@ -47,7 +47,7 @@ public:
         friend void Sphere::AddToScene(Scene& scene);
         friend void TriangleMesh::AddToScene(Scene& scene);
         friend void Triangle::AddToScene(Scene& scene);
-        friend void AreaLight::AddToScene(std::shared_ptr<Scene>);
+        friend void AreaLight::AddToScene(Scene*);
         friend void CsgCuboid::AddToScene(Scene& scene);
         friend void CsgCylinder::AddToScene(Scene& scene);
         friend void CsgSphere::AddToScene(Scene& scene);
@@ -61,11 +61,11 @@ public:
         {
             scene.lights.push_back(light);
         }
-        friend void AreaLight::AddToScene(std::shared_ptr<Scene>);
-        friend void SphereLight::AddToScene(std::shared_ptr<Scene>);
-        friend void MeshLight::AddToScene(std::shared_ptr<Scene>);
-        friend void LightPortal::AddToScene(std::shared_ptr<Scene>);
-        friend void UniformEnvironmentLight::AddToScene(std::shared_ptr<Scene>);
+        friend void AreaLight::AddToScene(Scene*);
+        friend void SphereLight::AddToScene(Scene*);
+        friend void MeshLight::AddToScene(Scene*);
+        friend void LightPortal::AddToScene(Scene*);
+        friend void UniformEnvironmentLight::AddToScene(Scene*);
     };
 
     // And a last one, for materials
@@ -78,7 +78,7 @@ public:
         friend void Sphere::AddToScene(Scene& scene);
         friend void TriangleMesh::AddToScene(Scene& scene);
         friend void Triangle::AddToScene(Scene& scene);
-        friend void AreaLight::AddToScene(std::shared_ptr<Scene>);
+        friend void AreaLight::AddToScene(Scene*);
     };
 
 	Scene(string file);
@@ -104,6 +104,8 @@ public:
 
     bool Intersect(const Ray&, double tmax) const;
     double Intersect(const Ray&, const Primitive*&, const Light*&) const;
+
+    std::pair<Light*, double> PickLight(double) const;
 
     BoundingBox GetBoundingBox();
 

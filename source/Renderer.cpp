@@ -9,9 +9,7 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     if(!scene->partitioning)
         scene->partitioning = new KDTree();
     scene->partitioning->Build(scene->primitives);
-    vector<Light*> lights = scene->GetLights();
-    lightTree = new LightNode(lights);
-    m_lights = lights;
+    m_lights = scene->GetLights();
 }
 
 Renderer::~Renderer()

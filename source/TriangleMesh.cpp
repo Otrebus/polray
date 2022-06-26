@@ -456,8 +456,8 @@ bool TriangleMesh::ReadFromFile(string file, Material* meshMat)
 
 				if (!ns[0]) {
 					tri->v0->normal = tri->GetNormal();
-					if(tri->v0->normal.x != tri->v0->normal.x)
-						__debugbreak();
+					//if(tri->v0->normal.x != tri->v0->normal.x)
+					//	__debugbreak();
 					tri->v1->normal = tri->v0->normal;
 					tri->v2->normal = tri->v0->normal;
 

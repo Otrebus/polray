@@ -54,9 +54,8 @@ public:
 
 protected:
     friend class Scene;
-    void AddToScene(std::shared_ptr<Scene>);
+    void AddToScene(Scene*);
     Light* light;
     std::vector<Portal> portals;
-    std::shared_ptr<Scene> scene_;
     mutable Random r;
 };

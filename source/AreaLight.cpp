@@ -22,7 +22,7 @@ AreaLight::AreaLight(const Vector3d& position, const Vector3d& corner1, const Ve
 #endif
 }
 
-void AreaLight::AddToScene(std::shared_ptr<Scene> scn)
+void AreaLight::AddToScene(Scene* scn)
 {
     scene = scn;
    

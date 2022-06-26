@@ -55,7 +55,7 @@ public:
 
 protected:
     friend class Scene;
-    virtual void AddToScene(std::shared_ptr<Scene>);
+    virtual void AddToScene(Scene*);
 
     TriangleNode* BuildTree(int from, int to, double area, double cutoff);
     MeshTriangle* PickRandomTriangle() const;

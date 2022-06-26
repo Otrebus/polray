@@ -126,9 +126,8 @@ Color PathTracer::TracePath(const Ray& ray) const
     inRay = ray;
     double rr = 1.0f;
 
-    double lightWeight;
     double r = m_random.GetDouble(0.0f, 1.0f);
-    Light* light = lightTree->PickLight(r, lightWeight);
+    auto [light, lightWeight] = scene->PickLight(r);
 
     do
     {

@@ -13,6 +13,7 @@ Fix the friend/attourney etc relationships and private fields in general
 Use more modern threads
 Add physical camera to bdpt
 Make various functions return a tuple instead of taking output parameters
+Add check that all primitives have materials, in scene
 - Make mr. lightportal use next event estimation
 - Try including rr with mis o
 - Investigate BDPT fireflies

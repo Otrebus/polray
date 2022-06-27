@@ -146,8 +146,8 @@ void SampleHemisphereCos(double r1, double r2, const Vector3d& apex, Vector3d& s
     Vector3d right, forward;
     MakeBasis(apex, right, forward);
 
-    sample = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) 
-             + apex*sqrt(1-r2);
+    sample = forward*cos(r1*2*pi)*sqrt(r2) + right*sin(r1*2*pi)*sqrt(r2) 
+             + apex*sqrt(1-r2) + apex*eps;
 }
 
 Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
@@ -155,7 +155,7 @@ Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
     Vector3d right, forward;
     MakeBasis(apex, right, forward);
 
-    return forward*cos(r1)*sqrt(1-r2*r2) + right*sin(r1)*sqrt(1-r2*r2) 
+    return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + right*sin(r1*2*pi)*sqrt(1-r2*r2) 
              + apex*r2;
 }
 

@@ -8,6 +8,7 @@ Clean up Ashikhmin & other materials
 Read light sources from .mtl files
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Modules?
+Implement multiple importance sampling for light portals
 Fix the friend/attourney etc relationships and private fields in general
 (mostly for "fun") Make light portals work inside scenes
 Use more modern threads

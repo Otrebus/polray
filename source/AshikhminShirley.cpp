@@ -45,7 +45,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         Vector3d N_s = info.GetNormal();
         Vector3d w_i = -info.GetDirection();
 
-        double r1 = rnd.GetDouble(0, 2*F_PI);
+        double r1 = rnd.GetDouble(0, 1.0);
         double r2 = rnd.GetDouble(0, 1.0);
 
         if(w_i*N_g < 0)

@@ -32,8 +32,8 @@ float df = Kd.GetMax();
     {
         int component = 1;
 
-        float r1 = rnd.GetDouble(0.0001f, 2*M_PI);
-        float r2 = rnd.GetDouble(0.0000f, 1.0f);
+        float r1 = rnd.GetDouble(0, 1.0);
+        float r2 = rnd.GetDouble(0, 1.0f);
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -275,7 +275,7 @@ void PhongMaterial::Load(Bytestream& stream)
 //    {
 //        int component = 1;
 //
-//        float r1 = rnd.GetDouble(0, 2*M_PI);
+//        float r1 = rnd.GetDouble(0, 1);
 //        float r2 = rnd.GetDouble(0, 1);
 //
 //        Vector3d N_g = info.GetGeometricNormal();
@@ -549,7 +549,7 @@ void PhongMaterial::Load(Bytestream& stream)
 //    {
 //        int component = 1;
 //
-//        float r1 = rnd.GetDouble(0, 2*M_PI);
+//        float r1 = rnd.GetDouble(0, 1);
 //        float r2 = rnd.GetDouble(0, 1);
 //
 //        Vector3d N_g = info.GetGeometricNormal();

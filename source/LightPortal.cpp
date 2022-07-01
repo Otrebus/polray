@@ -195,13 +195,11 @@ Color LightPortal::NextEventEstimation(const Renderer* renderer, const Intersect
     lp = lightPoint;
     ln = lightNormal;
     Ray ray(info.position, (lightPoint-info.position).Normalized());
-    double t = -inf;
-    for(auto p : portals) {
-        t = p.Intersect(ray);
-        if(t != -inf)
-            break;
-    }
-    return t == -inf ? Color(0, 0, 0) : color;
+
+    for(auto p : portals)
+        if(p.Intersect(ray) >= 0)
+            return color;
+    return Color(0, 0, 0);
 }
 
 Color LightPortal::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const

@@ -49,11 +49,11 @@ Cubemap* cubemap;
 
 //#define INTERIOR
 //#define INTERIORSKY
-//#define ROOM
+#define ROOM
 //#define EMPTYBOX
 //#define KITCHEN2
 //#define WINDOWBOX
-#define WINDOWBOX2
+//#define WINDOWBOX2
 //#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
@@ -294,8 +294,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 #ifdef ROOM
     auto s = std::shared_ptr<Scene> (new Scene("Room.obj"));
 
-    Vector3d camPos = Vector3d(-29.5, 0.8, 324.6);
-    Vector3d target = Vector3d(-60.1, -30.8, 172.1);
+    Vector3d camPos = Vector3d(-29.5, 0.8, 824.6);
+    Vector3d target = Vector3d(0, 0, 0);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
     //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
@@ -318,8 +318,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     auto mat = new LambertianMaterial();
     mat->Kd = Color(0.2, 0.2, 0.2);
 
-    auto triangle1 = new Triangle(Vector3d(-180, -115, 350), Vector3d(250, 115, 350), Vector3d(250, -115, 350));
-    auto triangle2 = new Triangle(Vector3d(-180, 115, 350), Vector3d(250, 115, 350), Vector3d(250, -115, 350));
+    auto triangle1 = new Triangle(Vector3d(-180, -115, 345), Vector3d(260, 115, 345), Vector3d(260, -115, 345));
+    auto triangle2 = new Triangle(Vector3d(-180, 115, 345), Vector3d(260, 115, 345), Vector3d(-180, -115, 345));
     triangle1->SetMaterial(mat);
     triangle2->SetMaterial(mat);
     s->AddModel(triangle1);
@@ -327,18 +327,18 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //AreaLight* sunLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 10), Vector3d(10, 0.0, 0.0), Color(4000, 4000, 4000));
     LightPortal* portalLight = new LightPortal();
-    portalLight->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, -120, 0), Vector3d(0, 0, 120));
-    portalLight->AddPortal(Vector3d(-270, 87, 80), Vector3d(0, -120, 0), Vector3d(0, 0, 120));
+    portalLight->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, -130, 0), Vector3d(0, 0, 130));
+    portalLight->AddPortal(Vector3d(-270, 87, 80), Vector3d(0, -130, 0), Vector3d(0, 0, 130));
     portalLight->SetLight(sunLight);
 
     LightPortal* portalLight2 = new LightPortal();
-    portalLight2->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, 0, 120), Vector3d(0, -120, 0));
-    portalLight2->AddPortal(Vector3d(-271, 87, 80), Vector3d(0, 0, 120), Vector3d(0, -120, 0));
+    portalLight2->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, 0, 130), Vector3d(0, -130, 0));
+    portalLight2->AddPortal(Vector3d(-271, 87, 80), Vector3d(0, 0, 130), Vector3d(0, -130, 0));
     portalLight2->SetLight(skyLight);
 
     //s->AddLight(portalLight);
-    //s->AddLight(portalLight2);
-    s->AddLight(skyLight);
+    s->AddLight(portalLight2);
+    //s->AddLight(skyLight);
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -487,6 +487,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //auto sunLight = new SphereLight(Vector3d(40, 16, 18)*20, 100, Color(550, 500, 480));
     auto sunLight = new AreaLight(Vector3d(40, 16, 14), Vector3d(0.0, 0.0, 4.4), Vector3d(0.0, 4.4, 0.0), Color(3500, 3500, 3500));
 
+    auto fakeSkyLight = new AreaLight(Vector3d(4, 4, -4), Vector3d(0, -8, 0), Vector3d(0, 0, 8), Color(10, 10, 10));
+
     LightPortal* portalLight = new LightPortal();
     portalLight->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
     portalLight->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
@@ -497,12 +499,18 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     portalLight2->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
     portalLight2->SetLight(skyLight);
 
+    LightPortal* portalLight3 = new LightPortal();
+    portalLight3->AddPortal(Vector3d(1, 0.25, 0.25), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    portalLight3->AddPortal(Vector3d(1, 0.25, -0.75), Vector3d(0, 1.5, 0), Vector3d(0, 0, 0.5));
+    portalLight3->SetLight(fakeSkyLight);
+
     //auto boxLight = new SphereLight(Vector3d(4, 1.0, 0), 0.4, Color(2000, 2000, 2000));
     //auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
     //portalLight->SetLight(boxLight);
 
-    //s->AddLight(portalLight);
-    s->AddLight(portalLight2);
+    //s->AddLight(fakeSkyLight);
+    //s->AddLight(skyLight);
+    s->AddLight(skyLight);
     //s->AddLight(sunLight);
 
     //auto a = new PhongMaterial();
@@ -532,7 +540,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     a->Kd = Color(0, 0, 0);
     a->alpha = 0;*/
 
-    s->SetPartitioning(new BrutePartitioning());
+    //s->SetPartitioning(new BrutePartitioning());
 
     auto a = new LambertianMaterial();
     a->Kd = Color(0.5, 0.5, 0.5);
@@ -546,7 +554,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     s->AddModel(sphere2);*/
 
-    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 

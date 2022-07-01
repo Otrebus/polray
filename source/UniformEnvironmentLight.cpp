@@ -122,24 +122,19 @@ Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, con
     SamplePoint(lightPoint, lightNormal);
     auto toLight = lightPoint - info.GetPosition();
     Ray lightRay = Ray(info.GetPosition(), toLight);
-    double d = toLight.GetLength();
+    double d = toLight.GetLength()*(1.-1.e-6);
     toLight.Normalize();
 
-    if(toLight*lightNormal < 0)
+    if(renderer->TraceShadowRay(lightRay, d))
     {
-        if(renderer->TraceShadowRay(lightRay, d))
-        {
-            double cosphi = abs(info.GetNormal()*toLight);
-            double costheta = abs(toLight*lightNormal);
-            Color c;
-            Material* mat = info.GetMaterial();			
-            c = mat->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d);
-            double brdfPdf = costheta*mat->PDF(info, toLight, false, component)/(d*d);
-            double lightPdf = 1.0f/GetArea();
-            lp = lightPoint;
-            ln = lightNormal;
-            return c;
-        }
+        double cosphi = abs(info.GetNormal()*toLight);
+        double costheta = abs(toLight*lightNormal);
+        Color c;
+        Material* mat = info.GetMaterial();
+        c = mat->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d);
+        lp = lightPoint;
+        ln = lightNormal;
+        return c;
     }
     return Color(0, 0, 0);
 }

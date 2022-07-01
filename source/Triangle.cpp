@@ -32,10 +32,7 @@ Triangle::~Triangle()
 double Triangle::Intersect(const Ray& ray) const
 {
     double u, v, t;
-    Vector3d D;
-    D.x = ray.direction.x;
-    D.y = ray.direction.y;
-    D.z = ray.direction.z;
+    Vector3d D = ray.direction;
 
     Vector3d E1 = v1.pos-v0.pos;
     Vector3d E2 = v2.pos-v0.pos;
@@ -109,7 +106,7 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
 
     info.normal.Normalize();
 
-    info.position = ray.origin + ray.direction*(t-eps);
+    info.position = v0.pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
     info.texpos.x = u;
     info.texpos.y = v;
     info.material = material;

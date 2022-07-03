@@ -1,21 +1,20 @@
-Fix rendering exposure to use luminance as input for exp
-Add light source resampling to BDPT
-Copy to clipboard feature
-Make TraceShadowRay account for light portals
-Unhardcode light area sampling in light portal
-Constexpr template intpow
+C++ modules
+Make various functions return a tuple instead of taking output parameters
 Clean up Ashikhmin & other materials
+Copy to clipboard feature
 Read light sources from .mtl files
+Fix rendering exposure to use luminance as input for exp
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
-Modules?
+Use more modern threads
+Make TraceShadowRay account for light portals
+Think of a better way of dealing with epsilons - account for numerical errors etc
+Add light source resampling to BDPT
+Unhardcode light area sampling in light portal
 Implement multiple importance sampling for light portals
 Fix the friend/attourney etc relationships and private fields in general
 (mostly for "fun") Make light portals work inside scenes
-Use more modern threads
 Add physical camera to bdpt
-Make various functions return a tuple instead of taking output parameters
 Add check that all primitives have materials, in scene
-Think of a better way of dealing with epsilons - account for numerical errors etc
 - Make mr. lightportal use next event estimation
 - Try including rr with mis o
 - Investigate BDPT fireflies

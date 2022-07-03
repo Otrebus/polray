@@ -166,7 +166,6 @@
     <ClCompile Include="source\DielectricMaterial.cpp" />
     <ClCompile Include="source\Draw.cpp" />
     <ClCompile Include="source\EmissiveMaterial.cpp" />
-    <ClCompile Include="source\EnvironmentLight.cpp" />
     <ClCompile Include="source\GeometricRoutines.cpp" />
     <ClCompile Include="source\Gfx.cpp" />
     <ClCompile Include="source\Input.cpp" />

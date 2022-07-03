@@ -203,9 +203,6 @@
     <ClCompile Include="source\PreethamSky.cpp">
       <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClCompile>
-    <ClCompile Include="source\EnvironmentLight.cpp">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
-    </ClCompile>
     <ClCompile Include="source\Sample.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -108,12 +108,18 @@ Color UniformEnvironmentLight::GetIntensity() const
     return intensity;
 }
 
-void UniformEnvironmentLight::Save(Bytestream& stream) const
+void UniformEnvironmentLight::Save(Bytestream& s) const
 {
+    s << ID_UNIFORMENVIRONMENTLIGHT << position.x << position.y << position.z
+      << radius << intensity;
 }
-
-void UniformEnvironmentLight::Load(Bytestream& stream)
+void UniformEnvironmentLight::Load(Bytestream& s)
 {
+    s >> position.x >> position.y >> position.z 
+      >> radius >> intensity;
+    material = new EmissiveMaterial();
+    material->emissivity = intensity;
+    material->light = this;
 }
 
 Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const

@@ -2,6 +2,7 @@
 #include "LightPortal.h"
 #include "Light.h"
 #include "SphereLight.h"
+#include "UniformEnvironmentLight.h"
 #include <intrin.h>
 
 Light::Light()
@@ -20,6 +21,8 @@ Light* Light::Create(unsigned char c)
         return new SphereLight;
     else if(c == ID_LIGHTPORTAL)
         return new LightPortal;
+    else if(c == ID_UNIFORMENVIRONMENTLIGHT)
+        return new UniformEnvironmentLight;
     else {
         __debugbreak();
         return new AreaLight; // To satisfy the compiler who thinks the function otherwise might return null

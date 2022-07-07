@@ -1,5 +1,5 @@
-C++ modules
 Make various functions return a tuple instead of taking output parameters
+Change the DirectHitMIS etc stuff
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
 Read light sources from .mtl files

@@ -22,7 +22,6 @@ public:
 	~MeshVertex();
 
 	vector<MeshTriangle*> triangles;
-    Vertex3d* replacement;
 };
 
 class MeshTriangle : public Primitive
@@ -56,8 +55,6 @@ public:
 	TriangleMesh(string, Material*);
 	~TriangleMesh();
 	void CalculateVertexNormals();
-	bool ReadFromFile(string, Material* mat);
-	bool ReadMaterialFile(string, map<string, Material*>&);
 
     void AddToScene(Scene& scene);
 

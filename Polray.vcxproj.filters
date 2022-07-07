@@ -224,6 +224,9 @@
     <ClCompile Include="source\GeometricRoutines.cpp">
       <Filter>Source Files\Utils</Filter>
     </ClCompile>
+    <ClCompile Include="source\ObjReader.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -404,6 +407,9 @@
       <Filter>Source Files\Lights</Filter>
     </ClInclude>
     <ClInclude Include="source\GeometricRoutines.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ObjReader.h">
       <Filter>Source Files\Utils</Filter>
     </ClInclude>
   </ItemGroup>

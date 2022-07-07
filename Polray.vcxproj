@@ -182,6 +182,7 @@
     <ClCompile Include="source\MeshLight.cpp" />
     <ClCompile Include="source\MirrorMaterial.cpp" />
     <ClCompile Include="source\Model.cpp" />
+    <ClCompile Include="source\ObjReader.cpp" />
     <ClCompile Include="source\PathTracer.cpp" />
     <ClCompile Include="source\PhongMaterial.cpp" />
     <ClCompile Include="source\PinholeCamera.cpp" />
@@ -245,6 +246,7 @@
     <ClInclude Include="source\MeshLight.h" />
     <ClInclude Include="source\MirrorMaterial.h" />
     <ClInclude Include="source\Model.h" />
+    <ClInclude Include="source\ObjReader.h" />
     <ClInclude Include="source\PathTracer.h" />
     <ClInclude Include="source\PhongMaterial.h" />
     <ClInclude Include="source\PinholeCamera.h" />

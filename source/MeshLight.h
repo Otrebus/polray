@@ -26,6 +26,7 @@ class MeshLight : public Light
 {
 public:
     MeshLight(Color intensity, std::string fileName);
+    MeshLight(Color intensity);
     ~MeshLight();
     virtual Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const;
     void SamplePoint(Vector3d& point, Vector3d& Normal) const;
@@ -53,16 +54,17 @@ public:
 
     void AddPortal(const Vector3d& pos, const Vector3d& v1, const Vector3d& v2);
 
+    TriangleMesh* mesh;
 protected:
+    mutable bool builtTree;
     friend class Scene;
     virtual void AddToScene(Scene*);
 
-    TriangleNode* BuildTree(int from, int to, double area, double cutoff);
+    TriangleNode* BuildTree(int from, int to, double area, double cutoff) const;
     MeshTriangle* PickRandomTriangle() const;
-    double area_;
-    TriangleMesh* mesh_;
+    mutable double area_;
     mutable Random r;
-    TriangleNode* triangleTree_;
+    mutable TriangleNode* triangleTree_;
 };
 
 #endif

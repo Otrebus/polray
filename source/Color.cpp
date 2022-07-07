@@ -91,6 +91,10 @@ Color Color::operator*=(const Color& c)
     return Color(r, g, b);
 }
 
+Color::operator bool() const {
+    return !!(*this);
+}
+
 Color Color::operator*=(double f)
 {
     r *= f; g *= f;	b *= f;
@@ -101,6 +105,11 @@ Color Color::operator/=(double t)
 {
     r /= t;	g /= t;	b /= t;
     return Color(r, g, b);
+}
+
+bool Color::operator==(const Color& c)
+{
+    return c.r == r && c.g == g && c.b == b;
 }
 
 bool Color::operator!() const

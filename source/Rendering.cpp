@@ -44,7 +44,7 @@ Rendering::Rendering(std::string fileName)
     image = new ColorBuffer(accumulation->GetXRes(), accumulation->GetYRes());
     image->Clear(0);
 }
-
+ 
 void Rendering::SaveRendering(std::string fileName)
 {
     Bytestream b;

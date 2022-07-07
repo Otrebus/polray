@@ -27,7 +27,9 @@ public:
     Color operator+=(const Color& c);
     Color operator*=(const Color& c);
     Color operator/=(double t);
+    bool operator==(const Color& c);
     Color operator*=(double t);
+    explicit operator bool() const;
     double& operator[](int);
     bool operator!() const;
 

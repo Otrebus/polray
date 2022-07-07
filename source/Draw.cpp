@@ -49,8 +49,9 @@ Cubemap* cubemap;
 
 //#define INTERIOR
 //#define INTERIORSKY
-//#define INTERIORINLIGHT
-#define INTERIORFOG
+#define INTERIORINLIGHT
+//#define INTERIORFOG
+//#define BOX
 //#define ROOM
 //#define EMPTYBOX
 //#define KITCHEN2
@@ -294,7 +295,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef INTERIORINLIGHT
-    auto s = std::shared_ptr<Scene> (new Scene("interior-open.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("interior-open3-lights.obj"));
 
     Vector3d camPos = Vector3d(-118, 254.8, 500);
     Vector3d target = Vector3d(157, 159, -209);
@@ -372,8 +373,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //auto boxLight = new SphereLight(Vector3d(-43.9, 292, 43.4), 1.11, Color(150000, 150000, 150000));
     auto boxLight = new AreaLight(Vector3d(-43.9, 232, 43.4), Vector3d(0, 1.0, 0), Vector3d(0, 0, 1.0), Color(250000, 250000, 250000));
-    s->AddLight(boxLight);
-
+    //s->AddLight(boxLight);
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -404,7 +404,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<LightTracer>(new LightTracer(s));
 #endif
 #ifdef INTERIORFOG
     auto s = std::shared_ptr<Scene> (new Scene("interior-open3.obj"));
@@ -1138,6 +1138,161 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
+#endif
+#ifdef BOX
+
+    /*
+    Matrix3d rotatebunny (-1, 0, 0, 0,
+                     0, 1, 0, 0,
+                     0, 0, -1, 0,
+                     0, 0, 0, 1);
+    Matrix3d translatebunny (1, 0, 0, 0,
+                        0, 1, 0, -0.0f,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+    Matrix3d scalebunny (0.53f, 0, 0, 0,
+                    0, 0.53f, 0, 0,
+                    0, 0, 0.53f, 0,
+                    0, 0, 0, 1);*/
+    /*
+        Matrix3d rotatebunny2 (-1, 0, 0, 0,
+                     0, 1, 0, 0,
+                     0, 0, -1, 0,
+                     0, 0, 0, 1);
+    Matrix3d translatebunny2 (1, 0, 0, 0.5,
+                        0, 1, 0, 0,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+    Matrix3d scalebunny2 (0.23f, 0, 0, 0,
+                    0, 0.23f, 0, 0,
+                    0, 0, 0.23f, 0,
+                    0, 0, 0, 1);
+        Matrix3d rotatebunny3 (-1, 0, 0, 0,
+                     0, 1, 0, 0,
+                     0, 0, -1, 0,
+                     0, 0, 0, 1);
+    Matrix3d translatebunny3 (1, 0, 0, -0.5,
+                        0, 1, 0, 0,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+    Matrix3d scalebunny3 (0.23f, 0, 0, 0,
+                    0, 0.23f, 0, 0,
+                    0, 0, 0.23f, 0,
+                    0, 0, 0, 1);*/
+
+    //MeshLight* bunny = new MeshLight(Color(10, 10, 10), "bunny.obj");
+    //bunny->Transform(translatebunny*(scalebunny*rotatebunny));
+    /*
+        TriangleMesh* bunny2 = new TriangleMesh("bunny.obj", 0);
+        bunny2->Transform(translatebunny2*(scalebunny2*rotatebunny2));
+        PhongMaterial* bunmat = new PhongMaterial();
+        bunmat->alpha = 30;
+        bunmat->Kd = Color(0, 0.7, 0.1);
+        bunmat->Ks = Color(0.05, 0.05, 0.05);
+            TriangleMesh* bunny3 = new TriangleMesh("bunny.obj", bunmat);
+            bunny3->Transform(translatebunny3*(scalebunny3*rotatebunny3));*/
+
+
+
+    /*
+    Matrix3d translate (1, 0, 0, 0,
+                        0, 1, 0, -0.6f,
+                        0, 0, 1, 1.6f,
+                        0, 0, 0, 1);
+    Matrix3d scale (0.43f, 0, 0, 0,
+                    0, 0.43f, 0, 0,
+                    0, 0, 0.43f, 0,
+                    0, 0, 0, 1);
+    TriangleMesh teapot("teapotwithnormals.obj", 0);
+    teapot.Transform(translate*scale);*/
+    //Renderer* boxrenderer = new RayTracer();
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original.obj"));
+    //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
+    //auto s = std::shared_ptr<Scene> (new Scene());
+    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d target = Vector3d(0, 1, 0);
+    Vector3d camdir = target-camPos;
+    camdir.Normalize();
+    //box.camera = new Camera(Vector3d(0, 1, 0), camPos, camdir);
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
+    s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+    
+    //box.camera->SetFov(75);
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.65, 0.99, 1.35), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(20, 200, 50), &box);
+    //AreaLight* cubearealight2 = new AreaLight(Vector3d(.25, 0.99, 1.35), Vector3d(0.6, 0, 0), Vector3d(0, 0, 0.6), Color(3, 5, 50), &box);
+
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.99, 1.35), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(400, 400, 400), s);
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.99, 1.35), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(400, 400, 400), s);
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.79, 1.35), Vector3d(0, 0, 0.3), Vector3d(0.3, 0, 0), Color(400, 400, 400), s);
+    
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, -10.99, -30), Vector3d(0.3, 0.0, 0), Vector3d(0.0, 0.3, 0), Color(50000, 50000, 50000), s);
+
+    //MeshLight* cubearealight = new MeshLight(Color(50, 50, 50), "trilight.obj");
+
+    /*MeshTriangle* m = new MeshTriangle(Vector3d(-100000, 100000, -3), Vector3d(100000, 100000, -3), Vector3d(0, -100000, -3));
+    box.AddShape(m);
+    m->material = new PhongMaterial();
+    ((PhongMaterial*)m->material)->Kd = Color(0.7, 0.7 , 0.7);*/
+
+    //s->SetEnvironmentLight(ps);
+    //AshikhminShirley* mat = new AshikhminShirley;
+    PhongMaterial* mat = new PhongMaterial;
+    mat->Kd = Color(0.65, 0.65, 0.6);
+    mat->Ks = Color(0.08, 0.08, 0.08);
+    mat->alpha = 300;
+  /*  TriangleMesh* ajax = new TriangleMesh("Ajax_Jotero_com.obj", mat);
+    double rt = -0.8;
+    Matrix3d rot (cos(rt), 0, sin(rt), 0,
+                  0, 1, 0, 0,
+                  -sin(rt), 0, cos(rt), 0,
+                  0, 0, 0, 0);
+    Matrix3d move(1,0,0,0,
+                   0,1,0,0,
+                   0,0,1,17.28,
+                   0,0,0,1);
+    Matrix3d scale(0.035f,0,0,0,
+                   0,0.035f,0,0,
+                   0,0,0.035f,0,
+                   0,0,0,0.035f);
+    Matrix3d move2(1,0,0,-0.4,
+                   0,1,0,-0.7,
+                   0,0,1,1.7,
+                   0,0,0,0);
+    
+    ajax->Transform(rot);
+    ajax->Transform(move);
+    ajax->Transform(scale);
+    ajax->Transform(move2);
+    s->AddModel(ajax);
+*/
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
+
+    s->SetPartitioning(new BrutePartitioning());
+
+    SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
+
+    //auto a = new AshikhminShirley();
+    //a->Rs = Color(0.5, 0.4, 0.6);
+    //a->Rd = Color(0.3, 0.4, 0.6);
+    //a->n = 200;
+    //Sphere* sphere = new Sphere(Vector3d(-0.1, 1.1, 0.3), 0.11);
+    //sphere->SetMaterial(a);
+    //s->AddModel(sphere);
+    
+    /*auto g = new DielectricMaterial();
+    Sphere* sphere2 = new Sphere(Vector3d(-0.1, 1.5, 0.3), 0.21);
+    sphere2->SetMaterial(g);*/
+    /*sphere2->AddToScene(*s);
+    s->AddModel(sphere2);*/
+
+    //boxLight->AddToScene(s);
+    //s->AddLight(boxLight);
+
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef BALLBOX
 

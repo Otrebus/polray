@@ -12,18 +12,35 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
     r.Seed(GetTickCount() + (int) this);
     material = new EmissiveMaterial();
     material->light = this;
-    mesh_ = new TriangleMesh(fileName, material);
+    mesh = new TriangleMesh(fileName, material);
     intensity_ = intensity;
 
     area_ = 0;
-    for(auto it = mesh_->triangles.cbegin(); it < mesh_->triangles.cend(); it++)
+    for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
         area_ += (*it)->GetArea();
 
-    triangleTree_ = BuildTree(0, mesh_->triangles.size() - 1, area_, 0);
+    triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+    builtTree = true;
+}
+
+MeshLight::MeshLight(Color intensity)
+{
+    r.Seed(GetTickCount() + (int) this);
+    material = new EmissiveMaterial();
+    material->light = this;
+    mesh = new TriangleMesh();
+    intensity_ = intensity;
+    builtTree = false;
 }
 
 MeshTriangle* MeshLight::PickRandomTriangle() const
 {
+    if(!builtTree) {
+        for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
+            area_ += (*it)->GetArea();
+        triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+        builtTree = true;
+    }
     double f = r.GetDouble(0, area_);
     TriangleNode* node = triangleTree_;
     while(true)
@@ -35,10 +52,10 @@ MeshTriangle* MeshLight::PickRandomTriangle() const
             node = node->rightChild;
 }
 
-TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaStart)
+TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaStart) const
 {
     assert(from <= to);
-    std::vector<MeshTriangle*>& triangles = mesh_->triangles;
+    std::vector<MeshTriangle*>& triangles = mesh->triangles;
     if(from == to)
     {
         TriangleNode* n = new TriangleNode;
@@ -69,7 +86,7 @@ TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaSta
 
 Color MeshLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& anglePdf) const
 {
-    MeshTriangle* t = mesh_->triangles[r.GetInt(0, mesh_->triangles.size()-1)];
+    MeshTriangle* t = mesh->triangles[r.GetInt(0, mesh->triangles.size()-1)];
     SamplePoint(ray.origin, normal);
 
     Vector3d right, forward;
@@ -121,7 +138,7 @@ void MeshLight::SamplePoint(Vector3d& point, Vector3d& normal) const
 
 void MeshLight::Transform(const Matrix3d& m)
 {
-    mesh_->Transform(m);
+    mesh->Transform(m);
 }
 
 void MeshLight::Save(Bytestream& s) const
@@ -140,18 +157,19 @@ double MeshLight::GetArea() const
 
 void MeshLight::AddToScene(Scene* scene)
 {
-    mesh_->AddToScene(*scene);
+    mesh->AddToScene(*scene);
     Scene::LightAdder::AddLight(*scene, this);
 }
 
 Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const
 {
-    SamplePoint(lightPoint, lightNormal);
-    Vector3d toLight = lightPoint - info.GetPosition();
+    Vector3d lightPoint_, lightNormal_;
+    SamplePoint(lightPoint_, lightNormal_);
+    Vector3d toLight = lightPoint_ - info.GetPosition();
     double d = toLight.GetLength();
     Vector3d normal = info.GetNormal();
 
-    if(toLight*lightNormal < 0)
+    if(toLight*lightNormal_ < 0)
     {
         double d = toLight.GetLength();
         toLight.Normalize();
@@ -161,7 +179,7 @@ Color MeshLight::NextEventEstimation(const Renderer* renderer, const Intersectio
         if(renderer->TraceShadowRay(lightRay, d))
         {
             double cosphi = abs(normal*toLight);
-            double costheta = abs(toLight*lightNormal);
+            double costheta = abs(toLight*lightNormal_);
             Color c;
             c = info.GetMaterial()->BRDF(info, toLight, component)
                 *costheta*cosphi*intensity_*GetArea()/(d*d);

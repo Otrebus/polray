@@ -3,6 +3,7 @@
 #include "triangle.h"
 #include "Random.h"
 #include "Utils.h"
+#include "ObjReader.h"
 //#include "RayFactory.h"
 
 //vector<PartRenderer*> PartRenderer::parts;
@@ -20,9 +21,10 @@ Scene::Scene()
 //------------------------------------------------------------------------------
 Scene::Scene(string f)
 {
-	TriangleMesh* tmp = new TriangleMesh;
-	tmp->ReadFromFile(f, 0);
-	AddModel(tmp);
+	auto [success, mesh, lights] = ReadFromFile(f, 0);
+	AddModel(&mesh);
+    for(auto light : lights)
+        AddLight(light);
 }
 
 //------------------------------------------------------------------------------

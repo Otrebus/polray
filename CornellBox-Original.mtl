@@ -66,7 +66,8 @@ newmtl shortBox
   Ka 0.725 0.71 0.68 # White
   Kd 0.725 0.71 0.68
   Ks 0 0 0
-  Ke 0 0 0
+  # Ke 12 12 12
+  ke 12 1 0
   
 
 newmtl tallBox
@@ -76,7 +77,8 @@ newmtl tallBox
   Ka 0.725 0.71 0.68 # White
   Kd 0.725 0.71 0.68
   Ks 0 0 0
-  Ke 0 0 0
+  # Ke 0 0 0
+  ke 0 12 1
 
 newmtl light
   Ns 10.0000
@@ -85,4 +87,5 @@ newmtl light
   Ka 0.78 0.78 0.78 # White
   Kd 0.78 0.78 0.78
   Ks 0 0 0
-  Ke 17 12 4
+  # Ke 17 12 4
+  ke 6 0 12

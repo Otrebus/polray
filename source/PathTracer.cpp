@@ -152,9 +152,11 @@ Color PathTracer::TracePath(const Ray& ray) const
         if(info.GetMaterial()->GetLight() == light)
         {
             if(sampledLight) // We already sampled with next event estimation
-                return finalColor;
+                return finalColor/lightWeight;
             else return pathColor*( info.GetNormal()*info.GetDirection() < 0
                         ? light->GetIntensity()/lightWeight : Color(0, 0, 0) );
+        } else if(info.GetMaterial()->GetLight()) {
+            return finalColor/lightWeight;
         }
 
         auto sample = material->GetSample(info, false);
@@ -168,7 +170,7 @@ Color PathTracer::TracePath(const Ray& ray) const
         else
         {
             Vector3d dummy;
-            finalColor += pathColor*light->NextEventEstimation(this, info, dummy, dummy, sample.component)/lightWeight;
+            finalColor += pathColor*light->NextEventEstimation(this, info, dummy, dummy, sample.component);
             sampledLight = true;
         }
         pathColor *= c/0.7f;
@@ -176,5 +178,5 @@ Color PathTracer::TracePath(const Ray& ray) const
     }   
     while(m_random.GetDouble(0, 1) < 0.7f);
     
-    return finalColor;
+    return finalColor/lightWeight;
 }

@@ -452,15 +452,11 @@ std::tuple<bool, TriangleMesh, std::vector<MeshLight*>> ReadFromFile(std::string
 			else {
 				if(materials[mtl]->light) {
 					isLightMesh = true;
-					if(!(curmat == materials[mtl]
-					     || curmat && curmat->light && materials[mtl]->light && curmat->light->GetIntensity() == materials[mtl]->light->GetIntensity())
-					)
-					{
-						meshLights.emplace_back((MeshLight*) materials[mtl]->light);
-					}
+					meshLights.emplace_back((MeshLight*) materials[mtl]->light);
 					currentMesh = meshLights.back()->mesh;
 				} else {
 					isLightMesh = false;
+					currentMesh = &mesh;
 				}
 				curmat = materials[mtl];
 			}

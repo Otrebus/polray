@@ -36,7 +36,7 @@ bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& inf
 
     info.direction = ray.direction;
     info.material = material;
-    info.normal = position_ - (ray.origin + ray.direction*t);
+    info.normal = (ray.origin + ray.direction*t) - position_;
     info.normal.Normalize();
     info.position = ray.origin + ray.direction*t + info.normal*eps;
     info.geometricnormal = info.normal;

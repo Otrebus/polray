@@ -20,6 +20,10 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
         area_ += (*it)->GetArea();
 
     triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+    std::vector<const Primitive*> v;
+    for(auto t : mesh->triangles)
+        v.push_back(t);
+    tree.Build(v);
     builtTree = true;
 }
 
@@ -36,9 +40,14 @@ MeshLight::MeshLight(Color intensity)
 MeshTriangle* MeshLight::PickRandomTriangle() const
 {
     if(!builtTree) {
+        area_ = 0;
         for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
             area_ += (*it)->GetArea();
         triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+        std::vector<const Primitive*> v;
+        for(auto t : mesh->triangles)
+            v.push_back(t);
+        tree.Build(v);
         builtTree = true;
     }
     double f = r.GetDouble(0, area_);
@@ -70,7 +79,7 @@ TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaSta
     {
         MeshTriangle* t = triangles[i];
         halfIndex = i;
-        if(areaSum > area/2)
+        if(areaSum + t->GetArea() > area/2)
             break;
         areaSum += t->GetArea();
     }
@@ -108,14 +117,42 @@ MeshLight::~MeshLight()
 }
 
 double MeshLight::Intersect(const Ray& ray) const
-{
-    // Not implemented
+{    
+    /*if(!builtTree) {
+        area_ = 0;
+        for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
+            area_ += (*it)->GetArea();
+        triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+        std::vector<const Primitive*> v;
+        for(auto t : mesh->triangles)
+            v.push_back(t);
+        tree.Build(v);
+        builtTree = true;
+    }
+    const Primitive* prim;
+    return tree.Intersect(ray, prim, 0, inf, false);*/
+
+    // Intersecting against lights might need a rethink
     return -inf;
 }
 
 bool MeshLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    // Not implemented
+    /*if(!builtTree) {
+        area_ = 0;
+        for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
+            area_ += (*it)->GetArea();
+        triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+        std::vector<const Primitive*> v;
+        for(auto t : mesh->triangles)
+            v.push_back(t);
+        tree.Build(v);
+        builtTree = true;
+    }
+
+    const Primitive* prim;
+    tree.Intersect(ray, prim, 0, inf, true);
+    return prim->GenerateIntersectionInfo(ray, info);*/
     return false;
 }
 
@@ -152,6 +189,13 @@ void MeshLight::Load(Bytestream& s)
 
 double MeshLight::GetArea() const
 {
+    if(!builtTree) {
+        area_ = 0;
+        for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
+            area_ += (*it)->GetArea();
+
+        triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+    }
     return area_;
 }
 
@@ -169,14 +213,16 @@ Color MeshLight::NextEventEstimation(const Renderer* renderer, const Intersectio
     double d = toLight.GetLength();
     Vector3d normal = info.GetNormal();
 
-    if(toLight*lightNormal_ < 0)
+    //if(toLight*lightNormal_ < 0)
+    if(toLight*lightNormal_ > 0)
+        lightNormal = -lightNormal;
     {
         double d = toLight.GetLength();
         toLight.Normalize();
 
         Ray lightRay = Ray(info.GetPosition(), toLight);
 
-        if(renderer->TraceShadowRay(lightRay, d))
+        if(renderer->TraceShadowRay(lightRay, (1-1e-6)*d))
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal_);

@@ -2,6 +2,7 @@
 #define MESHLIGHT_H
 
 #include "Light.h"
+#include "KDTree.h"
 
 class TriangleMesh;
 class MeshTriangle;
@@ -57,6 +58,7 @@ public:
     TriangleMesh* mesh;
 protected:
     mutable bool builtTree;
+    mutable KDTree tree;
     friend class Scene;
     virtual void AddToScene(Scene*);
 

@@ -49,9 +49,9 @@ Cubemap* cubemap;
 
 //#define INTERIOR
 //#define INTERIORSKY
-#define INTERIORINLIGHT
+//#define INTERIORINLIGHT
 //#define INTERIORFOG
-//#define BOX
+#define BOX
 //#define ROOM
 //#define EMPTYBOX
 //#define KITCHEN2
@@ -304,6 +304,12 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).GetLength(), 10.15));
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
+    //Vector3d camPos = Vector3d(116, 225, -248);
+    //Vector3d target = Vector3d(-38, 186, -947);
+    //Vector3d camdir = target-camPos;
+    //camdir.Normalize();
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+
 
     // tmp
     //Vector3d camPos = Vector3d(-43.9, 293.8, 43);
@@ -404,7 +410,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef INTERIORFOG
     auto s = std::shared_ptr<Scene> (new Scene("interior-open3.obj"));
@@ -1272,7 +1278,8 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     s->SetPartitioning(new BrutePartitioning());
 
-    SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
+    SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(0.5, 0, 0.8));
+    s->AddLight(boxLight);
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
 
     //auto a = new AshikhminShirley();
@@ -1292,7 +1299,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     //s->AddLight(boxLight);
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<LightTracer>(new LightTracer(s));
 #endif
 #ifdef BALLBOX
 

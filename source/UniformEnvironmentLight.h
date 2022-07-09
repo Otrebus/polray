@@ -28,10 +28,6 @@ public:
     Color GetIntensity() const;
 
     Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int sample) const;
-    Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int sample) const;
-    Color DirectHitMIS(const Renderer* renderer,
-                               const IntersectionInfo& lastInfo,
-                               const IntersectionInfo& thisInfo, int component) const;
 
 
     void SamplePoint (Vector3d& point, Vector3d& normal) const;
@@ -42,8 +38,8 @@ public:
     void Load(Bytestream& s);
 
     static UniformEnvironmentLight* Create(unsigned char);
-protected:
 
+protected:
     std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> GetProjectedSceneHull(Ray& ray, Vector3d normal) const;
     friend class Scene;
     double radius;

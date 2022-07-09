@@ -201,14 +201,3 @@ Color LightPortal::NextEventEstimation(const Renderer* renderer, const Intersect
             return color;
     return Color(0, 0, 0);
 }
-
-Color LightPortal::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const
-{
-    return Color(0, 0, 0); // TODO: implement
-}
-
-
-Color LightPortal::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const
-{
-    return 0; // TODO: implement
-}

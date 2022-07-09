@@ -36,10 +36,6 @@ public:
     virtual Color GetIntensity() const;
 
     virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int sample) const = 0;
-    virtual Color NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int sample) const = 0;
-    virtual Color DirectHitMIS(const Renderer* renderer,
-                               const IntersectionInfo& lastInfo,
-                               const IntersectionInfo& thisInfo, int component) const = 0;
 
     virtual void SamplePoint (Vector3d& point, Vector3d& normal) const = 0;
     virtual double GetArea() const = 0;

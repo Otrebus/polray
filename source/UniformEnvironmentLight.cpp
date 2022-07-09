@@ -145,16 +145,6 @@ Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, con
     return Color(0, 0, 0);
 }
 
-Color UniformEnvironmentLight::DirectHitMIS(const Renderer* renderer, const IntersectionInfo& lastInfo, const IntersectionInfo& thisInfo, int component) const
-{
-    return Color(0, 0, 0);
-}
-
-Color UniformEnvironmentLight::NextEventEstimationMIS(const Renderer* renderer, const IntersectionInfo& info, int component) const
-{
-    return Color(0, 0, 0);
-}
-
 std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformEnvironmentLight::GetProjectedSceneHull(Ray& ray, Vector3d normal) const
 {
     auto bb = scene->GetBoundingBox();

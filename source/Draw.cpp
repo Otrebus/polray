@@ -49,9 +49,9 @@ Cubemap* cubemap;
 
 //#define INTERIOR
 //#define INTERIORSKY
-//#define INTERIORINLIGHT
+#define INTERIORINLIGHT
 //#define INTERIORFOG
-#define BOX
+//#define BOX
 //#define ROOM
 //#define EMPTYBOX
 //#define KITCHEN2
@@ -1259,7 +1259,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     Matrix3d scale(0.035f,0,0,0,
                    0,0.035f,0,0,
                    0,0,0.035f,0,
-                   0,0,0,0.035f);
+                   0,0,0,0.035f);   
     Matrix3d move2(1,0,0,-0.4,
                    0,1,0,-0.7,
                    0,0,1,1.7,
@@ -1276,7 +1276,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     Random ballsC(0);
 
-    s->SetPartitioning(new BrutePartitioning());
+    //s->SetPartitioning(new BrutePartitioning());
 
     SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(0.5, 0, 0.8));
     s->AddLight(boxLight);

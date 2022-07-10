@@ -22,7 +22,7 @@ Scene::Scene()
 Scene::Scene(string f)
 {
 	auto [success, mesh, lights] = ReadFromFile(f, 0);
-	AddModel(&mesh);
+	AddModel(mesh);
     for(auto light : lights)
         AddLight(light);
 }

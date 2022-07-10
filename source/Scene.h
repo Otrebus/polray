@@ -52,6 +52,8 @@ public:
         friend void CsgCylinder::AddToScene(Scene& scene);
         friend void CsgSphere::AddToScene(Scene& scene);
         friend void CsgIntersection::AddToScene(Scene& scene);
+        friend void MeshLight::AddToScene(Scene* scene);
+        friend void SphereLight::AddToScene(Scene* scene);
     };
 
     // Another one, but for lights

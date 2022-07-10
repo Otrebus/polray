@@ -12,6 +12,7 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
     r.Seed(GetTickCount() + (int) this);
     material = new EmissiveMaterial();
     material->light = this;
+    material->emissivity = intensity;
     mesh = new TriangleMesh(fileName, material);
     intensity_ = intensity;
 
@@ -23,6 +24,7 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
     std::vector<const Primitive*> v;
     for(auto t : mesh->triangles)
         v.push_back(t);
+    mesh->materials.push_back(material);
     tree.Build(v);
     builtTree = true;
 }
@@ -32,9 +34,15 @@ MeshLight::MeshLight(Color intensity)
     r.Seed(GetTickCount() + (int) this);
     material = new EmissiveMaterial();
     material->light = this;
+    material->emissivity = intensity;
     mesh = new TriangleMesh();
+    mesh->materials.push_back(material);
     intensity_ = intensity;
     builtTree = false;
+}
+
+MeshLight::MeshLight()
+{
 }
 
 MeshTriangle* MeshLight::PickRandomTriangle() const
@@ -174,13 +182,22 @@ void MeshLight::Transform(const Matrix3d& m)
     mesh->Transform(m);
 }
 
-void MeshLight::Save(Bytestream& s) const
+void MeshLight::Save(Bytestream& stream) const
 {
-
+    // This could also be a hash table, for very large triangle meshes
+    stream << (unsigned char)ID_MESHLIGHT;
+    mesh->Save(stream);
+    stream << intensity_;
 }
-void MeshLight::Load(Bytestream& s)
-{
 
+void MeshLight::Load(Bytestream& stream)
+{
+    mesh = new TriangleMesh();
+    unsigned char dummy;
+    stream >> dummy;
+    mesh->Load(stream);
+    mesh->materials[0]->light = this;
+    stream >> intensity_;
 }
 
 double MeshLight::GetArea() const
@@ -198,7 +215,8 @@ double MeshLight::GetArea() const
 
 void MeshLight::AddToScene(Scene* scene)
 {
-    mesh->AddToScene(*scene);
+    for(auto& t : mesh->triangles)
+		Scene::PrimitiveAdder::AddPrimitive(*scene, t);
     Scene::LightAdder::AddLight(*scene, this);
 }
 

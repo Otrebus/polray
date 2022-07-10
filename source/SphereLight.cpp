@@ -105,7 +105,7 @@ void SphereLight::AddToScene(Scene* scene)
     Sphere* s = new Sphere(position_, Vector3d(0, 1, 0), 
                            Vector3d(0, 0, 1), radius_);
     Scene::LightAdder::AddLight(*scene, this);
-    scene->AddModel(s);
+    Scene::PrimitiveAdder::AddPrimitive(*scene, s);
     s->SetMaterial(material);
 }
 

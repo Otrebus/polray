@@ -410,7 +410,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef INTERIORFOG
     auto s = std::shared_ptr<Scene> (new Scene("interior-open3.obj"));
@@ -1278,7 +1278,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(0.5, 0, 0.8));
+    SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, 100*Color(0.5, 0, 0.8));
     s->AddLight(boxLight);
     //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
 

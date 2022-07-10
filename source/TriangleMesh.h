@@ -65,7 +65,7 @@ public:
 
 //protected:	
 	vector<MeshTriangle*> triangles;
-	vector<MeshVertex*> points;
+	vector<Vertex3d*> points;
     vector<Material*> materials;
 };
 

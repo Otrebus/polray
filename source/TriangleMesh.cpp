@@ -192,7 +192,7 @@ TriangleMesh::TriangleMesh(string file, Material* mat)
 	//logger.File("Reading from file");
 	//ReadFromFile(file, mat);
 	auto [success, mesh, meshLights] = ReadFromFile(file, mat);
-	*this = mesh;
+	*this = *mesh;
 }
 
 TriangleMesh::TriangleMesh()
@@ -233,7 +233,8 @@ void TriangleMesh::CalculateVertexNormals()
 
 	for(auto& p : points)
 	{
-		for(auto& t : p->triangles)
+		MeshVertex* pp = (MeshVertex*) p;
+		for(auto& t : pp->triangles)
 			totalnormal += t->GetNormal();
 		totalnormal.Normalize();
 		p->normal = totalnormal;
@@ -335,6 +336,8 @@ void TriangleMesh::Save(Bytestream& stream) const
     {
         unsigned int a, b, c;
         MeshTriangle* v = *it;
+
+		auto x = vertexMemToIndex[v->v0];
 
         stream << vertexMemToIndex[v->v0] 
                << vertexMemToIndex[v->v1] << vertexMemToIndex[v->v2];

@@ -8,6 +8,7 @@
 #include "Utils.h"
 #include <stack>
 #include <tuple>
+#include <set>
 
 bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 {
@@ -166,7 +167,7 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 	return true;
 }
 
-std::tuple<bool, TriangleMesh, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat)
+std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat)
 {
 	Material* curmat = 0;
 	map<string, Material*> materials;
@@ -174,10 +175,10 @@ std::tuple<bool, TriangleMesh, std::vector<MeshLight*>> ReadFromFile(std::string
 	string line;
 	myfile.open(file.c_str(), ios::out);
 
-	std::vector<MeshLight*> meshLights;
+	std::set<MeshLight*> meshLights;
 
-	TriangleMesh mesh;
-	TriangleMesh* currentMesh = &mesh;
+	TriangleMesh* mesh = new TriangleMesh();
+	TriangleMesh* currentMesh = mesh;
 
 	if(myfile.fail())
 	{
@@ -354,7 +355,7 @@ std::tuple<bool, TriangleMesh, std::vector<MeshLight*>> ReadFromFile(std::string
                                 MeshVertex* vold(v);
                                 v1->triangles.clear();
 								MeshVertex* v2 = new MeshVertex(*v);
-                                mesh.points.push_back(v2);
+                                currentMesh->points.push_back(v2);
 								v2->triangles.clear();
 								v1->normal = t1->GetNormal(); // Just the geometric normal for now, maybe averaged is better
 								v2->normal = t2->GetNormal();
@@ -452,30 +453,34 @@ std::tuple<bool, TriangleMesh, std::vector<MeshLight*>> ReadFromFile(std::string
 			else {
 				if(materials[mtl]->light) {
 					isLightMesh = true;
-					meshLights.emplace_back((MeshLight*) materials[mtl]->light);
-					currentMesh = meshLights.back()->mesh;
+					meshLights.emplace((MeshLight*) materials[mtl]->light);
+					currentMesh = ((MeshLight*) materials[mtl]->light)->mesh;
 				} else {
 					isLightMesh = false;
-					currentMesh = &mesh;
+					currentMesh = mesh;
 				}
 				curmat = materials[mtl];
 			}
 		}
 	}
 
-	for(auto& t : mesh.triangles) {
+	for(auto& t : mesh->triangles) {
 		for(auto vv : { &t->v0, &t->v1, &t->v2 }) {
 			auto& v = (*((MeshVertex**) vv));
 			if(replacement.find(v) == replacement.end()) {
 				auto oldv = v;
 				v = (MeshVertex*) new Vertex3d(v->pos, v->normal, v->texpos);
 				replacement[oldv] = (Vertex3d*) v;
+				mesh->points.push_back(v);
 				replacement[v] = v;
 			}
 			else
 				v = (MeshVertex*) replacement[v];
 		}
 	}
+	for(auto& p : mesh->points)
+		if(replacement.find((MeshVertex*)p) != replacement.end())
+			p = replacement[(MeshVertex*)p];
 
 	for(auto& m : meshLights) {
 		for(auto& t : m->mesh->triangles) {
@@ -485,17 +490,22 @@ std::tuple<bool, TriangleMesh, std::vector<MeshLight*>> ReadFromFile(std::string
 					auto oldv = v;
 					v = (MeshVertex*) new Vertex3d(v->pos, v->normal, v->texpos);
 					replacement[oldv] = (Vertex3d*) v;
+					m->mesh->points.push_back(v);
 					replacement[v] = v;
 				}
 				else
 					v = (MeshVertex*) replacement[v];
 			}
 		}
+		for(auto& p : m->mesh->points)
+			if(replacement.find((MeshVertex*)p) != replacement.end())
+				p = replacement[(MeshVertex*)p];
 	}
 
     for(auto it = materials.begin(); it != materials.end(); it++)
-        mesh.materials.push_back((*it).second);
+        mesh->materials.push_back((*it).second);
 
 	myfile.close();
-	return { true, mesh, meshLights };
+	auto meshLightVector = std::vector<MeshLight*>(meshLights.begin(), meshLights.end());
+	return { true, mesh, meshLightVector };
 }

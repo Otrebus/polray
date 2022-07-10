@@ -28,6 +28,7 @@ class MeshLight : public Light
 public:
     MeshLight(Color intensity, std::string fileName);
     MeshLight(Color intensity);
+    MeshLight();
     ~MeshLight();
     virtual Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const;
     void SamplePoint(Vector3d& point, Vector3d& Normal) const;

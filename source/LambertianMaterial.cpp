@@ -39,9 +39,7 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
 
     Vector3d N = adjoint ? N_g : N_s;
     Vector3d adjN = adjoint ? N_s : N_g;
-    Vector3d dir;
-
-    SampleHemisphereCos(r1, r2, N, dir);
+    Vector3d dir = SampleHemisphereCos(r1, r2, N);
 
     const Vector3d& w_o = dir;
     out.origin = info.GetPosition();

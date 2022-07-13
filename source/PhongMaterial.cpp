@@ -49,8 +49,7 @@ float df = Kd.GetMax();
         Vector3d N = adjoint ? N_g : N_s;
         Vector3d adjN = adjoint ? N_s : N_g;
 
-        Vector3d dir;
-        SampleHemisphereCos(r1, r2, N, dir);
+        Vector3d dir = SampleHemisphereCos(r1, r2, N);
 
         const Vector3d& w_o = dir;
 
@@ -91,9 +90,8 @@ float df = Kd.GetMax();
         Vector3d adjN = adjoint ? N_s : N_g;
 
         Vector3d up = Reflect(info.GetDirection(), N_s);
-        Vector3d right, forward;
 
-        MakeBasis(up, right, forward);
+        auto [right, forward] = MakeBasis(up);
         Vector3d base = forward*cos(r1) + right*sin(r1);
 
         auto out = Ray(info.GetPosition(), right*std::sin(r1)*sin(r2) + forward*std::cos(r1)*sin(r2) + up*std::cos(r2));

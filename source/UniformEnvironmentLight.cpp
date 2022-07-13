@@ -148,9 +148,8 @@ Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, con
 std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformEnvironmentLight::GetProjectedSceneHull(Ray& ray, Vector3d normal) const
 {
     auto bb = scene->GetBoundingBox();
-    Vector3d right, forward;
 
-    MakeBasis(normal, right, forward);
+    auto [right, forward] = MakeBasis(normal);
 
     Vector3d p[8] = {
         { bb.c2.x, bb.c1.y, bb.c2.z },

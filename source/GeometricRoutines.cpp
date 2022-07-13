@@ -108,52 +108,30 @@ Vector3d Reflect(const Vector3d& incident, const Vector3d& normal)
     return incident - normal*(incident*normal)*2;
 }
 
-double Refract(double n1, double n2, Vector3d& _normal, Vector3d& incident, Vector3d& refraction)
+std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
 {
-    double R;
-    Vector3d& normal = _normal;
-    double cosi = normal*incident*-1;
-    double d = 1-(n1/n2)*(n1/n2)*(1-cosi*cosi);
-    if(d < 0)
-        return 1.0f;
-    refraction = incident * (n1/n2) + normal * ( cosi*(n1/n2) - sqrt(d) );
-    double cost = -(refraction*(normal));
-
-    refraction.Normalize();
-
-    double Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
-    Rs*=Rs;
-    double Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
-    Rp*=Rp;
-    R = (Rs+Rp)/2.0f;
-    return R;
-}
-
-void MakeBasis(const Vector3d& givenVector, Vector3d& v2, Vector3d& v3)
-{
-    v2 = givenVector^Vector3d(1, 0, 0);
+    auto v2 = givenVector^Vector3d(1, 0, 0);
 
     if(v2.GetLengthSquared() < 0.0001f)
         v2 = givenVector^Vector3d(0, 0, 1);
 
     v2.Normalize();
-    v3 = givenVector^v2;
+    auto v3 = givenVector^v2;
     v3.Normalize();
+    return { v2, v3 };
 }
 
-void SampleHemisphereCos(double r1, double r2, const Vector3d& apex, Vector3d& sample)
+Vector3d SampleHemisphereCos(double r1, double r2, const Vector3d& apex)
 {
-    Vector3d right, forward;
-    MakeBasis(apex, right, forward);
+    auto [right, forward] = MakeBasis(apex);
 
-    sample = forward*cos(r1*2*pi)*sqrt(r2) + right*sin(r1*2*pi)*sqrt(r2) 
+    return forward*cos(r1*2*pi)*sqrt(r2) + right*sin(r1*2*pi)*sqrt(r2) 
              + apex*sqrt(1-r2) + apex*eps;
 }
 
 Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
 {
-    Vector3d right, forward;
-    MakeBasis(apex, right, forward);
+    auto [right, forward] = MakeBasis(apex);
 
     return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + right*sin(r1*2*pi)*sqrt(1-r2*r2) 
              + apex*r2;

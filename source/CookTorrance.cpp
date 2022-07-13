@@ -53,8 +53,7 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool adjoint) const
 
     auto N = N_s;
 
-    Vector3d right, forward;
-    MakeBasis(N_s, right, forward);
+    auto [right, forward] = MakeBasis(N_s);
 
     float r1 = rnd.GetDouble(0.0f, 2*F_PI);
     float r2 = rnd.GetDouble(0.0f, 1);

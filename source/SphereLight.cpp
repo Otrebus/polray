@@ -51,13 +51,12 @@ double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
 {
     SamplePoint(ray.origin, normal);
-    Vector3d right, forward;
-    MakeBasis(normal, right, forward);
+    auto [right, forward] = MakeBasis(normal);
 
     areaPdf = 1/GetArea();
 
     double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
-    SampleHemisphereCos(r1, r2, normal, ray.direction);
+    ray.direction = SampleHemisphereCos(r1, r2, normal);
     pdf = abs(ray.direction*normal)/M_PI;
 
     return Color::Identity*F_PI;

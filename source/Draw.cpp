@@ -410,7 +410,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef INTERIORFOG
     auto s = std::shared_ptr<Scene> (new Scene("interior-open3.obj"));

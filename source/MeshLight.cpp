@@ -105,13 +105,12 @@ Color MeshLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& 
 {
     SamplePoint(ray.origin, normal);
 
-    Vector3d right, forward;
-    MakeBasis(normal, right, forward);
+    auto [right, forward] = MakeBasis(normal);
 
     areaPdf = 1.0f/GetArea();
 
     double r1 = r.GetDouble(0, 1), r2 = r.GetDouble(0, 1);
-    SampleHemisphereCos(r1, r2, normal, ray.direction);
+    ray.direction = SampleHemisphereCos(r1, r2, normal);
     anglePdf = abs(ray.direction*normal)/pi;
 
     return Color::Identity*pi;

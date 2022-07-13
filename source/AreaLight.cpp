@@ -140,8 +140,7 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& angle
 
     ray.origin = pos + c1*x + c2*y + eps*normal;
 
-    Vector3d right, forward;
-    MakeBasis(normal, right, forward);
+    auto [right, forward] = MakeBasis(normal);
 
     n = normal;
     areaPdf = 1.0f/GetArea();

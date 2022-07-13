@@ -57,8 +57,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         Vector3d N = adjoint ? N_g : N_s;
         Vector3d adjN = adjoint ? N_s : N_g;
 
-        Vector3d dir;
-        SampleHemisphereCos(r1, r2, N, dir);
+        auto dir = SampleHemisphereCos(r1, r2, N);
         const Vector3d& w_o = dir;
 
         double pdf = w_o*N/F_PI;
@@ -102,8 +101,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         Vector3d N = adjoint ? N_g : N_s;
         Vector3d adjN = adjoint ? N_s : N_g;
 
-        Vector3d right, forward;
-        MakeBasis(N_s, right, forward);
+        auto [right, forward] = MakeBasis(N_s);
         Vector3d hv = sin(r2)*(forward*cos(r1) + right*sin(r1)) + cos(r2)*N_s;
 
         Ray outRay;

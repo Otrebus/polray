@@ -5,6 +5,7 @@
 #include "color.h"
 #include "intersectioninfo.h"
 #include "EmissiveMaterial.h"
+#include "Utils.h"
 #include <memory>
 #include <vector>
 
@@ -26,9 +27,7 @@ public:
     Light();
     Light(Color intensity);
     virtual ~Light() {}
-    //virtual Color CalculateSurfaceRadiance(const Vector3d&, const IntersectionInfo&) = 0;
-    virtual Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const = 0;
-    //  virtual void SamplePoint(Vector3d& point, Vector3d& Normal) const = 0;
+    virtual std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SampleRay() const = 0;
 
     virtual double Intersect(const Ray& ray) const = 0;
     virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
@@ -38,7 +37,7 @@ public:
 
     virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int sample) const = 0;
 
-    virtual void SamplePoint (Vector3d& point, Vector3d& normal) const = 0;
+    virtual std::tuple<Vector3d, Vector3d> SamplePoint() const = 0;
     virtual double GetArea() const = 0;
     virtual void AddToScene(Scene* scene) = 0;
 

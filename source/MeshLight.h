@@ -30,8 +30,8 @@ public:
     MeshLight(Color intensity);
     MeshLight();
     ~MeshLight();
-    virtual Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const;
-    void SamplePoint(Vector3d& point, Vector3d& Normal) const;
+    std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SampleRay() const;
+    std::tuple<Point, Normal> SamplePoint() const;
 
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
@@ -47,8 +47,6 @@ public:
     virtual void Load(Bytestream& s);
 
     void Transform(const Matrix3d& m);
-
-    static Light* Create(unsigned char);
 
     void AddPortal(const Vector3d& pos, const Vector3d& v1, const Vector3d& v2);
 

@@ -19,8 +19,8 @@ public:
     SphereLight(Vector3d position, double radius, Color intensity);
     ~SphereLight();
 
-    Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& pdf) const;
-    void SamplePoint(Vector3d& point, Vector3d& Normal) const;
+    std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SampleRay() const;
+    std::tuple<Point, Normal> SamplePoint() const;
 
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
@@ -34,8 +34,6 @@ public:
 
     void Save(Bytestream& s) const;
     void Load(Bytestream& s);
-
-    static Light* Create(unsigned char);
 
 protected:
     virtual void SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& Normal) const;

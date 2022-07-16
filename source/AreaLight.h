@@ -6,7 +6,6 @@
 #include "Random.h"
 #include <memory>
 
-
 class Renderer;
 class Scene;
 class EmissiveMaterial;
@@ -17,8 +16,7 @@ public:
     AreaLight();
     virtual ~AreaLight() {}
     AreaLight(const Vector3d& pos, const Vector3d& c1, const Vector3d& c2, const Color& color);
-    Color CalculateSurfaceRadiance(const Vector3d&, const IntersectionInfo&);
-    //Color SamplePoint (Vector3d& point, Vector3d& normal) const;
+
     Vector3d GetNormal() const;
 
     double Intersect(const Ray& ray) const;
@@ -28,8 +26,8 @@ public:
 
     Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const;
 
-    Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const;
-    void SamplePoint(Vector3d& point, Vector3d& Normal) const;
+    std::tuple<Point, Normal> SamplePoint() const;
+    std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SampleRay() const;
 
     void Save(Bytestream& s) const;
     void Load(Bytestream& s);

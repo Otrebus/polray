@@ -129,7 +129,7 @@ double AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return ray.direction*GetNormal()/F_PI;
 }
 
-Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& anglePdf) const
+std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> AreaLight::SampleRay() const
 {
     Vector3d normal = c1^c2;
     normal.Normalize();
@@ -138,21 +138,23 @@ Color AreaLight::SampleRay(Ray& ray, Vector3d& n, double& areaPdf, double& angle
     double x = r.GetDouble(0, 1);
     double y = r.GetDouble(0, 1);
 
-    ray.origin = pos + c1*x + c2*y + eps*normal;
-
     auto [right, forward] = MakeBasis(normal);
-
-    n = normal;
-    areaPdf = 1.0f/GetArea();
 
     double r1 = r.GetDouble(0, 2*F_PI);
     double r2 = r.GetDouble(0, 1.0);
+
+    Ray ray;
+    ray.origin = pos + c1*x + c2*y + eps*normal;
     ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) + normal*sqrt(1-r2);
-    anglePdf = abs(ray.direction*normal)/(F_PI);
-    return Color(1, 1, 1)*(F_PI);
+
+    double areaPdf = 1.0f/GetArea();
+    double anglePdf = abs(ray.direction*normal)/(F_PI);
+    Color color = Color(1, 1, 1)*(F_PI);
+
+    return { ray, color, normal, areaPdf, anglePdf };
 }
 
-void AreaLight::SamplePoint(Vector3d& point, Vector3d& n) const
+std::tuple<Point, Normal> AreaLight::SamplePoint() const
 {
     double x, y;
     Vector3d normal = c1^c2;
@@ -161,10 +163,8 @@ void AreaLight::SamplePoint(Vector3d& point, Vector3d& n) const
 
     x = r.GetDouble(0, 1);
     y = r.GetDouble(0, 1);
-    //dir = Vector3d(r.Getdouble(-1, 1), r.Getdouble(-1, 1), r.Getdouble(-1, 1));
 
-    point = pos + c1*x + c2*y + eps*normal;
-    n = normal;
+    return { pos + c1*x + c2*y + eps*normal, normal };
 }
 
 Vector3d AreaLight::GetNormal() const
@@ -186,8 +186,7 @@ void AreaLight::Load(Bytestream& stream)
 
 Color AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
 {
-    Vector3d lightPoint, lightNormal;
-    SamplePoint(lightPoint, lightNormal);
+    auto [lightPoint, lightNormal] = SamplePoint();
     lp = lightPoint;
     ln = lightNormal;
 

@@ -162,15 +162,16 @@ int BDPT::BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) co
     BDVertex* lightPoint = new BDVertex();
     double rr = 0.7f;
     double lastPdf;
-    Color lastSample = light->SampleRay(lightPoint->out, lightPoint->info.normal, lightPoint->pdf, lastPdf);
+    auto [ray, color, normal, areaPdf, anglePdf] = light->SampleRay();
+    lightPoint->out = ray;
+    lightPoint->pdf = areaPdf;
 
     lightPoint->alpha = light->GetArea()*light->GetIntensity();
     lightPoint->rr = 1;
-    lightPoint->info.normal = lightPoint->info.normal;
-    lightPoint->info.geometricnormal = lightPoint->info.normal;
+    lightPoint->info.normal = lightPoint->info.geometricnormal = normal;
     lightPoint->info.position = lightPoint->out.origin;
 
-    lightPoint->sample = Sample(lastSample, lightPoint->out, lastPdf, 0, false, 0);
+    lightPoint->sample = Sample(color, lightPoint->out, anglePdf, 0, false, 0);
     path.push_back(lightPoint);
     std::vector<BDSample> dummy;
 

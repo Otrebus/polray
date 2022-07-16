@@ -95,7 +95,7 @@ double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return 0;
 }
 
-Color LightPortal::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
+std::tuple<Ray, Color, Vector3d, double, double> LightPortal::SampleRay() const
 {
     // Pick the portal that we will sample the light through
     double areaSum = 0;
@@ -120,30 +120,29 @@ Color LightPortal::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double
     auto portalPos = portal.pos + portal.v1*x + portal.v2*y + (0.0001)*portalNormal;
 
     // Sample the light and calculate the resulting pdfs
-    Ray lightRay;
-    Vector3d lightNormal;
-    double lightAreaPdf, lightAnglePdf;
-    auto color = light->SampleRay(lightRay, lightNormal, lightAreaPdf, lightAnglePdf);
+    auto [lightRay, color, normal, lightAreaPdf, lightAnglePdf] = light->SampleRay();
+
     auto d = (portalPos-lightRay.origin).GetLength();
-    ray = Ray(lightRay.origin, (portalPos-lightRay.origin).Normalized());
+    Ray ray(lightRay.origin, (portalPos-lightRay.origin).Normalized());
 
     // TODO: this pdf calculation might want to be different for different lights
     // TODO: we're essentially undoing the sampling of the light source here
     auto dirPdf = d*d/(std::abs(portalNormal*ray.direction)*areaSum);
-    areaPdf = lightAreaPdf;
-    normal = lightNormal;
-    pdf = dirPdf;
-    if(lightNormal*ray.direction < 0) {
+    double areaPdf = lightAreaPdf;
+    double pdf = dirPdf;
+    if(normal*ray.direction < 0) {
         pdf = 0;
         areaPdf = 0;
-        return Color(0, 0, 0);
+        return { ray, Color::Black, normal, areaPdf, pdf };
     }
-    return std::abs(lightNormal*ray.direction)*Color(1, 1, 1)/dirPdf;
+
+    return { ray, std::abs(normal*ray.direction)*Color(1, 1, 1)/dirPdf, normal, areaPdf, pdf };
 }
 
-void LightPortal::SamplePoint(Vector3d& point, Vector3d& normal) const
+std::tuple<Point, Normal> LightPortal::SamplePoint() const
 {
     // Seems not to be used by any other light
+    return { {}, {} };
 }
 
 void LightPortal::Save(Bytestream& stream) const

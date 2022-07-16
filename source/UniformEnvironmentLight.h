@@ -18,9 +18,8 @@ public:
     virtual ~UniformEnvironmentLight() {}
     UniformEnvironmentLight(const Vector3d& position, double radius, const Color& color);
 
-    Color SampleRay(Ray& ray, Vector3d& Normal, double& areaPdf, double& anglePdf) const;
-     
-    Vector2d point_on_triangle(Vector2d, Vector2d, Vector2d) const;
+    std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SampleRay() const;
+
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
@@ -29,15 +28,12 @@ public:
 
     Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int sample) const;
 
-
-    void SamplePoint (Vector3d& point, Vector3d& normal) const;
+    std::tuple<Point, Normal> SamplePoint() const;
     double GetArea() const;
     void AddToScene(Scene*);
 
     void Save(Bytestream& s) const;
     void Load(Bytestream& s);
-
-    static UniformEnvironmentLight* Create(unsigned char);
 
 protected:
     std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> GetProjectedSceneHull(Ray& ray, Vector3d normal) const;

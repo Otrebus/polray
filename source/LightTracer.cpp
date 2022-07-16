@@ -30,11 +30,9 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         int ypixel = (int)yres;
 
         auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
-        Ray ray; 
-        Vector3d lightNormal;
+        auto [ray, pathColor, lightNormal, _, __] = light->SampleRay();
 
-        Color pathColor = light->SampleRay(ray, lightNormal, dummydouble, dummydouble)*light->GetArea()*light->GetIntensity(); // First direction is from the light source
-        ray.direction.Normalize();
+        pathColor *= light->GetArea()*light->GetIntensity(); // First direction is from the light source
 
         double u, v;
         Vector3d lensPoint;

@@ -54,11 +54,13 @@ bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, Intersect
     return true;
 }
 
-Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
+std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> UniformEnvironmentLight::SampleRay() const
 {
-    SamplePoint(ray.origin, normal);
+    Ray ray;
+    auto [position, normal] = SamplePoint();
+    ray.origin = position;
     
-    areaPdf = 1/GetArea();
+    double areaPdf = 1/GetArea();
 
     auto [h, A, right, forward, cv] = GetProjectedSceneHull(ray, normal);
 
@@ -78,8 +80,8 @@ Color UniformEnvironmentLight::SampleRay(Ray& ray, Vector3d& normal, double& are
             auto p3 = right*p.x + forward*p.y + pp;
             auto dir = (p3-ray.origin);
             ray.direction = dir.Normalized();
-            pdf = dir.GetLengthSquared()/(ray.direction*n)/A;
-            return (ray.direction*n)*Color::Identity/pdf;
+            double anglePdf = dir.GetLengthSquared()/(ray.direction*n)/A;
+            return { ray, (ray.direction*n)*Color::Identity/anglePdf, normal, areaPdf, anglePdf };
         }
     }
 }
@@ -95,12 +97,13 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
     return r*r/std::abs(out*n)/A;
 }
 
-void UniformEnvironmentLight::SamplePoint(Vector3d& point, Vector3d& normal) const
+std::tuple<Point, Normal> UniformEnvironmentLight::SamplePoint() const
 {
     auto r1 = random.GetDouble(0, 1), r2 = random.GetDouble(0, 1);
     auto pos = SampleSphereUniform(r1, r2);
-    normal = -pos;
-    point = position + pos*radius + normal*eps;
+    auto normal = -pos;
+    auto point = position + pos*radius + normal*eps;
+    return { point, normal };
 }
 
 Color UniformEnvironmentLight::GetIntensity() const 
@@ -124,8 +127,7 @@ void UniformEnvironmentLight::Load(Bytestream& s)
 
 Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
 {
-    Vector3d lightPoint, lightNormal;
-    SamplePoint(lightPoint, lightNormal);
+    auto [lightPoint, lightNormal] = SamplePoint();
     auto toLight = lightPoint - info.GetPosition();
     Ray lightRay = Ray(info.GetPosition(), toLight);
     double d = toLight.GetLength()*(1.-1.e-6);

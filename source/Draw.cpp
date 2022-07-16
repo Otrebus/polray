@@ -49,14 +49,14 @@ Cubemap* cubemap;
 
 //#define INTERIOR
 //#define INTERIORSKY
-#define INTERIORINLIGHT
+//#define INTERIORINLIGHT
 //#define INTERIORFOG
 //#define BOX
 //#define ROOM
 //#define EMPTYBOX
 //#define KITCHEN2
 //#define WINDOWBOX
-//#define WINDOWBOX2
+#define WINDOWBOX2
 //#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
@@ -549,7 +549,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
 
     auto skyLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 100000, 3.5*Color(0.9, 1.2, 1.5));
-    auto sunLight = new SphereLight(Vector3d(-40, 16, 18)*2000, 500, 600*Color(255, 247, 223));
+    auto sunLight = new SphereLight(Vector3d(-40, 16, 18)*2000, 500, 2400*Color(255, 247, 223));
     auto inLight = new SphereLight(Vector3d(-80, -25, 90), 10, Color(2500, 2500, 2500));
     //auto inLight = new AreaLight(Vector3d(-80, 25, 90), Vector3d(0.0, 0.0, 4), Vector3d(0, 4, 0), Color(4000, 4000, 4000));
 
@@ -652,7 +652,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
     //portalLight->SetLight(boxLight);
 
-    //s->AddLight(portalLight);
+    s->AddLight(portalLight);
     s->AddLight(portalLight2);
 
     //auto a = new PhongMaterial();
@@ -696,7 +696,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     s->AddModel(sphere2);*/
 
-    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 
@@ -748,9 +748,12 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //auto boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(3500, 3500, 3500));
     //portalLight->SetLight(boxLight);
 
+    s->AddLight(portalLight);
+    s->AddLight(portalLight2);
+
     //s->AddLight(fakeSkyLight);
     //s->AddLight(skyLight);
-    s->AddLight(skyLight);
+    //s->AddLight(skyLight);
     //s->AddLight(sunLight);
 
     //auto a = new PhongMaterial();
@@ -1299,7 +1302,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     //s->AddLight(boxLight);
 
-    r = std::shared_ptr<LightTracer>(new LightTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef BALLBOX
 

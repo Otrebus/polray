@@ -48,26 +48,31 @@ double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return std::max(0.0, (out*info.normal)/M_PI);
 }
 
-Color SphereLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& pdf) const
+std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SphereLight::SampleRay() const
 {
-    SamplePoint(ray.origin, normal);
-    auto [right, forward] = MakeBasis(normal);
+    Ray ray;
 
-    areaPdf = 1/GetArea();
+    auto [point, normal] = SamplePoint();
+    ray.origin = point;
+    auto [right, forward] = MakeBasis(normal);
 
     double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
-    pdf = abs(ray.direction*normal)/M_PI;
+    double anglePdf = abs(ray.direction*normal)/M_PI;
+    double areaPdf = 1/GetArea();
 
-    return Color::Identity*F_PI;
+    return { ray, Color::Identity*F_PI, normal, areaPdf, anglePdf };
 }
 
-void SphereLight::SamplePoint(Vector3d& point, Vector3d& normal) const
+std::tuple<Point, Normal> SphereLight::SamplePoint() const
 {
     auto r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
     auto pos = SampleSphereUniform(r1, r2);
-    normal = pos;
-    point = position_ + pos*radius_ + normal*eps;
+
+    auto normal = pos;
+    auto point = position_ + pos*radius_ + normal*eps;
+
+    return { point, normal };
 }
 
 void SphereLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const

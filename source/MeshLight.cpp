@@ -101,19 +101,22 @@ TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaSta
     return node;
 }
 
-Color MeshLight::SampleRay(Ray& ray, Vector3d& normal, double& areaPdf, double& anglePdf) const
+std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> MeshLight::SampleRay() const
 {
-    SamplePoint(ray.origin, normal);
+    Ray ray;
+    double areaPdf, anglePdf;
+
+    auto [point, normal] = SamplePoint();
+    ray.origin = point;
 
     auto [right, forward] = MakeBasis(normal);
-
-    areaPdf = 1.0f/GetArea();
-
     double r1 = r.GetDouble(0, 1), r2 = r.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
-    anglePdf = abs(ray.direction*normal)/pi;
 
-    return Color::Identity*pi;
+    anglePdf = abs(ray.direction*normal)/pi;
+    areaPdf = 1.0f/GetArea();
+
+    return { ray, Color::Identity*pi, normal, areaPdf, anglePdf };
 }
 
 MeshLight::~MeshLight()
@@ -165,15 +168,20 @@ double MeshLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return out*info.geometricnormal/F_PI;
 }
 
-void MeshLight::SamplePoint(Vector3d& point, Vector3d& normal) const
+std::tuple<Point, Normal> MeshLight::SamplePoint() const
 {
     MeshTriangle* t = PickRandomTriangle();
+
     double u = sqrt(r.GetDouble(0, 1));
     double v = r.GetDouble(0, 1);
+
     Vector3d e1 = t->v1->pos - t->v0->pos;
     Vector3d e2 = t->v2->pos - t->v0->pos;
-    normal = t->GetNormal();
-    point = t->v0->pos + u*(e1 + v*(e2-e1)) + eps*normal;
+
+    auto normal = t->GetNormal();
+    auto point = t->v0->pos + u*(e1 + v*(e2-e1)) + eps*normal;
+
+    return { point, normal };
 }
 
 void MeshLight::Transform(const Matrix3d& m)
@@ -221,8 +229,7 @@ void MeshLight::AddToScene(Scene* scene)
 
 Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const
 {
-    Vector3d lightPoint_, lightNormal_;
-    SamplePoint(lightPoint_, lightNormal_);
+    auto [lightPoint_, lightNormal_] = SamplePoint();
     Vector3d toLight = lightPoint_ - info.GetPosition();
     double d = toLight.GetLength();
     Vector3d normal = info.GetNormal();

@@ -1,5 +1,4 @@
 Make various functions return a tuple instead of taking output parameters
-Change the DirectHitMIS etc stuff
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
 Read light sources from .mtl files
@@ -15,6 +14,7 @@ Fix the friend/attourney etc relationships and private fields in general
 (mostly for "fun") Make light portals work inside scenes
 Add physical camera to bdpt
 Add check that all primitives have materials, in scene
+- Change the DirectHitMIS etc stuff
 - Make mr. lightportal use next event estimation
 - Try including rr with mis o
 - Investigate BDPT fireflies

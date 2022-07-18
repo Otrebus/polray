@@ -5,7 +5,7 @@
 #include "vector3d.h"
 #include "Ray.h"
 
-void ClipPolygonToAAP(int axis, int side, double position, std::vector<Vector3d>& input);
+void ClipPolygonToAAP(int axis, bool side, double position, std::vector<Vector3d>& input);
 Vector3d Reflect(const Vector3d& incident, const Vector3d& normal);
 std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector);
 Vector3d SampleHemisphereCos(double r1, double r2, const Vector3d& apex);

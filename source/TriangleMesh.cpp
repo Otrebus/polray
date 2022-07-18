@@ -244,19 +244,14 @@ void TriangleMesh::CalculateVertexNormals()
 
 bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
 {
-	const int positive = 1;
-	const int negative = -1;
-	vector<Vector3d> points;
-	points.push_back(v0->pos);	
-	points.push_back(v1->pos);
-	points.push_back(v2->pos);
+	vector<Vector3d> points = { v0->pos, v1->pos, v2->pos };
 
-	ClipPolygonToAAP(0, positive, clipbox.c1.x, points); // Left side of the bounding box
-	ClipPolygonToAAP(0, negative, clipbox.c2.x, points); // Right
-	ClipPolygonToAAP(1, positive, clipbox.c1.y, points); // Bottom
-	ClipPolygonToAAP(1, negative, clipbox.c2.y, points); // Top
-	ClipPolygonToAAP(2, positive, clipbox.c1.z, points); // Front
-	ClipPolygonToAAP(2, negative, clipbox.c2.z, points); // Back
+	ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
+	ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
+	ClipPolygonToAAP(1, true, clipbox.c1.y, points); // Bottom
+	ClipPolygonToAAP(1, false, clipbox.c2.y, points); // Top
+	ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
+	ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
 	resultbox.c1.x = numeric_limits<double>::infinity();
 	resultbox.c2.x = -numeric_limits<double>::infinity();

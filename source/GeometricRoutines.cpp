@@ -11,93 +11,34 @@ using namespace std;
 // Clips a polygon to an axis aligned plane (apparently this is the
 // Sutherman-Hodgeman algorithm)
 //-----------------------------------------------------------------------------
-void ClipPolygonToAAP(int axis, int side, double position, vector<Vector3d>& input)
+void ClipPolygonToAAP(int axis, bool side, double pos, vector<Vector3d>& input)
 {
     vector<Vector3d> output;
     output.reserve(6);
+    const int& a = axis;
 
-    if(side == 1) // Clip away the negative side of the plane
+    for(vector<Vector3d>::iterator it = input.begin(); it < input.end(); it++)
     {
-        for(vector<Vector3d>::iterator it = input.begin(); it < input.end(); it++)
-        {
-            Vector3d s, e; // Start and end vectors for this line segment
-            if(it + 1 == input.end())
-            {
-                s = *it;
-                e = input.front();
-            }
-            else
-            {
-                s = *it;
-                e = it[1];
-            }
-            if(s[axis] == position && e[axis] == position)
-            {   // Planar segment, keep it on the plane
-                output.push_back(e);
-                continue;
-            }
+        Vector3d s = *it, e; // Start and end vectors for this line segment
+        e = it + 1 == input.end() ? input.front() : it[1];
 
-            else if(position <= s[axis] && position <= e[axis])
-            {   // Both start and end vectors are inside the clip region, add the end
-                // vector to the output (the for loop has already taken care of the first part
-                // or will revisit it in the first if statement above as the last point)
-                output.push_back(e);
-                continue;
-            }
-            else if(position >= s[axis] && position > e[axis])
-                continue; // Both are to be clipped away
+        if(s[a] == pos && e[a] == pos)
+            output.push_back(e); // Planar segment, keep it on the plane
 
-            // The line segment is being clipped, determine which points to add to output
-            double t = (position - s[axis])/(e[axis]-s[axis]);
+        else if(side && pos <= s[a] && pos <= e[a] || !side && pos >= s[a] && pos >= e[a])
+            // Both start and end vectors are inside the clip region, add the end vector to output
+            output.push_back(e);
+
+        else if(!(side && pos >= s[a] && pos > e[a] || !side && pos <= s[a] && pos < e[a]))
+        {   // The line segment is being clipped, determine which points to add to output
+            double t = (pos - s[a])/(e[a]-s[a]);
             Vector3d splitpoint = t*(e - s) + s;
-            if(s[axis] < position)
-            {
-                output.push_back(splitpoint);
-                output.push_back(e);
-            }
-            else if(s[axis] > position)
-                output.push_back(splitpoint);
-        }
-    }
-    if(side == -1)
-    {
-        for(vector<Vector3d>::iterator it = input.begin(); it < input.end(); it++)
-        {
-            Vector3d s, e;
-            if(it + 1 == input.end())
-            {
-                s = *it;
-                e = input.front();
-            }
-            else
-            {
-                s = *it;
-                e = it[1];
-            }
-            if(s[axis] == position && e[axis] == position)
-            {   
-                output.push_back(e);
-                continue;
-            }
-            else if(position >= s[axis] && position >= e[axis])
-            {
-                output.push_back(e);
-                continue;
-            }
-            else if(position <= s[axis] && position < e[axis])
-                continue;
 
-            double t = (position - s[axis])/(e[axis]-s[axis]);
-            Vector3d splitpoint = t*(e - s) + s;
-            if(s[axis] > position)
-            {
+            if(side && s[a] < pos || !side && s[a] > pos)
+                output.insert(output.end(), { splitpoint, e });
+
+            else if(side && s[a] > pos || !side && s[a] < pos)
                 output.push_back(splitpoint);
-                output.push_back(e);
-            }
-            else if(s[axis] < position)
-            {
-                output.push_back(splitpoint);
-            }
         }
     }
     input = output;
@@ -115,26 +56,21 @@ std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
     if(v2.GetLengthSquared() < 0.0001f)
         v2 = givenVector^Vector3d(0, 0, 1);
 
-    v2.Normalize();
-    auto v3 = givenVector^v2;
-    v3.Normalize();
-    return { v2, v3 };
+    return { v2.Normalized(), (givenVector^v2).Normalized() };
 }
 
 Vector3d SampleHemisphereCos(double r1, double r2, const Vector3d& apex)
 {
     auto [right, forward] = MakeBasis(apex);
 
-    return forward*cos(r1*2*pi)*sqrt(r2) + right*sin(r1*2*pi)*sqrt(r2) 
-             + apex*sqrt(1-r2) + apex*eps;
+    return forward*cos(r1*2*pi)*sqrt(r2) + right*sin(r1*2*pi)*sqrt(r2) + apex*sqrt(1-r2) + apex*eps;
 }
 
 Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
 {
     auto [right, forward] = MakeBasis(apex);
 
-    return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + right*sin(r1*2*pi)*sqrt(1-r2*r2) 
-             + apex*r2;
+    return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + right*sin(r1*2*pi)*sqrt(1-r2*r2) + apex*r2;
 }
 
 Vector3d SampleSphereUniform(double r1, double r2)
@@ -145,18 +81,17 @@ Vector3d SampleSphereUniform(double r1, double r2)
     return Vector3d(r*cos(u), r*sin(u), z);
 }
 
-double IntersectSphere(const Vector3d& position, double radius, const Ray& ray) {
-    double t;
+double IntersectSphere(const Vector3d& position, double radius, const Ray& ray)
+{
     Vector3d dir(ray.direction);
-    Vector3d vec = ray.origin - position;
+    Vector3d vec(ray.origin - position);
 
     double C = vec*vec - radius*radius;
     double B = 2*(vec*dir);
     double A = dir*dir;
-
     double D = (B*B/(4*A) - C)/A;
 
-    t = -B/(2*A) - sqrt(D);
+    double t = -B/(2*A) - sqrt(D);
 
     if(D > 0) {
         if(t < eps)
@@ -166,14 +101,13 @@ double IntersectSphere(const Vector3d& position, double radius, const Ray& ray) 
     return -inf;
 }
 
-bool turnsRight(Vector2d a, Vector2d b, Vector2d c) {
-    return (b.x-a.x)*(c.y-a.y) - (c.x-a.x)*(b.y-a.y) < 0;
-}
 
-std::vector<Vector2d> convexHull(std::vector<Vector2d> v) {
+std::vector<Vector2d> convexHull(std::vector<Vector2d> v)
+{
     std::vector<Vector2d> ps, ps2; // Partial and full convex hulls and the output
 
     auto sortFn = [] (const Vector2d& a, const Vector2d& b) { return std::make_pair(a.x, a.y) < std::make_pair(b.x, b.y); };
+    auto turnsRight = [] (Vector2d a, Vector2d b, Vector2d c) { return (b.x-a.x)*(c.y-a.y) - (c.x-a.x)*(b.y-a.y) < 0; };
 
     std::sort(v.begin(), v.end(), sortFn);
 

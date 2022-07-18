@@ -47,7 +47,7 @@ Texture* test;
 Texture* bl;
 Cubemap* cubemap;
 
-//#define INTERIOR
+#define INTERIOR
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
@@ -56,7 +56,7 @@ Cubemap* cubemap;
 //#define EMPTYBOX
 //#define KITCHEN2
 //#define WINDOWBOX
-#define WINDOWBOX2
+//#define WINDOWBOX2
 //#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX

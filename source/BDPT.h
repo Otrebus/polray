@@ -94,7 +94,6 @@ protected:
 
     Roulette* roulette;
     
-    int m_spp;
     mutable Random m_random;
 };
 

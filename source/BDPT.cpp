@@ -18,8 +18,7 @@ BDSample::~BDSample()
 
 BDPT::BDPT(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
-    roulette = new Roulette[XRES*YRES]; //std::vector(XRES, std::vector(YRES, Roulette()));
-    m_spp = 1;
+    roulette = new Roulette[XRES*YRES];
 }
 
 BDPT::~BDPT()
@@ -472,32 +471,13 @@ void BDPT::Render(Camera& cam, ColorBuffer& colBuf)
     ColorBuffer lightImage(colBuf.GetXRes(), colBuf.GetYRes(), 0);
     ColorBuffer eyeImage(colBuf.GetXRes(), colBuf.GetYRes(), 0);
 
-    for(int i = 0; i < m_spp; i++)	
-    {	
-        for(int x = 0; x < colBuf.GetXRes(); x++)	
-        {	
-            for(int y = 0; y < colBuf.GetYRes(); y++)	
-            {	
-                if(stopping)	
-                    return;	
-                RenderPixel(x, y, cam, eyeImage, lightImage);	
-            }	
-        }	
-    }	
+    for(int x = 0; x < colBuf.GetXRes(); x++)	
+        for(int y = 0; y < colBuf.GetYRes() && !stopping; y++)	
+            RenderPixel(x, y, cam, eyeImage, lightImage);	
+
     for(int x = 0; x < colBuf.GetXRes(); x++)	
         for(int y = 0; y < colBuf.GetYRes(); y++)	
-            colBuf.AddColor(x, y, (eyeImage.GetPixel(x, y)	
-                                   + lightImage.GetPixel(x, y))/m_spp);	
-}
-
-void BDPT::SetSPP(unsigned int spp)
-{
-    m_spp = spp;
-}
-
-unsigned int BDPT::GetSPP() const
-{
-    return m_spp;
+            colBuf.AddColor(x, y, eyeImage.GetPixel(x, y)+ lightImage.GetPixel(x, y));
 }
 
 unsigned int BDPT::GetType() const

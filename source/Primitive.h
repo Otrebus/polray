@@ -28,7 +28,7 @@ public:
     void SetMaterial(Material* material);
     Material* GetMaterial() const;
 
-    // ugly temporary hack thingy until nlogn kd tree builder is proper
+    // ugly temporary hack thingy until nlogn kd tree builder is proper [14 years later: HA!]
     mutable int side;
 
 protected:

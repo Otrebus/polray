@@ -73,7 +73,6 @@ void Rendering::Thread()
     while(true)
     {
         ColorBuffer temp(image->GetXRes(), image->GetYRes(), Color::Black);
-        unsigned int nNewSamples = renderer->GetSPP();
         renderer->Render(*(renderer->GetScene()->GetCamera()), temp);
 
         if(stopping) // If we were asked to stop rendering, the latest frame 
@@ -89,10 +88,10 @@ void Rendering::Thread()
                 if(nSamples > 0)
                 {   // Calculate the new average image based on the new samples
                     // and the number of old samples (running average)
-                    double D = double(nSamples + nNewSamples);
-                    double final_r = c.r + nNewSamples*(k.r - c.r)/D;
-                    double final_g = c.g + nNewSamples*(k.g - c.g)/D;
-                    double final_b = c.b + nNewSamples*(k.b - c.b)/D;
+                    double D = double(nSamples + 1);
+                    double final_r = c.r + (k.r - c.r)/D;
+                    double final_g = c.g + (k.g - c.g)/D;
+                    double final_b = c.b + (k.b - c.b)/D;
                     accumulation->SetPixel(x, y, final_r, final_g, final_b);
                 }
                 else
@@ -114,7 +113,7 @@ void Rendering::Thread()
             }
         }
         updated = true;
-        nSamples += nNewSamples;
+        nSamples ++;
         ReleaseMutex(bufferMutex);
     }
 }

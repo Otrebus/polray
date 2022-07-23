@@ -36,40 +36,15 @@ double MeshTriangle::GetArea()
 	return fabsf(((v1->pos-v0->pos)^(v2->pos-v0->pos)).GetLength())/2;
 }
 
-MeshVertex::MeshVertex(double a, double b, double c)
-{
-	pos.x = a;
-	pos.y = b;
-	pos.z = c;
-}
-
-MeshVertex::MeshVertex(const Vector3d& vec)
-{
-	pos.x = vec.x;
-	pos.y = vec.y;
-	pos.z = vec.z;
-}
-
-
 MeshTriangle::MeshTriangle(MeshVertex* _v0, MeshVertex* _v1, MeshVertex* _v2)// : mesh(t)
 {
 	v0 = _v0;
 	v1 = _v1;
 	v2 = _v2;
 }
-/*
-MeshTriangle::MeshTriangle(TriangleMesh* t, MeshVertex* _v0, MeshVertex* _v1, MeshVertex* _v2, Material* mat)// : mesh(t)
-{
-//		id = highestid++;
-	v0 = _v0;
-	v1 = _v1;
-	v2 = _v2;
-	material = mat;
-}*/
 
 MeshTriangle::MeshTriangle()
 {
-//		id = highestid++;
 }
 
 MeshTriangle::~MeshTriangle()
@@ -83,35 +58,7 @@ MeshTriangle::MeshTriangle(Material* mat)
 
 double MeshTriangle::Intersect(const Ray& ray) const
 {
-	double u, v, t;
-	Vector3d D;
-	D.x = ray.direction.x;
-	D.y = ray.direction.y;
-	D.z = ray.direction.z;
-
-	Vector3d E1 = v1->pos-v0->pos;
-	Vector3d E2 = v2->pos-v0->pos;
-	Vector3d T = ray.origin - v0->pos;
-
-	Vector3d P = E2^T;
-	Vector3d Q = E1^D;
-
-	double det = E2*Q;
-	if(!det)
-		return -inf;
-	u = D*P/det;
-
-	if(u > 1 || u < 0)
-		return -inf;
-
-	v = T*Q/det;
-
-	if(u+v > 1 || u < 0 || v < 0)
-		return -inf;
-
-	t = E1*P/det;
-
-	return t <= 0 ? -inf : t;
+	return IntersectTriangle(v0->pos, v1->pos, v2->pos, ray);
 }
 
 

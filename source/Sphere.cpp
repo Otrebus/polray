@@ -15,30 +15,14 @@ Sphere::Sphere(const Vector3d& pos, const Vector3d& u, const Vector3d& ri, doubl
     right.Normalize();
 }
 
-Sphere::Sphere()
+Sphere::Sphere() : radius(1), position(0, 0, 0)
 {
     radius = 1.0f;
     position = Vector3d(0.0f, 0.0f, 0.0f);
-    material = 0;
 }
 
 Sphere::~Sphere()
 {
-}
-
-double Sphere::GetRadius() const
-{
-    return radius;
-}
-
-void Sphere::SetRadius(double r)
-{
-    radius = r;
-}
-
-Vector3d Sphere::GetPosition() const
-{
-    return position;
 }
 
 double Sphere::Intersect(const Ray& ray) const

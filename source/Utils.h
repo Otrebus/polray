@@ -16,7 +16,7 @@ typedef double AnglePdf;
 typedef Vector3d Point;
 typedef Vector3d Normal;
 
-template<typename T> T sgn(T s) {
+template<typename T> T sgn(T s)
+{
     return s > 0 ? 1 : s < 0 ? -1 : 0;
 }
-

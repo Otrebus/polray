@@ -5,7 +5,6 @@
 
 LightTracer::LightTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
-    m_SPP = 1;
 }
 
 LightTracer::~LightTracer()
@@ -22,7 +21,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
     colBuf.Clear(0);
 
-    for(int samples = 0; samples < xres*yres*m_SPP && ! stopping; samples++)
+    for(int samples = 0; samples < xres*yres && ! stopping; samples++)
     {
         if(stopping)
             return;
@@ -50,7 +49,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         surfcos = abs(surfcos);
 
         if(TraceShadowRay(lightToCamRay, camRayLength) && cam.GetPixelFromRay(lightToCamRay, xpixel, ypixel, u, v))
-            colBuf.AddColor(xpixel, ypixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP)/lightWeight);
+            colBuf.AddColor(xpixel, ypixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight);
 
         do
         {
@@ -88,7 +87,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
                 Color brdf = info.GetMaterial()->BRDF(info, camRay.direction, sample.component);
                 // Flux to radiance and stuff involving probability and sampling of the camera
-                Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres*m_SPP)/lightWeight;
+                Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight;
                 pixelColor*=abs(info.GetDirection()*info.GetNormal())/abs(info.GetDirection()*info.GetGeometricNormal());
                 colBuf.AddColor(xpixel, ypixel, pixelColor);
             }
@@ -127,16 +126,6 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
                     colBuf.AddColor(x, y, partBuf[i]->GetPixel(x, y)/(double)nCores);
     for(int i = 0; i < nCores; i++)
         delete partBuf[i];
-}
-
-void LightTracer::SetSPP(unsigned int spp)
-{
-    m_SPP = spp;
-}
-
-unsigned int LightTracer::GetSPP() const
-{
-    return m_SPP;
 }
 
 unsigned int LightTracer::GetType() const

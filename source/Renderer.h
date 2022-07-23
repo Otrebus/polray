@@ -23,8 +23,6 @@ public:
     virtual void Render(Camera& cam, ColorBuffer& colBuf) = 0;
     virtual bool TraceShadowRay(const Ray& ray, double tmax) const;
 
-    virtual unsigned int GetSPP() const = 0;
-    virtual void SetSPP(unsigned int) = 0;
     virtual unsigned int GetType() const = 0;
     std::shared_ptr<Scene> GetScene() const;
 
@@ -38,7 +36,6 @@ protected:
 
     bool stopping;
 
-    int m_SPP;
     mutable Random m_random;
     vector<Light*> m_lights;
 };

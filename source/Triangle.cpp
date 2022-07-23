@@ -31,43 +31,14 @@ Triangle::~Triangle()
 
 double Triangle::Intersect(const Ray& ray) const
 {
-    double u, v, t;
-    Vector3d D = ray.direction;
-
-    Vector3d E1 = v1.pos-v0.pos;
-    Vector3d E2 = v2.pos-v0.pos;
-    Vector3d T = ray.origin - v0.pos;
-
-    Vector3d P = E2^T;
-    Vector3d Q = E1^D;
-
-    double det = E2*Q;
-    if(!det)	// Ray in (almost) the same plane as the triangle
-        return -inf;							// NOTE: depending on this epsilon value, extremely
-    u = D*P/det;								// small triangles could be missed
-
-    if(u > 1 || u < 0)
-        return -inf;
-
-    v = T*Q/det;
-
-    if(u+v > 1 || u < 0 || v < 0)
-        return -inf;
-
-    t = E1*P/det;
-    return t < eps ? -inf : t;
+    return IntersectTriangle(v0.pos, v1.pos, v2.pos, ray);
 }
 
 bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    double u, v, t;
-    Vector3d D;
+    Vector3d D = ray.direction;
 
     info.direction = ray.direction;
-
-    D.x = ray.direction.x;
-    D.y = ray.direction.y;
-    D.z = ray.direction.z;
 
     Vector3d E1 = v1.pos-v0.pos;
     Vector3d E2 = v2.pos-v0.pos;
@@ -77,38 +48,18 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
     Vector3d Q = E1^D;
 
     double det = E2*Q;
-    if(!det) // Ray in (almost) the same plane as the triangle
-        return false;
 
-    u = D*P/det;
-
-    if(u > 1 || u < 0)
-        return false;
-
-    v = T*Q/det;
-
-    if(u+v > 1 || u < 0 || v < 0)
-        return false;
-
-    t = E1*P/det;
-    if(t <= 0)
-        return false;
-
-    Vector3d n0 = v0.normal;
-    Vector3d n1 = v1.normal;
-    Vector3d n2 = v2.normal;
+    auto u = D*P/det, v = T*Q/det, t = E1*P/det;
 
     info.normal = u*(v1.normal-v0.normal) + v*(v2.normal-v0.normal) + v0.normal;
-
     info.normal.Normalize();
+
     info.geometricnormal = E1^E2;
     info.geometricnormal.Normalize();
 
-    info.normal.Normalize();
-
     info.position = v0.pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
-    info.texpos.x = u;
-    info.texpos.y = v;
+    //info.texpos.x = u;
+    //info.texpos.y = v;
     info.material = material;
 
     return true;

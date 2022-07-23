@@ -410,8 +410,6 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 			if(ins.fail())
 				__debugbreak();
 
-//			if(!ReadMaterialFile(matfilestr, materials))
-//				__debugbreak();
             if(!meshMat)
 			    ReadMaterialFile(matfilestr, materials);
 

@@ -235,8 +235,8 @@ Color MeshLight::NextEventEstimation(const Renderer* renderer, const Intersectio
     Vector3d normal = info.GetNormal();
 
     //if(toLight*lightNormal_ < 0)
-    if(toLight*lightNormal_ > 0)
-        lightNormal = -lightNormal;
+    if(toLight*lightNormal_ < 0)
+        //lightNormal = -lightNormal;
     {
         double d = toLight.GetLength();
         toLight.Normalize();

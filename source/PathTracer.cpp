@@ -16,21 +16,10 @@ PathTracer::PathTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 #else
     m_random.Seed(GetTickCount() + int(this));
 #endif
-    m_SPP = 1;
 }
 
 PathTracer::~PathTracer()
 {
-}
-
-void PathTracer::SetSPP(unsigned int s)
-{
-    m_SPP = s;
-}
-
-unsigned int PathTracer::GetSPP() const
-{
-    return m_SPP;
 }
 
 //Color PathTracer::TracePathPrimitive(const Ray& ray) const
@@ -85,25 +74,15 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
 
     for(int y = 0; y < yres; y++)
     {
-        for(int x = 0; x < xres; x++)
+        for(int x = 0; x < xres && !stopping; x++)
         {
-            Color result(0, 0, 0);
-            for(int i = 0; i < m_SPP; i++)
-            {
-                if(stopping)
-                    colBuf.SetPixel(x, y, Color(0, 0, 0));
-                else
-                {
-                    double q = m_random.GetDouble(0, 1);
-                    double p = m_random.GetDouble(0, 1);
-                    double u, v;
-                    Vector3d pos;
-                    cam.SampleAperture(pos, u, v);
-                    Ray outRay = cam.GetRayFromPixel(x, y, q, p, u, v);
-                    result += TracePath(outRay);
-                }
-            }
-            colBuf.SetPixel(x, y, result/(double)m_SPP);
+            double q = m_random.GetDouble(0, 1), p = m_random.GetDouble(0, 1);
+            double u, v;
+            Vector3d pos;
+            cam.SampleAperture(pos, u, v);
+            Ray outRay = cam.GetRayFromPixel(x, y, q, p, u, v);
+            Color result = TracePath(outRay);
+            colBuf.SetPixel(x, y, result);
         }
     }
 }

@@ -34,7 +34,7 @@ public:
     virtual void Load(Bytestream& stream) = 0;
 
     Vector3d up, pos, dir;  // Orientation of the camera
-    double halfwidth;        // Size of the film plane (plane is always 1 unit behind the camera)
+    double halfwidth;       // Size of the film plane (plane is always 1 unit behind the camera)
     int xres, yres;         // Pixel resolution of the film plane
 };
 

@@ -25,12 +25,8 @@ public:
 
     void SampleAperture(Vector3d& pos, double& u, double& v) const;
 
-    void SetFov(double fov);
     void SetFocalLength(double focalLength);
     void SetLensRadius(double lensRadius);
-
-    double GetPixelArea() const;
-    double GetFilmArea() const;
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

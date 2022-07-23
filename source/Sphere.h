@@ -18,11 +18,6 @@ public:
     Sphere();
     ~Sphere();
 
-    double GetRadius() const;
-    void SetRadius(double radius);
-    Vector3d GetPosition() const;
-    Vector3d SetPosition(Vector3d& position);
-
     bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
     BoundingBox GetBoundingBox() const;
 

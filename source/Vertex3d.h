@@ -12,11 +12,9 @@ public:
     Vertex3d(double x, double y, double z);
     Vertex3d();
     ~Vertex3d();
-    //Vector3d padding[100];
-    Vector3d pos;
-    Vector3d normal;
+
+    Vector3d pos, normal;
     Vector2d texpos;
-    //Vector3d padding2[100];
 };
 
 #endif

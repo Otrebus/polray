@@ -17,8 +17,7 @@ class TriangleMesh;
 class MeshVertex : public Vertex3d
 {
 public:
-	MeshVertex(const Vector3d& vec);
-	MeshVertex(double, double, double);
+	using Vertex3d::Vertex3d;
 	~MeshVertex();
 
 	vector<MeshTriangle*> triangles;

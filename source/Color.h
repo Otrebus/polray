@@ -35,10 +35,8 @@ public:
 
     bool IsValid() const;
 
-    void SetLuminance(double L);
     double GetLuminance() const;
     double GetIntensity() const;
-    double GetAverage() const;
     double GetMax() const;
     double GetSum() const;
 

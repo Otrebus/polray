@@ -16,11 +16,7 @@ public:
     Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const;
     bool GetPixelFromRay(const Ray& ray, int& x, int& y, double u, double v) const;
 
-    void SetFov(double fov);
     void SampleAperture(Vector3d& pos, double& u, double& v) const;
-
-    double GetPixelArea() const;
-    double GetFilmArea() const;
     
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

@@ -90,8 +90,6 @@ public:
     void Load(Bytestream& b);
     void Save(Bytestream& b) const;
 
-	void Build();
-
 	void AddModel(Model*);
     void AddLight(Light*);
 

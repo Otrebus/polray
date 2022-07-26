@@ -56,12 +56,12 @@ void Roulette::AddSample(double sample, int nrays) {
 
 double Roulette::GetThreshold() const {
     std::lock_guard<std::mutex> lock(*m);
-    int size = samples.size();
+    auto size = samples.size();
     auto ret = std::sqrt((sumSq - (1/double(size))*sum*sum)/double(sumRays));
     return std::isfinite(ret) ? std::abs(ret) : 1;
 }
 
-int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
+int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
 
     double rr = 0.7;
 
@@ -103,7 +103,7 @@ int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSa
             if(!newV->alpha && hitLight != light)
             {
                 delete newV;
-                return path.size();
+                return (int) path.size();
             }
 
             lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
@@ -113,20 +113,20 @@ int BDPT::BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSa
             {   // Direct light hit
                 lastV->rpdf = hitLight->Pdf(info, -v)*(abs(lastV->info.GetGeometricNormal()*v))/(lSqr);
                 samples.push_back(BDSample(0, path.size()));
-                return path.size() - 1;
+                return (int) path.size() - 1;
             }
         } else {
             if(!newV->sample.color)
             {
                 lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
                 path.push_back(newV);
-                return path.size();
+                return (int) path.size();
             }
             lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
             path.push_back(newV);
         }
     }
-    return path.size();
+    return (int) path.size();
 }
 
 int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path, 
@@ -152,15 +152,12 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     camPoint->sample = Sample(lastSample, camPoint->out, lastPdf, camPoint->rpdf, false, 0);
 
     path.push_back(camPoint);
-    return BuildPath(x, y, path, samples, light, false);
+    return BuildPath(path, samples, light, false);
 }
 
-int BDPT::BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) const
+int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
 {
-    int depth = 1;
     BDVertex* lightPoint = new BDVertex();
-    double rr = 0.7f;
-    double lastPdf;
     auto [ray, color, normal, areaPdf, anglePdf] = light->SampleRay();
     lightPoint->out = ray;
     lightPoint->pdf = areaPdf;
@@ -174,7 +171,7 @@ int BDPT::BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) co
     path.push_back(lightPoint);
     std::vector<BDSample> dummy;
 
-    return BuildPath(x, y, path, dummy, light, true);
+    return BuildPath(path, dummy, light, true);
 }
 
 Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
@@ -397,7 +394,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     double r = m_random.GetDouble(0.0f, 1.0f);
     auto [light, lightWeight] = scene->PickLight(r);
 
-    int lLength = BuildLightPath(x, y, lightPath, light);
+    int lLength = BuildLightPath(lightPath, light);
     int eLength = BuildEyePath(x, y, eyePath, cam, samples, light);
 
     int rays = lLength + eLength;

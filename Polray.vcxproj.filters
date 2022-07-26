@@ -42,23 +42,14 @@
     <Filter Include="Source Files\Lights\EnvironmentLights">
       <UniqueIdentifier>{c50c8409-bdfb-4472-a2c1-56baab79e891}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Spectral">
+      <UniqueIdentifier>{ccd244fc-f3b8-403e-ac27-7af62679984e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{7217aa0c-e67b-4eb5-8f36-33ec8f3ec22e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="source\Bytestream.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Color.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\ColorBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Scene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\PhongMaterial.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
@@ -203,12 +194,6 @@
     <ClCompile Include="source\PreethamSky.cpp">
       <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="source\LightPortal.cpp">
       <Filter>Source Files\Lights</Filter>
     </ClCompile>
@@ -226,6 +211,27 @@
     </ClCompile>
     <ClCompile Include="source\ObjReader.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Bytestream.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Color.cpp">
+      <Filter>Source Files\Spectral</Filter>
+    </ClCompile>
+    <ClCompile Include="source\ColorBuffer.cpp">
+      <Filter>Source Files\Spectral</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sample.cpp">
+      <Filter>Source Files\Spectral</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Texture.cpp">
+      <Filter>Source Files\Spectral</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Draw.cpp">
+      <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Scene.cpp">
+      <Filter>Source Files\Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -331,21 +337,6 @@
     <ClInclude Include="source\Gfx.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
-    <ClInclude Include="source\Bytestream.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Color.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\ColorBuffer.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Scene.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Texture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\Ray.h">
       <Filter>Source Files\Math</Filter>
     </ClInclude>
@@ -388,12 +379,6 @@
     <ClInclude Include="source\EnvironmentLight.h">
       <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sample.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Draw.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="source\LightPortal.h">
       <Filter>Source Files\Lights</Filter>
     </ClInclude>
@@ -411,6 +396,27 @@
     </ClInclude>
     <ClInclude Include="source\ObjReader.h">
       <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Bytestream.h">
+      <Filter>Source Files\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Color.h">
+      <Filter>Source Files\Spectral</Filter>
+    </ClInclude>
+    <ClInclude Include="source\ColorBuffer.h">
+      <Filter>Source Files\Spectral</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sample.h">
+      <Filter>Source Files\Spectral</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Texture.h">
+      <Filter>Source Files\Spectral</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Draw.h">
+      <Filter>Source Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Scene.h">
+      <Filter>Source Files\Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

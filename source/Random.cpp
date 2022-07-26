@@ -3,7 +3,8 @@
 Random::Random()
 {
     std::random_device rd;
-    generator.seed(rd());
+    auto x = rd();
+    generator.seed(x);
 }
 
 Random::~Random()

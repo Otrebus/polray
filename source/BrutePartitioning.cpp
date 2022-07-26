@@ -1,7 +1,8 @@
 #include "BrutePartitioning.h"
 #include "Utils.h"
 
-void BrutePartitioning::Build(std::vector<const Primitive*> primitives) {
+void BrutePartitioning::Build(std::vector<const Primitive*> primitives)
+{
     this->primitives = primitives;
 }
 

@@ -76,11 +76,11 @@ protected:
                      ColorBuffer& eyeImage, ColorBuffer& lightImage);
     void RenderPart(Camera& cam, ColorBuffer& colBuf) const;
 
-    int BuildPath(int x, int y, std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
+    int BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
 
     int BuildEyePath(int x, int y, vector<BDVertex*>& path, const Camera& cam,
                      vector<BDSample>& samples, Light* light) const;
-    int BuildLightPath(int x, int y, vector<BDVertex*>& path, Light* light) const;
+    int BuildLightPath(vector<BDVertex*>& path, Light* light) const;
 
     Color EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath, 
                    int s, int t, Light* light) const;

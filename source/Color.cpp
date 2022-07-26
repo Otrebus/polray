@@ -78,17 +78,14 @@ Color Color::operator*(const Color& v) const
 
 Color Color::operator+=(const Color& c)
 {
-    r+=c.r;
-    g+=c.g;
-    b+=c.b;
-
-    return Color(r, g, b);
+    r+=c.r, g+=c.g, b+=c.b;
+    return *this;
 }
 
 Color Color::operator*=(const Color& c)
 {
-    r *= c.r; g *= c.g; b *= c.b;
-    return Color(r, g, b);
+    r *= c.r, g *= c.g, b *= c.b;
+    return *this;
 }
 
 Color::operator bool() const {
@@ -98,13 +95,13 @@ Color::operator bool() const {
 Color Color::operator*=(double f)
 {
     r *= f; g *= f;	b *= f;
-    return Color(r, g, b);
+    return *this;
 }
 
 Color Color::operator/=(double t)
 {
     r /= t;	g /= t;	b /= t;
-    return Color(r, g, b);
+    return *this;
 }
 
 bool Color::operator==(const Color& c)
@@ -127,11 +124,6 @@ double Color::GetMax() const
     return __max(r, __max(g, b));
 }
 
-double Color::GetAverage() const
-{
-    return (r + g + b)/3.0f;
-}
-
 double Color::GetSum() const
 {
     return r + g + b;
@@ -141,12 +133,6 @@ double Color::GetLuminance() const
 {
     // Rec. 709 would be 0.2126f*r + 0.7152f*g + 0.0722f*b, below is Rec. 601
     return 0.2989f*r + 0.5866f*g + 0.1145f*b;
-}
-
-void Color::SetLuminance(double L)
-{
-    double x = L / (0.2989f*r + 0.5866f*g + 0.1145f*b);
-    r = r*x; g = g*x; b = b*x;
 }
 
 bool Color::IsValid() const

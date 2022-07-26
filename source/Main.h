@@ -18,17 +18,13 @@ extern bool g_isActive;
 extern bool g_quitting;
 extern Gfx* gfx;
 extern Input* input;
-extern bool* grid;
 extern LPDIRECTDRAWSURFACE7 bitmapsurface;
 extern DDSURFACEDESC2 ddsd;
 
 extern HANDLE bufferMutex;
-extern HANDLE workingMutex;
-extern int nCurrentFrame;
-extern int frames;
 
 #define XRES 320
-#define YRES 200
+#define YRES 240
 //#define DETERMINISTIC
 
 LRESULT WINAPI WndProc(HWND, UINT, WPARAM, LPARAM);

@@ -45,8 +45,7 @@ void AreaLight::AddToScene(Scene* scn)
 
     scn->AddModel(tr1);
     scn->AddModel(tr2);
-
-    Scene::LightAdder::AddLight(*scn, this);
+    scn->AddLight(this);
 }
 
 double AreaLight::GetArea() const
@@ -191,7 +190,6 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
     ln = lightNormal;
 
     Vector3d toLight = lightPoint - info.GetPosition();
-    double d = toLight.GetLength();
     Vector3d normal = info.GetNormal();
 
     if(toLight*lightNormal < 0)
@@ -211,5 +209,5 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
             return c;
         }
     }
-    return Color(0, 0, 0);
+    return Color::Black;
 }

@@ -2,13 +2,6 @@
 #include "Model.h"
 #include <fstream>
 
-//template Bytestream& Bytestream::operator<<(const int& t);
-//template Bytestream& Bytestream::operator>>(int& t);
-//template Bytestream& Bytestream::operator<<(const char& t);
-//template Bytestream& Bytestream::operator>>(char& t);
-//template Bytestream& Bytestream::operator<<(const double& t);
-//template Bytestream& Bytestream::operator>>(double& t);
-
 //------------------------------------------------------------------------------
 // Constructor.
 //------------------------------------------------------------------------------
@@ -44,7 +37,7 @@ void Bytestream::ClearFail()
 // Returns the size, in bytes, of the data currently in the stream. This is the
 // amount of data put into the stream minus the amount of data streamed from it.
 //------------------------------------------------------------------------------
-unsigned int Bytestream::GetSize() const
+size_t Bytestream::GetSize() const
 {
     return data.size() - first;
 }
@@ -67,11 +60,6 @@ void Bytestream::LoadFromFile(std::string fileName)
     std::ifstream file;
     file.open(fileName, ios::in | ios::binary);
 
-    char byte;
-    while(!file.eof())
-    {
-        char byte;
+    for(char byte; !file.eof(); data.push_back(byte))
         file.read(&byte, sizeof(char));
-        data.push_back(byte);
-    }
 }

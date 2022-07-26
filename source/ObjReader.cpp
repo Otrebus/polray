@@ -35,7 +35,7 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 		stringstream ss(line); // Read one line at a time into a stringstream
 		ss >> a;               // and parse it
 
-		transform(a.begin(), a.end(), a.begin(), [](unsigned char c) { return std::tolower(c); });
+		transform(a.begin(), a.end(), a.begin(), tolower);
 
 		if(a.length() && a[0] == '#')
 			continue;
@@ -52,7 +52,7 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 				ss >> b;
 				if(!ss)
 					__debugbreak();
-				transform(b.begin(), b.end(), b.begin(), [](unsigned char c) { return std::tolower(c); });
+				transform(b.begin(), b.end(), b.begin(), tolower);
 				if(b == "emissive")
 					curmat = new EmissiveMaterial;
 				else if(b == "lambertian")
@@ -81,12 +81,8 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 				while(!matfile.eof())
 				{
 					string line, s;
-                    //matfile.getline(blah, s);
                     getline(matfile, s);
-					//char blah[10000];
-					//matfile.getline(blah, 10000);
-					//s = blah;
-					s+="\n";
+					s += "\n";
 					if(s[0] == '}')
 						break;
 					arg << s;

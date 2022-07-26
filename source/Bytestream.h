@@ -53,7 +53,7 @@ public:
         return *this;
     }
 
-    unsigned int GetSize() const;
+    size_t GetSize() const;
     void ClearFail();
     bool HasFailed() const;
 

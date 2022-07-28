@@ -23,8 +23,8 @@ extern DDSURFACEDESC2 ddsd;
 
 extern HANDLE bufferMutex;
 
-#define XRES 320
-#define YRES 240
+#define XRES 1920
+#define YRES 1080
 //#define DETERMINISTIC
 
 LRESULT WINAPI WndProc(HWND, UINT, WPARAM, LPARAM);

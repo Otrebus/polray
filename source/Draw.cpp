@@ -53,11 +53,11 @@ Cubemap* cubemap;
 //#define INTERIORFOG
 //#define BOX
 //#define MESHLIGHTBOX
-//#define ROOM
+#define ROOM
 //#define EMPTYBOX
 //#define KITCHEN2
 //#define WINDOWBOX
-#define WINDOWBOX2
+//#define WINDOWBOX2
 //#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
@@ -609,7 +609,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 
 #ifdef WINDOWBOX
@@ -797,7 +797,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     s->AddModel(sphere2);*/
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
 

@@ -1,9 +1,11 @@
 #include "Random.h"
+#include "Logger.h"
 
 Random::Random()
 {
     std::random_device rd;
     auto x = rd();
+    seed = x;
     generator.seed(x);
 }
 
@@ -33,4 +35,4 @@ void Random::Seed(unsigned int seed)
     generator.seed(seed);
 }
 
-std::default_random_engine thread_local Random::generator = std::default_random_engine();
+std::default_random_engine thread_local Random::generator = std::default_random_engine(std::random_device()());

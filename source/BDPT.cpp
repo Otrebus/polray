@@ -372,9 +372,6 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
             weight += l*l;
     }
 
-    if(!std::isfinite(weight)) // In case we ever get a stray 0/0 for whatever reason
-        return 0;
-
     return 1.0f/(1.0f+weight);
 }
 
@@ -444,14 +441,16 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
             double costheta = abs(cam.dir*camRay.direction);
             double mod = costheta*costheta*costheta*costheta*cam.GetFilmArea();
             Color result = eval/mod/lightWeight;
-            lightImage.AddColor(camx, camy, result);
+            if(result.IsValid())
+                lightImage.AddColor(camx, camy, result);
         }
         else
         {
             double costheta = abs(cam.dir*eyePath[0]->out.direction);
             double mod = costheta*costheta*costheta*costheta*(cam.GetFilmArea());
             Color result = eval/mod/lightWeight;
-            eyeImage.AddColor(x, y, result);
+            if(result.IsValid())
+                eyeImage.AddColor(x, y, result);
         }
     }
 

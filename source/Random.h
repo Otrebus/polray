@@ -2,8 +2,6 @@
 
 #include <random>
 
-/* Period parameters */  
-
 class Random
 {
 public:
@@ -16,4 +14,5 @@ public:
     ~Random();
 
     static thread_local std::default_random_engine generator;
+    unsigned int seed;
 };

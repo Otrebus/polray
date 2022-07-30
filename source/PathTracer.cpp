@@ -77,9 +77,7 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
         for(int x = 0; x < xres && !stopping; x++)
         {
             double q = m_random.GetDouble(0, 1), p = m_random.GetDouble(0, 1);
-            double u, v;
-            Vector3d pos;
-            cam.SampleAperture(pos, u, v);
+            auto [u, v, pos] = cam.SampleAperture();
             Ray outRay = cam.GetRayFromPixel(x, y, q, p, u, v);
             Color result = TracePath(outRay);
             colBuf.SetPixel(x, y, result);

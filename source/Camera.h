@@ -18,8 +18,8 @@ public:
     virtual ~Camera();
     
     virtual Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const = 0;
-    virtual bool GetPixelFromRay(const Ray& ray, int& x, int& y, double u, double v) const = 0;
-    virtual void SampleAperture(Vector3d& pos, double& u, double& v) const = 0;
+    virtual std::tuple<bool, int, int> GetPixelFromRay(const Ray& ray, double u, double v) const = 0;
+    virtual std::tuple<double, double, Vector3d> SampleAperture() const = 0;
 
     void SetFov(double fov);
 

@@ -549,7 +549,10 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddPortal(Vector3d(1, 1.25, 0.25), Vector3d(0, 0.5, 0), Vector3d(0, 0, 1));
 
     auto skyLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 100000, 3.5*Color(0.9, 1.2, 1.5));
+
     auto sunLight = new SphereLight(Vector3d(-40, 16, 18)*2000, 500, 2400*Color(255, 247, 223));
+    //auto sunLight = new AreaLight(Vector3d(-40, 16, 18)*2000+Vector3d(0, 0, -250)+Vector3d(0, -250, 0), Vector3d(0.0, 1, 0)*500, Vector3d(0, 0, 1)*500, 4400*Color(255, 247, 223));
+    
     auto inLight = new SphereLight(Vector3d(-80, -25, 90), 10, Color(2500, 2500, 2500));
     //auto inLight = new AreaLight(Vector3d(-80, 25, 90), Vector3d(0.0, 0.0, 4), Vector3d(0, 4, 0), Color(4000, 4000, 4000));
 
@@ -566,19 +569,43 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //AreaLight* sunLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 10), Vector3d(10, 0.0, 0.0), Color(4000, 4000, 4000));
     LightPortal* portalLight = new LightPortal();
-    portalLight->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, -130, 0), Vector3d(0, 0, 130));
-    portalLight->AddPortal(Vector3d(-270, 87, 77), Vector3d(0, -130, 0), Vector3d(0, 0, 130));
+    portalLight->AddPortal(Vector3d(-270, 140, -354), Vector3d(0, -280, 0), Vector3d(0, 0, 870));
+    
+    /*portalLight->AddPortal(Vector3d(-270, 114, -354), Vector3d(0, -250, 0), Vector3d(0, 0, 200));
+    portalLight->AddPortal(Vector3d(-270, 114, -154), Vector3d(0, -250, 0), Vector3d(0, 0, 200));
+    portalLight->AddPortal(Vector3d(-270, 114, 54), Vector3d(0, -250, 0), Vector3d(0, 0, 200));
+    portalLight->AddPortal(Vector3d(-270, 114, 254), Vector3d(0, -250, 0), Vector3d(0, 0, 200));*/
+    
+    //portalLight->AddPortal(Vector3d(-270, 100, -120), Vector3d(0, -140, 0), Vector3d(0, 0, 150));
+    //portalLight->AddPortal(Vector3d(-270, 100, 60), Vector3d(0, -140, 0), Vector3d(0, 0, 150));
+
+    //portalLight->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, -130, 0), Vector3d(0, 0, 130));
+    //portalLight->AddPortal(Vector3d(-270, 87, 77), Vector3d(0, -130, 0), Vector3d(0, 0, 130));
+    
     portalLight->SetLight(sunLight);
 
     LightPortal* portalLight2 = new LightPortal();
-    portalLight2->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, 0, 130), Vector3d(0, -130, 0));
-    portalLight2->AddPortal(Vector3d(-271, 87, 77), Vector3d(0, 0, 130), Vector3d(0, -130, 0));
+
+    /*portalLight2->AddPortal(Vector3d(-270, 114, -354), Vector3d(0, -250, 0), Vector3d(0, 0, 200));
+    portalLight2->AddPortal(Vector3d(-270, 114, -154), Vector3d(0, -250, 0), Vector3d(0, 0, 200));
+    portalLight2->AddPortal(Vector3d(-270, 114, 54), Vector3d(0, -250, 0), Vector3d(0, 0, 200));
+    portalLight2->AddPortal(Vector3d(-270, 114, 254), Vector3d(0, -250, 0), Vector3d(0, 0, 200));*/
+
+
+    portalLight2->AddPortal(Vector3d(-270, 140, -354), Vector3d(0, -280, 0), Vector3d(0, 0, 870));
+    
+    //portalLight2->AddPortal(Vector3d(-270, 100, -120), Vector3d(0, -140, 0), Vector3d(0, 0, 170));
+    //portalLight2->AddPortal(Vector3d(-270, 100, 60), Vector3d(0, -140, 0), Vector3d(0, 0, 170));
+    
+    //portalLight2->AddPortal(Vector3d(-271, 87, -106), Vector3d(0, 0, 130), Vector3d(0, -130, 0));
+    //portalLight2->AddPortal(Vector3d(-271, 87, 77), Vector3d(0, 0, 130), Vector3d(0, -130, 0));
+    
     portalLight2->SetLight(skyLight);
 
-    s->AddLight(portalLight);
-    s->AddLight(portalLight2);
-    //s->AddLight(skyLight);
-    //s->AddLight(inLight);
+    /*s->AddLight(portalLight);
+    s->AddLight(portalLight2);*/
+    s->AddLight(sunLight);
+    s->AddLight(skyLight);
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -1218,7 +1245,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
-    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d camPos = Vector3d(0, 1.1, 3);
     Vector3d target = Vector3d(0, 1, 0);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
@@ -1302,7 +1329,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     //s->AddLight(boxLight);
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef MESHLIGHTBOX
 

@@ -114,9 +114,8 @@ std::tuple<Ray, Color, Vector3d, double, double> LightPortal::SampleRay() const
     // Sample the point within the portal
     Vector3d portalNormal = portal.v1^portal.v2;
     portalNormal.Normalize();
-    Vector3d dir;
-    double x = r.GetDouble(0, 1.f);
-    double y = r.GetDouble(0, 1.f);
+
+    double x = r.GetDouble(0, 1.f), y = r.GetDouble(0, 1.f);
     auto portalPos = portal.pos + portal.v1*x + portal.v2*y + (0.0001)*portalNormal;
 
     // Sample the light and calculate the resulting pdfs
@@ -128,15 +127,10 @@ std::tuple<Ray, Color, Vector3d, double, double> LightPortal::SampleRay() const
     // TODO: this pdf calculation might want to be different for different lights
     // TODO: we're essentially undoing the sampling of the light source here
     auto dirPdf = d*d/(std::abs(portalNormal*ray.direction)*areaSum);
-    double areaPdf = lightAreaPdf;
-    double pdf = dirPdf;
-    if(normal*ray.direction < 0) {
-        pdf = 0;
-        areaPdf = 0;
-        return { ray, Color::Black, normal, areaPdf, pdf };
-    }
 
-    return { ray, std::abs(normal*ray.direction)*Color(1, 1, 1)/dirPdf, normal, areaPdf, pdf };
+    if(normal*ray.direction < 0)
+        return { ray, Color::Black, normal, 0, 0 };
+    return { ray, std::abs(normal*ray.direction)*Color(1, 1, 1)/dirPdf, normal, lightAreaPdf, dirPdf };
 }
 
 std::tuple<Point, Normal> LightPortal::SamplePoint() const

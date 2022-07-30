@@ -11,7 +11,7 @@ LightTracer::~LightTracer()
 {
 }
 
-void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
+void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
     const double xres = (double)colBuf.GetXRes();
     const double yres = (double)colBuf.GetYRes();
@@ -25,17 +25,13 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
     {
         if(stopping)
             return;
-        int xpixel = (int)xres;
-        int ypixel = (int)yres;
 
         auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
         auto [ray, pathColor, lightNormal, _, __] = light->SampleRay();
 
         pathColor *= light->GetArea()*light->GetIntensity(); // First direction is from the light source
 
-        double u, v;
-        Vector3d lensPoint;
-        cam.SampleAperture(lensPoint, u, v);
+        auto [u, v, lensPoint] = cam.SampleAperture();
 
         // Light going straight from the surface of the light source to the camera
         Vector3d lightToCam = lensPoint - ray.origin;
@@ -48,9 +44,9 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
         double surfcos = abs(lightNormal*lightToCamRay.direction);
         surfcos = abs(surfcos);
 
-        if(TraceShadowRay(lightToCamRay, camRayLength) && cam.GetPixelFromRay(lightToCamRay, xpixel, ypixel, u, v))
-            colBuf.AddColor(xpixel, ypixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight);
-
+        auto [hitCam, xPixel, yPixel] = cam.GetPixelFromRay(lightToCamRay, u, v);
+        if(hitCam && TraceShadowRay(lightToCamRay, camRayLength))
+            colBuf.AddColor(xPixel, yPixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight);
         do
         {
             const Primitive* minprimitive = nullptr;
@@ -67,9 +63,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
                 minlight->GenerateIntersectionInfo(ray, info);
             
             // Next event estimation
-            double u, v;
-            Vector3d lensPoint;
-            cam.SampleAperture(lensPoint, u, v);
+            auto [u, v, lensPoint] = cam.SampleAperture();
 
             Ray camRay = Ray(info.GetPosition(), lensPoint - info.GetPosition());
             double camRayLength = camRay.direction.GetLength();
@@ -79,7 +73,8 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
             auto c = sample.color;
             bounceRay = sample.outRay;
 
-            if(TraceShadowRay(camRay, camRayLength) && cam.GetPixelFromRay(camRay, xpixel, ypixel, u, v))
+            auto [hitCam, xPixel, yPixel] = cam.GetPixelFromRay(camRay, u, v);
+            if(hitCam && TraceShadowRay(camRay, camRayLength))
             {
                 double camcos = abs(-camRay.direction*cam.dir);
                 double pixelArea = (double)cam.GetPixelArea();
@@ -89,7 +84,7 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
                 // Flux to radiance and stuff involving probability and sampling of the camera
                 Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight;
                 pixelColor*=abs(info.GetDirection()*info.GetNormal())/abs(info.GetDirection()*info.GetGeometricNormal());
-                colBuf.AddColor(xpixel, ypixel, pixelColor);
+                colBuf.AddColor(xPixel, yPixel, pixelColor);
             }
             
             // Bounce a new ray
@@ -98,34 +93,6 @@ void LightTracer::RenderPart(Camera& cam, ColorBuffer& colBuf) const
 
         } while(m_random.GetDouble(0.f, 1.f) < 0.7f);
     }
-}
-
-void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
-{
-    SYSTEM_INFO sysinfo;
-    GetSystemInfo(&sysinfo);
-
-    int nCores = sysinfo.dwNumberOfProcessors;
-    ColorBuffer** partBuf = new ColorBuffer*[nCores];
-
-    colBuf.Clear(0);
-
-    stopping = false;
-
-#pragma omp parallel for
-    for(int i = 0; i < nCores; i++)
-    {
-        partBuf[i] = new ColorBuffer(colBuf.GetXRes(), colBuf.GetYRes());
-        LightTracer::RenderPart(cam, *partBuf[i]);
-    }
-    if(stopping)
-        return;
-    for(int i = 0; i < nCores; i++)
-        for(int x = 0; x < colBuf.GetXRes(); x++)
-            for(int y = 0; y < colBuf.GetYRes(); y++)
-                    colBuf.AddColor(x, y, partBuf[i]->GetPixel(x, y)/(double)nCores);
-    for(int i = 0; i < nCores; i++)
-        delete partBuf[i];
 }
 
 unsigned int LightTracer::GetType() const

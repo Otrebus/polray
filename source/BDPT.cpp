@@ -134,8 +134,8 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
                        Light* light) const
 {
     BDVertex* camPoint = new BDVertex();
-    Vector3d lensPoint;
-    cam.SampleAperture(lensPoint, camPoint->camU, camPoint->camV);
+    auto [camu, camv, lensPoint] = cam.SampleAperture();
+    camPoint->camU = camu, camPoint->camV = camv;
     camPoint->out = cam.GetRayFromPixel(x, y, m_random.GetDouble(0, 1), 
                                         m_random.GetDouble(0, 1), camPoint->camU,
                                         camPoint->camV);
@@ -432,11 +432,12 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
 
         if(sample.t == 1) // These samples end up on the light image
         {
-            int camx, camy;
             Ray camRay(lightPath[sample.s-1]->out.origin, 
                        cam.pos - lightPath[sample.s-1]->out.origin);
             camRay.direction.Normalize();
-            if(!cam.GetPixelFromRay(camRay, camx, camy, eyePath[0]->camU, eyePath[0]->camV))
+
+            auto [hitCam, camx, camy] = cam.GetPixelFromRay(camRay, eyePath[0]->camU, eyePath[0]->camV);
+            if(!hitCam)
                 continue;
             double costheta = abs(cam.dir*camRay.direction);
             double mod = costheta*costheta*costheta*costheta*cam.GetFilmArea();
@@ -473,7 +474,7 @@ void BDPT::Render(Camera& cam, ColorBuffer& colBuf)
 
     for(int x = 0; x < colBuf.GetXRes(); x++)	
         for(int y = 0; y < colBuf.GetYRes(); y++)	
-            colBuf.AddColor(x, y, eyeImage.GetPixel(x, y)+ lightImage.GetPixel(x, y));
+            colBuf.AddColor(x, y, eyeImage.GetPixel(x, y) + lightImage.GetPixel(x, y));
 }
 
 unsigned int BDPT::GetType() const

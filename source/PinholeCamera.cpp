@@ -45,13 +45,13 @@ Ray PinholeCamera::GetRayFromPixel(int x, int y, double a, double b, double, dou
 // returns false only if the ray does not hit the film plane (screen), or if
 // it starts behind the camera or heads away from the camera.
 //------------------------------------------------------------------------------
-bool PinholeCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, double, double) const
+std::tuple<bool, int, int> PinholeCamera::GetPixelFromRay(const Ray& ray, double, double) const
 {
     if(ray.direction*dir > 0) // Ray shooting away from camera
-        return false;
+        return { false, 0, 0 };
 
     if((ray.origin-pos) * dir < 0) // Ray origin behind camera
-        return false;
+        return { false, 0, 0 };
 
     double ratio = (double)yres/(double)xres;
     Vector3d left = up^dir;
@@ -64,23 +64,22 @@ bool PinholeCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, double, doub
     double rx = 1/halfwidth*up*B/det;
     double ry = 1/halfwidth*-left*B/det;
 
-    x = (int)((double)xres*(1.0f - rx)/2.0f);
-    y = (int)((double)yres*(ratio - ry)/(ratio*2.0f));
+    double x = ((double)xres*(1.0f - rx)/2.0f);
+    double y = ((double)yres*(ratio - ry)/(ratio*2.0f));
 
     if(x < 0 || x >= xres || y < 0 || y >= yres)
-        return false;
+        return { false, 0, 0 };
 
-    return true;
+    return { true, (int)x, (int)y };
 }
 
 
 //------------------------------------------------------------------------------
 // Since the aperture is a finite point, this function will always return (0,0).
 //------------------------------------------------------------------------------
-void PinholeCamera::SampleAperture(Vector3d& pos, double& u, double& v) const
+std::tuple<double, double, Vector3d> PinholeCamera::SampleAperture() const
 {
-    pos = this->pos;
-    u = v = 0;
+    return { 0, 0, this->pos };
 }
 
 void PinholeCamera::Save(Bytestream& stream) const

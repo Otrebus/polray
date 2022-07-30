@@ -43,9 +43,9 @@ void AreaLight::AddToScene(Scene* scn)
     tr1->SetMaterial(material);
     tr2->SetMaterial(material);
 
-    scn->AddModel(tr1);
-    scn->AddModel(tr2);
-    scn->AddLight(this);
+    Scene::PrimitiveAdder::AddPrimitive(*scene, tr1);
+    Scene::PrimitiveAdder::AddPrimitive(*scene, tr2);
+    Scene::LightAdder::AddLight(*scene, this);
 }
 
 double AreaLight::GetArea() const

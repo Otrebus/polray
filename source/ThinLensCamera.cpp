@@ -55,13 +55,13 @@ Ray ThinLensCamera::GetRayFromPixel(int x, int y, double a, double b, double u, 
 // returns false only if the ray does not hit the film plane (screen), or if
 // it starts behind the camera or heads away from the camera.
 //------------------------------------------------------------------------------
-bool ThinLensCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, double u, double v) const
+std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, double u, double v) const
 {
     if(ray.direction*dir > 0) // Ray shooting away from camera
-        return false;
+        return { false, 0, 0 };
 
     if((ray.origin-pos) * dir < 0) // Ray origin behind camera
-        return false;
+        return { false, 0, 0 };
 
     Vector3d right = dir^up;
     Vector3d lensPoint = pos+lensRadius*v*(right*cos(u)+up*sin(u));
@@ -88,25 +88,26 @@ bool ThinLensCamera::GetPixelFromRay(const Ray& ray, int& x, int& y, double u, d
     double rx = 1/halfwidth*up*B/det;
     double ry = 1/halfwidth*-left*B/det;
 
-    x = (int)((double)xres*(1.0f - rx)/2.0f);
-    y = (int)((double)yres*(ratio - ry)/(ratio*2.0f));
+    double x = ((double)xres*(1.0f - rx)/2.0f);
+    double y = ((double)yres*(ratio - ry)/(ratio*2.0f));
 
     if(x < 0 || x >= xres || y < 0 || y >= yres)
-        return false;
+        return { false, 0, 0 };
 
-    return true;
+    return { true, (int)x, (int)y };
 }
 
 
 //------------------------------------------------------------------------------
 // Randomly samples the camera aperture
 //------------------------------------------------------------------------------
-void ThinLensCamera::SampleAperture(Vector3d& pos, double& u, double& v) const
+std::tuple<double, double, Vector3d> ThinLensCamera::SampleAperture() const
 {
-    u = random.GetDouble(0, 2*F_PI);
-    v = sqrt(random.GetDouble(0, 1));
+    double u = random.GetDouble(0, 2*F_PI);
+    double v = sqrt(random.GetDouble(0, 1));
 
-    pos = this->pos + lensRadius*v*(up*sin(u) + (dir^up)*cos(u));
+    Vector3d pos = this->pos + lensRadius*v*(up*sin(u) + (dir^up)*cos(u));
+    return { u, v, pos };
 }
 
 //------------------------------------------------------------------------------

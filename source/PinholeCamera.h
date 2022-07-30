@@ -14,9 +14,8 @@ public:
     ~PinholeCamera();
     
     Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const;
-    bool GetPixelFromRay(const Ray& ray, int& x, int& y, double u, double v) const;
-
-    void SampleAperture(Vector3d& pos, double& u, double& v) const;
+    std::tuple<bool, int, int> GetPixelFromRay(const Ray& ray, double u, double v) const;
+    std::tuple<double, double, Vector3d> SampleAperture() const;
     
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

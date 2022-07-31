@@ -97,7 +97,7 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 				phong = true;
 			}
 		}
-		
+
 		else if(a == "ka")
 		{
 			double dummy;

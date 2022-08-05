@@ -15,8 +15,8 @@ public:
 
     Vector3d operator *(const Vector3d&) const;
     Matrix3d operator *(const Matrix3d& v) const;
-    double& operator() (unsigned char i, unsigned char j);
-    double operator() (unsigned char i, unsigned char j) const;
+    double& operator() (int i, int j);
+    double operator() (int i, int j) const;
 
 private:
     double m_val[4][4];

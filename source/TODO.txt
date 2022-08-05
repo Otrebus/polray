@@ -12,6 +12,7 @@ Unhardcode light area sampling in light portal
 Implement multiple importance sampling for light portals
 Fix the friend/attourney etc relationships and private fields in general
 (mostly for "fun") Make light portals work inside scenes
+Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
 Add physical camera to bdpt
 Add check that all primitives have materials, in scene
 - Change the DirectHitMIS etc stuff

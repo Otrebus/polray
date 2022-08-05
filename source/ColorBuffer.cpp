@@ -64,7 +64,7 @@ void ColorBuffer::Dump(std::string filename) {
         for (int x = 0; x < width; x++) {
             auto color = GetPixel(x, y);
             for(auto c : { color.b, color.g, color.r })
-                file.put(std::max(0, std::min(255, (int)(255*c))));
+                file.put((char) std::max(0, std::min(255, (int)(255*c))));
         }
         for (int n = 0; n < pad; n++)
             file.put(0);
@@ -164,7 +164,7 @@ void ColorBuffer::PutText(const char* const text, int x, int y)
     SelectObject(hdc, hbhb);
     ::SetTextColor(hdc, 0x00ffffff);
     ::SetBkMode(hdc, TRANSPARENT);
-    ::TextOut(hdc, x, y, (LPCWSTR) text, strlen(text));
+    ::TextOut(hdc, x, y, (LPCWSTR) text, (int) strlen(text));
 
     for(int b = 0; b < height; b++)
         for(int a = 0; a < width; a++)

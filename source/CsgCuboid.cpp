@@ -122,7 +122,7 @@ bool CsgCuboid::GenerateIntersectionInfo(const Ray& inRay,
                                          IntersectionInfo& info) const
 {
     double t, tnear, tfar;
-    int axisNear, axisFar, sideNear, sideFar, axis, side;
+    int axisNear, axisFar, sideNear, sideFar, axis, Side;
     
     SlabsTest(inRay, tnear, tfar, axisNear, axisFar, sideNear, sideFar);
     
@@ -130,19 +130,19 @@ bool CsgCuboid::GenerateIntersectionInfo(const Ray& inRay,
     {
         t = tnear;
         axis = axisNear;
-        side = sideNear;
+        Side = sideNear;
     }
     else if(tfar > 0)
     {
         t = tfar;
         axis = axisFar;
-        side = sideFar;
+        Side = sideFar;
     }
     else
         return false;
 
     Vector3d normal(0, 0, 0);
-    normal[axis] = side;
+    normal[axis] = Side;
     info.normal = info.geometricnormal 
                 = Multiply(x_, y_, z_, normal);
     info.direction = inRay.direction;
@@ -159,8 +159,7 @@ BoundingBox CsgCuboid::GetBoundingBox() const
     return BoundingBox(pos_ - Vector3d(X, Y, Z), pos_ + Vector3d(X, Y, Z));
 }
 
-bool CsgCuboid::GetClippedBoundingBox(const BoundingBox& clipbox, 
-                                      BoundingBox& resultbox) const
+bool CsgCuboid::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
 {
     resultbox = GetBoundingBox();
     return true;
@@ -171,11 +170,11 @@ void CsgCuboid::AddToScene(Scene& scene)
     Scene::PrimitiveAdder::AddPrimitive(scene, this);
 }
 
-void CsgCuboid::Save(Bytestream& stream) const
+void CsgCuboid::Save(Bytestream&) const
 {
 }
 
-void CsgCuboid::Load(Bytestream& stream)
+void CsgCuboid::Load(Bytestream&)
 {
 }
 
@@ -186,7 +185,6 @@ void CsgCuboid::SetMaterial(Material* mat)
 
 bool CsgCuboid::SlabsTest(const Ray& inRay, double& tNear, double& tFar, int& axisNear, int& axisFar, int& sideNear, int& sideFar) const
 {
-    double x, y, z;
     Vector3d transPos = Multiply(invMatU_, invMatV_, invMatW_, pos_);
     Vector3d transOrigin = Multiply(invMatU_, invMatV_, invMatW_, inRay.origin);
     Vector3d transDir = Multiply(invMatU_, invMatV_, invMatW_, inRay.direction);
@@ -207,8 +205,8 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, double& tNear, double& tFar, int& ax
         }
         else
         {  
-            double tmpSideNear = -1;
-            double tmpSideFar = 1;
+            int tmpSideNear = -1;
+            int tmpSideFar = 1;
             double t1 = (c1[u] - ray.origin[u]) / ray.direction[u];
             double t2 = (c2[u] - ray.origin[u]) / ray.direction[u];
             if (t1 > t2)

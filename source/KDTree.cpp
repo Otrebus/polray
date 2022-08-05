@@ -35,8 +35,10 @@ double KDNode::SAHCost(int nPrimitives, double area, int nLeft, double leftarea,
         if(nRight + nPlanar == 0 || nLeft == 0)
             cost *= 1.0f;
     }
-    else
+    else {
         __debugbreak();
+        return 0; // To appease the compiler
+    }
     return cost;
 }
 
@@ -101,12 +103,11 @@ void KDNode::Build()
 {
 }
 
-BoundingBox KDTree::CalculateExtents(vector<const Primitive*>& primitives)
+BoundingBox KDTree::CalculateExtents(vector<const Primitive*>& shapes)
 {
-    const auto inf = numeric_limits<double>::infinity();
     double maxx = -inf, maxy = -inf, maxz = -inf, minx = inf, miny = inf, minz = inf;
 
-    for(auto& s : primitives)
+    for(auto& s : shapes)
     {
         double smaxx, smaxy, smaxz, sminx, sminy, sminz;
 
@@ -150,9 +151,9 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         return;
     }
 
-    double bestsplit;
-    int bestsplitdir;
-    char bestside;
+    double bestsplit = 0;
+    int bestsplitdir = 0;
+    char bestside = 0;
     double bestcost = numeric_limits<double>::infinity();
     double boxarea = 2*(bbox.c2.z-bbox.c1.z)*(bbox.c2.y-bbox.c1.y) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.z-bbox.c1.z) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.y-bbox.c1.y);
 
@@ -236,7 +237,6 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         }
         else
             badsplits--;
-
     }
 
     // Ok, now we've found the best split location, it's time to split and prepare for recursion
@@ -521,9 +521,6 @@ void KDTree::Build(vector<const Primitive*> primitives)
     // Loop through each axis - u is the primary axis
     for(int u = 0; u < 3; u++)
     {
-        int v = (u + 1) % 3;
-        int w = (u + 2) % 3;
-
         if(g_quitting)
             return;
 

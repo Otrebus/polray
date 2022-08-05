@@ -51,11 +51,11 @@ Cubemap* cubemap;
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
-//#define BOX
+#define BOX
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-#define KITCHEN2
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -76,15 +76,15 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     auto s = std::shared_ptr<Scene> (new Scene("Morning Apartment2.obj"));
 
     Vector3d camPos = Vector3d(0.6, 2.0, 2.5);
-    Vector3d target = Vector3d(-1.4, 1.45, -2.1);
+    Vector3d target = Vector3d(-1.4, 1.35, -2.1);
 
     //Vector3d camPos = Vector3d(2.1, 3.1, -0.4);
     //Vector3d target = Vector3d(-1.8, 0.6, -2.9);
 
     Vector3d camdir = target-camPos;
     camdir.Normalize();
-    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).GetLength(), 10.15));
-    s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 70));
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 70, (Vector3d(0, 1.9, -3.2)-camPos).GetLength(), 0.03));
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 70));
 
     // tmp
     //Vector3d camPos = Vector3d(-43.9, 293.8, 43);
@@ -117,12 +117,12 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
 
     LightPortal* portalLight = new LightPortal();
-    portalLight->AddPortal(Vector3d(-4.7, 7, -15.1), Vector3d(0, -7, 0), Vector3d(0, 0, 30));
+    portalLight->AddPortal(Vector3d(-2.7, 3.1, -3.5), Vector3d(0, -1.7, 0), Vector3d(0, 0, 2.7));
 
     LightPortal* portalLight2 = new LightPortal();
-    portalLight2->AddPortal(Vector3d(-4.7, 7, -15.1), Vector3d(0, -7, 0), Vector3d(0, 0, 30));
+    portalLight2->AddPortal(Vector3d(-2.7, 3.1, -3.5), Vector3d(0, -1.7, 0), Vector3d(0, 0, 2.7));
 
-    auto sunLight = new SphereLight(Vector3d(-18.4, 8.4, 4)*100, 10, 10000*Color(233, 237, 107));
+    auto sunLight = new SphereLight(Vector3d(-18.4, 8.4, 4)*100, 10, 8000*Color(233, 237, 127));
     auto skyLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 100000, 3*Color(0.9, 1.2, 1.5));
 
     portalLight->SetLight(sunLight);
@@ -141,12 +141,22 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     auto bl = Vector3d(-2.5, 0.0, 3.2);
     auto br = Vector3d(4.0, 0.0, 3.2);
 
-
     auto mat = new LambertianMaterial();
     mat->Kd = Color(0.8, 0.8, 0.8);
 
     auto triangle1 = new Triangle(tl, tr, br);
     auto triangle2 = new Triangle(tl, bl, br);
+    triangle1->SetMaterial(mat);
+    triangle2->SetMaterial(mat);
+    s->AddModel(triangle1);
+    s->AddModel(triangle2);
+
+    tl = Vector3d(-2.6, 3.2, -0.3);
+    tr = Vector3d(-2.6, 3.2, 2.9);
+    bl = Vector3d(-2.6, -0.2, -0.3);
+    br = Vector3d(-2.6, -0.2, 2.9);
+    triangle1 = new Triangle(tl, tr, br);
+    triangle2 = new Triangle(tl, bl, br);
     triangle1->SetMaterial(mat);
     triangle2->SetMaterial(mat);
     s->AddModel(triangle1);
@@ -1376,7 +1386,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     //s->AddLight(boxLight);
 
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef MESHLIGHTBOX
 

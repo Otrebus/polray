@@ -43,8 +43,7 @@ BoundingBox CsgIntersection::GetBoundingBox() const
     return BoundingBox(c1, c2);
 }
 
-bool CsgIntersection::GetClippedBoundingBox(const BoundingBox& clipbox, 
-                                            BoundingBox& resultbox) const
+bool CsgIntersection::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
 {
     resultbox = GetBoundingBox();
     return true;
@@ -90,11 +89,11 @@ void CsgIntersection::AddToScene(Scene& scene)
     Scene::PrimitiveAdder::AddPrimitive(scene, this);
 }
 
-void CsgIntersection::Save(Bytestream& stream) const
+void CsgIntersection::Save(Bytestream&) const
 {
 }
 
-void CsgIntersection::Load(Bytestream& stream)
+void CsgIntersection::Load(Bytestream&)
 {
 }
 

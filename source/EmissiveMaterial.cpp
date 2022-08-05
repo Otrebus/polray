@@ -6,8 +6,6 @@ EmissiveMaterial::EmissiveMaterial()
 {
 #ifdef DETERMINISTIC
     rnd.Seed(0);
-#else
-    rnd.Seed(GetTickCount() + int(this));
 #endif
     texture = 0;
     normalmap = 0;
@@ -22,7 +20,7 @@ EmissiveMaterial::~EmissiveMaterial()
         delete texture;
 }
 
-Sample EmissiveMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
+Sample EmissiveMaterial::GetSample(const IntersectionInfo& info, bool) const
 {
     auto pdf = 2*F_PI;
     auto rpdf = 2*F_PI;
@@ -36,7 +34,7 @@ Light* EmissiveMaterial::GetLight() const
     return light;
 }
 
-Color EmissiveMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int sample) const
+Color EmissiveMaterial::BRDF(const IntersectionInfo&, const Vector3d&, int) const
 {
     return Color(0.0, 0.0, 0.0); // Blackbody
 }
@@ -45,7 +43,7 @@ void EmissiveMaterial::ReadProperties(stringstream& ss)
 {
 }
 
-double EmissiveMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int sample) const
+double EmissiveMaterial::PDF(const IntersectionInfo&, const Vector3d&, bool, int) const
 {
     return 0;
 }

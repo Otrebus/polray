@@ -22,7 +22,7 @@ void AshikhminShirley::ReadProperties(stringstream& ss)
         getline(ss, line);
         stringstream ss2(line);
         ss2 >> a;
-        transform(a.begin(), a.end(), a.begin(), tolower);
+        transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
         if(a == "rd")
             ss2 >> Rd.r >> Rd.g >> Rd.b;
         else if(a == "rs")

@@ -13,8 +13,6 @@ CookTorrance::CookTorrance()
     alpha = 0;
 #ifdef DETERMINISTIC
     rnd.Seed(0);
-#else
-    rnd.Seed(GetTickCount() + int(this));
 #endif
 }
 
@@ -36,7 +34,7 @@ double D_p(double alpha, double cosn) {
     return sq(alpha)/(M_PI*sq((sq(alpha)-1)*cosn*cosn+1));
 }
 
-Sample CookTorrance::GetSample(const IntersectionInfo& info, bool adjoint) const
+Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
 {
     //float df = Kd.GetMax();
     //float sp = Ks.GetMax();
@@ -55,8 +53,8 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool adjoint) const
 
     auto [right, forward] = MakeBasis(N_s);
 
-    float r1 = rnd.GetDouble(0.0f, 2*F_PI);
-    float r2 = rnd.GetDouble(0.0f, 1);
+    auto r1 = rnd.GetDouble(0.0, 2*pi);
+    auto r2 = rnd.GetDouble(0.0, 1.0);
 
     auto t = std::atan(alpha*std::sqrt(r2)/std::sqrt(1-r2));
 
@@ -118,7 +116,7 @@ void CookTorrance::ReadProperties(stringstream& ss)
         getline(ss, line);
         stringstream ss2(line);
         ss2 >> a;
-        transform(a.begin(), a.end(), a.begin(), tolower);
+        transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
 
         if(a == "ks")
             ss2 >> Ks.r >> Ks.g >> Ks.b;

@@ -101,7 +101,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
 // relative to the given intersectioninfo. In the case of any specular material
 // the BRDF is 0 in all directions, since it is effectively a distribution.
 //------------------------------------------------------------------------------
-Color DielectricMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
+Color DielectricMaterial::BRDF(const IntersectionInfo&, const Vector3d&, int) const
 {
     return Color(0, 0, 0); // The chance that the out, in vectors 
 }                          // are reflectant is 0

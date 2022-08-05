@@ -85,8 +85,8 @@ double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
             auto lightPoint = info.position;
 
             double areaSum = 0;
-            for(auto p : portals)
-                areaSum += p.GetArea();
+            for(auto pt : portals)
+                areaSum += pt.GetArea();
 
             auto d = (lightPoint - portalPoint).GetLength();
             return d*d/(std::abs(portalNormal*ray.direction)*areaSum);

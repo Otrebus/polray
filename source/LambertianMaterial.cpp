@@ -92,7 +92,7 @@ void LambertianMaterial::ReadProperties(stringstream& ss)
         getline(ss, line);
         stringstream ss2(line);
         ss2 >> a;
-        transform(a.begin(), a.end(), a.begin(), tolower);
+        transform(a.begin(), a.end(), a.begin(), [](char a) { return tolower((int)a); });
         if(a == "kd")
             ss2 >> Kd.r >> Kd.g >> Kd.b;
     }

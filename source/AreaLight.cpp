@@ -17,8 +17,6 @@ AreaLight::AreaLight(const Vector3d& position, const Vector3d& corner1, const Ve
     intensity_ = color;
 #ifdef DETERMINISTIC
     r.Seed(0);
-#else
-    r.Seed(GetTickCount() + int(this));
 #endif
 }
 

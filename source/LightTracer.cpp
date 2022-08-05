@@ -17,7 +17,6 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
     const double yres = (double)colBuf.GetYRes();
 
     Vector3d dummyVector;
-    double dummydouble;
 
     colBuf.Clear(0);
 
@@ -31,10 +30,10 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
 
         pathColor *= light->GetArea()*light->GetIntensity(); // First direction is from the light source
 
-        auto [u, v, lensPoint] = cam.SampleAperture();
+        auto [firstU, firstV, firstLensPoint] = cam.SampleAperture();
 
         // Light going straight from the surface of the light source to the camera
-        Vector3d lightToCam = lensPoint - ray.origin;
+        Vector3d lightToCam = firstLensPoint - ray.origin;
         Ray lightToCamRay(ray.origin, lightToCam);
         double camRayLength = lightToCam.GetLength();
         lightToCamRay.direction.Normalize();
@@ -44,9 +43,9 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
         double surfcos = abs(lightNormal*lightToCamRay.direction);
         surfcos = abs(surfcos);
 
-        auto [hitCam, xPixel, yPixel] = cam.GetPixelFromRay(lightToCamRay, u, v);
-        if(hitCam && TraceShadowRay(lightToCamRay, camRayLength))
-            colBuf.AddColor(xPixel, yPixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight);
+        auto [firstHitCam, firstXPixel, firstYPixel] = cam.GetPixelFromRay(lightToCamRay, firstU, firstV);
+        if(firstHitCam && TraceShadowRay(lightToCamRay, camRayLength))
+            colBuf.AddColor(firstXPixel, firstYPixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight);
         do
         {
             const Primitive* minprimitive = nullptr;
@@ -66,7 +65,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             auto [u, v, lensPoint] = cam.SampleAperture();
 
             Ray camRay = Ray(info.GetPosition(), lensPoint - info.GetPosition());
-            double camRayLength = camRay.direction.GetLength();
+            camRayLength = camRay.direction.GetLength();
             camRay.direction.Normalize();
 
             auto sample = info.GetMaterial()->GetSample(info, true);
@@ -76,9 +75,9 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             auto [hitCam, xPixel, yPixel] = cam.GetPixelFromRay(camRay, u, v);
             if(hitCam && TraceShadowRay(camRay, camRayLength))
             {
-                double camcos = abs(-camRay.direction*cam.dir);
-                double pixelArea = (double)cam.GetPixelArea();
-                double surfcos = abs(info.GetGeometricNormal()*camRay.direction);
+                camcos = abs(-camRay.direction*cam.dir);
+                pixelArea = (double)cam.GetPixelArea();
+                surfcos = abs(info.GetGeometricNormal()*camRay.direction);
 
                 Color brdf = info.GetMaterial()->BRDF(info, camRay.direction, sample.component);
                 // Flux to radiance and stuff involving probability and sampling of the camera

@@ -155,7 +155,7 @@ BoundingBox CsgCylinder::GetBoundingBox() const
     return BoundingBox(pos_ + c1, pos_ + c2);
 }
 
-bool CsgCylinder::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
+bool CsgCylinder::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
 {
     resultbox = GetBoundingBox();
     return true;
@@ -254,11 +254,11 @@ void CsgCylinder::AddToScene(Scene& scene)
     Scene::PrimitiveAdder::AddPrimitive(scene, this);
 }
 
-void CsgCylinder::Save(Bytestream& stream) const
+void CsgCylinder::Save(Bytestream&) const
 {
 }
 
-void CsgCylinder::Load(Bytestream& stream)
+void CsgCylinder::Load(Bytestream&)
 {
 }
 

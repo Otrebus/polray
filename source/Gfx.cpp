@@ -354,7 +354,7 @@ void Gfx::DestroySurfaces()
 //------------------------------------------------------------------------------
 // Creates the front buffer and back buffers
 //------------------------------------------------------------------------------
-bool Gfx::CreateSurfaces(bool windowed, int bpp, int xres, int yres)
+bool Gfx::CreateSurfaces(bool windowed, int, int xres, int yres)
 {
     if(windowed)
     {

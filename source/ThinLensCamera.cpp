@@ -110,24 +110,6 @@ std::tuple<double, double, Vector3d> ThinLensCamera::SampleAperture() const
     return { u, v, pos };
 }
 
-//------------------------------------------------------------------------------
-// Sets the focal length of the camera.
-//------------------------------------------------------------------------------
-void ThinLensCamera::SetFocalLength(double focalLength)
-{
-    assert(focalLength > 0);
-    this->focalLength = focalLength;
-}
-
-//------------------------------------------------------------------------------
-// Sets the lens of the camera.
-//------------------------------------------------------------------------------
-void ThinLensCamera::SetLensRadius(double lensRadius)
-{
-    assert(lensRadius > 0);
-    this->lensRadius = lensRadius;
-}
-
 void ThinLensCamera::Save(Bytestream& stream) const
 {
     stream << ID_THINLENSCAMERA << pos << dir << up << halfwidth << xres << yres 

@@ -1,9 +1,9 @@
 #include "BrutePartitioning.h"
 #include "Utils.h"
 
-void BrutePartitioning::Build(std::vector<const Primitive*> primitives)
+void BrutePartitioning::Build(std::vector<const Primitive*> shapes)
 {
-    this->primitives = primitives;
+    primitives = shapes;
 }
 
 double BrutePartitioning::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const {

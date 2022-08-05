@@ -142,11 +142,11 @@ std::vector<Vector2d> convexHull(std::vector<Vector2d> v)
     std::sort(v.begin(), v.end(), sortFn);
 
     for(auto it = v.begin(); it < v.end(); ps.push_back(*it), it++) // Lower hull part
-        for(int i = ps.size() - 2; i >= 0 && turnsRight(ps[i], ps[i+1], *it); i--)
+        for(int i = (int) ps.size() - 2; i >= 0 && turnsRight(ps[i], ps[i+1], *it); i--)
             ps.pop_back();
 
     for(auto it = v.rbegin(); it < v.rend(); ps2.push_back(*it), it++) // Upper hull part
-        for(int i = ps2.size() - 2; i >= 0 && turnsRight(ps2[i], ps2[i+1], *it); i--)
+        for(int i = (int) ps2.size() - 2; i >= 0 && turnsRight(ps2[i], ps2[i+1], *it); i--)
             ps2.pop_back();
 
     // Merge the convex hull parts

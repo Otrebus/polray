@@ -30,7 +30,7 @@ Rendering* rendering;
 //-----------------------------------------------------------------------------
 // Entry point.
 //-----------------------------------------------------------------------------
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     WNDCLASSEX  wc;
     HWND	    hWnd;
@@ -63,7 +63,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     Texture::hInstance = hInstance;
 
     if (!RegisterClassEx(&wc))
-        return 0;
+        return 1;
 
     SetProcessDPIAware();
 
@@ -182,6 +182,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
     }
 
     DestroyWindow(hWnd);
+    return 0;
 }
 
 //------------------------------------------------------------------------------

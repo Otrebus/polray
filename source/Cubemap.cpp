@@ -13,7 +13,7 @@ int Cubemap::GetTexel(const Vector3d& v) const
     // These cases can be optimized a little more to just check for the largest part and its sign
 
     // South side (positive z)
-    if(v.z >= fabsf(v.x) && v.z >= fabsf(v.y))
+    if(v.z >= std::abs(v.x) && v.z >= std::abs(v.y))
     {
         face = &m_south;
         w.x = -w.x;
@@ -21,13 +21,13 @@ int Cubemap::GetTexel(const Vector3d& v) const
     }
 
     // North side
-    else if(-v.z >= fabsf(v.x) && -v.z >= fabsf(v.y))
+    else if(-v.z >= std::abs(v.x) && -v.z >= std::abs(v.y))
     {
         face = &m_north;
     }
 
     // West side
-    else if(-v.x >= fabsf(v.z) && -v.x >= fabsf(v.y))
+    else if(-v.x >= std::abs(v.z) && -v.x >= std::abs(v.y))
     {
         face = &m_west;
         w.x = -v.z;
@@ -35,7 +35,7 @@ int Cubemap::GetTexel(const Vector3d& v) const
     }
 
     // East side
-    else if(v.x >= fabsf(v.z) && v.x >= fabsf(v.y))
+    else if(v.x >= std::abs(v.z) && v.x >= std::abs(v.y))
     {
         face = &m_east;
         w.x = v.z;
@@ -43,7 +43,7 @@ int Cubemap::GetTexel(const Vector3d& v) const
     }
 
     // Top side
-    else if(v.y >= fabsf(v.x) && v.y >= fabsf(v.z))
+    else if(v.y >= std::abs(v.x) && v.y >= std::abs(v.z))
     {
         face = &m_top;
         w.y = v.z;

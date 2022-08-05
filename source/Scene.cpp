@@ -104,7 +104,6 @@ void Scene::Load(Bytestream& b)
 
     for(unsigned int i = 0; i < nLights; i++)
     {
-        unsigned char id;
         b >> id;
         Light* l = Light::Create(id);
         l->Load(b);
@@ -112,7 +111,6 @@ void Scene::Load(Bytestream& b)
     }
     for(unsigned int i = 0; i < nModels; i++)
     {
-        unsigned char id;
         b >> id;
         Model* m = Model::Create(id);
         m->Load(b);

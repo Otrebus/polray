@@ -9,7 +9,9 @@
 
 MeshLight::MeshLight(Color intensity, std::string fileName)
 {
-    r.Seed(GetTickCount() + (int) this);
+#ifdef DETERMINISTIC
+    r.Seed(0);
+#endif
     material = new EmissiveMaterial();
     material->light = this;
     material->emissivity = intensity;
@@ -20,7 +22,7 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
     for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
         area_ += (*it)->GetArea();
 
-    triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+    triangleTree_ = BuildTree(0, (int) mesh->triangles.size() - 1, area_, 0);
     std::vector<const Primitive*> v;
     for(auto t : mesh->triangles)
         v.push_back(t);
@@ -31,7 +33,9 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
 
 MeshLight::MeshLight(Color intensity)
 {
-    r.Seed(GetTickCount() + (int) this);
+#ifdef DETERMINISTIC
+    r.Seed(0);
+#endif
     material = new EmissiveMaterial();
     material->light = this;
     material->emissivity = intensity;
@@ -51,7 +55,7 @@ MeshTriangle* MeshLight::PickRandomTriangle() const
         area_ = 0;
         for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
             area_ += (*it)->GetArea();
-        triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+        triangleTree_ = BuildTree(0, (int) mesh->triangles.size() - 1, area_, 0);
         std::vector<const Primitive*> v;
         for(auto t : mesh->triangles)
             v.push_back(t);
@@ -220,23 +224,20 @@ double MeshLight::GetArea() const
     return area_;
 }
 
-void MeshLight::AddToScene(Scene* scene)
+void MeshLight::AddToScene(Scene* scn)
 {
     for(auto& t : mesh->triangles)
-		Scene::PrimitiveAdder::AddPrimitive(*scene, t);
-    Scene::LightAdder::AddLight(*scene, this);
+		Scene::PrimitiveAdder::AddPrimitive(*scn, t);
+    Scene::LightAdder::AddLight(*scn, this);
 }
 
 Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const
 {
     auto [lightPoint_, lightNormal_] = SamplePoint();
     Vector3d toLight = lightPoint_ - info.GetPosition();
-    double d = toLight.GetLength();
     Vector3d normal = info.GetNormal();
 
-    //if(toLight*lightNormal_ < 0)
     if(toLight*lightNormal_ < 0)
-        //lightNormal = -lightNormal;
     {
         double d = toLight.GetLength();
         toLight.Normalize();

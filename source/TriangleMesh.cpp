@@ -33,7 +33,7 @@ Vector3d MeshTriangle::GetNormal() const
 
 double MeshTriangle::GetArea()
 {
-	return fabsf(((v1->pos-v0->pos)^(v2->pos-v0->pos)).GetLength())/2;
+	return std::abs(((v1->pos-v0->pos)^(v2->pos-v0->pos)).GetLength())/2;
 }
 
 MeshTriangle::MeshTriangle(MeshVertex* _v0, MeshVertex* _v1, MeshVertex* _v2)// : mesh(t)
@@ -276,10 +276,7 @@ void TriangleMesh::Save(Bytestream& stream) const
     }
     for(auto it = triangles.begin(); it < triangles.end(); it++)
     {
-        unsigned int a, b, c;
         MeshTriangle* v = *it;
-
-		auto x = vertexMemToIndex[v->v0];
 
         stream << vertexMemToIndex[v->v0] 
                << vertexMemToIndex[v->v1] << vertexMemToIndex[v->v2];

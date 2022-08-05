@@ -60,7 +60,7 @@ BoundingBox CsgSphere::GetBoundingBox() const
                        pos_ + Vector3d(radius_, radius_, radius_));
 }
 
-bool CsgSphere::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
+bool CsgSphere::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
 {
     resultbox = GetBoundingBox();
     return true;
@@ -135,11 +135,11 @@ void CsgSphere::AddToScene(Scene& scene)
     Scene::PrimitiveAdder::AddPrimitive(scene, this);
 }
 
-void CsgSphere::Save(Bytestream& stream) const
+void CsgSphere::Save(Bytestream&) const
 {
 }
 
-void CsgSphere::Load(Bytestream& stream)
+void CsgSphere::Load(Bytestream&)
 {
 }
 

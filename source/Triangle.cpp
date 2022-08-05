@@ -49,7 +49,7 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
 
     double det = E2*Q;
 
-    auto u = D*P/det, v = T*Q/det, t = E1*P/det;
+    auto u = D*P/det, v = T*Q/det;
 
     info.normal = u*(v1.normal-v0.normal) + v*(v2.normal-v0.normal) + v0.normal;
     info.normal.Normalize();

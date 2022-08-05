@@ -112,7 +112,7 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
             if(hitLight == light)
             {   // Direct light hit
                 lastV->rpdf = hitLight->Pdf(info, -v)*(abs(lastV->info.GetGeometricNormal()*v))/(lSqr);
-                samples.push_back(BDSample(0, path.size()));
+                samples.push_back(BDSample(0, (int) path.size()));
                 return (int) path.size() - 1;
             }
         } else {
@@ -309,14 +309,14 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         forwardProbs[s] = newPdf*abs(lastE->info.geometricnormal*out)/(lSqr);
 
         if(t > 2) {
-            auto info = eyePath[t-1]->info;
+            info = eyePath[t-1]->info;
             info.direction = out;
-            auto out2 = eyePath[t-2]->info.position - lastE->info.position;
-            lSqr = out2.GetLengthSquared();
-            out2.Normalize();
-            newPdf = lastE->info.GetMaterial()->PDF(info, out2, true, lastE->sample.component);
+            out = eyePath[t-2]->info.position - lastE->info.position;
+            lSqr = out.GetLengthSquared();
+            out.Normalize();
+            newPdf = lastE->info.GetMaterial()->PDF(info, out, true, lastE->sample.component);
         
-            forwardProbs[s+1] = newPdf*abs(eyePath[t-2]->info.geometricnormal*out2)/(lSqr);
+            forwardProbs[s+1] = newPdf*abs(eyePath[t-2]->info.geometricnormal*out)/(lSqr);
         }
     }
 
@@ -345,14 +345,14 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
             newPdf = lastE->info.GetMaterial()->PDF(info, out, false, lastE->sample.component);
         backwardProbs[s-1] = newPdf*abs(lastL->info.geometricnormal*out)/lSqr;
         if(s > 1) {
-            auto info = lightPath[s-1]->info;
+            info = lightPath[s-1]->info;
             info.direction = out;
-            auto out2 = lightPath[s-2]->info.position - lastL->info.position;
-            lSqr = out2.GetLengthSquared();
-            out2.Normalize();
-            newPdf = lastL->info.GetMaterial()->PDF(info, out2, false, lastL->sample.component);
+            out = lightPath[s-2]->info.position - lastL->info.position;
+            lSqr = out.GetLengthSquared();
+            out.Normalize();
+            newPdf = lastL->info.GetMaterial()->PDF(info, out, false, lastL->sample.component);
 
-            backwardProbs[s-2] = newPdf*abs(lightPath[s-2]->info.geometricnormal*out2)/(lSqr);
+            backwardProbs[s-2] = newPdf*abs(lightPath[s-2]->info.geometricnormal*out)/(lSqr);
         }
     }
     
@@ -388,8 +388,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     vector<BDVertex*> eyePath;
     vector<BDVertex*> lightPath;
 
-    double r = m_random.GetDouble(0.0f, 1.0f);
-    auto [light, lightWeight] = scene->PickLight(r);
+    auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
 
     int lLength = BuildLightPath(lightPath, light);
     int eLength = BuildEyePath(x, y, eyePath, cam, samples, light);

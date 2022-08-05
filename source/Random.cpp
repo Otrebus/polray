@@ -35,4 +35,9 @@ void Random::Seed(unsigned int seed)
     generator.seed(seed);
 }
 
+void Random::Seed()
+{
+    generator.seed(std::random_device()());
+}
+
 std::default_random_engine thread_local Random::generator = std::default_random_engine(std::random_device()());

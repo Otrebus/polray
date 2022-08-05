@@ -26,7 +26,7 @@ Matrix3d::Matrix3d(double m00, double m01, double m02, double m03,
 //-----------------------------------------------------------------------------
 // Returns a reference to the value stored in matrix position (row,col)
 //-----------------------------------------------------------------------------
-double& Matrix3d::operator() (unsigned char i, unsigned char j)
+double& Matrix3d::operator() (int i, int j)
 {
     assert(i >= 0 && j <= 3 && j >= 0 && j <= 3);
     return m_val[i][j];
@@ -35,7 +35,7 @@ double& Matrix3d::operator() (unsigned char i, unsigned char j)
 //-----------------------------------------------------------------------------
 // Returns a reference to the value stored in matrix position (row,col)
 //-----------------------------------------------------------------------------
-double Matrix3d::operator() (unsigned char i, unsigned char j) const
+double Matrix3d::operator() (int i, int j) const
 {
     assert(i >= 0 && j <= 3 && j >= 0 && j <= 3);
     return m_val[i][j];

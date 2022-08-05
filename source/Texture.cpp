@@ -120,7 +120,7 @@ Color Texture::GetTexelBLInterp(double fx, double fy) const
     if(x < 0 || x > width - 1 || y < 0 || y > height - 1)
         return Color(1, 0, 1);
 
-    double dx = x - floorf(fx), dy = y - floorf(fy);
+    double dx = x - floorl(fx), dy = y - floorl(fy);
     double dxu = 1 - dx, dyu = 1 - dy;
     return (GetTexel(x, y)*dxu + GetTexel(x + 1, y)*dx)*dyu + (GetTexel(x, y+1)*dxu + GetTexel(x+1,y+1)*dx)*dy;
 }

@@ -106,8 +106,8 @@ std::tuple<double, double, Vector3d> ThinLensCamera::SampleAperture() const
     double u = random.GetDouble(0, 2*F_PI);
     double v = sqrt(random.GetDouble(0, 1));
 
-    Vector3d pos = this->pos + lensRadius*v*(up*sin(u) + (dir^up)*cos(u));
-    return { u, v, pos };
+    Vector3d position = this->pos + lensRadius*v*(up*sin(u) + (dir^up)*cos(u));
+    return { u, v, position };
 }
 
 void ThinLensCamera::Save(Bytestream& stream) const

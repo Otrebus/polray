@@ -24,22 +24,9 @@ Rendering::Rendering(std::string fileName)
     b.LoadFromFile(fileName);
     std::shared_ptr<Scene> scene(new Scene());
     scene->Load(b);
-    unsigned int rendererType;
+    unsigned char rendererType;
     b >> rendererType >> nSamples;
-    switch(rendererType)
-    {
-    case Renderer::typePathTracer:
-        renderer = make_shared<PathTracer>(scene);
-        break;
-    case Renderer::typeLightTracer:
-        renderer = make_shared<LightTracer>(scene);
-        break;
-    case Renderer::typeBDPT:
-        renderer = make_shared<BDPT>(scene);
-        break;
-    default:
-        __debugbreak();
-    }
+    renderer = std::shared_ptr<Renderer>(Renderer::Create(rendererType, scene));
     accumulation = new ColorBuffer(b);
     image = new ColorBuffer(accumulation->GetXRes(), accumulation->GetYRes());
     image->Clear(0);
@@ -49,7 +36,8 @@ void Rendering::SaveRendering(std::string fileName)
 {
     Bytestream b;
     renderer->GetScene()->Save(b);
-    b << renderer->GetType() << nSamples;
+    renderer->Save(b);
+    b << nSamples;
     accumulation->Save(b);
     b.SaveToFile(fileName);
 }
@@ -132,7 +120,7 @@ void Rendering::Start()
 #ifdef _DEBUG
     processor_count = 1;
 #endif
-    for(int i = 0; i < processor_count; i++)
+    for(unsigned int i = 0; i < processor_count; i++)
         _beginthread(Rendering::Thread, 0, (void*)this);
 }
 

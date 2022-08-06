@@ -65,7 +65,7 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
 }
 
 
-Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
+Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
 {
     assert(component == 1);
 
@@ -89,17 +89,14 @@ Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int 
     if(in*N_g < 0 || out*N_g < 0 || in*N_s < 0 || out*N_s < 0) // FIXME: redundant checks
         return 0;
 
-    if(component == 1)
-    {
-        auto cosn = h*N;
-        auto cosv = h*in;
-        auto F_0 = sq((1-ior)/(1+ior));
-        auto D = D_p(alpha, cosn);
-        auto G = 1.0/(1.0 + G_p(h, in, alpha) + G_p(h, out, alpha));
-        auto F = F_0 + (1-F_0)*(std::pow(1-cosv, 5));
+    auto cosn = h*N;
+    auto cosv = h*in;
+    auto F_0 = sq((1-ior)/(1+ior));
+    auto D = D_p(alpha, cosn);
+    auto G = 1.0/(1.0 + G_p(h, in, alpha) + G_p(h, out, alpha));
+    auto F = F_0 + (1-F_0)*(std::pow(1-cosv, 5));
 
-        return Ks*D*G*F/(4*(out*N)*(in*N));
-    }
+    return Ks*D*G*F/(4*(out*N)*(in*N));
 }
 
 Light* CookTorrance::GetLight() const
@@ -146,7 +143,7 @@ double CookTorrance::PDF(const IntersectionInfo& info, const Vector3d& out, bool
 
     if(component == 1)
         return 0;
-
+    return 1; // TODO: fix
 }
 
 void CookTorrance::Save(Bytestream& stream) const

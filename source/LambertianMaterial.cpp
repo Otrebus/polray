@@ -10,8 +10,6 @@ LambertianMaterial::LambertianMaterial()
     emissivity = Color(0, 0, 0);
 #ifdef DETERMINISTIC
     rnd.Seed(0);
-#else
-    rnd.Seed(GetTickCount() + int(this));
 #endif
 }
 
@@ -58,7 +56,7 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     return Sample(color, out, pdf, rpdf, false, 1);
 }
 
-Color LambertianMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
+Color LambertianMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
 {
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();
@@ -92,13 +90,13 @@ void LambertianMaterial::ReadProperties(stringstream& ss)
         getline(ss, line);
         stringstream ss2(line);
         ss2 >> a;
-        transform(a.begin(), a.end(), a.begin(), [](char a) { return tolower((int)a); });
+        transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower((int)a); });
         if(a == "kd")
             ss2 >> Kd.r >> Kd.g >> Kd.b;
     }
 }
 
-double LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const
+double LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int) const
 {
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();

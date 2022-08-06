@@ -5,6 +5,7 @@
 //------------------------------------------------------------------------------
 
 #include "Input.h"
+#pragma warning(disable : 4644) // Warns about the use of Offsetof inside DIMOFS_X
 
 //------------------------------------------------------------------------------
 // Constructor

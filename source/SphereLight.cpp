@@ -13,7 +13,9 @@ SphereLight::SphereLight()
 SphereLight::SphereLight(Vector3d pos, double rad, Color str)
     : position_(pos), radius_(rad), Light(str)
 {
-    r_.Seed(GetTickCount() + int(this));
+#ifdef DETERMINISTIC
+    r_.Seed(0);
+#endif
     material = new EmissiveMaterial();
     material->emissivity = str;
     material->light = this;
@@ -104,12 +106,12 @@ double SphereLight::GetArea() const
     return 4*M_PI*radius_*radius_;
 }
 
-void SphereLight::AddToScene(Scene* scene)
+void SphereLight::AddToScene(Scene* scn)
 {
     Sphere* s = new Sphere(position_, Vector3d(0, 1, 0), 
                            Vector3d(0, 0, 1), radius_);
-    Scene::LightAdder::AddLight(*scene, this);
-    Scene::PrimitiveAdder::AddPrimitive(*scene, s);
+    Scene::LightAdder::AddLight(*scn, this);
+    Scene::PrimitiveAdder::AddPrimitive(*scn, s);
     s->SetMaterial(material);
 }
 

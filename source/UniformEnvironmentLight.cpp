@@ -16,8 +16,6 @@ UniformEnvironmentLight::UniformEnvironmentLight(const Vector3d& position, doubl
     intensity = color;
 #ifdef DETERMINISTIC
     r.Seed(0);
-#else
-    random.Seed(GetTickCount() + int(this));
 #endif
 }
 
@@ -57,8 +55,8 @@ bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, Intersect
 std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> UniformEnvironmentLight::SampleRay() const
 {
     Ray ray;
-    auto [position, normal] = SamplePoint();
-    ray.origin = position;
+    auto [origin, normal] = SamplePoint();
+    ray.origin = origin;
     
     double areaPdf = 1/GetArea();
 
@@ -84,6 +82,7 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> UniformEnvironmentLight::Sam
             return { ray, (ray.direction*n)*Color::Identity/anglePdf, normal, areaPdf, anglePdf };
         }
     }
+    return { ray, Color::Identity, Vector3d(1, 1, 1), 1, 1 }; // Should never happen
 }
 
 double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
@@ -172,14 +171,8 @@ std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformE
     for(int i = 0; i < 8; i++) {
         auto u = p[i] - ray.origin;
         Vector2d w = Vector2d(u * right, u * forward).Normalized();
-        auto r1 = (u - n*(u*n)).GetLength();
-        auto r2 = Vector2d(u * right, u * forward).GetLength();
         auto vp = n*(n*u);
         auto v = n*(cv*n);
-
-        auto l1 = v.GetLength();
-        auto l2 = u * n;
-
         auto rp = ((v.GetLength() / (u*n)) * (u - n*(u*n)).GetLength());
 
         q.push_back(rp*w);

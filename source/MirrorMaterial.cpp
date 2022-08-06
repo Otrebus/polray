@@ -39,7 +39,7 @@ Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) con
     return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1), out, 1, 1, true, 1);
 }
 
-Color MirrorMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int sample) const
+Color MirrorMaterial::BRDF(const IntersectionInfo&, const Vector3d&, int) const
 {
     return Color(0, 0, 0); // The chance that the out, in vectors are reflectant is effectively 0
 }
@@ -60,7 +60,7 @@ void MirrorMaterial::ReadProperties(stringstream& ss)
     }
 }
 
-double MirrorMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int sample) const
+double MirrorMaterial::PDF(const IntersectionInfo&, const Vector3d&, bool, int) const
 {
     return 1;
 }
@@ -70,6 +70,6 @@ void MirrorMaterial::Save(Bytestream& stream) const
     stream << (unsigned char) 103;
 }
 
-void MirrorMaterial::Load(Bytestream& stream)
+void MirrorMaterial::Load(Bytestream&)
 {
 }

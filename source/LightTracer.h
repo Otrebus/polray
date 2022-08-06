@@ -15,9 +15,9 @@ public:
 
     void Render(Camera& cam, ColorBuffer& colBuf);
     void RenderPart(Camera& cam, ColorBuffer& colBuf) const;
-
-    unsigned int GetType() const;
-
+    
+    void Save(Bytestream& stream) const;
+    void Load(Bytestream& stream);
 private:
     mutable Random m_random;
 };

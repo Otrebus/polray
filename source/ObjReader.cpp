@@ -67,10 +67,10 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
                     curmat = new AshikhminShirley;
 				while(!matfile.eof())
 				{
-					string line, s;
-					getline(matfile, line);
-					stringstream ss(line);
-					ss >> s;
+					string line2, s;
+					getline(matfile, line2);
+					stringstream ss2(line2);
+					ss2 >> s;
 					if(s == "{")
 						break;
 					else if(s == "")
@@ -80,7 +80,7 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 				}
 				while(!matfile.eof())
 				{
-					string line, s;
+					string s;
                     getline(matfile, s);
 					s += "\n";
 					if(s[0] == '}')
@@ -185,15 +185,8 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 
 	string a;
 	double x, y, z;
-	int v0, v1, v2;
-	int t0, t1, t2;
-	int n0, n1, n2;
 
-	t0 = t1 = t2 = n0 = n1 = n2 = 0;
-
-	char slash;
 	int index = 0;
-	bool b = false;
 	bool normalInterp = true;
 	vector<MeshVertex*> vectors;
 	vector<Vector3d> normals;
@@ -248,7 +241,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 				MeshVertex* mv;
 
 				if (v < 0)
-					v = vectors.size() + v + 1;
+					v = (int) vectors.size() + v + 1;
 				auto it = groupVertices.find(v - 1);
 				if (it == groupVertices.end()) { // We have not seen this vertex before in this group so create a new one
 					mv = groupVertices[v-1] = new MeshVertex(*vectors[v-1]);

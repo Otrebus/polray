@@ -21,9 +21,9 @@ Scene::Scene()
 //------------------------------------------------------------------------------
 Scene::Scene(string f)
 {
-	auto [success, mesh, lights] = ReadFromFile(f, 0);
+	auto [success, mesh, lghts] = ReadFromFile(f, 0);
 	AddModel(mesh);
-    for(auto light : lights)
+    for(auto light : lghts)
         AddLight(light);
 }
 
@@ -71,9 +71,9 @@ void Scene::SetCamera(Camera* cam)
     camera = cam;
 }
 
-void Scene::SetPartitioning(SpatialPartitioning* partitioning)
+void Scene::SetPartitioning(SpatialPartitioning* prt)
 {
-    this->partitioning = partitioning;
+    this->partitioning = prt;
 }
 
 SpatialPartitioning* Scene::GetPartitioning() const
@@ -184,4 +184,5 @@ std::pair<Light*, double> Scene::PickLight(double r1) const
         if(sum > r1)
             return { light, p };
     }
+    return { lights[0], 0 }; // Should never happen
 }

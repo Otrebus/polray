@@ -16,6 +16,5 @@ extern Texture* test;
 extern Cubemap* cubemap;
 extern KDTree* tree;
 extern Texture* normalmap;
-extern Texture* bl;
 
 #endif

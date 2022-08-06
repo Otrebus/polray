@@ -135,7 +135,7 @@ void DielectricMaterial::ReadProperties(stringstream& ss)
 // never be used in practice since it would only cause NaNs in any integrator.
 // Hence the actual value is returned as 1, just to avoid any potential issues.
 //------------------------------------------------------------------------------
-double DielectricMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const
+double DielectricMaterial::PDF(const IntersectionInfo&, const Vector3d&, bool, int) const
 {
     return 1;
 }

@@ -30,9 +30,9 @@ double Random::GetDouble(double a, double b)
     return ngen(generator);
 }
 
-void Random::Seed(unsigned int seed)
+void Random::Seed(unsigned int aSeed)
 {
-    generator.seed(seed);
+    generator.seed(aSeed);
 }
 
 void Random::Seed()

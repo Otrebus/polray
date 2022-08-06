@@ -27,24 +27,24 @@ Sphere::~Sphere()
 
 double Sphere::Intersect(const Ray& ray) const
 {
-        double t;
-        Vector3d dir(ray.direction);
-        Vector3d vec = ray.origin - position;
+    double t;
+    Vector3d dir(ray.direction);
+    Vector3d vec = ray.origin - position;
 
-        double C = vec*vec - radius*radius;
-        double B = 2*(vec*dir);
-        double A = dir*dir;
+    double C = vec*vec - radius*radius;
+    double B = 2*(vec*dir);
+    double A = dir*dir;
 
-        double D = (B*B/(4*A) - C)/A;
+    double D = (B*B/(4*A) - C)/A;
 
-        t = -B/(2*A) - sqrt(D);
+    t = -B/(2*A) - sqrt(D);
             
-        if(D > 0) {
-            if(t < eps)
-                return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
-            return t;
-        }
-        return -inf;
+    if(D > 0) {
+        if(t < eps)
+            return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
+        return t;
+    }
+    return -inf;
 }
 
 bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
@@ -84,16 +84,16 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
         w.Normalize();
         forward.Normalize();
 
-        double vcoord = acosf(up*v) / 3.14159265f;
+        double vcoord = std::acos(up*v) / pi;
         double ucoord;
 
         // Clamp the coordinates to prevent NaNs, which is one of the reasons this method is inferior
         double wright = w*right > 1 ? 1 : w*right < -1 ? -1 : w*right;
 
         if(w*forward >= 0)
-            ucoord = acos(wright) / (2.0f*3.14159265f);
+            ucoord = acos(wright) / (2*pi);
         else
-            ucoord = 1.0f - acos(wright) / (2.0f*3.14159265f);
+            ucoord = 1.0f - acos(wright) / (2*pi);
         
         info.texpos.x = ucoord;
         info.texpos.y = vcoord;
@@ -111,7 +111,7 @@ BoundingBox Sphere::GetBoundingBox() const
     return BoundingBox(c1, c2);
 }
 
-bool Sphere::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
+bool Sphere::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
 {
     // Just return the unclipped box for now
     resultbox = GetBoundingBox();

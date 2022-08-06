@@ -15,10 +15,10 @@ public:
     bool TraceShadowRay(const Ray& ray, double tmax) const;
     void Build();
     void Render(Camera&, ColorBuffer&);
-    void SetSPP(unsigned int);
 
-        virtual unsigned int GetSPP() const;
-    virtual unsigned int GetType() const;
+    void Save(Bytestream& stream) const;
+    void Load(Bytestream& stream);
+
 //private:
 
     Color TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, double contribution) const;

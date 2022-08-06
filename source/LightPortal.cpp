@@ -174,11 +174,11 @@ Color LightPortal::GetIntensity() const
     return light->GetIntensity();
 }
 
-void LightPortal::AddToScene(Scene* scene)
+void LightPortal::AddToScene(Scene* scn)
 {
     light->material->light = this;
-    Scene::LightAdder::AddLight(*scene, this);
-    light->scene = scene;
+    Scene::LightAdder::AddLight(*scn, this);
+    light->scene = scn;
 }
 
 Color LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const

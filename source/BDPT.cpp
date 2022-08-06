@@ -385,8 +385,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
                        ColorBuffer& eyeImage, ColorBuffer& lightImage)
 {
     vector<BDSample> samples;
-    vector<BDVertex*> eyePath;
-    vector<BDVertex*> lightPath;
+    vector<BDVertex*> eyePath, lightPath;
 
     auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
 
@@ -403,6 +402,9 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     {
         Color eval = EvalPath(lightPath, eyePath, sample.s, sample.t, light);
         // TODO: break early if zero eval
+
+        if(!eval)
+            continue;
 
         double weight = WeighPath(sample.s, sample.t, lightPath, eyePath, light, &cam);
         eval *= weight;
@@ -476,7 +478,12 @@ void BDPT::Render(Camera& cam, ColorBuffer& colBuf)
             colBuf.AddColor(x, y, eyeImage.GetPixel(x, y) + lightImage.GetPixel(x, y));
 }
 
-unsigned int BDPT::GetType() const
+
+void BDPT::Save(Bytestream& stream) const
 {
-    return typeBDPT;
+    stream << ID_BDPT;
+}
+
+void BDPT::Load(Bytestream&)
+{
 }

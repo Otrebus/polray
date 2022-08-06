@@ -1,5 +1,4 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#pragma once
 
 #include <vector>
 #include "KDTree.h"
@@ -13,24 +12,28 @@ class Light;
 
 using namespace std;
 
+#define ID_PATHTRACER ((char) 50)
+#define ID_LIGHTTRACER ((char) 51)
+#define ID_BDPT ((char) 52)
+#define ID_RAYTRACER ((char) 53)
+
 class Renderer
 {
 public:
     Renderer(std::shared_ptr<Scene> scene);
     virtual ~Renderer();
 
-    //virtual void Setup(const std::vector<Primitive*>& primitives, const std::vector<Light*>& lights) = 0;
     virtual void Render(Camera& cam, ColorBuffer& colBuf) = 0;
     virtual bool TraceShadowRay(const Ray& ray, double tmax) const;
 
-    virtual unsigned int GetType() const = 0;
     std::shared_ptr<Scene> GetScene() const;
 
     void Stop();
+    
+    virtual void Save(Bytestream& stream) const = 0;
+    virtual void Load(Bytestream& stream) = 0;
 
-    static const unsigned int typePathTracer = 1;
-    static const unsigned int typeLightTracer = 2;
-    static const unsigned int typeBDPT = 3;
+    static Renderer* Create(unsigned char, shared_ptr<Scene> scn);
 protected:
     std::shared_ptr<Scene> scene;
 
@@ -39,5 +42,3 @@ protected:
     mutable Random m_random;
     vector<Light*> m_lights;
 };
-
-#endif

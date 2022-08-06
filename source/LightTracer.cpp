@@ -22,9 +22,6 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
 
     for(int samples = 0; samples < xres*yres && ! stopping; samples++)
     {
-        if(stopping)
-            return;
-
         auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
         auto [ray, pathColor, lightNormal, _, __] = light->SampleRay();
 
@@ -94,7 +91,11 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
     }
 }
 
-unsigned int LightTracer::GetType() const
+void LightTracer::Save(Bytestream& stream) const
 {
-    return typeLightTracer;
+    stream << ID_LIGHTTRACER;
+}
+
+void LightTracer::Load(Bytestream&)
+{
 }

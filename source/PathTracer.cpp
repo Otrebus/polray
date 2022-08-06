@@ -12,9 +12,7 @@ PathTracer::PathTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
     //m_random.Seed(GetTickCount());
 #ifdef DETERMINISTIC
-    m_random.Seed(0);
-#else
-    m_random.Seed(GetTickCount() + int(this));
+    m_random.Seed();
 #endif
 }
 
@@ -85,11 +83,14 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
     }
 }
 
-unsigned int PathTracer::GetType() const
+void PathTracer::Save(Bytestream& stream) const
 {
-    return typePathTracer;
+    stream << ID_PATHTRACER;
 }
 
+void PathTracer::Load(Bytestream&)
+{
+}
 
 Color PathTracer::TracePath(const Ray& ray) const
 {
@@ -101,7 +102,6 @@ Color PathTracer::TracePath(const Ray& ray) const
     Color finalColor(0, 0, 0);
     bool sampledLight = false;
     inRay = ray;
-    double rr = 1.0f;
 
     double r = m_random.GetDouble(0.0f, 1.0f);
     auto [light, lightWeight] = scene->PickLight(r);

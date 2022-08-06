@@ -127,7 +127,7 @@ MeshLight::~MeshLight()
 {
 }
 
-double MeshLight::Intersect(const Ray& ray) const
+double MeshLight::Intersect(const Ray&) const
 {    
     /*if(!builtTree) {
         area_ = 0;
@@ -147,7 +147,7 @@ double MeshLight::Intersect(const Ray& ray) const
     return -inf;
 }
 
-bool MeshLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
+bool MeshLight::GenerateIntersectionInfo(const Ray&, IntersectionInfo&) const
 {
     /*if(!builtTree) {
         area_ = 0;
@@ -218,7 +218,7 @@ double MeshLight::GetArea() const
         for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
             area_ += (*it)->GetArea();
 
-        triangleTree_ = BuildTree(0, mesh->triangles.size() - 1, area_, 0);
+        triangleTree_ = BuildTree(0, (int) mesh->triangles.size() - 1, area_, 0);
         builtTree = true;
     }
     return area_;
@@ -231,7 +231,7 @@ void MeshLight::AddToScene(Scene* scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const
+Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d&, Vector3d&, int component) const
 {
     auto [lightPoint_, lightNormal_] = SamplePoint();
     Vector3d toLight = lightPoint_ - info.GetPosition();

@@ -5,9 +5,8 @@
 #include "ColorBuffer.h"
 #include "Scene.h"
 #include <process.h>
-#include "PathTracer.h"
-#include "LightTracer.h"
-#include "BDPT.h"
+
+
 
 class Rendering
 {

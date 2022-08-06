@@ -76,5 +76,6 @@ Camera* Camera::Create(unsigned char id)
         break;
     default:
         __debugbreak();
+        return nullptr;
     }
 }

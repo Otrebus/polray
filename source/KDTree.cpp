@@ -18,7 +18,7 @@ SAHEvent::SAHEvent(const Primitive* m, double p, int t) : triangle(m), position(
 {
 }
 
-double KDNode::SAHCost(int nPrimitives, double area, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
+double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
 {
     double cost;
     if(side == KDTree::left)
@@ -142,11 +142,11 @@ bool KDNode::IsLeaf() const
     //return m_isLeaf;
 }
 
-void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* events, vector<const Primitive*>& primitives, int depth, int badsplits)
+void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* events, vector<const Primitive*>& shapes, int depth, int badsplits)
 {
-    if(depth > 20 || primitives.size() < 4) // TODO: fix
+    if(depth > 20 || shapes.size() < 4) // TODO: fix
     {
-        node->m_primitives = primitives;
+        node->m_primitives = shapes;
         //node->m_isLeaf = true;
         return;
     }
@@ -167,13 +167,12 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
 
         // First, initiate the primitive counting variables
         int nLeft = 0;
-        int nPlanar = 0;
-        int nRight = primitives.size();
-        int side = 0;
+        int nRight = (int) shapes.size();
+
         double leftarea, rightarea;
         double sidearea = (bbox.c2[v]-bbox.c1[v])*(bbox.c2[w]-bbox.c1[w]);
-        double height = bbox.c2[v]-bbox.c1[v];
-        double depth = bbox.c2[w]-bbox.c1[w];
+        double vLength = bbox.c2[v]-bbox.c1[v];
+        double wLength = bbox.c2[w]-bbox.c1[w];
         int pp = 0, pe = 0, ps = 0; // Event counters for current position
 
         // Sweep through all events
@@ -184,8 +183,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
             SAHEvent* e = *it;
             double sweeppos = e->position;
 
-            leftarea = 2*sidearea + 2*(sweeppos-bbox.c1[u])*(height + depth);
-            rightarea = 2*sidearea + 2*(bbox.c2[u]-sweeppos)*(height + depth);
+            leftarea = 2*sidearea + 2*(sweeppos-bbox.c1[u])*(vLength + wLength);
+            rightarea = 2*sidearea + 2*(bbox.c2[u]-sweeppos)*(vLength + wLength);
 
             // Go through all events on this position
             ps = pp = pe = 0;
@@ -207,8 +206,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
             nRight -= pe;
 
             // Calculate the costs for a split at this location
-            double leftcost = KDNode::SAHCost(primitives.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::left);
-            double rightcost = KDNode::SAHCost(primitives.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::right);
+            double leftcost = KDNode::SAHCost((int) shapes.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::left);
+            double rightcost = KDNode::SAHCost((int) shapes.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::right);
 
             if(bestcost > min(leftcost, rightcost)) 
             {
@@ -227,11 +226,11 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     }
 
     // It's not worth it to split this node, make it a leaf
-    if(bestcost + boxarea*KDTree::cost_trav > KDTree::cost_triint*primitives.size()*boxarea)
+    if(bestcost + boxarea*KDTree::cost_trav > KDTree::cost_triint*shapes.size()*boxarea)
     {
         if(badsplits <= 0 || bestcost == numeric_limits<double>::infinity())
         {
-            node->m_primitives = primitives;
+            node->m_primitives = shapes;
             //node->m_isLeaf = true;
             return;
         }
@@ -241,8 +240,6 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
 
     // Ok, now we've found the best split location, it's time to split and prepare for recursion
     int a = bestsplitdir;
-    int b = (a + 1) % 3;
-    int c = (b + 2) % 3;
 
     vector<Primitive*> nodeprimitives;
 
@@ -270,7 +267,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     const int rightonly = 2;
 
     // Mark all primitives as straddling for now
-    for(auto& s : primitives)
+    for(auto& s : shapes)
         s->side = both;
     for(auto& e : events[a])
     {
@@ -300,7 +297,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         }
     }
 
-    for(auto s : primitives)
+    for(auto s : shapes)
     {
         if(s->side == leftonly)
             leftprimitives.push_back(s);
@@ -512,10 +509,10 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
 //------------------------------------------------------------------------------
 // Builds a KD-Tree from the supplied vector of primitives
 //------------------------------------------------------------------------------
-void KDTree::Build(vector<const Primitive*> primitives)
+void KDTree::Build(vector<const Primitive*> shapes)
 {
     m_root = new KDNode();
-    m_bbox = CalculateExtents(primitives);
+    m_bbox = CalculateExtents(shapes);
     vector<SAHEvent*> eventlist[3];
 
     // Loop through each axis - u is the primary axis
@@ -525,7 +522,7 @@ void KDTree::Build(vector<const Primitive*> primitives)
             return;
 
         // Create event lists from the objects
-        for(auto& s : primitives)
+        for(auto& s : shapes)
         {
             // Get the bounding box of the to this bounding box culled primitive
             BoundingBox clippedbox;
@@ -557,7 +554,7 @@ void KDTree::Build(vector<const Primitive*> primitives)
         { return e1->position < e2->position;});
     }
 
-    BuildNode(m_root, m_bbox, eventlist, primitives, 0, 3);
+    BuildNode(m_root, m_bbox, eventlist, shapes, 0, 3);
 
     for(int u = 0; u < 3; u++)
         for(auto& e : eventlist[u])

@@ -91,6 +91,9 @@ protected:
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
     double PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
                       vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
+    
+    void Save(Bytestream& stream) const;
+    void Load(Bytestream& stream);
 
     Roulette* roulette;
     

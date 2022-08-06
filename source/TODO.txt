@@ -1,7 +1,8 @@
 Make various functions return a tuple instead of taking output parameters
+Make Sphere use IntersectSphere in its intersect/generateintersectioninfo functions
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
-Read light sources from .mtl files
+Refactor GetProjectedSceneHull
 Fix rendering exposure to use luminance as input for exp
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Use more modern threads
@@ -10,11 +11,11 @@ Think of a better way of dealing with epsilons - account for numerical errors et
 Add light source resampling to BDPT
 Unhardcode light area sampling in light portal
 Implement multiple importance sampling for light portals
-Fix the friend/attourney etc relationships and private fields in general
 (mostly for "fun") Make light portals work inside scenes
 Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
 Add physical camera to bdpt
 Add check that all primitives have materials, in scene
+- Read light sources from .mtl files
 - Change the DirectHitMIS etc stuff
 - Make mr. lightportal use next event estimation
 - Try including rr with mis o

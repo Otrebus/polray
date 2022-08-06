@@ -15,7 +15,8 @@ public:
     Color TracePath(const Ray& ray) const;
     Color TracePathPrimitive(const Ray& ray) const;
 
-    unsigned int GetType() const;
+    void Save(Bytestream& stream) const;
+    void Load(Bytestream& stream);
 
 private:
     mutable Random m_random;

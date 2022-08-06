@@ -13,8 +13,6 @@ PhongMaterial::PhongMaterial()
     alpha = 0;
 #ifdef DETERMINISTIC
     rnd.Seed(0);
-#else
-    rnd.Seed(GetTickCount() + int(this));
 #endif
 }
 
@@ -24,16 +22,14 @@ PhongMaterial::~PhongMaterial()
 
 Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-float df = Kd.GetMax();
-    float sp = Ks.GetMax();
+    auto df = Kd.GetMax();
+    auto sp = Ks.GetMax();
     
-    float r = rnd.GetDouble(0, df + sp);
+    auto r = rnd.GetDouble(0, df + sp);
     if(r <= df) // Diffuse bounce
     {
-        int component = 1;
-
-        float r1 = rnd.GetDouble(0, 1.0);
-        float r2 = rnd.GetDouble(0, 1.0f);
+        auto r1 = rnd.GetDouble(0, 1.0);
+        auto r2 = rnd.GetDouble(0, 1.0f);
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -72,9 +68,8 @@ float df = Kd.GetMax();
     }
     else // Specular bounce
     {
-        int component = 2;
-        float r1 = rnd.GetDouble(0.0f, 2*F_PI);
-        float r2 = acos(pow(rnd.GetDouble(0, 1), 1/(alpha+1)));
+        auto r1 = rnd.GetDouble(0.0f, 2*F_PI);
+        auto r2 = acos(pow(rnd.GetDouble(0, 1), 1/(alpha+1)));
 
         Vector3d N_g = info.GetGeometricNormal();
         Vector3d N_s = info.GetNormal();
@@ -113,8 +108,8 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
 {
     assert(component == 1 || component == 2);
 
-    float df = Kd.GetMax();
-    float sp = Ks.GetMax();
+    auto df = Kd.GetMax();
+    auto sp = Ks.GetMax();
 
     Vector3d N_s = info.GetNormal();
     Vector3d N_g = info.GetGeometricNormal();
@@ -193,7 +188,6 @@ double PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, boo
     else
     {
         Vector3d up = Reflect(info.GetDirection(), N_s);
-        float asdf = out*up;
         return out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
     }
 }

@@ -7,8 +7,6 @@
 class Bytestream;
 class Color;
 
-#define M_PI 3.141592654f
-
 class PreethamSky : public EnvironmentLight
 {
 public:

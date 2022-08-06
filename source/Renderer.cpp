@@ -1,6 +1,10 @@
 #include "Renderer.h"
 #include "Primitive.h"
 #include "KDTree.h"
+#include "PathTracer.h"
+#include "BDPT.h"
+#include "RayTracer.h"
+#include "LightTracer.h"
 
 Renderer::Renderer(std::shared_ptr<Scene> scene)
 {
@@ -22,7 +26,6 @@ Renderer::~Renderer()
 //------------------------------------------------------------------------------
 bool Renderer::TraceShadowRay(const Ray& ray, double tmax) const
 {
-    Ray& unconstRay = const_cast<Ray&>(ray);
     return !scene->Intersect(ray, tmax);
 }
 
@@ -34,4 +37,26 @@ std::shared_ptr<Scene> Renderer::GetScene() const
 void Renderer::Stop()
 {
     stopping = true;
+}
+
+Renderer* Renderer::Create(unsigned char id, shared_ptr<Scene> scn)
+{
+    switch(id)
+    {
+    case ID_PATHTRACER:
+        return new PathTracer(scn);
+        break;
+    case ID_LIGHTTRACER:
+        return new LightTracer(scn);
+        break;
+    case ID_RAYTRACER:
+        return new RayTracer(scn);
+        break;
+    case ID_BDPT:
+        return new BDPT(scn);
+        break;
+    default:
+        __debugbreak();
+        return nullptr;
+    }
 }

@@ -39,7 +39,7 @@ Color EmissiveMaterial::BRDF(const IntersectionInfo&, const Vector3d&, int) cons
     return Color(0.0, 0.0, 0.0); // Blackbody
 }
 
-void EmissiveMaterial::ReadProperties(stringstream& ss)
+void EmissiveMaterial::ReadProperties(stringstream&)
 {
 }
 

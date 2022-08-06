@@ -29,7 +29,7 @@ class Material
 {
 public:
     Material();
-    ~Material();
+    virtual ~Material();
 
     virtual Sample GetSample(const IntersectionInfo& info, bool adjoint) const = 0;
 

@@ -29,10 +29,6 @@ Color RayTracer::TraceRay(const Ray& ray) const
     return c;
 }
 
-void RayTracer::SetSPP(unsigned int spp)
-{
-}
-
 void RayTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
     int xres = colBuf.GetXRes();
@@ -56,7 +52,7 @@ void RayTracer::Render(Camera& cam, ColorBuffer& colBuf)
 //------------------------------------------------------------------------------
 // Helper function for TraceRay
 //------------------------------------------------------------------------------
-Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, double contribution) const
+Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double contribution) const
 {
     if(contribution < 0.005f)
         return Color(0, 0, 0);
@@ -110,7 +106,6 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, doub
 //------------------------------------------------------------------------------
 bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
 {
-    Ray& unconstRay = const_cast<Ray&>(ray);
     const Primitive* dummy = nullptr;
     const Light* dummy2 = nullptr;
     double result = scene->Intersect(ray, dummy, dummy2);
@@ -119,12 +114,12 @@ bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
     return true;
 }
 
-unsigned int RayTracer::GetType() const
+
+void RayTracer::Save(Bytestream& stream) const
 {
-    return 1;
+    stream << ID_RAYTRACER;
 }
 
-unsigned int RayTracer::GetSPP() const
+void RayTracer::Load(Bytestream&)
 {
-    return 1;
 }

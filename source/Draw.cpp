@@ -71,10 +71,10 @@ Cubemap* cubemap;
 
 void MakeScene(std::shared_ptr<Renderer>& r)
 {
-    #ifdef KITCHEN2
+#ifdef KITCHEN2
     auto s = std::shared_ptr<Scene> (new Scene("Morning Apartment2.obj"));
 
-    Vector3d camPos = Vector3d(0.6, 2.0, 2.4);
+    Vector3d camPos = Vector3d(0.6, 2.0, 2.5);
     Vector3d target = Vector3d(-1.4, 1.35, -2.1);
 
     //Vector3d camPos = Vector3d(2.1, 3.1, -0.4);
@@ -94,6 +94,10 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //camdir.Normalize();
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
 
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
 
     //auto portalLight = new AreaLight(Vector3d(-79, 387, 263), Vector3d(0, 15.0, 0.0), Vector3d(0.0, 0.0, 15.0), Color(7500, 7500, 7500));
     //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));
@@ -107,7 +111,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //v -1.447420 2.069140 -4.189088
 
 
-    //auto boxLight = new SphereLight(Vector3d(1.3, 3.6, 0), 0.05, Color(1000, 1000, 1000));
+    auto boxLight = new SphereLight(Vector3d(1.3, 3.6, 0), 0.05, Color(1000, 1000, 1000));
 
 
 
@@ -117,8 +121,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     LightPortal* portalLight2 = new LightPortal();
     portalLight2->AddPortal(Vector3d(-2.7, 3.1, -3.5), Vector3d(0, -1.7, 0), Vector3d(0, 0, 2.7));
 
-    //auto sunLight = new SphereLight(Vector3d(-18.4, 8.4, 4)*100, 10, 8000*Color(233, 237, 127));
-    auto sunLight = new SphereLight(Vector3d(-18.4, 10.0, 3)*100, 10, 8000*Color(233, 237, 147));
+    auto sunLight = new SphereLight(Vector3d(-18.4, 8.4, 4)*100, 10, 8000*Color(233, 237, 147));
     auto skyLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 100000, 3*Color(0.9, 1.2, 1.5));
 
     portalLight->SetLight(sunLight);

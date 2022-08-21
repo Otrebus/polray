@@ -50,11 +50,11 @@ Cubemap* cubemap;
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
-//#define BOX
+#define BOX
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-#define KITCHEN2
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -1380,7 +1380,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     //s->AddLight(boxLight);
 
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef MESHLIGHTBOX
 

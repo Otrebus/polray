@@ -65,7 +65,7 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
 }
 
 
-Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
+Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
 {
     assert(component == 1);
 

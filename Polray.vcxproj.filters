@@ -233,6 +233,12 @@
     <ClCompile Include="source\Scene.cpp">
       <Filter>Source Files\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="source\MonEstimator.cpp">
+      <Filter>Source Files\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Estimator.cpp">
+      <Filter>Source Files\Renderers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -417,6 +423,12 @@
     </ClInclude>
     <ClInclude Include="source\Scene.h">
       <Filter>Source Files\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Estimator.h">
+      <Filter>Source Files\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\MonEstimator.h">
+      <Filter>Source Files\Renderers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

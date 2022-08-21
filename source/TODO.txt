@@ -1,3 +1,7 @@
+Simplify stuff around comment "Calculate the new average image based on the new samples", the if statement isn't needed, and vectorize the stuff
+Rename various functions from GetBlahBlahBlah to just blah
+Put ids for saving in a single file
+Create Serializable interface class
 Make various functions return a tuple instead of taking output parameters
 Make Sphere use IntersectSphere in its intersect/generateintersectioninfo functions
 Clean up Ashikhmin & other materials

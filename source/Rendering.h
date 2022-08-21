@@ -5,7 +5,7 @@
 #include "ColorBuffer.h"
 #include "Scene.h"
 #include <process.h>
-
+#include "Estimator.h"
 
 
 class Rendering
@@ -27,7 +27,7 @@ public:
 
     std::shared_ptr<Renderer> renderer;
 
-    ColorBuffer* accumulation;
+    Estimator* estimator;
     ColorBuffer* image;
 
     unsigned int nSamples;

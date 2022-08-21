@@ -1,4 +1,5 @@
 #include "Rendering.h"
+#include "MonEstimator.h"
 #include <intrin.h>
 #include <iostream>
 #include <thread>
@@ -11,8 +12,7 @@ Rendering::Rendering(std::shared_ptr<Renderer> r) :
     int xres = r->GetScene()->GetCamera()->GetXRes();
     int yres = r->GetScene()->GetCamera()->GetYRes();
     image = new ColorBuffer(xres, yres);
-    accumulation = new ColorBuffer(xres, yres);
-    accumulation->Clear(0);
+    estimator = new MonEstimator(xres, yres);
     image->Clear(0);
     bufferMutex = CreateMutex(0, false, 0);
 }
@@ -24,11 +24,15 @@ Rendering::Rendering(std::string fileName)
     b.LoadFromFile(fileName);
     std::shared_ptr<Scene> scene(new Scene());
     scene->Load(b);
-    unsigned char rendererType;
-    b >> rendererType >> nSamples;
+    unsigned char rendererType, estimatorType;
+    b >> rendererType;
     renderer = std::shared_ptr<Renderer>(Renderer::Create(rendererType, scene));
-    accumulation = new ColorBuffer(b);
-    image = new ColorBuffer(accumulation->GetXRes(), accumulation->GetYRes());
+
+    b >> estimatorType;
+    estimator = Estimator::Create(estimatorType);
+    estimator->Load(b);
+
+    image = new ColorBuffer(estimator->GetWidth(), estimator->GetHeight());
     image->Clear(0);
 }
  
@@ -37,8 +41,7 @@ void Rendering::SaveRendering(std::string fileName)
     Bytestream b;
     renderer->GetScene()->Save(b);
     renderer->Save(b);
-    b << nSamples;
-    accumulation->Save(b);
+    estimator->Save(b);
     b.SaveToFile(fileName);
 }
 
@@ -70,27 +73,18 @@ void Rendering::Thread()
         {
             for(int x = 0; x < image->GetXRes(); x++)			
             {
-                Color k = temp.GetPixel(x, y);
-                Color c = accumulation->GetPixel(x, y);
-
-                if(nSamples > 0)
-                {   // Calculate the new average image based on the new samples
-                    // and the number of old samples (running average)
-                    double D = double(nSamples + 1);
-                    double final_r = c.r + (k.r - c.r)/D;
-                    double final_g = c.g + (k.g - c.g)/D;
-                    double final_b = c.b + (k.b - c.b)/D;
-                    accumulation->SetPixel(x, y, final_r, final_g, final_b);
-                }
-                else
-                    accumulation->SetPixel(x, y, k);
+                //if(y == YRES/2 && x == XRES/2)
+                //    __debugbreak();
+                estimator->AddSample(x, y, temp.GetPixel(x, y));
             }
         }
         for(int y = 0; y < image->GetYRes(); y++)
         {
             for(int x = 0; x < image->GetXRes(); x++)
             {
-                Color c = accumulation->GetPixel(x, y);
+                //if(y == YRES/2 && x == XRES/2)
+                //    __debugbreak();
+                Color c = estimator->GetEstimate(x, y);
                 
                 double exposure = 0.75;
                 c.r = 1 - exp(-exposure*c.r);
@@ -116,11 +110,12 @@ void Rendering::Start()
     assert(!running);
     running = true;
     stopping = false;
-    auto processor_count = std::thread::hardware_concurrency();
-#ifdef _DEBUG
-    processor_count = 1;
-#endif
-    for(unsigned int i = 0; i < processor_count; i++)
+    auto processorCount = std::thread::hardware_concurrency();
+//#ifdef _DEBUG
+//    processorCount = 1;
+//#endif
+    //processorCount = 1;
+    for(unsigned int i = 0; i < processorCount; i++)
         _beginthread(Rendering::Thread, 0, (void*)this);
 }
 

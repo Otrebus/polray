@@ -4,10 +4,13 @@
 #include "Bytestream.h"
 
 #define ID_MONESTIMATOR ((unsigned char) 70)
+#define ID_MEANESTIMATOR ((unsigned char) 71)
 
 class Estimator
 {
 public:
+    virtual ~Estimator();
+
     virtual void AddSample(int, int, const Color& c) = 0;
     virtual Color GetEstimate(int, int) const = 0;
 

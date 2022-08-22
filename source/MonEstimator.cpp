@@ -60,7 +60,6 @@ Color MonEstimator::GetEstimate(int x, int y) const {
         if(std::abs(G) < 1e-9)
             return pBuckets[0]->avg;
         if(!(G > 0 && G <= 1)) {
-            logger.Box(std::to_string(G));
             return Color::Black;
         }
 

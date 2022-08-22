@@ -23,7 +23,7 @@ int Color::GetInt() const
 
 Color::Color(double _r, double _g, double _b) : r(_r), g(_g), b(_b)
 {
-    //assert(IsValid());
+    assert(IsValid());
 }
 
 Color::~Color()
@@ -137,7 +137,7 @@ double Color::GetLuminance() const
 
 bool Color::IsValid() const
 {
-    return std::isfinite(r) && std::isfinite(g) && std::isfinite(b) && r >= 0 && g >= 0 && b >= 0;
+    return std::isfinite(r) && std::isfinite(g) && std::isfinite(b);// && r >= 0 && g >= 0 && b >= 0;
 }
 
 std::ostream& operator << (std::ostream& s , const Color& v)

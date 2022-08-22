@@ -11,7 +11,7 @@
 class Rendering
 {
 public:
-    Rendering(std::shared_ptr<Renderer> renderer);
+    Rendering(std::shared_ptr<Renderer> renderer, std::shared_ptr<Estimator> estimator);
     Rendering(std::string fileName);
 
     void Start();
@@ -26,8 +26,7 @@ public:
     static void __cdecl Thread(void*);
 
     std::shared_ptr<Renderer> renderer;
-
-    Estimator* estimator;
+    std::shared_ptr<Estimator> estimator;
     ColorBuffer* image;
 
     unsigned int nSamples;

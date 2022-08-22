@@ -1,6 +1,10 @@
 #include "Estimator.h"
 #include "MonEstimator.h"
 
+Estimator::~Estimator()
+{
+}
+
 Estimator* Estimator::Create(unsigned char id)
 {
     switch(id)

@@ -6,6 +6,7 @@
 #include <process.h>
 #include <string>
 
+#include "Estimator.h"
 #include "Rendering.h"
 #include "Random.h"
 #include "KDTree.h"
@@ -110,6 +111,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
      std::shared_ptr<Scene> scene;
      std::shared_ptr<Renderer> renderer;
+     std::shared_ptr<Estimator> estimator;
      Bytestream bb;
      bb << (int) 3;
      ifstream ifile("btstrout");
@@ -118,8 +120,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     }
     else
     {
-        MakeScene(renderer);
-        rendering = new Rendering(renderer);
+        MakeScene(renderer, estimator);
+        rendering = new Rendering(renderer, estimator);
     }
         
      rendering->Start();

@@ -5,14 +5,13 @@
 #include <thread>
 
 
-Rendering::Rendering(std::shared_ptr<Renderer> r) : 
-    renderer(r), running(false), updated(true), 
+Rendering::Rendering(std::shared_ptr<Renderer> r, std::shared_ptr<Estimator> e) : 
+    renderer(r), estimator(e), running(false), updated(true), 
     stopping(false), nSamples(0)
 {
     int xres = r->GetScene()->GetCamera()->GetXRes();
     int yres = r->GetScene()->GetCamera()->GetYRes();
     image = new ColorBuffer(xres, yres);
-    estimator = new MonEstimator(xres, yres);
     image->Clear(0);
     bufferMutex = CreateMutex(0, false, 0);
 }
@@ -29,7 +28,7 @@ Rendering::Rendering(std::string fileName)
     renderer = std::shared_ptr<Renderer>(Renderer::Create(rendererType, scene));
 
     b >> estimatorType;
-    estimator = Estimator::Create(estimatorType);
+    estimator = std::shared_ptr<Estimator>(Estimator::Create(estimatorType));
     estimator->Load(b);
 
     image = new ColorBuffer(estimator->GetWidth(), estimator->GetHeight());
@@ -111,10 +110,10 @@ void Rendering::Start()
     running = true;
     stopping = false;
     auto processorCount = std::thread::hardware_concurrency();
-//#ifdef _DEBUG
-//    processorCount = 1;
-//#endif
-    //processorCount = 1;
+#ifdef _DEBUG
+    processorCount = 1;
+#endif
+
     for(unsigned int i = 0; i < processorCount; i++)
         _beginthread(Rendering::Thread, 0, (void*)this);
 }

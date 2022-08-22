@@ -181,6 +181,7 @@
     <ClCompile Include="source\Main.cpp" />
     <ClCompile Include="source\Material.cpp" />
     <ClCompile Include="source\Matrix3d.cpp" />
+    <ClCompile Include="source\MeanEstimator.cpp" />
     <ClCompile Include="source\MeshLight.cpp" />
     <ClCompile Include="source\MirrorMaterial.cpp" />
     <ClCompile Include="source\Model.cpp" />
@@ -247,6 +248,7 @@
     <ClInclude Include="source\Main.h" />
     <ClInclude Include="source\Material.h" />
     <ClInclude Include="source\Matrix3d.h" />
+    <ClInclude Include="source\MeanEstimator.h" />
     <ClInclude Include="source\MeshLight.h" />
     <ClInclude Include="source\MirrorMaterial.h" />
     <ClInclude Include="source\Model.h" />

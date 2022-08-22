@@ -2,6 +2,7 @@
 #define DRAW_H
 
 #include "gfx.h"
+#include "Estimator.h"
 #include "Texture.h"
 #include "Cubemap.h"
 #include "kdtree.h"
@@ -10,7 +11,7 @@
 #include "Renderer.h"
 
 void Draw(Gfx* g, ColorBuffer& cb);
-void MakeScene(std::shared_ptr<Renderer>& r);
+void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e);
 //extern int* ptr;
 extern Texture* test;
 extern Cubemap* cubemap;

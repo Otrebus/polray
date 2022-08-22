@@ -21,6 +21,8 @@
 #include "kdtree.h"
 #include "trianglemesh.h"
 #include "Scene.h"
+#include "MeanEstimator.h"
+#include "MonEstimator.h"
 #include "RayTracer.h"
 #include "PathTracer.h"
 #include "AreaLight.h"
@@ -50,11 +52,11 @@ Cubemap* cubemap;
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
-#define BOX
+//#define BOX
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-//#define KITCHEN2
+#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -69,7 +71,7 @@ Cubemap* cubemap;
 //#define CSGTEST
 //#define SAMPLES_PER_PIXEL 1
 
-void MakeScene(std::shared_ptr<Renderer>& r)
+void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
 {
 #ifdef KITCHEN2
     auto s = std::shared_ptr<Scene> (new Scene("Morning Apartment2.obj"));
@@ -161,6 +163,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     s->AddModel(triangle1);
     s->AddModel(triangle2);
 
+    e = std::shared_ptr<MonEstimator>(new MonEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef INTERIOR
@@ -235,6 +238,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef INTERIORSKY
@@ -348,6 +352,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef INTERIORINLIGHT
@@ -466,6 +471,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef INTERIORFOG
@@ -582,6 +588,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef ROOM
@@ -692,6 +699,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
 
     //s->SetPartitioning(new BrutePartitioning());
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 
@@ -779,6 +787,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     s->AddModel(sphere2);*/
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
@@ -875,6 +884,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sphere2->SetMaterial(g);
     s->AddModel(sphere2);*/
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
@@ -1037,6 +1047,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     s->AddLight(portalLight);
     s->AddLight(portalLight2);
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 
 #endif
@@ -1064,6 +1075,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     sp->SetMaterial(pm);
     sp->AddToScene(*s);
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     //r = std::shared_ptr<LightTracer>(new LightTracer(s));
     //r = std::shared_ptr<PathTracer>(new PathTracer(s));
     r = std::shared_ptr<BDPT>(new BDPT(s));
@@ -1223,6 +1235,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     s->AddLight(boxLight);
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
@@ -1380,6 +1393,7 @@ void MakeScene(std::shared_ptr<Renderer>& r)
     //boxLight->AddToScene(s);
     //s->AddLight(boxLight);
 
+    e = std::shared_ptr<MonEstimator>(new MonEstimator(XRES, YRES));
     r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef MESHLIGHTBOX

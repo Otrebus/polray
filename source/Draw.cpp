@@ -1394,7 +1394,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->AddLight(boxLight);
 
     e = std::shared_ptr<MonEstimator>(new MonEstimator(XRES, YRES));
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef MESHLIGHTBOX
 

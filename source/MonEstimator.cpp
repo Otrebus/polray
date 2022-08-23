@@ -75,12 +75,12 @@ Color MonEstimator::GetEstimate(int x, int y) const {
 void MonEstimator::Save(Bytestream& stream) const {
     stream << ID_MONESTIMATOR << height << width;
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             stream << nSamples[y*width+x];
         }
     }
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             for(int m = 0; m < M; m++) {
                 GetBucket(x, y, m).Save(stream);
             }
@@ -92,13 +92,13 @@ void MonEstimator::Load(Bytestream& stream) {
     stream >> height >> width;
     nSamples = new int[width*height];
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             stream >> nSamples[y*width+x];
         }
     }
     buckets = new Bucket[width*height*M];
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             for(int m = 0; m < M; m++) {
                 GetBucket(x, y, m).Load(stream);
             }

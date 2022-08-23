@@ -29,12 +29,12 @@ Color MeanEstimator::GetEstimate(int x, int y) const {
 void MeanEstimator::Save(Bytestream& stream) const {
     stream << ID_MEANESTIMATOR << height << width;
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             stream << nSamples[y*width+x];
         }
     }
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             stream << samples[y*width+x];
         }
     }
@@ -44,13 +44,13 @@ void MeanEstimator::Load(Bytestream& stream) {
     stream >> height >> width;
     nSamples = new int[width*height];
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             stream >> nSamples[y*width+x];
         }
     }
     samples = new Color[width*height];
     for(int y = 0; y < height; y++) {
-        for(int x = 0; x < height; x++) {
+        for(int x = 0; x < width; x++) {
             stream >> samples[y*width+x];
         }
     }

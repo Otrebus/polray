@@ -9,10 +9,6 @@
 #include "Ray.h"
 #include "Vector3d.h"
 
-#ifndef F_PI
-#define F_PI 3.14159265
-#endif
-
 class ThinLensCamera : public Camera
 {
 public:

@@ -12,11 +12,6 @@ class Light;
 
 using namespace std;
 
-#define ID_PATHTRACER ((char) 50)
-#define ID_LIGHTTRACER ((char) 51)
-#define ID_BDPT ((char) 52)
-#define ID_RAYTRACER ((char) 53)
-
 class Renderer
 {
 public:

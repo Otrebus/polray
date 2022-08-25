@@ -14,8 +14,6 @@
 
 class Ray;
 
-#define F_PI 3.141592653f
-
 class MirrorMaterial : public Material
 {
 public:

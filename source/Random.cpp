@@ -4,9 +4,9 @@
 Random::Random()
 {
     std::random_device rd;
-    auto x = rd();
-    seed = x;
-    generator.seed(x);
+    //auto x = rd();
+    //seed = x;
+    //generator.seed(x);
 }
 
 Random::~Random()

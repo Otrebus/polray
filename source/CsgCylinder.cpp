@@ -11,7 +11,7 @@ CsgCylinder::CsgCylinder(Vector3d& position, Vector3d& dir,
     z_ = dir;
     y_ = Vector3d(1, 0, 0);
     y_ = (z_^y_)^z_; // Ensure orthogonality
-    if(y_.GetLength() < eps)
+    if(y_.Length() < eps)
     {
         y_ = Vector3d(0, 1, 0);
         y_ = (z_^y_)^z_;
@@ -136,7 +136,7 @@ bool CsgCylinder::Intersect(const Ray& inRay, std::vector<CsgHit>& intersects) c
 BoundingBox CsgCylinder::GetBoundingBox() const
 {
     Vector3d v = z_^(z_^Vector3d(0, 0, 1));
-    if(v.GetLengthSquared() == 0)
+    if(v.Length2() == 0)
         return BoundingBox(Vector3d(pos_.x - radius_, pos_.y - 
                                     radius_, pos_.z - length_/2),
                            Vector3d(pos_.x + radius_, pos_.y +

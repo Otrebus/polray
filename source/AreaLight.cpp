@@ -48,7 +48,7 @@ void AreaLight::AddToScene(Scene* scn)
 
 double AreaLight::GetArea() const
 {
-    auto area = abs((c1^c2).GetLength());
+    auto area = abs((c1^c2).Length());
     return area;
 }
 
@@ -123,7 +123,7 @@ bool AreaLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
 double AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     Ray ray(info.position, out);
-    return ray.direction*GetNormal()/F_PI;
+    return ray.direction*GetNormal()/pi;
 }
 
 std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> AreaLight::SampleRay() const
@@ -137,7 +137,7 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> AreaLight::SampleRay() const
 
     auto [right, forward] = MakeBasis(normal);
 
-    double r1 = r.GetDouble(0, 2*F_PI);
+    double r1 = r.GetDouble(0, 2*pi);
     double r2 = r.GetDouble(0, 1.0);
 
     Ray ray;
@@ -145,8 +145,8 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> AreaLight::SampleRay() const
     ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) + normal*sqrt(1-r2);
 
     double areaPdf = 1.0f/GetArea();
-    double anglePdf = abs(ray.direction*normal)/(F_PI);
-    Color color = Color(1, 1, 1)*(F_PI);
+    double anglePdf = abs(ray.direction*normal)/pi;
+    Color color = Color(1, 1, 1)*pi;
 
     return { ray, color, normal, areaPdf, anglePdf };
 }
@@ -192,7 +192,7 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
 
     if(toLight*lightNormal < 0)
     {
-        double d = toLight.GetLength();
+        double d = toLight.Length();
         toLight.Normalize();
 
         Ray lightRay = Ray(info.GetPosition(), toLight);

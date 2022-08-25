@@ -62,14 +62,14 @@ Vector3d Vector3d::operator^(const Vector3d& v) const
     return Vector3d(y*v.z-z*v.y, z*v.x-x*v.z, x*v.y-y*v.x);
 }
 
-double Vector3d::GetLength() const
+double Vector3d::Length() const
 {
     return sqrt(x*x+y*y+z*z);
 }
 
 void Vector3d::Normalize()
 {
-    double l = GetLength();
+    double l = Length();
 
     x /= l;
     y /= l;
@@ -78,7 +78,7 @@ void Vector3d::Normalize()
 
 Vector3d Vector3d::Normalized() const
 {
-    double l = GetLength();
+    double l = Length();
     return { x/l, y/l, z/l };
 }
 
@@ -139,7 +139,7 @@ double Vector2d::operator*(const Vector2d& v) const
     return x*v.x + y*v.y;
 }
 
-double Vector2d::GetLength() const
+double Vector2d::Length() const
 {
     return sqrt(x*x+y*y);
 }
@@ -150,7 +150,7 @@ double Vector2d::operator^(const Vector2d& v) const {
 
 void Vector2d::Normalize()
 {
-    double l = GetLength();
+    double l = Length();
 
     x /= l;
     y /= l;
@@ -158,7 +158,7 @@ void Vector2d::Normalize()
 
 Vector2d Vector2d::Normalized() const
 {
-    double l = GetLength();
+    double l = Length();
     return { x/l, y/l };
 }
 
@@ -219,7 +219,7 @@ bool Vector3d::operator!=(const Vector3d& v) const
     return v.x != x || v.y != y || v.z != z;
 }
 
-double Vector3d::GetLengthSquared() const
+double Vector3d::Length2() const
 {
     return x*x + y*y + z*z;
 }

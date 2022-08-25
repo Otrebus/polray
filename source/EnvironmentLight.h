@@ -4,8 +4,6 @@
 #include "Vector3d.h"
 #include "Light.h"
 
-#define ID_PREETHAMSKY ((unsigned char)50)
-
 class Bytestream;
 class Color;
 class Vector3d;

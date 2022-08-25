@@ -1,10 +1,6 @@
 #ifndef MODEL_H
 #define MODEL_H
 
-#define ID_TRIANGLEMESH ((unsigned char)1)
-#define ID_TRIANGLE ((unsigned char)2)
-#define ID_SPHERE ((unsigned char)3)
-
 class Scene;
 class Bytestream;
 

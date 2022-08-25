@@ -5,9 +5,6 @@
 #include "Ray.h"
 #include <assert.h>
 
-#define ID_PINHOLECAMERA ((unsigned char)199)
-#define ID_THINLENSCAMERA ((unsigned char)198)
-
 class Bytestream;
 
 class Camera

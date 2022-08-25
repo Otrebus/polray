@@ -5,8 +5,6 @@
 #include "Random.h"
 #include <memory>
 
-//#define M_PI 3.14159265
-
 class Renderer;
 class Scene;
 class EmissiveMaterial;
@@ -16,9 +14,9 @@ class Portal
 public:
     Portal() {}
     Portal(Vector3d pos, Vector3d v1, Vector3d v2) : pos(pos), v1(v1), v2(v2) {}
-    double GetArea() const { return (v1 ^ v2).GetLength(); }
+    double GetArea() const { return (v1 ^ v2).Length(); }
     double Intersect(const Ray& ray) const;
-    Vector3d GetNormal() const { Vector3d n = v1 ^ v2; n.Normalize(); return n; }
+    Vector3d GetNormal() const { return (v1 ^ v2).Normalized(); }
     Vector3d pos, v1, v2;
 };
 

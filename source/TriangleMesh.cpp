@@ -33,7 +33,7 @@ Vector3d MeshTriangle::GetNormal() const
 
 double MeshTriangle::GetArea()
 {
-	return std::abs(((v1->pos-v0->pos)^(v2->pos-v0->pos)).GetLength())/2;
+	return std::abs(((v1->pos-v0->pos)^(v2->pos-v0->pos)).Length())/2;
 }
 
 MeshTriangle::MeshTriangle(MeshVertex* _v0, MeshVertex* _v1, MeshVertex* _v2)// : mesh(t)

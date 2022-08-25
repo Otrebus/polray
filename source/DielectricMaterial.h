@@ -16,8 +16,6 @@
 
 class Ray;
 
-#define F_PI 3.141592653f
-
 class DielectricMaterial : public Material
 {
 public:

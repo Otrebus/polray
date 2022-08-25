@@ -44,9 +44,6 @@
 #include "UniformEnvironmentLight.h"
 
 KDTree* tree;
-Texture* normalmap;
-Texture* test;
-Cubemap* cubemap;
 
 //#define INTERIOR
 //#define INTERIORSKY
@@ -56,10 +53,10 @@ Cubemap* cubemap;
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-#define KITCHEN2
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
-//#define BALLSBOX
+#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
 //#define LEGOCAR
@@ -113,7 +110,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //v -1.447420 2.069140 -4.189088
 
 
-    auto boxLight = new SphereLight(Vector3d(1.3, 3.6, 0), 0.05, Color(1000, 1000, 1000));
+    // auto boxLight = new SphereLight(Vector3d(1.3, 3.6, 0), 0.05, Color(1000, 1000, 1000));
 
 
 
@@ -1048,7 +1045,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     s->AddLight(portalLight2);
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 
@@ -1149,7 +1146,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
-    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats7.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
     Vector3d camPos = Vector3d(0, 1.4, 3);
@@ -1208,15 +1205,29 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     ajax->Transform(move2);
     s->AddModel(ajax);
 */
-    Random ballsR(47);
-    Random test(1);
+    Random ballsR(41);
+    //Random test(1);
 
-    Random ballsC(0);
+    //Random ballsC(0);
 
-    s->SetPartitioning(new BrutePartitioning());
+    for(int i = 0; i < 120; i++) {
+        Sphere* sphere = new Sphere(Vector3d(ballsR.GetDouble(-1, 1), ballsR.GetDouble(0, 2), ballsR.GetDouble(-1, 1)), ballsR.GetDouble(0, 0.2));
+        auto a = new AshikhminShirley();
+        a->Rd = Color(ballsR.GetDouble(0, 1), ballsR.GetDouble(0, 1), ballsR.GetDouble(0, 1));
+        a->Rs = Color(ballsR.GetDouble(0, 1-a->Rd.r), ballsR.GetDouble(0, 1-a->Rd.g), ballsR.GetDouble(0, 1-a->Rd.b));
+        int asdf = ballsR.GetInt(0, 1) > 2;
+        if(asdf > 2)
+            a->n = ballsR.GetInt(1, 500);
+        else if(asdf > 1)
+            a->n = ballsR.GetInt(1, 50);
+        else
+            a->n = ballsR.GetInt(1, 5);
+        sphere->SetMaterial(a);
+        s->AddModel(sphere);
+    }
 
     //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, Color(500, 500, 500));
-    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
+    //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
 
     //auto a = new AshikhminShirley();
     //a->Rs = Color(0.5, 0.4, 0.6);
@@ -1233,7 +1244,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     s->AddModel(sphere2);*/
 
     //boxLight->AddToScene(s);
-    s->AddLight(boxLight);
+    //s->AddLight(boxLight);
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<PathTracer>(new PathTracer(s));

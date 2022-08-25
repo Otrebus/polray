@@ -58,7 +58,7 @@ PathTracer::~PathTracer()
 //		dir.Normalize();
 //		break;
 //	}
-//    Color mod = info.GetMaterial()->BRDF(info, dir)*2*F_PI*abs(info.GetNormal()*dir);
+//    Color mod = info.GetMaterial()->BRDF(info, dir)*2*pi*abs(info.GetNormal()*dir);
 //
 //	out.direction = dir;
 //	Color c = mod*TracePathPrimitive(out)/0.8f;

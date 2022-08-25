@@ -9,12 +9,6 @@
 #include <memory>
 #include <vector>
 
-#define ID_AREALIGHT ((unsigned char)200)
-#define ID_SPHERELIGHT ((unsigned char)201)
-#define ID_LIGHTPORTAL ((unsigned char)202)
-#define ID_UNIFORMENVIRONMENTLIGHT ((unsigned char)203)
-#define ID_MESHLIGHT ((unsigned char)204)
-
 class Bytestream;
 class Scene;
 class Ray;

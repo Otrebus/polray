@@ -1,6 +1,7 @@
 #include "EmissiveMaterial.h"
 #include "Bytestream.h"
 #include "Sample.h"
+#include "Utils.h"
 
 EmissiveMaterial::EmissiveMaterial()
 {
@@ -22,8 +23,8 @@ EmissiveMaterial::~EmissiveMaterial()
 
 Sample EmissiveMaterial::GetSample(const IntersectionInfo& info, bool) const
 {
-    auto pdf = 2*F_PI;
-    auto rpdf = 2*F_PI;
+    auto pdf = 2*pi;
+    auto rpdf = 2*pi;
 
     auto out = Ray(info.GetPosition(), -info.GetDirection());
     return Sample(Color(0.0, 0.0, 0.0), out, pdf, rpdf, false, 1); // Blackbody

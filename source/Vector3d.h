@@ -33,8 +33,8 @@ public:
     double& operator[](int);
     double operator[](int) const;
     
-    double GetLength() const;
-    double GetLengthSquared() const;
+    double Length() const;
+    double Length2() const;
     void Normalize();
     Vector3d Normalized() const;
     bool IsNull() const;
@@ -58,7 +58,7 @@ public:
 
     double operator*(const Vector2d&) const;
 
-    double GetLength() const;
+    double Length() const;
     void Normalize();
     Vector2d Normalized() const;
 

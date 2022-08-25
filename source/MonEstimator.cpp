@@ -64,7 +64,7 @@ Color MonEstimator::GetEstimate(int x, int y) const {
         }
 
         // Average the medians
-        int c = (G*(M/2));
+        int c = int(G*(M/2));
         Color MoN = Color::Black;
         for(int i = c; i < M-c; i++)
             MoN += pBuckets[i]->avg/(M-2*c);

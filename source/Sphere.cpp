@@ -27,81 +27,46 @@ Sphere::~Sphere()
 
 double Sphere::Intersect(const Ray& ray) const
 {
-    double t;
-    Vector3d dir(ray.direction);
-    Vector3d vec = ray.origin - position;
-
-    double C = vec*vec - radius*radius;
-    double B = 2*(vec*dir);
-    double A = dir*dir;
-
-    double D = (B*B/(4*A) - C)/A;
-
-    t = -B/(2*A) - sqrt(D);
-            
-    if(D > 0) {
-        if(t < eps)
-            return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
-        return t;
-    }
-    return -inf;
+    return IntersectSphere(position, radius, ray);
 }
 
 bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    double t;
-    Vector3d dir(ray.direction);
-    Vector3d vec = ray.origin - position;
+    double t = IntersectSphere(position, radius, ray);
+    if(t < eps)
+        return false;
 
     info.direction = ray.direction;
     info.material = material;
 
-    double C = vec*vec - radius*radius;
-    double B = 2*(vec*dir);
-    double A = dir*dir;
+    info.normal = (ray.origin + ray.direction*t) - position;
+    info.normal.Normalize();
+    info.position = ray.origin + ray.direction*t + info.normal*1e-6;
 
-    double D = (B*B/(4*A) - C)/A;
+    // Texture coordinates - there are probably better methods than this one
+    Vector3d v = info.position - position;
+    Vector3d w = (up^v)^up;
+    Vector3d forward = up^right;
+    v.Normalize();
+    w.Normalize();
+    forward.Normalize();
 
-    t = -B/(2*A) - sqrt(D);
+    double vcoord = std::acos(up*v) / pi;
+    double ucoord;
 
-    if(D >= 0)
-    {
-        if(t < eps)
-        {
-            t = -B/(2*A) + sqrt(D);
-            if(t < eps)
-                return false;
-        }
-        info.normal = (ray.origin + ray.direction*t) - position;
-        info.normal.Normalize();
-        info.position = ray.origin + ray.direction*t + info.normal*1e-6;
+    // Clamp the coordinates to prevent NaNs, which is one of the reasons this method is inferior
+    double wright = w*right > 1 ? 1 : w*right < -1 ? -1 : w*right;
 
-        // Texture coordinates - there are probably better methods than this one
-        Vector3d v = info.position - position;
-        Vector3d w = (up^v)^up;
-        Vector3d forward = up^right;
-        v.Normalize();
-        w.Normalize();
-        forward.Normalize();
-
-        double vcoord = std::acos(up*v) / pi;
-        double ucoord;
-
-        // Clamp the coordinates to prevent NaNs, which is one of the reasons this method is inferior
-        double wright = w*right > 1 ? 1 : w*right < -1 ? -1 : w*right;
-
-        if(w*forward >= 0)
-            ucoord = acos(wright) / (2*pi);
-        else
-            ucoord = 1.0f - acos(wright) / (2*pi);
+    if(w*forward >= 0)
+        ucoord = acos(wright) / (2*pi);
+    else
+        ucoord = 1.0f - acos(wright) / (2*pi);
         
-        info.texpos.x = ucoord;
-        info.texpos.y = vcoord;
+    info.texpos.x = ucoord;
+    info.texpos.y = vcoord;
 
-        info.geometricnormal = info.normal;
-        return true;
-    }
-    return false;
+    info.geometricnormal = info.normal;
+    return true;
 }
 
 BoundingBox Sphere::GetBoundingBox() const

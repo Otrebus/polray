@@ -47,7 +47,7 @@ bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& inf
 
 double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
-    return std::max(0.0, (out*info.normal)/M_PI);
+    return std::max(0.0, (out*info.normal)/pi);
 }
 
 std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SphereLight::SampleRay() const
@@ -60,10 +60,10 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SphereLight::SampleRay() con
 
     double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
-    double anglePdf = abs(ray.direction*normal)/M_PI;
+    double anglePdf = abs(ray.direction*normal)/pi;
     double areaPdf = 1/GetArea();
 
-    return { ray, Color::Identity*F_PI, normal, areaPdf, anglePdf };
+    return { ray, Color::Identity*pi, normal, areaPdf, anglePdf };
 }
 
 std::tuple<Point, Normal> SphereLight::SamplePoint() const
@@ -103,7 +103,7 @@ void SphereLight::Load(Bytestream& s)
 
 double SphereLight::GetArea() const
 {
-    return 4*M_PI*radius_*radius_;
+    return 4*pi*radius_*radius_;
 }
 
 void SphereLight::AddToScene(Scene* scn)
@@ -126,7 +126,7 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
     lp = lightPoint;
     ln = lightNormal;
     toLight = lightPoint - info.GetPosition();
-    double d = toLight.GetLength();
+    double d = toLight.Length();
     toLight.Normalize();
     Ray lightRay = Ray(info.GetPosition(), toLight);
 

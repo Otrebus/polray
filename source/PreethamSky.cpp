@@ -5,7 +5,7 @@
 //#include <cmath>
 //
 //PreethamSky::PreethamSky(double phi, double theta, double T, double divisor)
-//    : phi_(phi*M_PI/180.0f), theta_(theta*M_PI/180.0f), T_(T), divisor_(divisor)
+//    : phi_(phi*pi/180.0f), theta_(theta*pi/180.0f), T_(T), divisor_(divisor)
 //{
 //    Init();
 //}
@@ -25,7 +25,7 @@
 //    dir_sun_ = Vector3d(cos(phi_), cos(theta_), sin(phi_));
 //    dir_sun_.Normalize();
 //
-//    Y_z_ = (4.0453f*T_-4.9710f)*tan((4.0f/9.0f-T_/120.0f)*(M_PI-2*theta_))
+//    Y_z_ = (4.0453f*T_-4.9710f)*tan((4.0f/9.0f-T_/120.0f)*(pi-2*theta_))
 //           - 0.2155f*T_ + 2.4192;
 //
 //    xz0 = t3*0.00166f  + t2*-0.00375f + t*0.00209f;

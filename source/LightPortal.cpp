@@ -88,7 +88,7 @@ double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
             for(auto pt : portals)
                 areaSum += pt.GetArea();
 
-            auto d = (lightPoint - portalPoint).GetLength();
+            auto d = (lightPoint - portalPoint).Length();
             return d*d/(std::abs(portalNormal*ray.direction)*areaSum);
         }
     }
@@ -121,7 +121,7 @@ std::tuple<Ray, Color, Vector3d, double, double> LightPortal::SampleRay() const
     // Sample the light and calculate the resulting pdfs
     auto [lightRay, color, normal, lightAreaPdf, lightAnglePdf] = light->SampleRay();
 
-    auto d = (portalPos-lightRay.origin).GetLength();
+    auto d = (portalPos-lightRay.origin).Length();
     Ray ray(lightRay.origin, (portalPos-lightRay.origin).Normalized());
 
     // TODO: this pdf calculation might want to be different for different lights

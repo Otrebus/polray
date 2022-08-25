@@ -43,8 +43,8 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     out.origin = info.GetPosition();
     out.direction = dir;
 
-    auto pdf = dir*N/F_PI;
-    auto rpdf = w_i*adjN/F_PI;
+    auto pdf = dir*N/pi;
+    auto rpdf = w_i*adjN/pi;
 
     if(rpdf < 0)
         rpdf = 0;
@@ -73,7 +73,7 @@ Color LambertianMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out
     if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
         return Color(0, 0, 0);
 
-    return Kd/F_PI;
+    return Kd/pi;
 }
 
 Light* LambertianMaterial::GetLight() const
@@ -113,7 +113,7 @@ double LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out
     if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
         return 0;
 
-    return (adjoint ? N_g : N_s)*w_o/F_PI;
+    return (adjoint ? N_g : N_s)*w_o/pi;
 }
 
 void LambertianMaterial::Save(Bytestream& stream) const

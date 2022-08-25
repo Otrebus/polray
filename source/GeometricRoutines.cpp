@@ -53,7 +53,7 @@ std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
 {
     auto v2 = givenVector^Vector3d(1, 0, 0);
 
-    if(v2.GetLengthSquared() < 0.0001f)
+    if(v2.Length2() < 0.0001f)
         v2 = givenVector^Vector3d(0, 0, 1);
 
     return { v2.Normalized(), (givenVector^v2).Normalized() };
@@ -132,7 +132,7 @@ double IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d&
 }
 
 
-std::vector<Vector2d> convexHull(std::vector<Vector2d> v)
+std::vector<Vector2d> ConvexHull(std::vector<Vector2d> v)
 {
     std::vector<Vector2d> ps, ps2; // Partial and full convex hulls and the output
 

@@ -4,6 +4,7 @@
 #include "SphereLight.h"
 #include "UniformEnvironmentLight.h"
 #include "MeshLight.h"
+#include "Bytestream.h"
 #include <intrin.h>
 
 Light::Light()

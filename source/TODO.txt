@@ -1,9 +1,5 @@
-Simplify stuff around comment "Calculate the new average image based on the new samples", the if statement isn't needed, and vectorize the stuff
 Rename various functions from GetBlahBlahBlah to just blah
-Put ids for saving in a single file
-Create Serializable interface class
 Make various functions return a tuple instead of taking output parameters
-Make Sphere use IntersectSphere in its intersect/generateintersectioninfo functions
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
 Refactor GetProjectedSceneHull
@@ -19,6 +15,8 @@ Implement multiple importance sampling for light portals
 Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
 Add physical camera to bdpt
 Add check that all primitives have materials, in scene
+- Make Sphere use IntersectSphere in its intersect/generateintersectioninfo functions
+- Put ids for saving in a single file
 - Read light sources from .mtl files
 - Change the DirectHitMIS etc stuff
 - Make mr. lightportal use next event estimation

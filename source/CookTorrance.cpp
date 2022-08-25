@@ -31,7 +31,7 @@ double G_p(Vector3d h, Vector3d w, double alpha) {
 }
 
 double D_p(double alpha, double cosn) {
-    return sq(alpha)/(M_PI*sq((sq(alpha)-1)*cosn*cosn+1));
+    return sq(alpha)/(pi*sq((sq(alpha)-1)*cosn*cosn+1));
 }
 
 Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
@@ -65,10 +65,8 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
 }
 
 
-Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
+Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
 {
-    assert(component == 1);
-
     //float df = Kd.GetMax();
     //float sp = Ks.GetMax();
 

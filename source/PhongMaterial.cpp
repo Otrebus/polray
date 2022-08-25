@@ -49,8 +49,8 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
 
         const Vector3d& w_o = dir;
 
-        double pdf = w_o*N/F_PI;
-        double rpdf = w_i*adjN/F_PI;
+        double pdf = w_o*N/pi;
+        double rpdf = w_i*adjN/pi;
         if(rpdf < 0)
             rpdf = 0;
         if(pdf < 0)
@@ -68,7 +68,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
     }
     else // Specular bounce
     {
-        auto r1 = rnd.GetDouble(0.0f, 2*F_PI);
+        auto r1 = rnd.GetDouble(0.0f, 2*pi);
         auto r2 = acos(pow(rnd.GetDouble(0, 1), 1/(alpha+1)));
 
         Vector3d N_g = info.GetGeometricNormal();
@@ -93,7 +93,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
         out.direction.Normalize();
         Vector3d w_o = out.direction;
                 double pdf, rpdf;
-        pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*F_PI);
+        pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*pi);
         if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
         {
             return Sample(Color(0, 0, 0), out, 0, 0, false, 2);
@@ -126,8 +126,8 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
 
     if(component == 1)
     {
-        //pdf = out*N_s/F_PI;
-        return Kd/F_PI/(df/(df+sp));
+        //pdf = out*N_s/pi;
+        return Kd/pi/(df/(df+sp));
     }
     else
     {
@@ -136,7 +136,7 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
         if(reflection*out < 0)
             return Color(0, 0, 0);
 
-        return Ks*((alpha + 2)/(2*F_PI))*pow(out*reflection, alpha)/(sp/(df+sp));
+        return Ks*((alpha + 2)/(2*pi))*pow(out*reflection, alpha)/(sp/(df+sp));
     }
 }
 
@@ -184,11 +184,11 @@ double PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, boo
     Vector3d normal = adjoint ? N_g : N_s;
 
     if(component == 1)
-        return out*normal/F_PI;
+        return out*normal/pi;
     else
     {
         Vector3d up = Reflect(info.GetDirection(), N_s);
-        return out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*F_PI) : 0;
+        return out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*pi) : 0;
     }
 }
 

@@ -85,7 +85,7 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         BDVertex* newV = new BDVertex();
         newV->info = info;
         Vector3d v = (info.GetPosition() - lastV->out.origin);
-        double lSqr = v.GetLengthSquared();
+        double lSqr = v.Length2();
         v.Normalize();
         newV->pdf = lastPdf*(abs(info.GetGeometricNormal()*info.GetDirection()))/(lSqr);
         newV->alpha = lastV->alpha*lastSample;
@@ -205,7 +205,7 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     BDVertex* lastE = eyePath[t-1];
 
     Ray c = Ray(lastE->out.origin, lastL->out.origin - lastE->out.origin);
-    double r = c.direction.GetLength();
+    double r = c.direction.Length();
     c.direction.Normalize();
 
     result *= abs(lastL->info.GetGeometricNormal()*c.direction)*abs(lastE->info.GetNormal()*c.direction)/(r*r);
@@ -299,7 +299,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lightPath[s-1]->info;
         Vector3d out = lastE->info.GetPosition() - lastL->info.GetPosition();
-        double lSqr = out.GetLengthSquared();
+        double lSqr = out.Length2();
         out.Normalize();
         double newPdf;
         if(s > 1)
@@ -312,7 +312,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
             info = eyePath[t-1]->info;
             info.direction = out;
             out = eyePath[t-2]->info.position - lastE->info.position;
-            lSqr = out.GetLengthSquared();
+            lSqr = out.Length2();
             out.Normalize();
             newPdf = lastE->info.GetMaterial()->PDF(info, out, true, lastE->sample.component);
         
@@ -335,7 +335,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lastE->info;
         Vector3d out = lastL->info.GetPosition()-lastE->info.GetPosition();
-        double lSqr = out.GetLengthSquared();
+        double lSqr = out.Length2();
         out.Normalize();
         double newPdf;
         double costheta = abs(lastE->info.geometricnormal*out);
@@ -348,7 +348,7 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
             info = lightPath[s-1]->info;
             info.direction = out;
             out = lightPath[s-2]->info.position - lastL->info.position;
-            lSqr = out.GetLengthSquared();
+            lSqr = out.Length2();
             out.Normalize();
             newPdf = lastL->info.GetMaterial()->PDF(info, out, false, lastL->sample.component);
 
@@ -416,7 +416,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
             BDVertex* lastE = eyePath[t-1];
 
             Ray c = Ray(lastE->out.origin, lastL->out.origin - lastE->out.origin);
-            double r = c.direction.GetLength();
+            double r = c.direction.Length();
             c.direction.Normalize();
 
             /*auto q = std::min(1.0, eval.GetLuminance()/roulette[x+y*XRES].GetThreshold());

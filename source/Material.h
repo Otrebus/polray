@@ -13,16 +13,6 @@ class Ray;
 class IntersectionInfo;
 class Bytestream;
 
-#define F_PI 3.141592653f
-
-#define ID_ASHIKHMINSHIRLEY ((unsigned char)104)
-#define ID_DIELECTRICMATERIAL ((unsigned char)102)
-#define ID_MIRRORMATERIAL ((unsigned char)103)
-#define ID_PHONGMATERIAL ((unsigned char)101)
-#define ID_LAMBERTIANMATERIAL ((unsigned char)100)
-#define ID_EMISSIVEMATERIAL ((unsigned char)105)
-#define ID_COOKTORRANCEMATERIAL ((unsigned char)106)
-
 class ShadingState;
 
 class Material

@@ -29,7 +29,7 @@ void UniformEnvironmentLight::AddToScene(Scene* scn)
 
 double UniformEnvironmentLight::GetArea() const
 {
-    return radius*radius*4*M_PI;
+    return radius*radius*4*pi;
 }
 
 double UniformEnvironmentLight::Intersect(const Ray& ray) const
@@ -78,7 +78,7 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> UniformEnvironmentLight::Sam
             auto p3 = right*p.x + forward*p.y + pp;
             auto dir = (p3-ray.origin);
             ray.direction = dir.Normalized();
-            double anglePdf = dir.GetLengthSquared()/(ray.direction*n)/A;
+            double anglePdf = dir.Length2()/(ray.direction*n)/A;
             return { ray, (ray.direction*n)*Color::Identity/anglePdf, normal, areaPdf, anglePdf };
         }
     }
@@ -92,7 +92,7 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
     auto [h, A, right, forward, cv] = GetProjectedSceneHull(outRay, n);
 
     auto v = n*(cv*n);
-    auto r = v.GetLength()/std::abs(out*n);
+    auto r = v.Length()/std::abs(out*n);
     return r*r/std::abs(out*n)/A;
 }
 
@@ -129,7 +129,7 @@ Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, con
     auto [lightPoint, lightNormal] = SamplePoint();
     auto toLight = lightPoint - info.GetPosition();
     Ray lightRay = Ray(info.GetPosition(), toLight);
-    double d = toLight.GetLength()*(1.-1.e-6);
+    double d = toLight.Length()*(1.-1.e-6);
     toLight.Normalize();
 
     if(renderer->TraceShadowRay(lightRay, d))
@@ -173,12 +173,12 @@ std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformE
         Vector2d w = Vector2d(u * right, u * forward).Normalized();
         auto vp = n*(n*u);
         auto v = n*(cv*n);
-        auto rp = ((v.GetLength() / (u*n)) * (u - n*(u*n)).GetLength());
+        auto rp = ((v.Length() / (u*n)) * (u - n*(u*n)).Length());
 
         q.push_back(rp*w);
     }
 
-    auto h = convexHull(q);
+    auto h = ConvexHull(q);
 
     double A = 0;
     for(int i = 0; i < h.size(); i++)

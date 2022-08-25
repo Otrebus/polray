@@ -32,7 +32,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
         // Light going straight from the surface of the light source to the camera
         Vector3d lightToCam = firstLensPoint - ray.origin;
         Ray lightToCamRay(ray.origin, lightToCam);
-        double camRayLength = lightToCam.GetLength();
+        double camRayLength = lightToCam.Length();
         lightToCamRay.direction.Normalize();
 
         double camcos = abs(-lightToCamRay.direction*cam.dir);
@@ -62,7 +62,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             auto [u, v, lensPoint] = cam.SampleAperture();
 
             Ray camRay = Ray(info.GetPosition(), lensPoint - info.GetPosition());
-            camRayLength = camRay.direction.GetLength();
+            camRayLength = camRay.direction.Length();
             camRay.direction.Normalize();
 
             auto sample = info.GetMaterial()->GetSample(info, true);

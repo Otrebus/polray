@@ -3,9 +3,6 @@
 #include "Color.h"
 #include "Bytestream.h"
 
-#define ID_MONESTIMATOR ((unsigned char) 70)
-#define ID_MEANESTIMATOR ((unsigned char) 71)
-
 class Estimator
 {
 public:

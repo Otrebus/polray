@@ -2,6 +2,7 @@
 #include "Triangle.h"
 #include "TriangleMesh.h"
 #include "Sphere.h"
+#include "Bytestream.h"
 
 Model::Model()
 {

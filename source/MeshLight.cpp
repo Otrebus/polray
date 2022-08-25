@@ -169,7 +169,7 @@ bool MeshLight::GenerateIntersectionInfo(const Ray&, IntersectionInfo&) const
 
 double MeshLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
-    return out*info.geometricnormal/F_PI;
+    return out*info.geometricnormal/pi;
 }
 
 std::tuple<Point, Normal> MeshLight::SamplePoint() const
@@ -239,7 +239,7 @@ Color MeshLight::NextEventEstimation(const Renderer* renderer, const Intersectio
 
     if(toLight*lightNormal_ < 0)
     {
-        double d = toLight.GetLength();
+        double d = toLight.Length();
         toLight.Normalize();
 
         Ray lightRay = Ray(info.GetPosition(), toLight);

@@ -1,5 +1,6 @@
 #include "ThinLensCamera.h"
 #include "Bytestream.h"
+#include "Utils.h"
 
 //------------------------------------------------------------------------------
 // Constructor.
@@ -103,7 +104,7 @@ std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, doubl
 //------------------------------------------------------------------------------
 std::tuple<double, double, Vector3d> ThinLensCamera::SampleAperture() const
 {
-    double u = random.GetDouble(0, 2*F_PI);
+    double u = random.GetDouble(0, 2*pi);
     double v = sqrt(random.GetDouble(0, 1));
 
     Vector3d position = this->pos + lensRadius*v*(up*sin(u) + (dir^up)*cos(u));

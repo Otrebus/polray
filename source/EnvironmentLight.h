@@ -1,5 +1,4 @@
-#ifndef ENVIRONMENT_LIGHT
-#define ENVIRONMENT_LIGHT
+#pragma once
 
 #include "Vector3d.h"
 #include "Light.h"
@@ -21,5 +20,3 @@ public:
     virtual void Save(Bytestream& stream) const = 0;
     virtual void Load(Bytestream& stream) = 0;
 };
-
-#endif

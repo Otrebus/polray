@@ -1,5 +1,4 @@
-#ifndef COLOR_H
-#define COLOR_H
+#pragma once
 
 #define WIN32_MEAN_AND_LEAN
 #include <assert.h>
@@ -51,5 +50,3 @@ public:
 Color operator*(double, const Color&);
 Color operator*(int, const Color&);
 std::ostream& operator << (std::ostream& s, const Color& v);
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef VECTOR3D_H
-#define VECTOR3D_H
+#pragma once
 
 class Matrix3d;
 
@@ -68,5 +67,3 @@ public:
 Vector3d operator*(double t, const Vector3d& v);
 Vector2d operator*(double t, const Vector2d& v);
 std::ostream& operator<<(std::ostream& str, const Vector3d& v);
-
-#endif

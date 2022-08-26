@@ -1,5 +1,4 @@
-#ifndef CSGOBJECT_H
-#define CSGOBJECT_H
+#pragma once
 
 #include "IntersectionInfo.h"
 #include "Model.h"
@@ -40,5 +39,3 @@ protected:
     static Vector3d Multiply(const Vector3d& u, const Vector3d& v, 
                              const Vector3d& w, const Vector3d& x);
 };
-
-#endif

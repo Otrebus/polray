@@ -1,5 +1,4 @@
-#ifndef MIRRORMATERIAL_H
-#define MIRRORMATERIAL_H
+#pragma once
 
 #include "Material.h"
 #include "Vector3d.h"
@@ -39,5 +38,4 @@ public:
     Texture* normalmap;
 };
 
-#endif
     

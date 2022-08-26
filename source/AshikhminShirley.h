@@ -1,5 +1,4 @@
-#ifndef ASHIKHMINSHIRLEY_H
-#define ASHIKHMINSHIRLEY_H
+#pragma once
 
 #define _USE_MATH_DEFINES
 
@@ -45,5 +44,4 @@ public:
     int n;
 };
 
-#endif
 	

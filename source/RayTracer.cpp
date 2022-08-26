@@ -57,7 +57,7 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double cont
     if(contribution < 0.005f)
         return Color(0, 0, 0);
         
-    Vector3d dir = ray.GetDirection();
+    Vector3d dir = ray.direction;
     dir.Normalize();
     
     bool objecthit = false;

@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef BDPT_H
-#define BDPT_H
-
 #include "Renderer.h"
 #include "Random.h"
 #include "IntersectionInfo.h"
@@ -99,5 +96,3 @@ protected:
     
     mutable Random m_random;
 };
-
-#endif

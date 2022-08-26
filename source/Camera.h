@@ -1,5 +1,4 @@
-#ifndef CAMERA_H
-#define CAMERA_H
+#pragma once
 
 #include "vector3d.h"
 #include "Ray.h"
@@ -34,5 +33,3 @@ public:
     double halfwidth;       // Size of the film plane (plane is always 1 unit behind the camera)
     int xres, yres;         // Pixel resolution of the film plane
 };
-
-#endif

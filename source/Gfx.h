@@ -1,5 +1,4 @@
-#ifndef GFX_H
-#define GFX_H
+#pragma once
 
 #define WIN32_MEAN_AND_LEAN
 #include "ddraw.h"
@@ -66,6 +65,3 @@ public:
     LPRECT                  m_pScreenRect;
     LPDIRECTDRAWCLIPPER     m_pClipper;
 };
-
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef TRIANGLEMESH_H
-#define TRIANGLEMESH_H
+#pragma once
 
 #include <vector>
 #include <map>
@@ -67,5 +66,3 @@ public:
 	vector<Vertex3d*> points;
     vector<Material*> materials;
 };
-
-#endif

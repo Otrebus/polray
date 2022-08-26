@@ -1,5 +1,4 @@
-#ifndef CSGINTERSECTION_H
-#define CSGINTERSECTION_H
+#pragma once
 
 #include "CsgObject.h"
 #include <memory>
@@ -32,5 +31,3 @@ public:
 private:
     std::unique_ptr<CsgObject> objA_, objB_;
 };
-
-#endif

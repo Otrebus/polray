@@ -1,5 +1,4 @@
-#ifndef EMISSIVEMATERIAL_H
-#define EMISSIVEMATERIAL_H
+#pragma once
 
 #include "vector3d.h"
 #include "texture.h"
@@ -38,5 +37,4 @@ public:
     Color emissivity;
 };
 
-#endif
     

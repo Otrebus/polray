@@ -1,5 +1,4 @@
-#ifndef THINLENSCAMERA_H
-#define THINLENSCAMERA_H
+#pragma once
 
 #include <assert.h>
 #include <Windows.h>
@@ -21,9 +20,6 @@ public:
 
     std::tuple<double, double, Vector3d> SampleAperture() const;
 
-    void SetFocalLength(double focalLength);
-    void SetLensRadius(double lensRadius);
-
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
@@ -32,5 +28,3 @@ public:
 
     mutable Random random;
 };
-
-#endif

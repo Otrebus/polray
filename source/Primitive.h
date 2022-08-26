@@ -1,11 +1,4 @@
-#ifndef PRIMITIVE_H
-#define PRIMITIVE_H
-
-//#include "Material.h"
-//#include "Vector3d.h"
-//#include "Ray.h"
-//#include "Intersectioninfo.h"
-//#include "Boundingbox.h"
+#pragma once
 
 class Vector3d;
 class Ray;
@@ -35,4 +28,3 @@ protected:
     Material* material;
 };
 
-#endif

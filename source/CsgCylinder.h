@@ -1,5 +1,4 @@
-#ifndef CSGCYLINDER_H
-#define CSGCYLINDER_H
+#pragma once
 
 #include "CsgObject.h"
 #include "Matrix3d.h"
@@ -39,5 +38,3 @@ private:
 
     Vector3d invMatU_, invMatV_, invMatW_;
 };
-
-#endif

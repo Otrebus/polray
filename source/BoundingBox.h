@@ -1,5 +1,4 @@
-#ifndef BOUNDINGBOX_H
-#define BOUNDINGBOX_H
+#pragma once
 
 #include "vector3d.h"
 #include "ray.h"
@@ -22,5 +21,3 @@ public:
     bool Intersects(const Ray& r);
     Vector3d c1, c2;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef DIELECTRICMATERIAL_H
-#define DIELECTRICMATERIAL_H
+#pragma once
 
 #include "Material.h"
 #include "Vector3d.h"
@@ -39,5 +38,4 @@ public:
     mutable Random m_rnd;
 };
 
-#endif
     

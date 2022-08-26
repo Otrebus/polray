@@ -1,5 +1,4 @@
-#ifndef BYTESTREAM_H
-#define BYTESTREAM_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -95,5 +94,3 @@ private:
     unsigned int first;
     vector<char> data;
 };
-
-#endif

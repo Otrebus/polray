@@ -1,8 +1,6 @@
-#ifndef INTERSECTIONINFO_H
-#define INTERSECTIONINFO_H
+#pragma once
 
 #include "vector3d.h"
-
 
 class Material;
 
@@ -31,5 +29,3 @@ public:
     Vector3d rayposition;
     Material* material;
 };
-
-#endif

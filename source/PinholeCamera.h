@@ -1,5 +1,4 @@
-#ifndef PINHOLECAMERA_H
-#define PINHOLECAMERA_H
+#pragma once
 
 #include "Vector3d.h"
 #include "Camera.h"
@@ -20,5 +19,3 @@ public:
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 };
-
-#endif

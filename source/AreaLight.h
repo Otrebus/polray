@@ -1,5 +1,4 @@
-#ifndef AREALIGHT_H
-#define AREALIGHT_H
+#pragma once
 
 #include "Light.h"
 #include "Ray.h"
@@ -40,4 +39,3 @@ protected:
     mutable Random r;
 };
 
-#endif

@@ -1,5 +1,4 @@
-#ifndef MODEL_H
-#define MODEL_H
+#pragma once
 
 class Scene;
 class Bytestream;
@@ -18,5 +17,3 @@ private:
     friend class Scene;
     virtual void AddToScene(Scene& scene) = 0;
 };
-
-#endif

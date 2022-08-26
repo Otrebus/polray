@@ -1,4 +1,5 @@
-#ifndef KDTREE_H
+#pragma once
+
 #define NOMINMAX
 #include "kdtree.h"
 #include "trianglemesh.h"
@@ -614,6 +615,3 @@ double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmi
     }
     return -inf;
 }
-
-
-#endif

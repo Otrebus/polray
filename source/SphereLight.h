@@ -1,5 +1,4 @@
-#ifndef SPHERELIGHT_H
-#define SPHERELIGHT_H
+#pragma once
 
 #include "Light.h"
 #include "Ray.h"
@@ -40,5 +39,3 @@ protected:
     double radius_;
     mutable Random r_;
 };
-
-#endif

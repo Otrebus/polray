@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include "SpatialPartitioning.h"
 #include "Ray.h"
 #include "Primitive.h"

@@ -1,5 +1,4 @@
-#ifndef LAMBERTIANMATERIAL_H
-#define LAMBERTIANMATERIAL_H
+#pragma once
 
 #define _USE_MATH_DEFINES
 
@@ -40,5 +39,4 @@ public:
     Color emissivity;
 };
 
-#endif
     

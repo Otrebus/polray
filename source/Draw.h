@@ -1,5 +1,4 @@
-#ifndef DRAW_H
-#define DRAW_H
+#pragma once
 
 #include "gfx.h"
 #include "Estimator.h"
@@ -17,5 +16,3 @@ extern Texture* test;
 extern Cubemap* cubemap;
 extern KDTree* tree;
 extern Texture* normalmap;
-
-#endif

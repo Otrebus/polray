@@ -1,5 +1,4 @@
-#ifndef CSGSPHERE_H
-#define CSGSPHERE_H
+#pragma once
 
 #include "CsgObject.h"
 #include "Matrix3d.h"
@@ -32,5 +31,3 @@ private:
     Vector3d pos_;
     double radius_;
 };
-
-#endif

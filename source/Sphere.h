@@ -1,5 +1,4 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#pragma once
 
 #include "Vector3d.h"
 #include "Ray.h"
@@ -33,5 +32,3 @@ protected:
     double radius;
     Vector3d position, up, right;
 };
-
-#endif

@@ -1,8 +1,8 @@
-#ifndef KDTREE_H
-#define KDTREE_H
+#pragma once
 
 #include "BoundingBox.h"
 #include "SpatialPartitioning.h"
+#include "Timer.h"
 class Primitive;
 
 #include <cmath>
@@ -76,5 +76,3 @@ public:
     static const char planar = 1;
     static const char start = 2;
 };
-
-#endif

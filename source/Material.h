@@ -1,5 +1,4 @@
-#ifndef MATERIAL_H
-#define MATERIAL_H
+#pragma once
 
 #include "vector3d.h"
 #include "texture.h"
@@ -41,5 +40,3 @@ public:
     Texture* texture;
     Texture* normalmap;
 };
-
-#endif

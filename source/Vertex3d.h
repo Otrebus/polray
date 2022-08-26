@@ -1,5 +1,4 @@
-#ifndef VERTEX3D_H
-#define VERTEX3D_H
+#pragma once
 
 #include "Vector3d.h"
 
@@ -17,4 +16,3 @@ public:
     Vector2d texpos;
 };
 
-#endif

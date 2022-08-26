@@ -1,5 +1,4 @@
-#ifndef PREETHAMSKY_H
-#define PREETHAMSKY_H
+#pragma once
 
 #include "EnvironmentLight.h"
 #include "Vector3d.h"
@@ -38,5 +37,3 @@ private:
 
     double YDenom_, yDenom_, xDenom_;
 };
-
-#endif

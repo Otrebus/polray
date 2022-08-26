@@ -1,5 +1,4 @@
-#ifndef PATHTRACER_H
-#define PATHTRACER_H
+#pragma once
 
 #include "Renderer.h"
 #include "Random.h"
@@ -21,5 +20,3 @@ public:
 private:
     mutable Random m_random;
 };
-
-#endif

@@ -204,9 +204,7 @@ std::ostream& operator << (std::ostream& s , const Vector3d& v)
 
 bool Vector3d::IsValid() const
 {
-    return x < std::numeric_limits<double>::infinity() && x > -std::numeric_limits<double>::infinity() && x == x
-    && y < std::numeric_limits<double>::infinity() && y > -std::numeric_limits<double>::infinity() && y == y
-    && z < std::numeric_limits<double>::infinity() && z > -std::numeric_limits<double>::infinity() && z == z;
+    return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
 }
 
 bool Vector3d::operator==(const Vector3d& v) const

@@ -1,5 +1,4 @@
-#ifndef LOGGER_H
-#define LOGGER_H
+#pragma once
 
 #pragma warning( disable : 4996 )
 
@@ -29,5 +28,3 @@ private:
 };
 
 extern Logger logger;
-
-#endif

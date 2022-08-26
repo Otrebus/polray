@@ -1,5 +1,4 @@
-#ifndef COOKTORRANCE_H
-#define COOKTORRANCE_H
+#pragma once
 
 #define _USE_MATH_DEFINES
 
@@ -46,5 +45,4 @@ public:
     double ior;
 };
 
-#endif
     

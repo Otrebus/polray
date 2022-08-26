@@ -1,5 +1,4 @@
-#ifndef LIGHT_H
-#define LIGHT_H
+#pragma once
 
 #include "vector3d.h"
 #include "color.h"
@@ -45,5 +44,3 @@ public:
 protected:
     Color intensity_;
 };
-
-#endif

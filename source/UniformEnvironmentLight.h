@@ -1,5 +1,4 @@
-#ifndef UNIFORMENVIRONMENTLIGHT_H
-#define UNIFORMENVIRONMENTLIGHT_H
+#pragma once
 
 #include "Light.h"
 #include "Ray.h"
@@ -44,4 +43,3 @@ protected:
     mutable Random random;
 };
 
-#endif

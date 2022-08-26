@@ -1,5 +1,4 @@
-#ifndef MESHLIGHT_H
-#define MESHLIGHT_H
+#pragma once
 
 #include "Light.h"
 #include "KDTree.h"
@@ -63,5 +62,3 @@ protected:
     mutable Random r;
     mutable TriangleNode* triangleTree_;
 };
-
-#endif

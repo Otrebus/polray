@@ -1,5 +1,4 @@
-#ifndef LIGHTTRACER_H
-#define LIGHTTRACER_H
+#pragma once
 
 #include "Camera.h"
 #include "ColorBuffer.h"
@@ -21,5 +20,3 @@ public:
 private:
     mutable Random m_random;
 };
-
-#endif

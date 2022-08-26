@@ -1,5 +1,4 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#pragma once
 
 #include <string>
 #include "ddraw.h"
@@ -29,5 +28,3 @@ protected:
     int* texture;
     int height, width;
 };
-
-#endif

@@ -1,5 +1,4 @@
-#ifndef COLORBUFFER_H
-#define COLORBUFFER_H
+#pragma once
 
 #include "Bytestream.h"
 #include "Color.h"
@@ -34,5 +33,3 @@ private:
     Color* m_buffer;
     int width, height;
 };
-
-#endif

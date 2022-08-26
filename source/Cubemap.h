@@ -1,5 +1,4 @@
-#ifndef CUBEMAP_H
-#define CUBEMAP_H
+#pragma once
 
 #include "vector3d.h"
 #include "texture.h"
@@ -14,5 +13,3 @@ public:
 protected:
     Texture m_north, m_south, m_west, m_east, m_top, m_bottom;
 };
-
-#endif

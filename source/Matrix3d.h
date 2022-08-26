@@ -1,5 +1,4 @@
-#ifndef MATRIX3D_H
-#define MATRIX3D_H
+#pragma once
 
 #include "Vector3d.h"
 
@@ -21,5 +20,3 @@ public:
 private:
     double m_val[4][4];
 };
-
-#endif

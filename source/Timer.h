@@ -1,5 +1,4 @@
-#ifndef TIMER_H
-#define TIMER_H
+#pragma once
 
 #define WIN32_MEAN_AND_LEAN
 #include <windows.h>
@@ -18,6 +17,3 @@ private:
     LARGE_INTEGER m_startTick;
     LARGE_INTEGER m_dt;
 };
-
-#endif
-

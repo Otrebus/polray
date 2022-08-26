@@ -1,5 +1,4 @@
-#ifndef TRIANGLE_H
-#define TRIANGLE_H
+#pragma once
 
 #include "Vector3d.h"
 #include "Vertex3d.h"
@@ -33,5 +32,3 @@ protected:
     friend class Scene;
     void AddToScene(Scene& scene);
 };
-
-#endif

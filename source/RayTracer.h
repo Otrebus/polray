@@ -1,5 +1,4 @@
-#ifndef RAYTRACER_H
-#define RAYTRACER_H
+#pragma once
 
 #include "Renderer.h"
 #include "Light.h"
@@ -26,5 +25,3 @@ public:
     vector<Light*> m_lights;
     vector<Primitive*> m_primitives;
 };
-
-#endif

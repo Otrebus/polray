@@ -1,5 +1,4 @@
-#ifndef RENDERING_H
-#define RENDERING_H
+#pragma once
 
 #include "Bytestream.h"
 #include "ColorBuffer.h"
@@ -37,5 +36,3 @@ public:
     bool stopping;
     bool running;
 };
-
-#endif

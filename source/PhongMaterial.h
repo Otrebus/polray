@@ -1,5 +1,4 @@
-#ifndef PHONGMATERIAL_H
-#define PHONGMATERIAL_H
+#pragma once
 
 #define _USE_MATH_DEFINES
 
@@ -45,6 +44,3 @@ public:
     Color Ka, Kd, Ks;
     double alpha;
 };
-
-#endif
-    

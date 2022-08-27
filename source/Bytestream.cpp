@@ -45,20 +45,15 @@ size_t Bytestream::GetSize() const
 void Bytestream::SaveToFile(std::string fileName)
 {
     std::ofstream file;
-    file.open(fileName, ios::out | ios::trunc | ios::binary);
-
-    char byte;
-    for(auto i = data.begin() + first; i < data.end(); i++)
-    {
-        byte = *i;
+    file.open(fileName, std::ios::out | std::ios::trunc | std::ios::binary);
+    for(auto byte : data)
         file.write(&byte, sizeof(char));
-    }
 }
 
 void Bytestream::LoadFromFile(std::string fileName)
 {
     std::ifstream file;
-    file.open(fileName, ios::in | ios::binary);
+    file.open(fileName, std::ios::in | std::ios::binary);
 
     for(char byte; !file.eof(); data.push_back(byte))
         file.read(&byte, sizeof(char));

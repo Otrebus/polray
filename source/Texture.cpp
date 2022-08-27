@@ -7,7 +7,7 @@ Texture::Texture(int width, int height) : width(width), height(height)
     texture = new int[width*height];
 }
 
-Texture::Texture(const wstring& file)
+Texture::Texture(const std::wstring& file)
 {
     HDC hSrcDC;
     HDC hDestDC;
@@ -105,7 +105,7 @@ Color Texture::GetTexel(int x, int y) const
     if(x < 0 || x >= width || y < 0 || y >= height)
         return Color(1, 0, 1);
     else
-        return texture[x + width*y];
+        return Color(texture[x + width*y]);
 }
 
 void Texture::SetTexel(int x, int y, int color)

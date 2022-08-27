@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "Renderer.h"
 #include "Random.h"
 #include "IntersectionInfo.h"
@@ -75,19 +76,19 @@ protected:
 
     int BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
 
-    int BuildEyePath(int x, int y, vector<BDVertex*>& path, const Camera& cam,
-                     vector<BDSample>& samples, Light* light) const;
-    int BuildLightPath(vector<BDVertex*>& path, Light* light) const;
+    int BuildEyePath(int x, int y, std::vector<BDVertex*>& path, const Camera& cam,
+                     std::vector<BDSample>& samples, Light* light) const;
+    int BuildLightPath(std::vector<BDVertex*>& path, Light* light) const;
 
-    Color EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath, 
+    Color EvalPath(const std::vector<BDVertex*>& lightPath, const std::vector<BDVertex*>& eyePath, 
                    int s, int t, Light* light) const;
-    double WeighPath(int s, int t, vector<BDVertex*>& lightPath, 
-                    vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
+    double WeighPath(int s, int t, std::vector<BDVertex*>& lightPath, 
+                    std::vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
 
-    double UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
-                      vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
-    double PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
-                      vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
+    double UniformWeight(int s, int t, std::vector<BDVertex*>& lightPath,
+                      std::vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
+    double PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
+                      std::vector<BDVertex*>& eyePath, Light* light, Camera* camera) const;
     
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

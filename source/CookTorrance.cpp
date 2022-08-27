@@ -3,7 +3,6 @@
 #include "Bytestream.h"
 #include "CookTorrance.h"
 
-using namespace std;
 
 CookTorrance::CookTorrance()
 {
@@ -85,7 +84,7 @@ Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int)
     auto N = N_s;
 
     if(in*N_g < 0 || out*N_g < 0 || in*N_s < 0 || out*N_s < 0) // FIXME: redundant checks
-        return 0;
+        return Color::Black;
 
     auto cosn = h*N;
     auto cosv = h*in;
@@ -102,14 +101,14 @@ Light* CookTorrance::GetLight() const
     return light;
 }
 
-void CookTorrance::ReadProperties(stringstream& ss)
+void CookTorrance::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
     {
-        string line;
-        string a;
+        std::string line;
+        std::string a;
         getline(ss, line);
-        stringstream ss2(line);
+        std::stringstream ss2(line);
         ss2 >> a;
         transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
 

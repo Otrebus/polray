@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "vector3d.h"
 #include "Ray.h"
 #include <assert.h>

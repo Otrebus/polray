@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "Vector3d.h"
 #include "Camera.h"
 #include "Ray.h"
@@ -9,7 +10,7 @@ class PinholeCamera : public Camera
 {
 public:
     PinholeCamera();
-    PinholeCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, double fov);
+    PinholeCamera(const Vector3d& up, const Vector3d& pos, const Vector3d& dir, int xres, int yres, double fov);
     ~PinholeCamera();
     
     Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const;

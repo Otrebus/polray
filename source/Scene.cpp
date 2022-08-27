@@ -19,7 +19,7 @@ Scene::Scene()
 //------------------------------------------------------------------------------
 // Constructor, reads a trianglemesh into the scene data from the supplied file
 //------------------------------------------------------------------------------
-Scene::Scene(string f)
+Scene::Scene(std::string f)
 {
 	auto [success, mesh, lghts] = ReadFromFile(f, 0);
 	AddModel(mesh);
@@ -131,12 +131,12 @@ void Scene::Save(Bytestream& b) const
         model->Save(b);
 }
 
-vector<const Primitive*> Scene::GetPrimitives() const
+std::vector<const Primitive*> Scene::GetPrimitives() const
 {
     return primitives;
 }
 
-vector<Light*> Scene::GetLights() const
+std::vector<Light*> Scene::GetLights() const
 {
     return lights;
 }

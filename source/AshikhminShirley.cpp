@@ -13,14 +13,14 @@ AshikhminShirley::~AshikhminShirley()
 {
 }
 
-void AshikhminShirley::ReadProperties(stringstream& ss)
+void AshikhminShirley::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
     {
-        string line;
-        string a;
+        std::string line;
+        std::string a;
         getline(ss, line);
-        stringstream ss2(line);
+        std::stringstream ss2(line);
         ss2 >> a;
         transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
         if(a == "rd")
@@ -141,7 +141,7 @@ Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out, 
         N_s = -N_s;
 
     if(in*N_g < 0 || out*N_g < 0 || in*N_s < 0 || out*N_s < 0) // FIXME: redundant checks
-        return 0;
+        return Color(0);
 
     Vector3d wi = -info.GetDirection();
     Vector3d h = (wi + out);

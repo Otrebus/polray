@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include <vector>
 #include "KDTree.h"
 #include "ColorBuffer.h"
@@ -9,8 +10,6 @@
 class Ray;
 class Primitive;
 class Light;
-
-using namespace std;
 
 class Renderer
 {
@@ -28,12 +27,12 @@ public:
     virtual void Save(Bytestream& stream) const = 0;
     virtual void Load(Bytestream& stream) = 0;
 
-    static Renderer* Create(unsigned char, shared_ptr<Scene> scn);
+    static Renderer* Create(unsigned char, std::shared_ptr<Scene> scn);
 protected:
     std::shared_ptr<Scene> scene;
 
     bool stopping;
 
     mutable Random m_random;
-    vector<Light*> m_lights;
+    std::vector<Light*> m_lights;
 };

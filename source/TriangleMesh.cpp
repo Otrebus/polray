@@ -11,6 +11,7 @@
 #include "Scene.h"
 #include <filesystem>
 #include "Utils.h"
+#include <numeric>
 #include "ObjReader.h"
 
 #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
@@ -49,84 +50,33 @@ MeshTriangle::MeshTriangle()
 
 MeshTriangle::~MeshTriangle()
 {
+    delete v0;
+    delete v1;
+    delete v2;
 }
-/*
-MeshTriangle::MeshTriangle(Material* mat)
-{
-	material = mat;
-}*/
 
 double MeshTriangle::Intersect(const Ray& ray) const
 {
-	return IntersectTriangle(v0->pos, v1->pos, v2->pos, ray);
+	auto [t, u, v] = IntersectTriangle(v0->pos, v1->pos, v2->pos, ray);
+	return t;
 }
 
 
 bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-	double u, v, t;
-	Vector3d D;
+	auto [t, u, v] = IntersectTriangle(v0->pos, v1->pos, v2->pos, ray);
+	if(t < eps)
+        return false;
+	Vector3d E1 = v1->pos-v0->pos, E2 = v2->pos-v0->pos;
 
 	info.direction = ray.direction;
-
-	D.x = ray.direction.x;
-	D.y = ray.direction.y;
-	D.z = ray.direction.z;
-
-	Vector3d E1 = v1->pos-v0->pos;
-	Vector3d E2 = v2->pos-v0->pos;
-	Vector3d T = ray.origin - v0->pos;
-
-	Vector3d P = E2^T;
-	Vector3d Q = E1^D;
-
-	double det = E2*Q;
-	if(!det) // Ray in (almost) the same plane as the triangle
-		return false;
-
-	u = D*P/det;
-
-	if(u > 1 || u < 0)
-		return false;
-
-	v = T*Q/det;
-
-	if(u+v > 1 || u < 0 || v < 0)
-		return false;
-
-	t = E1*P/det;
-	if(t <= 0)
-		return false;
-
-/*	if(material && material->normalmap)
-	{
-		Vector2d tex1(u * (v1->texpos.x - v0->texpos.x),
-			          u * (v1->texpos.y - v0->texpos.y));
-		Vector2d tex2(v * (v2->texpos.x - v0->texpos.x),
-			          v * (v2->texpos.y - v0->texpos.y));
-
-		Vector2d txc = Vector2d(v0->texpos.x, v0->texpos.y) + tex1+tex2;
-		// If there's a problem with normal mapping not looking right, try normalizing this vector.
-		Color nc = material->normalmap->GetTexelBLInterp(txc.x, txc.y);
-		double nx = (nc.r - 0.5f)*2.0f;
-		double ny = (nc.g - 0.5f)*2.0f;
-		double nz = nc.b;
-
-		info.normal = (*tangent)*nx + (*binormal)*ny + (*normal)*nz;
-	}*/
-	//else
-	{
-		Vector3d n0 = v0->normal;
-		Vector3d n1 = v1->normal;
-		Vector3d n2 = v2->normal;
-
-		info.normal = u*(v1->normal-v0->normal) + v*(v2->normal-v0->normal) + v0->normal;
-	}
+	info.normal = u*(v1->normal-v0->normal) + v*(v2->normal-v0->normal) + v0->normal;
 
 	info.geometricnormal = GetNormal();
 	info.normal.Normalize();
 
-	info.position = v0->pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
+	auto posnorm = (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
+	info.position = v0->pos + u*E1 + v*E2 + posnorm;
 	info.texpos.x = u;
 	info.texpos.y = v;
 	info.material = material;
@@ -134,10 +84,8 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 	return true;
 }
 
-TriangleMesh::TriangleMesh(string file, Material* mat)
+TriangleMesh::TriangleMesh(const std::string& file, Material* mat)
 {
-	//logger.File("Reading from file");
-	//ReadFromFile(file, mat);
 	auto [success, mesh, meshLights] = ReadFromFile(file, mat);
 	*this = *mesh;
 }
@@ -145,27 +93,17 @@ TriangleMesh::TriangleMesh(string file, Material* mat)
 TriangleMesh::TriangleMesh()
 {
 }
-/*
-int TriangleMesh::GetType()
-{
-	return type_trianglemesh;
-}
-
-void MeshTriangle::ComputeTangentSpaceVectors()
-{
-}*/
 
 BoundingBox MeshTriangle::GetBoundingBox() const
 {
-//	return bbox;
 	Vector3d c1, c2;
-	c1.x = min(v0->pos.x, min(v1->pos.x, v2->pos.x));
-	c1.y = min(v0->pos.y, min(v1->pos.y, v2->pos.y));
-	c1.z = min(v0->pos.z, min(v1->pos.z, v2->pos.z));
+	c1.x = min(v0->pos.x, v1->pos.x, v2->pos.x);
+	c1.y = min(v0->pos.y, v1->pos.y, v2->pos.y);
+	c1.z = min(v0->pos.z, v1->pos.z, v2->pos.z);
 
-	c2.x = max(v0->pos.x, max(v1->pos.x, v2->pos.x));
-	c2.y = max(v0->pos.y, max(v1->pos.y, v2->pos.y));
-	c2.z = max(v0->pos.z, max(v1->pos.z, v2->pos.z));
+	c2.x = max(v0->pos.x, v1->pos.x, v2->pos.x);
+	c2.y = max(v0->pos.y, v1->pos.y, v2->pos.y);
+	c2.z = max(v0->pos.z, v1->pos.z, v2->pos.z);
 	return BoundingBox(c1, c2);
 }
 
@@ -175,23 +113,16 @@ TriangleMesh::~TriangleMesh()
 
 void TriangleMesh::CalculateVertexNormals()
 {
-	Vector3d totalnormal(0,0,0);
-	Vector3d normal(0, 0, 0);
-
-	for(auto& p : points)
-	{
-		MeshVertex* pp = (MeshVertex*) p;
-		for(auto& t : pp->triangles)
-			totalnormal += t->GetNormal();
-		totalnormal.Normalize();
-		p->normal = totalnormal;
-		totalnormal = Vector3d(0,0,0);
-	}
+	for(auto& p : points) {
+        auto& tris = static_cast<MeshVertex*>(p)->triangles;
+		p->normal = std::accumulate(tris.begin(), tris.end(), Vector3d(0, 0, 0),
+                [] (auto a, auto t) { return a + t->GetNormal(); }).Normalized();
+    }
 }
 
 bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
 {
-	vector<Vector3d> points = { v0->pos, v1->pos, v2->pos };
+	std::vector<Vector3d> points = { v0->pos, v1->pos, v2->pos };
 
 	ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
 	ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
@@ -200,12 +131,12 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
 	ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
 	ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
-	resultbox.c1.x = numeric_limits<double>::infinity();
-	resultbox.c2.x = -numeric_limits<double>::infinity();
-	resultbox.c1.y = numeric_limits<double>::infinity();
-	resultbox.c2.y = -numeric_limits<double>::infinity();
-	resultbox.c1.z = numeric_limits<double>::infinity();
-	resultbox.c2.z = -numeric_limits<double>::infinity();
+	resultbox.c1.x = inf;
+	resultbox.c2.x = -inf;
+	resultbox.c1.y = inf;
+	resultbox.c2.y = -inf;
+	resultbox.c1.z = inf;
+	resultbox.c2.z = -inf;
 
 	for(auto v : points)
 	{
@@ -253,8 +184,8 @@ void TriangleMesh::Transform(const Matrix3d& m)
 void TriangleMesh::Save(Bytestream& stream) const
 {
     // This could also be a hash table, for very large triangle meshes
-    map<Vertex3d*, unsigned int> vertexMemToIndex;
-    map<Material*, unsigned int> materialMemToIndex;
+    std::map<Vertex3d*, unsigned int> vertexMemToIndex;
+    std::map<Material*, unsigned int> materialMemToIndex;
 
     stream << (unsigned char)ID_TRIANGLEMESH; 
     stream << materials.size();
@@ -306,7 +237,7 @@ void TriangleMesh::Load(Bytestream& stream)
         stream >> v->pos.x >> v->pos.y >> v->pos.z 
                >> v->normal.x >> v->normal.y >> v->normal.z 
                >> v->texpos.x >> v->texpos.y;
-        points.push_back((MeshVertex*)v);
+        points.push_back(static_cast<MeshVertex*>(v));
     }
     for(unsigned int i = 0; i < nTriangles; i++)
     {

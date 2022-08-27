@@ -3,8 +3,6 @@
 
 #include <sstream>
 
-using namespace std;
-
 MirrorMaterial::MirrorMaterial()
 {
 }
@@ -49,13 +47,13 @@ Light* MirrorMaterial::GetLight() const
     return light;
 }
 
-void MirrorMaterial::ReadProperties(stringstream& ss)
+void MirrorMaterial::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
     {
-        string line, s;
+        std::string line, s;
         getline(ss, line);
-        stringstream ss2(line);
+        std::stringstream ss2(line);
         ss2 >> s;
     }
 }

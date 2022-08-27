@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include <random>
 
 class Random

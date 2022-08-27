@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include <assert.h>
 #include <Windows.h>
 
@@ -12,7 +13,7 @@ class ThinLensCamera : public Camera
 {
 public:
     ThinLensCamera();
-    ThinLensCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, double fov, double focalLength, double lensRadius);
+    ThinLensCamera(const Vector3d& up, const Vector3d& pos, const Vector3d& dir, int xres, int yres, double fov, double focalLength, double lensRadius);
     ~ThinLensCamera();
     
     Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const;

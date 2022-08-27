@@ -1,6 +1,7 @@
 #pragma once
 
 #define DIRECTINPUT_VERSION 0x0800
+#define NOMINMAX
 
 #include "dinput.h"
 #include "Logger.h"

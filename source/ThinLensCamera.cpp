@@ -12,7 +12,7 @@ ThinLensCamera::ThinLensCamera()
 //------------------------------------------------------------------------------
 // Constructor.
 //------------------------------------------------------------------------------
-ThinLensCamera::ThinLensCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, double fov, double focalLength, double lensRadius) 
+ThinLensCamera::ThinLensCamera(const Vector3d& up, const Vector3d& pos, const Vector3d& dir, int xres, int yres, double fov, double focalLength, double lensRadius) 
     : Camera(up, pos, dir, xres, yres, fov), focalLength(focalLength), lensRadius(lensRadius)
 {
     random.Seed(GetTickCount());

@@ -129,8 +129,8 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
     return (int) path.size();
 }
 
-int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path, 
-                       const Camera& cam, vector<BDSample>& samples, 
+int BDPT::BuildEyePath(int x, int y, std::vector<BDVertex*>& path, 
+                       const Camera& cam, std::vector<BDSample>& samples, 
                        Light* light) const
 {
     BDVertex* camPoint = new BDVertex();
@@ -155,7 +155,7 @@ int BDPT::BuildEyePath(int x, int y, vector<BDVertex*>& path,
     return BuildPath(path, samples, light, false);
 }
 
-int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
+int BDPT::BuildLightPath(std::vector<BDVertex*>& path, Light* light) const
 {
     BDVertex* lightPoint = new BDVertex();
     auto [ray, color, normal, areaPdf, anglePdf] = light->SampleRay();
@@ -174,7 +174,7 @@ int BDPT::BuildLightPath(vector<BDVertex*>& path, Light* light) const
     return BuildPath(path, dummy, light, true);
 }
 
-Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
+Color BDPT::EvalPath(const std::vector<BDVertex*>& lightPath, const std::vector<BDVertex*>& eyePath,
                      int s, int t, Light* light) const
 {
     Color result(1, 1, 1);
@@ -226,8 +226,8 @@ Color BDPT::EvalPath(vector<BDVertex*>& lightPath, vector<BDVertex*>& eyePath,
     return result;
 }
 
-double BDPT::UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
-                      vector<BDVertex*>& eyePath, Light*, Camera*) const
+double BDPT::UniformWeight(int s, int t, std::vector<BDVertex*>& lightPath,
+                      std::vector<BDVertex*>& eyePath, Light*, Camera*) const
 {
     double weight = double(s+t);
     bool wasSpec = false;
@@ -264,8 +264,8 @@ double BDPT::UniformWeight(int s, int t, vector<BDVertex*>& lightPath,
     return 1/weight;
 }
 
-double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
-                           vector<BDVertex*>& eyePath, Light* light, Camera* cam) const
+double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
+                           std::vector<BDVertex*>& eyePath, Light* light, Camera* cam) const
 {
     double weight = 0;
     std::vector<double> forwardProbs(s+t);
@@ -375,8 +375,8 @@ double BDPT::PowerHeuristic(int s, int t, vector<BDVertex*>& lightPath,
     return 1.0f/(1.0f+weight);
 }
 
-double BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
-                      vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
+double BDPT::WeighPath(int s, int t, std::vector<BDVertex*>& lightPath,
+                      std::vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
 {
     return PowerHeuristic(s, t, lightPath, eyePath, light, camera);
 }
@@ -384,8 +384,8 @@ double BDPT::WeighPath(int s, int t, vector<BDVertex*>& lightPath,
 void BDPT::RenderPixel(int x, int y, Camera& cam, 
                        ColorBuffer& eyeImage, ColorBuffer& lightImage)
 {
-    vector<BDSample> samples;
-    vector<BDVertex*> eyePath, lightPath;
+    std::vector<BDSample> samples;
+    std::vector<BDVertex*> eyePath, lightPath;
 
     auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
 
@@ -466,8 +466,8 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
 
 void BDPT::Render(Camera& cam, ColorBuffer& colBuf)	
 {	
-    ColorBuffer lightImage(colBuf.GetXRes(), colBuf.GetYRes(), 0);
-    ColorBuffer eyeImage(colBuf.GetXRes(), colBuf.GetYRes(), 0);
+    ColorBuffer lightImage(colBuf.GetXRes(), colBuf.GetYRes(), Color::Black);
+    ColorBuffer eyeImage(colBuf.GetXRes(), colBuf.GetYRes(), Color::Black);
 
     for(int x = 0; x < colBuf.GetXRes(); x++)	
         for(int y = 0; y < colBuf.GetYRes() && !stopping; y++)	

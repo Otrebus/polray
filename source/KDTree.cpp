@@ -85,7 +85,6 @@ KDNode::KDNode()
 {
     left = 0;
     right = 0;
-    splitdir = KDTree::xyplane;
 }
 
 KDNode::~KDNode()
@@ -104,7 +103,7 @@ void KDNode::Build()
 {
 }
 
-BoundingBox KDTree::CalculateExtents(vector<const Primitive*>& shapes)
+BoundingBox KDTree::CalculateExtents(std::vector<const Primitive*>& shapes)
 {
     double maxx = -inf, maxy = -inf, maxz = -inf, minx = inf, miny = inf, minz = inf;
 
@@ -143,7 +142,7 @@ bool KDNode::IsLeaf() const
     //return m_isLeaf;
 }
 
-void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* events, vector<const Primitive*>& shapes, int depth, int badsplits)
+void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* events, std::vector<const Primitive*>& shapes, int depth, int badsplits)
 {
     if(depth > 20 || shapes.size() < 4) // TODO: fix
     {
@@ -155,7 +154,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     double bestsplit = 0;
     int bestsplitdir = 0;
     char bestside = 0;
-    double bestcost = numeric_limits<double>::infinity();
+    double bestcost = std::numeric_limits<double>::infinity();
     double boxarea = 2*(bbox.c2.z-bbox.c1.z)*(bbox.c2.y-bbox.c1.y) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.z-bbox.c1.z) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.y-bbox.c1.y);
 
     for(int u = 0; u < 3; u++)
@@ -177,7 +176,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
         int pp = 0, pe = 0, ps = 0; // Event counters for current position
 
         // Sweep through all events
-        vector<SAHEvent*>::iterator it = events[u].begin();
+        std::vector<SAHEvent*>::iterator it = events[u].begin();
         
         while(it < events[u].end())
         {
@@ -229,7 +228,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     // It's not worth it to split this node, make it a leaf
     if(bestcost + boxarea*KDTree::cost_trav > KDTree::cost_triint*shapes.size()*boxarea)
     {
-        if(badsplits <= 0 || bestcost == numeric_limits<double>::infinity())
+        if(badsplits <= 0 || bestcost == std::numeric_limits<double>::infinity())
         {
             node->m_primitives = shapes;
             //node->m_isLeaf = true;
@@ -242,7 +241,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     // Ok, now we've found the best split location, it's time to split and prepare for recursion
     int a = bestsplitdir;
 
-    vector<Primitive*> nodeprimitives;
+    std::vector<Primitive*> nodeprimitives;
 
     node->left = new KDNode();
     node->right = new KDNode();
@@ -260,8 +259,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
     node->m_splitpos = bestsplit;
     node->splitdir = bestsplitdir;
 
-    vector<const Primitive*> leftprimitives, rightprimitives;
-    vector<SAHEvent*> leftevents[3], rightevents[3], addleft[3], addright[3];
+    std::vector<const Primitive*> leftprimitives, rightprimitives;
+    std::vector<SAHEvent*> leftevents[3], rightevents[3], addleft[3], addright[3];
 
     const int leftonly = 0;
     const int both = 1;
@@ -365,7 +364,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
             }
         }
     }
-    vector<SAHEvent*> mergedLeft[3], mergedRight[3];
+    std::vector<SAHEvent*> mergedLeft[3], mergedRight[3];
 
     // Merge the events of the clipped triangles to the respective event lists
     for(int u = 0; u < 3; u++)
@@ -374,8 +373,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
             [] (SAHEvent* e1, SAHEvent* e2) -> bool 
         { return e1->position == e2->position ? e1->type < e2->type : e1->position < e2->position; });
         
-        vector<SAHEvent*>::iterator evIt = leftevents[u].begin();
-        vector<SAHEvent*>::iterator addIt = addleft[u].begin();
+        std::vector<SAHEvent*>::iterator evIt = leftevents[u].begin();
+        std::vector<SAHEvent*>::iterator addIt = addleft[u].begin();
 
         while(true)
         {
@@ -435,8 +434,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
             return e1->position == e2->position ? e1->type < e2->type : e1->position < e2->position;
         });
 
-        vector<SAHEvent*>::iterator evIt = rightevents[u].begin();
-        vector<SAHEvent*>::iterator addIt = addright[u].begin();
+        std::vector<SAHEvent*>::iterator evIt = rightevents[u].begin();
+        std::vector<SAHEvent*>::iterator addIt = addright[u].begin();
 
         while(true)
         {
@@ -510,11 +509,11 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, vector<SAHEvent*>* event
 //------------------------------------------------------------------------------
 // Builds a KD-Tree from the supplied vector of primitives
 //------------------------------------------------------------------------------
-void KDTree::Build(vector<const Primitive*> shapes)
+void KDTree::Build(std::vector<const Primitive*> shapes)
 {
     m_root = new KDNode();
     m_bbox = CalculateExtents(shapes);
-    vector<SAHEvent*> eventlist[3];
+    std::vector<SAHEvent*> eventlist[3];
 
     // Loop through each axis - u is the primary axis
     for(int u = 0; u < 3; u++)
@@ -568,7 +567,7 @@ IntResult KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool re
         return { -inf, nullptr };
 
     int a = splitdir;
-    double locmint = numeric_limits<double>::infinity();
+    double locmint = std::numeric_limits<double>::infinity();
     const Primitive* minprimitive = nullptr;
     if(!left && !right) {
         for(auto& s : m_primitives) {

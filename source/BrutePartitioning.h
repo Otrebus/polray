@@ -8,7 +8,7 @@
 class BrutePartitioning : public SpatialPartitioning
 {
 public:
-    void Build(std::vector<const Primitive*>);
+    void Build(const std::vector<const Primitive*>&);
     double Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive) const;
 
 protected:

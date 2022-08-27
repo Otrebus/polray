@@ -19,7 +19,7 @@ public:
 	using Vertex3d::Vertex3d;
 	~MeshVertex();
 
-	vector<MeshTriangle*> triangles;
+	std::vector<MeshTriangle*> triangles;
 };
 
 class MeshTriangle : public Primitive
@@ -50,7 +50,7 @@ class TriangleMesh : public Model
     friend class MeshLight;
 public:
 	TriangleMesh();
-	TriangleMesh(string, Material*);
+	TriangleMesh(const std::string&, Material*);
 	~TriangleMesh();
 	void CalculateVertexNormals();
 
@@ -62,7 +62,7 @@ public:
     void Load(Bytestream& stream);
 
 //protected:	
-	vector<MeshTriangle*> triangles;
-	vector<Vertex3d*> points;
-    vector<Material*> materials;
+	std::vector<MeshTriangle*> triangles;
+	std::vector<Vertex3d*> points;
+    std::vector<Material*> materials;
 };

@@ -18,7 +18,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
 
     Vector3d dummyVector;
 
-    colBuf.Clear(0);
+    colBuf.Clear(Color::Black);
 
     for(int samples = 0; samples < xres*yres && ! stopping; samples++)
     {

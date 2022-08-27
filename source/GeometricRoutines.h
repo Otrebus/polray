@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include <vector>
 #include "vector3d.h"
 #include "Ray.h"
@@ -16,4 +17,4 @@ Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex);
 Vector3d SampleSphereUniform(double r1, double r2);
 
 double IntersectSphere(const Vector3d& position, double radius, const Ray& ray);
-double IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d& v2, const Ray& ray);
+std::tuple<double, double, double> IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d& v2, const Ray& ray);

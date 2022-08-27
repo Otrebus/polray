@@ -3,8 +3,6 @@
 #include <sstream>
 #include "Utils.h"
 
-using namespace std;
-
 //------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------
@@ -117,13 +115,13 @@ Light* DielectricMaterial::GetLight() const
 //------------------------------------------------------------------------------
 // Reads and sets the properties of this material from a stringstream.
 //------------------------------------------------------------------------------
-void DielectricMaterial::ReadProperties(stringstream& ss)
+void DielectricMaterial::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
     {
-        string line;
+        std::string line;
         getline(ss, line);
-        stringstream ss2(line);
+        std::stringstream ss2(line);
         ss2 >> m_ior;
     }
 }

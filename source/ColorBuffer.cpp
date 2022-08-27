@@ -168,7 +168,7 @@ void ColorBuffer::PutText(const char* const text, int x, int y)
 
     for(int b = 0; b < height; b++)
         for(int a = 0; a < width; a++)
-            m_buffer[b*width + a] = pBuffer[b * width + a];
+            m_buffer[b*width + a] = Color(pBuffer[b * width + a]);
 
     DeleteObject(hbhb);
     ReleaseDC(NULL, hdc);

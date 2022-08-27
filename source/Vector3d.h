@@ -2,6 +2,7 @@
 
 class Matrix3d;
 
+#define NOMINMAX
 #include <cmath>
 #include <sstream>
 

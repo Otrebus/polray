@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "Renderer.h"
 #include "Light.h"
 
@@ -9,7 +10,7 @@ public:
     RayTracer(std::shared_ptr<Scene>);
     ~RayTracer();
 
-    void Setup(const vector<Primitive*>& primitives, const vector<Light*>& lights);
+    void Setup(const std::vector<Primitive*>& primitives, const std::vector<Light*>& lights);
     Color TraceRay(const Ray& ray) const;
     bool TraceShadowRay(const Ray& ray, double tmax) const;
     void Build();
@@ -22,6 +23,6 @@ public:
 
     Color TraceRayRecursive(Ray ray, int bounces, Primitive* ignore, double contribution) const;
 
-    vector<Light*> m_lights;
-    vector<Primitive*> m_primitives;
+    std::vector<Light*> m_lights;
+    std::vector<Primitive*> m_primitives;
 };

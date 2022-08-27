@@ -53,10 +53,10 @@ KDTree* tree;
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-//#define KITCHEN2
+#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
-#define BALLSBOX
+//#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
 //#define LEGOCAR
@@ -81,7 +81,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
 
     Vector3d camdir = target-camPos;
     camdir.Normalize();
-    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 70, (Vector3d(0, 1.9, -3.2)-camPos).GetLength(), 0.02));
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 70, (Vector3d(0, 1.9, -3.2)-camPos).Length(), 0.02));
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 70));
 
     // tmp
@@ -94,7 +94,6 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
 
     Random ballsR(47);
-    Random test(1);
 
     Random ballsC(0);
 
@@ -160,7 +159,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     s->AddModel(triangle1);
     s->AddModel(triangle2);
 
-    e = std::shared_ptr<MonEstimator>(new MonEstimator(XRES, YRES));
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef INTERIOR

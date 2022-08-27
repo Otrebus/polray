@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "Camera.h"
 #include "ColorBuffer.h"
 #include "Primitive.h"

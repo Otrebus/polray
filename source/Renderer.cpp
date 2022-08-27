@@ -39,7 +39,7 @@ void Renderer::Stop()
     stopping = true;
 }
 
-Renderer* Renderer::Create(unsigned char id, shared_ptr<Scene> scn)
+Renderer* Renderer::Create(unsigned char id, std::shared_ptr<Scene> scn)
 {
     switch(id)
     {

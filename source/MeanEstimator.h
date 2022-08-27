@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "color.h"
 #include "Estimator.h"
 

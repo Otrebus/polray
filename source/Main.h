@@ -2,6 +2,7 @@
 
 #define WIN32_MEAN_AND_LEAN
 #define _USE_MATH_DEFINES
+#define NOMINMAX
 
 #include "logger.h"
 #include "input.h"
@@ -18,8 +19,8 @@ extern DDSURFACEDESC2 ddsd;
 
 extern HANDLE bufferMutex;
 
-#define XRES 640
-#define YRES 480
+#define XRES 320
+#define YRES 200
 //#define DETERMINISTIC
 
 LRESULT WINAPI WndProc(HWND, UINT, WPARAM, LPARAM);

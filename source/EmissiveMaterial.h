@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "vector3d.h"
 #include "texture.h"
 #include "Ray.h"
@@ -22,7 +23,7 @@ public:
 
     Light* GetLight() const;
 
-    void ReadProperties(stringstream& ss);
+    void ReadProperties(std::stringstream& ss);
 
     double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const;
 
@@ -30,9 +31,6 @@ public:
     void Load(Bytestream& stream);
 
     mutable Random rnd;
-
-    Texture* texture;
-    Texture* normalmap;
 
     Color emissivity;
 };

@@ -114,7 +114,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
      std::shared_ptr<Estimator> estimator;
      Bytestream bb;
      bb << (int) 3;
-     ifstream ifile("btstrout");
+     std::ifstream ifile("btstrout");
     if (ifile.good()) {
         rendering = new Rendering("btstrout");
     }

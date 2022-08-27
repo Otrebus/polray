@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "vector3d.h"
 #include "texture.h"
 #include "Color.h"
@@ -26,7 +27,7 @@ public:
 
     virtual Light* GetLight() const = 0;
 
-    virtual void ReadProperties(stringstream& ss) = 0;
+    virtual void ReadProperties(std::stringstream& ss) = 0;
     virtual double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const = 0;
 
     virtual void Save(Bytestream& stream) const = 0;

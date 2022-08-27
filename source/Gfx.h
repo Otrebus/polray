@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #define WIN32_MEAN_AND_LEAN
 #include "ddraw.h"
 #include <string.h>
@@ -7,8 +8,6 @@
 #include <windows.h>
 #include <math.h>
 #include <string>
-
-using namespace std;
 
 typedef unsigned char uchar;
 
@@ -50,9 +49,9 @@ public:
     void DestroySurfaces();
     bool CreateSurfaces(bool, int, int, int);
 
-    string GetLastError() const;
+    std::string GetLastError() const;
 
-    string					m_lastError;
+    std::string             m_lastError;
     bool                    m_isLocked;
     bool                    m_isWindowed;
     int                     m_xres, m_yres;

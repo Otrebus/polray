@@ -12,7 +12,7 @@ Rendering::Rendering(std::shared_ptr<Renderer> r, std::shared_ptr<Estimator> e) 
     int xres = r->GetScene()->GetCamera()->GetXRes();
     int yres = r->GetScene()->GetCamera()->GetYRes();
     image = new ColorBuffer(xres, yres);
-    image->Clear(0);
+    image->Clear(Color::Black);
     bufferMutex = CreateMutex(0, false, 0);
 }
 
@@ -32,7 +32,7 @@ Rendering::Rendering(std::string fileName)
     estimator->Load(b);
 
     image = new ColorBuffer(estimator->GetWidth(), estimator->GetHeight());
-    image->Clear(0);
+    image->Clear(Color::Black);
 }
  
 void Rendering::SaveRendering(std::string fileName)

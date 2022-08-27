@@ -2,8 +2,6 @@
 #include "Bytestream.h"
 #include "PhongMaterial.h"
 
-using namespace std;
-
 PhongMaterial::PhongMaterial()
 {
     Kd = Color(1, 1, 1);
@@ -122,7 +120,7 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
         N_s = -N_s;
 
     if(in*N_g < 0 || out*N_g < 0 || in*N_s < 0 || out*N_s < 0) // FIXME: redundant checks
-        return 0;
+        return Color::Black;
 
     if(component == 1)
     {
@@ -145,16 +143,15 @@ Light* PhongMaterial::GetLight() const
     return light;
 }
 
-void PhongMaterial::ReadProperties(stringstream& ss)
+void PhongMaterial::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
     {
-        string line;
-        string a;
+        std::string line, a;
         getline(ss, line);
-        stringstream ss2(line);
+        std::stringstream ss2(line);
         ss2 >> a;
-        transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
+        std::transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
         if(a == "kd")
             ss2 >> Kd.r >> Kd.g >> Kd.b;
         else if(a == "ks")

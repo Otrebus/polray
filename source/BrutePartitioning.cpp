@@ -1,17 +1,21 @@
 #include "BrutePartitioning.h"
 #include "Utils.h"
 
-void BrutePartitioning::Build(std::vector<const Primitive*> shapes)
+void BrutePartitioning::Build(const std::vector<const Primitive*>& shapes)
 {
     primitives = shapes;
 }
 
-double BrutePartitioning::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const {
+double BrutePartitioning::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive = true) const
+{
     bool found = false;
     double mint = inf;
-    for(auto p : primitives) {
+
+    for(auto p : primitives)
+    {
         double t = p->Intersect(ray);
-        if(t > -inf && t < mint && t >= tmin && t <= tmax) {
+        if(t > -inf && t < mint && t >= tmin && t <= tmax)
+        {
             if(!returnPrimitive)
                 return true;
             found = true;

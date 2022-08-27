@@ -1,4 +1,5 @@
 #include "boundingbox.h"
+#include "Utils.h"
 
 BoundingBox::BoundingBox(const Vector3d& a, const Vector3d& b) : c1(a), c2(b)
 {
@@ -19,7 +20,7 @@ bool BoundingBox::ContainsPoint(const Vector3d& v)
 
 bool BoundingBox::Intersects(const Ray& ray)
 {  
-    double t1, t2, tfar = numeric_limits<double>::max(), tnear = numeric_limits<double>::min();
+    double t1, t2, tfar = std::numeric_limits<double>::max(), tnear = std::numeric_limits<double>::min();
 
     // Check X slab
     for(int u = 0; u < 3; u++)
@@ -34,7 +35,7 @@ bool BoundingBox::Intersects(const Ray& ray)
             t1 = (c1[u] - ray.origin[u]) / ray.direction[u];
             t2 = (c2[u] - ray.origin[u]) / ray.direction[u];
             if (t1 > t2)  
-                swap(t1, t2);  
+                std::swap(t1, t2);  
             if (t1 > tnear) 
                 tnear = t1;  
             if (t2 < tfar) 
@@ -49,8 +50,8 @@ bool BoundingBox::Intersects(const Ray& ray)
 bool BoundingBox::Intersect(const Ray& ray, double& tnear, double& tfar) const {  
   
     double t1, t2;
-    tfar = numeric_limits<double>::infinity();
-    tnear = -numeric_limits<double>::infinity();
+    tfar = inf;
+    tnear = -inf;
 
     for(int u = 0; u < 3; u++)
     {
@@ -64,7 +65,7 @@ bool BoundingBox::Intersect(const Ray& ray, double& tnear, double& tfar) const {
             t1 = (c1[u] - ray.origin[u]) / ray.direction[u];
             t2 = (c2[u] - ray.origin[u]) / ray.direction[u];
             if (t1 > t2)  
-                swap(t1, t2);  
+                std::swap(t1, t2);  
             if (t1 > tnear) 
                 tnear = t1;  
             if (t2 < tfar) 

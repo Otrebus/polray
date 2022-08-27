@@ -31,26 +31,19 @@ Triangle::~Triangle()
 
 double Triangle::Intersect(const Ray& ray) const
 {
-    return IntersectTriangle(v0.pos, v1.pos, v2.pos, ray);
+    auto [t, u, v] = IntersectTriangle(v0.pos, v1.pos, v2.pos, ray);
+    return t;
 }
 
 bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    Vector3d D = ray.direction;
-
+    auto [t, u, v] = IntersectTriangle(v0.pos, v1.pos, v2.pos, ray);
+    
     info.direction = ray.direction;
 
     Vector3d E1 = v1.pos-v0.pos;
     Vector3d E2 = v2.pos-v0.pos;
-    Vector3d T = ray.origin - v0.pos;
-
-    Vector3d P = E2^T;
-    Vector3d Q = E1^D;
-
-    double det = E2*Q;
-
-    auto u = D*P/det, v = T*Q/det;
-
+    
     info.normal = u*(v1.normal-v0.normal) + v*(v2.normal-v0.normal) + v0.normal;
     info.normal.Normalize();
 
@@ -58,8 +51,6 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
     info.geometricnormal.Normalize();
 
     info.position = v0.pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
-    //info.texpos.x = u;
-    //info.texpos.y = v;
     info.material = material;
 
     return true;
@@ -80,7 +71,7 @@ BoundingBox Triangle::GetBoundingBox() const
 
 bool Triangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
 {
-    vector<Vector3d> points = { v0.pos, v1.pos, v2.pos };
+    std::vector<Vector3d> points = { v0.pos, v1.pos, v2.pos };
 
 	ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
 	ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
@@ -89,12 +80,12 @@ bool Triangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& re
 	ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
 	ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
-	resultbox.c1.x = numeric_limits<double>::infinity();
-	resultbox.c2.x = -numeric_limits<double>::infinity();
-	resultbox.c1.y = numeric_limits<double>::infinity();
-	resultbox.c2.y = -numeric_limits<double>::infinity();
-	resultbox.c1.z = numeric_limits<double>::infinity();
-	resultbox.c2.z = -numeric_limits<double>::infinity();
+	resultbox.c1.x = std::numeric_limits<double>::infinity();
+	resultbox.c2.x = -std::numeric_limits<double>::infinity();
+	resultbox.c1.y = std::numeric_limits<double>::infinity();
+	resultbox.c2.y = -std::numeric_limits<double>::infinity();
+	resultbox.c1.z = std::numeric_limits<double>::infinity();
+	resultbox.c2.z = -std::numeric_limits<double>::infinity();
 
 	for(auto v : points)
 	{

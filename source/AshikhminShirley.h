@@ -1,6 +1,7 @@
 #pragma once
 
 #define _USE_MATH_DEFINES
+#define NOMINMAX
 
 #include "Material.h"
 #include "Vector3d.h"
@@ -30,7 +31,7 @@ public:
     
     virtual double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const;
 
-	void ReadProperties(stringstream& ss);
+	void ReadProperties(std::stringstream& ss);
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

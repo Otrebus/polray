@@ -1,5 +1,6 @@
 #include "Estimator.h"
 #include "MonEstimator.h"
+#include "MeanEstimator.h"
 
 Estimator::~Estimator()
 {
@@ -11,6 +12,9 @@ Estimator* Estimator::Create(unsigned char id)
     {
     case ID_MONESTIMATOR:
         return new MonEstimator;
+        break;
+    case ID_MEANESTIMATOR:
+        return new MeanEstimator;
         break;
     default:
         __debugbreak();

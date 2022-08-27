@@ -2,8 +2,6 @@
 #include "Bytestream.h"
 #include "LambertianMaterial.h"
 
-using namespace std;
-
 LambertianMaterial::LambertianMaterial()
 {
     Kd = Color(1, 1, 1);
@@ -81,14 +79,14 @@ Light* LambertianMaterial::GetLight() const
     return light;
 }
 
-void LambertianMaterial::ReadProperties(stringstream& ss)
+void LambertianMaterial::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
     {
-        string line;
-        string a;
+        std::string line;
+        std::string a;
         getline(ss, line);
-        stringstream ss2(line);
+        std::stringstream ss2(line);
         ss2 >> a;
         transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower((int)a); });
         if(a == "kd")

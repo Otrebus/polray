@@ -4,7 +4,6 @@
 #include <string>
 #include "Model.h"
 
-using namespace std;
 
 #define ID_MONESTIMATOR ((unsigned char) 70)
 #define ID_MEANESTIMATOR ((unsigned char) 71)
@@ -92,5 +91,5 @@ private:
 
     bool fail;
     unsigned int first;
-    vector<char> data;
+    std::vector<char> data;
 };

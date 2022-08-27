@@ -437,8 +437,8 @@ void Gfx::Line(int fromX, int fromY, int toX, int toY, uchar r, uchar g, uchar b
         xdir = -1;
     if(steep)
     {
-        swap(fromX, fromY);
-        swap(dX, dY);
+        std::swap(fromX, fromY);
+        std::swap(dX, dY);
     }
 
     d = -dX;
@@ -514,7 +514,7 @@ int Gfx::GetXRes() const
     return m_xres;
 }
 
-string Gfx::GetLastError() const
+std::string Gfx::GetLastError() const
 {
     return m_lastError;
 }

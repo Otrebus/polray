@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "Vector3d.h"
 
 class Vertex3d

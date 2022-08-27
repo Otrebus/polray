@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "Color.h"
 #include "Bytestream.h"
 

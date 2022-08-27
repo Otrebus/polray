@@ -11,7 +11,7 @@ PinholeCamera::PinholeCamera()
 //------------------------------------------------------------------------------
 // Constructor.
 //------------------------------------------------------------------------------
-PinholeCamera::PinholeCamera(Vector3d up, Vector3d pos, Vector3d dir, int xres, int yres, double fov) 
+PinholeCamera::PinholeCamera(const Vector3d& up, const Vector3d& pos, const Vector3d& dir, int xres, int yres, double fov) 
     : Camera(up, pos, dir, xres, yres, fov)
 {
 }

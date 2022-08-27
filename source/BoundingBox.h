@@ -1,11 +1,11 @@
 #pragma once
 
+#define NOMINMAX
 #include "vector3d.h"
 #include "ray.h"
 #include <limits>
 #include <algorithm>
 
-using namespace std;
 
 class BoundingBox
 {

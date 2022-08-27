@@ -16,7 +16,7 @@ Logger::Logger()
 //------------------------------------------------------------------------------
 // Constructor
 //------------------------------------------------------------------------------
-Logger::Logger(const string& fileName)
+Logger::Logger(const std::string& fileName)
 {
     m_fileName = fileName;
 }
@@ -31,7 +31,7 @@ Logger::~Logger()
 //------------------------------------------------------------------------------
 // Shows a message box with a text message.
 //------------------------------------------------------------------------------
-void Logger::Box(const string& msg)
+void Logger::Box(const std::string& msg)
 {
     std::wstring ws(msg.begin(), msg.end());
     MessageBox(0, ws.c_str(), (LPCWSTR) L"Error", MB_OK | MB_ICONERROR);
@@ -41,14 +41,14 @@ void Logger::Box(const string& msg)
 // Appends a string with the timestamp and the given message to the file with
 // name given by m_fileName.
 //------------------------------------------------------------------------------
-void Logger::File(const string& msg)
+void Logger::File(const std::string& msg)
 {
-    ofstream file;
+    std::ofstream file;
     time_t currentTime;
     time(&currentTime);
     char timestamp[ 100 ];
 
-    file.open (m_fileName.c_str(), ofstream::app);
+    file.open (m_fileName.c_str(), std::ofstream::app);
     if(file.fail())
     {
         Box("Could not open debug log file.");
@@ -58,6 +58,6 @@ void Logger::File(const string& msg)
     sprintf( timestamp, "%s", ctime( &currentTime ) );
     timestamp[ strlen( timestamp ) - 1 ] = 32;
 
-    file << timestamp << ":: " << msg << endl;
+    file << timestamp << ":: " << msg << std::endl;
     file.close();
 }

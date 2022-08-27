@@ -7,12 +7,10 @@
 #include <windows.h>
 #include "color.h"
 
-using namespace std;
-
 class Texture
 {
 public:
-    Texture(const wstring& file);
+    Texture(const std::wstring& file);
     Texture(int, int);
     ~Texture();
     Texture(Texture&);

@@ -9,10 +9,9 @@
 class Color
 {
 public:
-    Color(double, double, double);
-    Color(double) = delete;
-    //Color(const Vector3d&);
-    Color(int);
+    Color(double, double, double);  
+
+    explicit Color(int);
     Color();
     int GetInt() const;
     ~Color();

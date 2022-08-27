@@ -5,19 +5,17 @@
 #include <vector>
 #include <algorithm>
 
-using namespace std;
-
 //-----------------------------------------------------------------------------
 // Clips a polygon to an axis aligned plane (apparently this is the
 // Sutherman-Hodgeman algorithm)
 //-----------------------------------------------------------------------------
-void ClipPolygonToAAP(int axis, bool side, double pos, vector<Vector3d>& input)
+void ClipPolygonToAAP(int axis, bool side, double pos, std::vector<Vector3d>& input)
 {
-    vector<Vector3d> output;
+    std::vector<Vector3d> output;
     output.reserve(6);
     const int& a = axis;
 
-    for(vector<Vector3d>::iterator it = input.begin(); it < input.end(); it++)
+    for(std::vector<Vector3d>::iterator it = input.begin(); it < input.end(); it++)
     {
         Vector3d s = *it, e; // Start and end vectors for this line segment
         e = it + 1 == input.end() ? input.front() : it[1];
@@ -103,7 +101,7 @@ double IntersectSphere(const Vector3d& position, double radius, const Ray& ray)
 }
 
 
-double IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d& v2, const Ray& ray)
+std::tuple<double, double, double> IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d& v2, const Ray& ray)
 {
     double u, v, t;
 	const Vector3d& D = ray.direction;
@@ -115,20 +113,20 @@ double IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d&
 
 	double det = E2*Q;
 	if(!det)
-		return -inf;
+        return { -inf, -inf, -inf };
 	u = ray.direction*P/det;
 
 	if(u > 1 || u < 0)
-		return -inf;
+        return { -inf, -inf, -inf };
 
 	v = T*Q/det;
 
 	if(u+v > 1 || u < 0 || v < 0)
-		return -inf;
+        return { -inf, -inf, -inf };
 
 	t = E1*P/det;
 
-	return t <= 0 ? -inf : t;
+    return { t <= 0 ? -inf : t, u, v };
 }
 
 

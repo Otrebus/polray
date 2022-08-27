@@ -10,11 +10,11 @@
 #include <tuple>
 #include <set>
 
-bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
+bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& materials)
 {
-	ifstream matfile;
+	std::ifstream matfile;
 
-	matfile.open(matfilestr.c_str(), ios::out);
+	matfile.open(matfilestr.c_str(), std::ios::out);
 
 	if(matfile.fail())
 	{
@@ -30,25 +30,25 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 	bool phong = false, emissive = false;
 	while(!matfile.eof())
 	{
-		string line, a;
-		getline(matfile, line);
-		stringstream ss(line); // Read one line at a time into a stringstream
+		std::string line, a;
+		std::getline(matfile, line);
+		std::stringstream ss(line); // Read one line at a time into a stringstream
 		ss >> a;               // and parse it
 
-		transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
+		std::transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
 
 		if(a.length() && a[0] == '#')
 			continue;
 		if(a == "newmtl")
 		{
-			string b;
+			std::string b;
 			ss >> matName;
 			if(!ss)
 				__debugbreak();
 			ss >> b;
 			if(b == ":") // We expect a special material definition to follow
 			{
-				stringstream arg;
+				std::stringstream arg;
 				ss >> b;
 				if(!ss)
 					__debugbreak();
@@ -67,9 +67,9 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
                     curmat = new AshikhminShirley;
 				while(!matfile.eof())
 				{
-					string line2, s;
-					getline(matfile, line2);
-					stringstream ss2(line2);
+					std::string line2, s;
+					std::getline(matfile, line2);
+					std::stringstream ss2(line2);
 					ss2 >> s;
 					if(s == "{")
 						break;
@@ -80,8 +80,8 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 				}
 				while(!matfile.eof())
 				{
-					string s;
-                    getline(matfile, s);
+					std::string s;
+                    std::getline(matfile, s);
 					s += "\n";
 					if(s[0] == '}')
 						break;
@@ -166,10 +166,10 @@ bool ReadMaterialFile(string matfilestr, map<string, Material*>& materials)
 std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat)
 {
 	Material* curmat = 0;
-	map<string, Material*> materials;
-	ifstream myfile;
-	string line;
-	myfile.open(file.c_str(), ios::out);
+	std::map<std::string, Material*> materials;
+	std::ifstream myfile;
+	std::string line;
+	myfile.open(file.c_str(), std::ios::out);
 
 	std::set<MeshLight*> meshLights;
 
@@ -183,22 +183,22 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 		return { false, {}, {} };
 	}
 
-	string a;
+	std::string a;
 	double x, y, z;
 
 	int index = 0;
 	bool normalInterp = true;
-	vector<MeshVertex*> vectors;
-	vector<Vector3d> normals;
-	map<int, MeshVertex*> groupVertices; // The vertices that have been added to the current group so far
+	std::vector<MeshVertex*> vectors;
+	std::vector<Vector3d> normals;
+	std::map<int, MeshVertex*> groupVertices; // The vertices that have been added to the current group so far
 
 	bool isLightMesh = false;
 	std::unordered_map<MeshVertex*, Vertex3d*> replacement;
 
 	while(!myfile.eof())
 	{
-		istringstream ins;
-		getline(myfile, line);
+		std::istringstream ins;
+		std::getline(myfile, line);
 		ins.str(line);
         a = "";
 		ins >> a;
@@ -213,7 +213,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 			std::vector<int> ns;
 			std::vector<int> ts;
 
-			string s1, s2, s3;
+			std::string s1, s2, s3;
 
 			while(!ins.eof()) {
 				std::string st; // The "v/t/n" string
@@ -313,7 +313,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 		}
         if(a == "g" || myfile.eof())
 		{   
-			map<int, MeshVertex*>::iterator it;
+			std::map<int, MeshVertex*>::iterator it;
 			std::stack<MeshVertex*> vs;
 
 			for(it = groupVertices.begin(); it != groupVertices.end(); it++)
@@ -392,8 +392,8 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 		if(a == "mtllib")
 		{
 			// Check if there's an associated materials file, and parse it
-			ifstream matfile;
-			string matfilestr;
+			std::ifstream matfile;
+			std::string matfilestr;
 			ins >> matfilestr;
 
 			if(ins.fail())
@@ -416,7 +416,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 		}
 		if(a == "s") // Smoothing group ending or starting
 		{
-			string s1;
+			std::string s1;
 			ins >> s1;
 			if(s1 == "off" || s1 == "0")
 				normalInterp = false;
@@ -432,7 +432,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 		}
 		if(a == "usemtl")
 		{
-			string mtl;
+			std::string mtl;
 			ins >> mtl;
 			auto it = materials.find(mtl);
 			if(it == materials.end())

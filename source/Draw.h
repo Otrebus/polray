@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include "gfx.h"
 #include "Estimator.h"
 #include "Texture.h"

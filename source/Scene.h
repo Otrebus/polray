@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include <type_traits>
 #include <string>
 #include <unordered_set>
@@ -83,7 +84,7 @@ public:
         friend void AreaLight::AddToScene(Scene*);
     };
 
-	Scene(string file);
+	Scene(std::string file);
 	Scene();
 	~Scene();
 
@@ -96,8 +97,8 @@ public:
     void SetCamera(Camera* camera);
     Camera* GetCamera() const;
 
-    vector<const Primitive*> GetPrimitives() const;
-    vector<Light*> GetLights() const;
+    std::vector<const Primitive*> GetPrimitives() const;
+    std::vector<Light*> GetLights() const;
 
     void SetPartitioning(SpatialPartitioning* partitioning);
     SpatialPartitioning* GetPartitioning() const;

@@ -1,5 +1,6 @@
 #pragma once
 
+#define NOMINMAX
 #include <string>
 #include <vector>
 #include "Vector3d.h"
@@ -16,7 +17,30 @@ typedef double AnglePdf;
 typedef Vector3d Point;
 typedef Vector3d Normal;
 
+#define min min
+#define max max
+
 template<typename T> T sgn(T s)
 {
     return s > 0 ? 1 : s < 0 ? -1 : 0;
+}
+
+template<typename T> T min(T a, T b)
+{
+    return std::min(a, b);
+}
+
+template <typename T, typename ...U> T min(T a, T b, U... c)
+{
+    return min(min(a, b), c...);
+}
+
+template<typename T> T max(T a, T b)
+{
+    return std::max(a, b);
+}
+
+template <typename T, typename ...U> T max(T a, T b, U... c)
+{
+    return max(max(a, b), c...);
 }

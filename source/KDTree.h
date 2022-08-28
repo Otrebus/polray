@@ -1,10 +1,10 @@
 #pragma once
 
+class Primitive;
+class SpatialPartitioning;
+
 #include "BoundingBox.h"
 #include "SpatialPartitioning.h"
-#include "Timer.h"
-class Primitive;
-
 #include <cmath>
 #include <vector>
 

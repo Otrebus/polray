@@ -1,8 +1,7 @@
 #pragma once
 
-#define NOMINMAX
-#include "Color.h"
-#include "Bytestream.h"
+class Bytestream;
+class Color;
 
 class Estimator
 {

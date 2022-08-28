@@ -59,13 +59,13 @@ bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) 
 BoundingBox Triangle::GetBoundingBox() const
 {
     Vector3d c1, c2;
-    c1.x = min(v0.pos.x, min(v1.pos.x, v2.pos.x));
-    c1.y = min(v0.pos.y, min(v1.pos.y, v2.pos.y));
-    c1.z = min(v0.pos.z, min(v1.pos.z, v2.pos.z));
+    c1.x = min(v0.pos.x, v1.pos.x, v2.pos.x);
+    c1.y = min(v0.pos.y, v1.pos.y, v2.pos.y);
+    c1.z = min(v0.pos.z, v1.pos.z, v2.pos.z);
 
-    c2.x = max(v0.pos.x, max(v1.pos.x, v2.pos.x));
-    c2.y = max(v0.pos.y, max(v1.pos.y, v2.pos.y));
-    c2.z = max(v0.pos.z, max(v1.pos.z, v2.pos.z));
+    c2.x = max(v0.pos.x, v1.pos.x, v2.pos.x);
+    c2.y = max(v0.pos.y, v1.pos.y, v2.pos.y);
+    c2.z = max(v0.pos.z, v1.pos.z, v2.pos.z);
     return BoundingBox(c1, c2);
 }
 

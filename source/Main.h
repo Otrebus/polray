@@ -1,14 +1,11 @@
 #pragma once
 
 #define WIN32_MEAN_AND_LEAN
-#define _USE_MATH_DEFINES
 #define NOMINMAX
 
-#include "logger.h"
-#include "input.h"
-#include "logger.h"
-#include "Gfx.h"
 #include <windows.h>
+#include "Gfx.h"
+#include "Input.h"
 
 extern bool g_isActive;
 extern bool g_quitting;
@@ -19,8 +16,8 @@ extern DDSURFACEDESC2 ddsd;
 
 extern HANDLE bufferMutex;
 
-#define XRES 320
-#define YRES 200
+#define XRES 640
+#define YRES 480
 //#define DETERMINISTIC
 
 LRESULT WINAPI WndProc(HWND, UINT, WPARAM, LPARAM);

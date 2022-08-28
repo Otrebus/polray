@@ -1,9 +1,10 @@
 #pragma once
 
 #include "SpatialPartitioning.h"
-#include "Ray.h"
-#include "Primitive.h"
 #include <vector>
+
+class Ray;
+class Primitive;
 
 class BrutePartitioning : public SpatialPartitioning
 {

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "Ray.h"
-#include "Primitive.h"
 #include <vector>
+
+class Ray;
+class Primitive;
 
 class SpatialPartitioning
 {

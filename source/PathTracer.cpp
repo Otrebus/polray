@@ -1,12 +1,6 @@
 #include "PathTracer.h"
-#include "AreaLight.h"
-#include "GeometricRoutines.h"
 #include "Primitive.h"
-#include "Scene.h"
-#include "Material.h"
-#include <intrin.h>
-
-#define CHECKVALID(v) if(!( v.x > -100 && v.x < 100 && v.y > -100 && v.y < 100 && v.z > -100 && v.z < 100 && v.x < std::numeric_limits<double>::infinity() && v.x > -std::numeric_limits<double>::infinity() && v.x == v.x && v.y < std::numeric_limits<double>::infinity() && v.y > -std::numeric_limits<double>::infinity() && v.y == v.y && v.z < std::numeric_limits<double>::infinity() && v.z > -std::numeric_limits<double>::infinity() && v.z == v.z)) __debugbreak();
+#include "Sample.h"
 
 PathTracer::PathTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
@@ -40,17 +34,17 @@ PathTracer::~PathTracer()
 //	Vector3d dir;
 //
 //    Light* l;
-//    if((l = info.GetMaterial()->GetLight()) && info.GetGeometricNormal() * info.GetDirection() < 0)
+//    if((l = info.material->GetLight()) && info.geometricnormal * info.direction < 0)
 //        return l->GetIntensity()/0.8f;
 //
 //    while(true)
 //	{
-//        Vector3d N_g = info.GetGeometricNormal();
-//        if(N_g*info.GetDirection() > 0)
+//        Vector3d N_g = info.geometricnormal;
+//        if(N_g*info.direction > 0)
 //            N_g = -N_g;
 //		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
 //
-//		out.origin = info.GetPosition() + 0.0001f*N_g;
+//		out.origin = info.position + 0.0001f*N_g;
 //		if(dir.GetLength() > 1)
 //			continue;
 //		else if(dir*N_g < 0)
@@ -58,7 +52,7 @@ PathTracer::~PathTracer()
 //		dir.Normalize();
 //		break;
 //	}
-//    Color mod = info.GetMaterial()->BRDF(info, dir)*2*pi*abs(info.GetNormal()*dir);
+//    Color mod = info.material->BRDF(info, dir)*2*pi*abs(info.normal*dir);
 //
 //	out.direction = dir;
 //	Color c = mod*TracePathPrimitive(out)/0.8f;
@@ -121,18 +115,18 @@ Color PathTracer::TracePath(const Ray& ray) const
             minprimitive->GenerateIntersectionInfo(inRay, info);
         else
             minlight->GenerateIntersectionInfo(inRay, info);
-        Material* material = info.GetMaterial();
-        //if(!info.GetMaterial())
+        Material* material = info.material;
+        //if(!info.material)
         //    break;
        
         // Randomly interesected a light source
-        if(info.GetMaterial()->GetLight() == light)
+        if(info.material->GetLight() == light)
         {
             if(sampledLight) // We already sampled with next event estimation
                 return finalColor/lightWeight;
-            else return pathColor*( info.GetNormal()*info.GetDirection() < 0
+            else return pathColor*( info.normal*info.direction < 0
                         ? light->GetIntensity()/lightWeight : Color(0, 0, 0) );
-        } else if(info.GetMaterial()->GetLight()) {
+        } else if(info.material->GetLight()) {
             return finalColor/lightWeight;
         }
 

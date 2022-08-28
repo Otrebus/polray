@@ -4,9 +4,7 @@
 #define NOMINMAX
 
 #include "dinput.h"
-#include "Logger.h"
 #include <queue>
-#include <assert.h>
 
 class Input
 {

@@ -1,15 +1,12 @@
 #pragma once
 
-#define NOMINMAX
-#include "kdtree.h"
-#include "trianglemesh.h"
-#include "triangle.h"
 #include <algorithm>
-#include <stack>
-#include "Main.h"
-#include <intrin.h>
+#include "KDTree.h"
+#include "Primitive.h"
+#include "Triangle.h"
 #include "Utils.h"
-#define CHECKVALID(v) if(!( v.x < std::numeric_limits<double>::infinity() && v.x > -std::numeric_limits<double>::infinity() && v.x == v.x && v.y < std::numeric_limits<double>::infinity() && v.y > -std::numeric_limits<double>::infinity() && v.y == v.y && v.z < std::numeric_limits<double>::infinity() && v.z > -std::numeric_limits<double>::infinity() && v.z == v.z)) _asm int 3;
+#include "Timer.h"
+
 double KDTree::cost_triint;
 double KDTree::cost_trav;
 double KDTree::cost_boxint;
@@ -161,9 +158,6 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
     {
         int v = (u + 1) % 3;
         int w = (u + 2) % 3;
-
-        if(g_quitting)
-            return;
 
         // First, initiate the primitive counting variables
         int nLeft = 0;
@@ -518,9 +512,6 @@ void KDTree::Build(std::vector<const Primitive*> shapes)
     // Loop through each axis - u is the primary axis
     for(int u = 0; u < 3; u++)
     {
-        if(g_quitting)
-            return;
-
         // Create event lists from the objects
         for(auto& s : shapes)
         {

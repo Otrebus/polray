@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Vector3d.h"
-#include "Ray.h"
 #include "Model.h"
 #include "Primitive.h"
 
 class BoundingBox;
 class IntersectionInfo;
 class Scene;
+class Ray;
 
 class Sphere : public Primitive, public Model
 {

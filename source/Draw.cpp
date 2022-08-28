@@ -43,8 +43,6 @@
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
 
-KDTree* tree;
-
 //#define INTERIOR
 //#define INTERIORSKY
 //#define INTERIORINLIGHT

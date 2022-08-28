@@ -3,10 +3,6 @@
 #define NOMINMAX
 #define WIN32_MEAN_AND_LEAN
 #include "ddraw.h"
-#include <string.h>
-#include <assert.h>
-#include <windows.h>
-#include <math.h>
 #include <string>
 
 typedef unsigned char uchar;

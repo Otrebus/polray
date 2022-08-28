@@ -15,6 +15,7 @@
 #include "AreaLight.h"
 #include "RayTracer.h"
 #include "Bytestream.h"
+#include "Logger.h"
 
 bool g_isActive;
 bool g_quitting;

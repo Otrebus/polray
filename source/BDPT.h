@@ -1,19 +1,16 @@
 #pragma once
 
-#define NOMINMAX
 #include "Renderer.h"
 #include "Random.h"
 #include "IntersectionInfo.h"
 #include "Sample.h"
 #include <mutex>
 
-#define WEIGHT_UNIFORM 1
-#define WEIGHT_POWER 2
-
 class Ray;
 class Primitive;
 
-class Roulette {
+class Roulette
+{
 public:
     Roulette();
     ~Roulette();
@@ -40,6 +37,7 @@ private:
     int s, t;
 };
 
+
 class BDVertex
 {
 public:
@@ -64,15 +62,8 @@ public:
 
     void Render(Camera& cam, ColorBuffer& colBuf);
 
-    void SetSPP(unsigned int spp);
-    unsigned int GetSPP() const;
-
-    unsigned int GetType() const;
-
 protected:
-    void RenderPixel(int x, int y, Camera& cam,
-                     ColorBuffer& eyeImage, ColorBuffer& lightImage);
-    void RenderPart(Camera& cam, ColorBuffer& colBuf) const;
+    void RenderPixel(int x, int y, Camera& cam, ColorBuffer& eyeImage, ColorBuffer& lightImage);
 
     int BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
 

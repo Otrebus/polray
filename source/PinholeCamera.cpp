@@ -1,5 +1,6 @@
 #include "PinholeCamera.h"
 #include "Bytestream.h"
+#include "Ray.h"
 
 //------------------------------------------------------------------------------
 // Constructor.

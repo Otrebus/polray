@@ -234,22 +234,22 @@ void MeshLight::AddToScene(Scene* scn)
 Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d&, Vector3d&, int component) const
 {
     auto [lightPoint_, lightNormal_] = SamplePoint();
-    Vector3d toLight = lightPoint_ - info.GetPosition();
-    Vector3d normal = info.GetNormal();
+    Vector3d toLight = lightPoint_ - info.position;
+    Vector3d normal = info.normal;
 
     if(toLight*lightNormal_ < 0)
     {
         double d = toLight.Length();
         toLight.Normalize();
 
-        Ray lightRay = Ray(info.GetPosition(), toLight);
+        Ray lightRay = Ray(info.position, toLight);
 
         if(renderer->TraceShadowRay(lightRay, (1-1e-6)*d))
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal_);
             Color c;
-            c = info.GetMaterial()->BRDF(info, toLight, component)
+            c = info.material->BRDF(info, toLight, component)
                 *costheta*cosphi*intensity_*GetArea()/(d*d);
             return c;
         }

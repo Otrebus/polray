@@ -1,6 +1,10 @@
 #include "Bytestream.h"
 #include "AshikhminShirley.h"
 #include "Utils.h"
+#include "Sample.h"
+#include "IntersectionInfo.h"
+#include "GeometricRoutines.h"
+
 
 AshikhminShirley::AshikhminShirley()
 {
@@ -41,9 +45,9 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
 
     if(r <= df) // Diffuse bounce
     {
-        Vector3d N_g = info.GetGeometricNormal();
-        Vector3d N_s = info.GetNormal();
-        Vector3d w_i = -info.GetDirection();
+        Vector3d N_g = info.geometricnormal;
+        Vector3d N_s = info.normal;
+        Vector3d w_i = -info.direction;
 
         double r1 = rnd.GetDouble(0, 1.0);
         double r2 = rnd.GetDouble(0, 1.0);
@@ -68,7 +72,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
             pdf = 0;
 
         Ray outRay;
-        outRay.origin = info.GetPosition();
+        outRay.origin = info.position;
         outRay.direction = dir;
 
         if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
@@ -88,9 +92,9 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         double r1 = rnd.GetDouble(0.0f, 2*pi);
         double r2 = acos(pow(rnd.GetDouble(0, 1.0), 1/double(n+1)));
 
-        Vector3d N_g = info.GetGeometricNormal();
-        Vector3d N_s = info.GetNormal();
-        Vector3d w_i = -info.GetDirection();
+        Vector3d N_g = info.geometricnormal;
+        Vector3d N_s = info.normal;
+        Vector3d w_i = -info.direction;
 
         if(w_i*N_g < 0)
             N_g = -N_g;
@@ -105,7 +109,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         Vector3d hv = sin(r2)*(forward*cos(r1) + right*sin(r1)) + cos(r2)*N_s;
 
         Ray outRay;
-        outRay = Ray(info.GetPosition(), -w_i + 2*(w_i*hv)*hv);
+        outRay = Ray(info.position, -w_i + 2*(w_i*hv)*hv);
         outRay.direction.Normalize();
         Vector3d& w_o = outRay.direction;
 
@@ -130,9 +134,9 @@ Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out, 
     double df = Rd.GetMax();
     double sp = Rs.GetMax();
 
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
-    Vector3d in = -info.GetDirection();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
+    Vector3d in = -info.direction;
 
     if(in*N_g < 0)
         N_g = -N_g;
@@ -143,7 +147,7 @@ Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out, 
     if(in*N_g < 0 || out*N_g < 0 || in*N_s < 0 || out*N_s < 0) // FIXME: redundant checks
         return Color(0);
 
-    Vector3d wi = -info.GetDirection();
+    Vector3d wi = -info.direction;
     Vector3d h = (wi + out);
     h.Normalize();
 
@@ -160,10 +164,10 @@ Light* AshikhminShirley::GetLight() const
 
 double AshikhminShirley::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const
 {
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
 
-    Vector3d in = -info.GetDirection();
+    Vector3d in = -info.direction;
 
     Vector3d hv = (in + out);
     hv.Normalize();

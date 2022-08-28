@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "MeanEstimator.h"
+#include "Bytestream.h"
 #include "Main.h"
 
 
@@ -26,7 +27,8 @@ Color MeanEstimator::GetEstimate(int x, int y) const {
     return samples[y*width+x];
 }
 
-void MeanEstimator::Save(Bytestream& stream) const {
+void MeanEstimator::Save(Bytestream& stream) const
+{
     stream << ID_MEANESTIMATOR << height << width;
     for(int y = 0; y < height; y++) {
         for(int x = 0; x < width; x++) {

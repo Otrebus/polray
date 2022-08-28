@@ -20,7 +20,6 @@ int Color::GetInt() const
     return (int)(b*255) | (int)(g*255) << 8 | (int)(r*255) << 16;
 }
 
-
 Color::Color(double _r, double _g, double _b) : r(_r), g(_g), b(_b)
 {
     assert(IsValid());
@@ -74,7 +73,6 @@ Color Color::operator*(const Color& v) const
 {
     return Color(r*v.r, g*v.g, b*v.b);
 }
-
 
 Color Color::operator+=(const Color& c)
 {

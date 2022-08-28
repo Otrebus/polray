@@ -2,7 +2,7 @@
 #include "ThinLensCamera.h"
 #include "PinholeCamera.h"
 #include "Bytestream.h"
-#include <intrin.h>
+#include <cassert>
 
 //------------------------------------------------------------------------------
 // Constructor.

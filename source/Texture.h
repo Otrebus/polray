@@ -1,11 +1,11 @@
 #pragma once
 
 #include <string>
-#include "ddraw.h"
-#include "main.h"
 #define WIN32_MEAN_AND_LEAN
+#define NOMINMAX
 #include <windows.h>
-#include "color.h"
+
+class Color;
 
 class Texture
 {

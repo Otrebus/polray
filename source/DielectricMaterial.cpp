@@ -2,6 +2,8 @@
 #include "DielectricMaterial.h"
 #include <sstream>
 #include "Utils.h"
+#include "Sample.h"
+#include "IntersectionInfo.h"
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -29,11 +31,11 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     auto pdf = 1;  // This is not true, of course, which is indicated by the
     auto rpdf = 1; // specularity of this brdf
 
-    Vector3d _normal = info.GetNormal();
+    Vector3d _normal = info.normal;
     Vector3d normal;
 
-    const Vector3d& wi = info.GetDirection();
-    const Vector3d& Ng = info.GetGeometricNormal();
+    const Vector3d& wi = info.direction;
+    const Vector3d& Ng = info.geometricnormal;
     Vector3d& Ns = normal;
 
     double cosi = _normal*wi*-1;
@@ -58,10 +60,10 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     if(d < 0) // Total internal reflection
     {
         Ray out;
-        out.direction = Reflect(info.GetDirection(), Ns);
+        out.direction = Reflect(info.direction, Ns);
         out.direction.Normalize();
         auto wo = out.direction;
-        out.origin = info.GetPosition() + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
         return Sample(color, out, pdf, rpdf, true, 1);
     }
@@ -78,17 +80,17 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
         out.direction = refraction;
         out.direction.Normalize();
         auto wo = out.direction;
-        out.origin = info.GetPosition() + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((wi*Ns/(wi*Ng))*(wo*Ng/(wo*Ns))) * Color::Identity : (n1/n2)*(n1/n2)*Color::Identity;
         return Sample(color, out, pdf, rpdf, true, 1);
     }
     else // Reflected
     {
         Ray out;
-        out.direction = Reflect(info.GetDirection(), Ns);
+        out.direction = Reflect(info.direction, Ns);
         out.direction.Normalize();
         auto wo = out.direction;
-        out.origin = info.GetPosition() + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
         return Sample(color, out, pdf, rpdf, true, 1);
     }

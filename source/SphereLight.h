@@ -1,8 +1,6 @@
 #pragma once
 
-#define NOMINMAX
 #include "Light.h"
-#include "Ray.h"
 #include "Random.h"
 #include <memory>
 

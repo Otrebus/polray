@@ -1,18 +1,12 @@
 #pragma once
 
-#define NOMINMAX
 #include "Material.h"
-#include "Vector3d.h"
-#include "Color.h"
-#include "GeometricRoutines.h"
-#include "IntersectionInfo.h"
-#include "Ray.h"
 #include "Random.h"
-#include "Texture.h"
-#include <Windows.h>
-#include <math.h>
 
-class Ray;
+class Bytestream;
+class Light;
+class Sample;
+class IntersectionInfo;
 
 class MirrorMaterial : public Material
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#define NOMINMAX
 #include "Light.h"
 #include "KDTree.h"
 

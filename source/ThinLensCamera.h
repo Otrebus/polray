@@ -1,13 +1,10 @@
 #pragma once
 
-#define NOMINMAX
-#include <assert.h>
-#include <Windows.h>
-
 #include "Camera.h"
+#include <tuple>
 #include "Random.h"
-#include "Ray.h"
-#include "Vector3d.h"
+
+class Vector3d;
 
 class ThinLensCamera : public Camera
 {

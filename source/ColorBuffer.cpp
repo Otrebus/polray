@@ -1,5 +1,7 @@
 #define NOMINMAX
 #include "ColorBuffer.h"
+#include "Bytestream.h"
+#include "Utils.h"
 #include <fstream>
 #pragma warning(disable:4996)
 
@@ -64,7 +66,7 @@ void ColorBuffer::Dump(std::string filename) {
         for (int x = 0; x < width; x++) {
             auto color = GetPixel(x, y);
             for(auto c : { color.b, color.g, color.r })
-                file.put((char) std::max(0, std::min(255, (int)(255*c))));
+                file.put((char) max(0, min(255, (int)(255*c))));
         }
         for (int n = 0; n < pad; n++)
             file.put(0);

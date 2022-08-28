@@ -1,10 +1,10 @@
 #pragma once
 
-#define NOMINMAX
-#include "Vector3d.h"
 #include "Camera.h"
-#include "Ray.h"
-#include <assert.h>
+#include <tuple>
+#include "Random.h"
+
+class Vector3d;
 
 class PinholeCamera : public Camera
 {

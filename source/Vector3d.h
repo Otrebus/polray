@@ -1,10 +1,9 @@
 #pragma once
 
-class Matrix3d;
-
-#define NOMINMAX
 #include <cmath>
 #include <sstream>
+
+class Matrix3d;
 
 class Vector3d
 {

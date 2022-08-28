@@ -1,7 +1,7 @@
 #pragma once
 
-#include "vector3d.h"
-#include "texture.h"
+class Vector3d;
+#include "Texture.h"
 
 class Cubemap
 {

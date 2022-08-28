@@ -1,12 +1,13 @@
 #pragma once
 
 #define NOMINMAX
-#include "Bytestream.h"
-#include "ColorBuffer.h"
-#include "Scene.h"
-#include <process.h>
-#include "Estimator.h"
+#include <memory>
+#include <string>
+#include <Windows.h>
 
+class ColorBuffer;
+class Estimator;
+class Renderer;
 
 class Rendering
 {

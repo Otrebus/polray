@@ -2,8 +2,6 @@
 
 #include <vector>
 #include <string>
-#include "Model.h"
-
 
 #define ID_MONESTIMATOR ((unsigned char) 70)
 #define ID_MEANESTIMATOR ((unsigned char) 71)

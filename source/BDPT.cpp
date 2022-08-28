@@ -1,10 +1,10 @@
 #define NOMINMAX
 #include "BDPT.h"
 #include <vector>
-#include "AreaLight.h"
 #include "Primitive.h"
 #include "Material.h"
 #include "Utils.h"
+#include "Main.h"
 
 const int N = 20; // Number of samples per ray to be saved for optimized russian roulette
 
@@ -25,15 +25,18 @@ BDPT::~BDPT()
 {
 }
 
-Roulette::Roulette() : sum(0), sumSq(0), sumRays(0) {
+Roulette::Roulette() : sum(0), sumSq(0), sumRays(0)
+{
     m = new std::mutex();
 }
 
-Roulette::~Roulette() {
+Roulette::~Roulette()
+{
     delete m;
 }
 
-void Roulette::AddSample(double sample, int nrays) {
+void Roulette::AddSample(double sample, int nrays)
+{
     std::lock_guard<std::mutex> lock(*m);
 
     sum += sample;
@@ -84,12 +87,12 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
 
         BDVertex* newV = new BDVertex();
         newV->info = info;
-        Vector3d v = (info.GetPosition() - lastV->out.origin);
+        Vector3d v = (info.position - lastV->out.origin);
         double lSqr = v.Length2();
         v.Normalize();
-        newV->pdf = lastPdf*(abs(info.GetGeometricNormal()*info.GetDirection()))/(lSqr);
+        newV->pdf = lastPdf*(abs(info.geometricnormal*info.direction))/(lSqr);
         newV->alpha = lastV->alpha*lastSample;
-        Material* mat = info.GetMaterial();
+        Material* mat = info.material;
 
         newV->sample = mat->GetSample(info, lightPath);
         newV->out = newV->sample.outRay;
@@ -106,23 +109,23 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
                 return (int) path.size();
             }
 
-            lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
+            lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
             path.push_back(newV);
 
             if(hitLight == light)
             {   // Direct light hit
-                lastV->rpdf = hitLight->Pdf(info, -v)*(abs(lastV->info.GetGeometricNormal()*v))/(lSqr);
+                lastV->rpdf = hitLight->Pdf(info, -v)*(abs(lastV->info.geometricnormal*v))/(lSqr);
                 samples.push_back(BDSample(0, (int) path.size()));
                 return (int) path.size() - 1;
             }
         } else {
             if(!newV->sample.color)
             {
-                lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
+                lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
                 path.push_back(newV);
                 return (int) path.size();
             }
-            lastV->rpdf = newV->sample.rpdf*abs(lastV->info.GetGeometricNormal()*v)/(lSqr);
+            lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
             path.push_back(newV);
         }
     }
@@ -208,7 +211,7 @@ Color BDPT::EvalPath(const std::vector<BDVertex*>& lightPath, const std::vector<
     double r = c.direction.Length();
     c.direction.Normalize();
 
-    result *= abs(lastL->info.GetGeometricNormal()*c.direction)*abs(lastE->info.GetNormal()*c.direction)/(r*r);
+    result *= abs(lastL->info.geometricnormal*c.direction)*abs(lastE->info.normal*c.direction)/(r*r);
     result *= lastL->alpha*lastE->alpha;
 
     // This BRDF is backwards so let's modify it 
@@ -298,12 +301,12 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
     {
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lightPath[s-1]->info;
-        Vector3d out = lastE->info.GetPosition() - lastL->info.GetPosition();
+        Vector3d out = lastE->info.position - lastL->info.position;
         double lSqr = out.Length2();
         out.Normalize();
         double newPdf;
         if(s > 1)
-            newPdf = lastL->info.GetMaterial()->PDF(info, out, true, lastL->sample.component);
+            newPdf = lastL->info.material->PDF(info, out, true, lastL->sample.component);
         else
             newPdf = light->Pdf(lastL->info, out);
         forwardProbs[s] = newPdf*abs(lastE->info.geometricnormal*out)/(lSqr);
@@ -314,7 +317,7 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
             out = eyePath[t-2]->info.position - lastE->info.position;
             lSqr = out.Length2();
             out.Normalize();
-            newPdf = lastE->info.GetMaterial()->PDF(info, out, true, lastE->sample.component);
+            newPdf = lastE->info.material->PDF(info, out, true, lastE->sample.component);
         
             forwardProbs[s+1] = newPdf*abs(eyePath[t-2]->info.geometricnormal*out)/(lSqr);
         }
@@ -334,7 +337,7 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
     {
         BDVertex* lastE = eyePath[t-1], *lastL = lightPath[s-1];
         IntersectionInfo info = lastE->info;
-        Vector3d out = lastL->info.GetPosition()-lastE->info.GetPosition();
+        Vector3d out = lastL->info.position-lastE->info.position;
         double lSqr = out.Length2();
         out.Normalize();
         double newPdf;
@@ -342,7 +345,7 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
         if(t == 1)
             newPdf = 1/(cam->GetFilmArea()*costheta*costheta*costheta);
         else
-            newPdf = lastE->info.GetMaterial()->PDF(info, out, false, lastE->sample.component);
+            newPdf = lastE->info.material->PDF(info, out, false, lastE->sample.component);
         backwardProbs[s-1] = newPdf*abs(lastL->info.geometricnormal*out)/lSqr;
         if(s > 1) {
             info = lightPath[s-1]->info;
@@ -350,7 +353,7 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
             out = lightPath[s-2]->info.position - lastL->info.position;
             lSqr = out.Length2();
             out.Normalize();
-            newPdf = lastL->info.GetMaterial()->PDF(info, out, false, lastL->sample.component);
+            newPdf = lastL->info.material->PDF(info, out, false, lastL->sample.component);
 
             backwardProbs[s-2] = newPdf*abs(lightPath[s-2]->info.geometricnormal*out)/(lSqr);
         }

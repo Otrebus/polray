@@ -1,22 +1,22 @@
-Rename various functions from GetBlahBlahBlah to just blah
 ctrl-F This could also be a hash table, for very large triangle meshes
+Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Replace debugbreaks with better error messages
-Make various functions return a tuple instead of taking output parameters
+Add physical camera to bdpt
+Add light source resampling to BDPT
+ctrl-F 14 years later
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
 Refactor GetProjectedSceneHull
-Fix rendering exposure to use luminance as input for exp
-Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Use more modern threads
 Make TraceShadowRay account for light portals
-Think of a better way of dealing with epsilons - account for numerical errors etc
-Add light source resampling to BDPT
 Unhardcode light area sampling in light portal
-Implement multiple importance sampling for light portals
+Think of a better way of dealing with epsilons - account for numerical errors etc
 (mostly for "fun") Make light portals work inside scenes
 Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
-Add physical camera to bdpt
 Add check that all primitives have materials, in scene
+Implement multiple importance sampling for light portals
+- Make various functions return a tuple instead of taking output parameters
+- Rename various functions from GetBlahBlahBlah to just blah
 - Make Sphere use IntersectSphere in its intersect/generateintersectioninfo functions
 - Put ids for saving in a single file
 - Read light sources from .mtl files

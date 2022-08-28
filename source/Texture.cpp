@@ -1,4 +1,9 @@
 #include "Texture.h"
+#include "Logger.h"
+#include "ddraw.h"
+#include "Gfx.h"
+#include "Color.h"
+#include "Main.h"
 
 HINSTANCE Texture::hInstance = 0;
 

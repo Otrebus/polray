@@ -1,10 +1,12 @@
 #pragma once
 
 #define WIN32_MEAN_AND_LEAN
-#include <assert.h>
-#include <math.h>
-#include "Vector3d.h"
-#include <stdlib.h>
+#include <cassert>
+#include <cmath>
+#include <cstdlib>
+#include <ostream>
+
+class Vector3d;
 
 class Color
 {

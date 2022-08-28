@@ -1,6 +1,5 @@
 #pragma once
 
-#define NOMINMAX
 #include "Renderer.h"
 #include "Random.h"
 

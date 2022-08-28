@@ -1,6 +1,5 @@
 #include "LightTracer.h"
-#include "AreaLight.h"
-#include "PhongMaterial.h" // temp
+#include "Sample.h"
 
 
 LightTracer::LightTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
@@ -61,11 +60,11 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             // Next event estimation
             auto [u, v, lensPoint] = cam.SampleAperture();
 
-            Ray camRay = Ray(info.GetPosition(), lensPoint - info.GetPosition());
+            Ray camRay = Ray(info.position, lensPoint - info.position);
             camRayLength = camRay.direction.Length();
             camRay.direction.Normalize();
 
-            auto sample = info.GetMaterial()->GetSample(info, true);
+            auto sample = info.material->GetSample(info, true);
             auto c = sample.color;
             bounceRay = sample.outRay;
 
@@ -74,12 +73,12 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             {
                 camcos = abs(-camRay.direction*cam.dir);
                 pixelArea = (double)cam.GetPixelArea();
-                surfcos = abs(info.GetGeometricNormal()*camRay.direction);
+                surfcos = abs(info.geometricnormal*camRay.direction);
 
-                Color brdf = info.GetMaterial()->BRDF(info, camRay.direction, sample.component);
+                Color brdf = info.material->BRDF(info, camRay.direction, sample.component);
                 // Flux to radiance and stuff involving probability and sampling of the camera
                 Color pixelColor = pathColor*surfcos*brdf/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight;
-                pixelColor*=abs(info.GetDirection()*info.GetNormal())/abs(info.GetDirection()*info.GetGeometricNormal());
+                pixelColor*=abs(info.direction*info.normal)/abs(info.direction*info.geometricnormal);
                 colBuf.AddColor(xPixel, yPixel, pixelColor);
             }
             

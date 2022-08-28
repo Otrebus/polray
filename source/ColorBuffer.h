@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Bytestream.h"
 #include "Color.h"
 #define WIN32_MEAN_AND_LEAN
+#define NOMINMAX
 #include <Windows.h>
 #include <string>
+
+class Bytestream;
 
 class ColorBuffer
 {

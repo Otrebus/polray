@@ -5,13 +5,7 @@
 #define LOG_FILENAME "debuglog"
 #define NOMINMAX
 
-#include <iostream>
 #include <string>
-#include <windows.h>
-#include <fstream>
-#include <ctime>
-
-typedef unsigned char uchar;
 
 class Logger
 {    

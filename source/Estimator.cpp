@@ -1,6 +1,7 @@
 #include "Estimator.h"
 #include "MonEstimator.h"
 #include "MeanEstimator.h"
+#include "Bytestream.h"
 
 Estimator::~Estimator()
 {

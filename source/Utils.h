@@ -3,7 +3,8 @@
 #define NOMINMAX
 #include <string>
 #include <vector>
-#include "Vector3d.h"
+
+class Vector3d;
 
 std::vector<std::string> split(const std::string& s, char delim);
 
@@ -17,6 +18,8 @@ typedef double AnglePdf;
 typedef Vector3d Point;
 typedef Vector3d Normal;
 
+// #undef min
+// #undef max
 #define min min
 #define max max
 

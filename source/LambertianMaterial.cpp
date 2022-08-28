@@ -1,6 +1,10 @@
 #include <sstream>
 #include "Bytestream.h"
 #include "LambertianMaterial.h"
+#include "GeometricRoutines.h"
+#include "Sample.h"
+#include "IntersectionInfo.h"
+#include "Utils.h"
 
 LambertianMaterial::LambertianMaterial()
 {
@@ -22,10 +26,10 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     double r1 = rnd.GetDouble(0, 1.0);
     double r2 = rnd.GetDouble(0, 1.0);
 
-    Vector3d N_g = info.GetGeometricNormal();
-    Vector3d N_s = info.GetNormal();
+    Vector3d N_g = info.geometricnormal;
+    Vector3d N_s = info.normal;
     
-    const Vector3d& w_i = -info.GetDirection();
+    const Vector3d& w_i = -info.direction;
     
     if(w_i*N_g < 0)
         N_g = -N_g;
@@ -38,7 +42,7 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     Vector3d dir = SampleHemisphereCos(r1, r2, N);
 
     const Vector3d& w_o = dir;
-    out.origin = info.GetPosition();
+    out.origin = info.position;
     out.direction = dir;
 
     auto pdf = dir*N/pi;
@@ -56,10 +60,10 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
 
 Color LambertianMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
 {
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
 
-    const Vector3d& w_i = -info.GetDirection();
+    const Vector3d& w_i = -info.direction;
     const Vector3d& w_o = out;
 
     if(w_i*N_g < 0)
@@ -96,10 +100,10 @@ void LambertianMaterial::ReadProperties(std::stringstream& ss)
 
 double LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int) const
 {
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
 
-    const Vector3d& w_i = -info.GetDirection();
+    const Vector3d& w_i = -info.direction;
     const Vector3d& w_o = out;
 
     if(w_i*N_g < 0)

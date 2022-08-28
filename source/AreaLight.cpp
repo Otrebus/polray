@@ -187,23 +187,22 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
     lp = lightPoint;
     ln = lightNormal;
 
-    Vector3d toLight = lightPoint - info.GetPosition();
-    Vector3d normal = info.GetNormal();
+    Vector3d toLight = lightPoint - info.position;
+    Vector3d normal = info.normal;
 
     if(toLight*lightNormal < 0)
     {
         double d = toLight.Length();
         toLight.Normalize();
 
-        Ray lightRay = Ray(info.GetPosition(), toLight);
+        Ray lightRay = Ray(info.position, toLight);
 
         if(renderer->TraceShadowRay(lightRay, d*(1-eps)))
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
             Color c;
-            c = info.GetMaterial()->BRDF(info, toLight, component)
-                *costheta*cosphi*intensity_*GetArea()/(d*d);
+            c = info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(d*d);
             return c;
         }
     }

@@ -1,6 +1,5 @@
 #pragma once
 
-#define NOMINMAX
 #include "Vector3d.h"
 
 class Matrix3d

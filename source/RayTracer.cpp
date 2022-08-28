@@ -1,9 +1,8 @@
 #include "RayTracer.h"
 #include "TriangleMesh.h"
 #include "Logger.h"
-#include "Main.h"
-#include <intrin.h>
 #include "Utils.h"
+#include "Main.h"
 
 //------------------------------------------------------------------------------
 // Constructor
@@ -81,15 +80,15 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double cont
         else
             minlight->GenerateIntersectionInfo(ray, info);
 
-        Vector3d intersection = info.GetPosition();
-        Vector3d normal = info.GetNormal();
+        Vector3d intersection = info.position;
+        Vector3d normal = info.normal;
         normal.Normalize();
 
-        if(info.GetMaterial())
+        if(info.material)
         {
             Vector3d light(1, 1, 1);
             light.Normalize();
-            double dot = light*(info.GetNormal());
+            double dot = light*(info.normal);
             if(dot > 0)
                 return 10*Color(0, 0, dot);
             else

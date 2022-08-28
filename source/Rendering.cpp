@@ -1,13 +1,11 @@
 #include "Rendering.h"
-#include "MonEstimator.h"
-#include <intrin.h>
-#include <iostream>
+#include "Estimator.h"
+#include "Scene.h"
+#include "ColorBuffer.h"
 #include <thread>
 
-
 Rendering::Rendering(std::shared_ptr<Renderer> r, std::shared_ptr<Estimator> e) : 
-    renderer(r), estimator(e), running(false), updated(true), 
-    stopping(false), nSamples(0)
+    renderer(r), estimator(e), running(false), updated(true), stopping(false), nSamples(0)
 {
     int xres = r->GetScene()->GetCamera()->GetXRes();
     int yres = r->GetScene()->GetCamera()->GetYRes();
@@ -16,14 +14,16 @@ Rendering::Rendering(std::shared_ptr<Renderer> r, std::shared_ptr<Estimator> e) 
     bufferMutex = CreateMutex(0, false, 0);
 }
 
-Rendering::Rendering(std::string fileName)
-    : running(false), updated(true), stopping(false)
+Rendering::Rendering(std::string fileName) : running(false), updated(true), stopping(false)
 {
     Bytestream b;
+
     b.LoadFromFile(fileName);
     std::shared_ptr<Scene> scene(new Scene());
     scene->Load(b);
+
     unsigned char rendererType, estimatorType;
+
     b >> rendererType;
     renderer = std::shared_ptr<Renderer>(Renderer::Create(rendererType, scene));
 

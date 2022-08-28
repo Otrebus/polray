@@ -1,4 +1,5 @@
 #include "Ray.h"
+#include "IntersectionInfo.h"
 
 Ray::Ray(const Vector3d& org, const Vector3d& dir) : origin(org), direction(dir)
 {

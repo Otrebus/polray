@@ -1,6 +1,8 @@
 #include "Bytestream.h"
 #include "MirrorMaterial.h"
-
+#include "Sample.h"
+#include "IntersectionInfo.h"
+#include "GeometricRoutines.h"
 #include <sstream>
 
 MirrorMaterial::MirrorMaterial()
@@ -14,24 +16,24 @@ MirrorMaterial::~MirrorMaterial()
 Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
 	Vector3d Ng, Ns;
-    const Vector3d in = info.GetDirection();
+    const Vector3d in = info.direction;
 
-    if(in*info.GetGeometricNormal() < 0)
+    if(in*info.geometricnormal < 0)
     {
-        Ng = info.GetGeometricNormal();
-        Ns = info.GetNormal();
+        Ng = info.geometricnormal;
+        Ns = info.normal;
     }
     else // The surface was hit from behind, so flip all normals
     {
-        Ng = -info.GetGeometricNormal();
-        Ns = -info.GetNormal();
+        Ng = -info.geometricnormal;
+        Ns = -info.normal;
     }
 
     Vector3d normal = Ns;
 
     Ray out;
-	out.direction = Reflect(info.GetDirection(), normal);
-	out.origin = info.GetPosition() + normal*0.0001f;
+	out.direction = Reflect(info.direction, normal);
+	out.origin = info.position + normal*0.0001f;
 	out.direction.Normalize();
 
     return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1), out, 1, 1, true, 1);

@@ -1,20 +1,12 @@
 #pragma once
 
-#define _USE_MATH_DEFINES
-#define NOMINMAX
-
 #include "Material.h"
-#include "Vector3d.h"
-#include "Color.h"
-#include "GeometricRoutines.h"
-#include "IntersectionInfo.h"
-#include "Ray.h"
 #include "Random.h"
-#include <Windows.h>
-#include <math.h>
-#include <memory>
-#include <functional>
-#include "Renderer.h"
+
+class Bytestream;
+class Light;
+class Sample;
+class IntersectionInfo;
 
 class PhongMaterial : public Material
 {

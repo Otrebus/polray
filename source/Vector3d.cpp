@@ -1,6 +1,5 @@
 #include "Matrix3d.h"
 #include "Vector3d.h"
-#include <limits>
 
 Vector3d::Vector3d(double a, double b, double c) : x(a), y(b), z(c)
 {

@@ -1,19 +1,13 @@
 #pragma once
 
-#define NOMINMAX
-#include "vector3d.h"
-#include "texture.h"
+#include "Texture.h"
 #include "Color.h"
-#include "GeometricRoutines.h"
-#include "Sample.h"
-#include <sstream>
 
 class Light;
-class Ray;
 class IntersectionInfo;
 class Bytestream;
-
-class ShadingState;
+class Sample;
+class Color;
 
 class Material
 {
@@ -36,8 +30,6 @@ public:
     static Material* Create(unsigned char);
 
     Light* light;
-    static int highestId;
-    int id;
     Texture* texture;
     Texture* normalmap;
 };

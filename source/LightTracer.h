@@ -1,11 +1,11 @@
 #pragma once
 
-#define NOMINMAX
-#include "Camera.h"
-#include "ColorBuffer.h"
-#include "Primitive.h"
 #include "Renderer.h"
 #include "Random.h"
+
+class Primitive;
+class ColorBuffer;
+class Camera;
 
 class LightTracer : public Renderer
 {
@@ -14,7 +14,6 @@ public:
     ~LightTracer();
 
     void Render(Camera& cam, ColorBuffer& colBuf);
-    void RenderPart(Camera& cam, ColorBuffer& colBuf) const;
     
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);

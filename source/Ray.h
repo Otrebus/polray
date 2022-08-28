@@ -1,8 +1,8 @@
 #pragma once
 
-#define NOMINMAX
 #include "Vector3d.h"
-#include "intersectioninfo.h"
+
+class IntersectionInfo;
 
 class Ray
 {

@@ -5,13 +5,12 @@
 #include <fstream>
 #include <sstream>
 #include "Primitive.h"
-#include "vertex3d.h"
-#include "KDTree.h"
-#include "Matrix3d.h"
 #include "Model.h"
+#include "Vertex3d.h"
 
 class MeshTriangle;
 class TriangleMesh;
+class Matrix3d;
 
 class MeshVertex : public Vertex3d
 {

@@ -2,13 +2,16 @@
 #include "TriangleMesh.h"
 #include "PhongMaterial.h"
 #include "LambertianMaterial.h"
+#include "MeshLight.h"
 #include "MirrorMaterial.h"
+#include "EmissiveMaterial.h"
 #include "DielectricMaterial.h"
 #include "AshikhminShirley.h"
 #include "Utils.h"
 #include <stack>
 #include <tuple>
 #include <set>
+#include <unordered_map>
 
 bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& materials)
 {

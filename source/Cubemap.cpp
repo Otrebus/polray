@@ -1,4 +1,6 @@
 #include "cubemap.h"
+#include "Color.h"
+#include "Vector3d.h"
 
 Cubemap::Cubemap(Texture front, Texture back, Texture left, Texture right, Texture up, Texture down) : m_north(front), m_south(back), m_west(left), m_east(right), m_top(up), m_bottom(down)
 {

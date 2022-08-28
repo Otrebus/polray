@@ -1,7 +1,6 @@
 #pragma once
 
-#define NOMINMAX
-#include "color.h"
+#include "Color.h"
 #include "Estimator.h"
 
 class MeanEstimator : public Estimator

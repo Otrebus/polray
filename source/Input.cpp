@@ -5,6 +5,8 @@
 //------------------------------------------------------------------------------
 
 #include "Input.h"
+#include "Logger.h"
+#include <cassert>
 #pragma warning(disable : 4644) // Warns about the use of Offsetof inside DIMOFS_X
 
 //------------------------------------------------------------------------------

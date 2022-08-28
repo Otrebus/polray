@@ -1,5 +1,4 @@
 #include "Random.h"
-#include "Logger.h"
 
 Random::Random()
 {

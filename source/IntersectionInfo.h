@@ -1,7 +1,6 @@
 #pragma once
 
-#define NOMINMAX
-#include "vector3d.h"
+#include "Vector3d.h"
 
 class Material;
 
@@ -11,14 +10,6 @@ public:
     IntersectionInfo(Vector3d&, Vector3d&, Vector3d&);
     IntersectionInfo();
     ~IntersectionInfo();
-
-    Vector3d GetNormal() const;
-    Vector3d GetPosition() const;
-    Vector3d GetRayPosition() const;
-    Vector2d GetTexturePosition() const;
-    Material* GetMaterial() const;
-    Vector3d GetDirection() const;
-    Vector3d GetGeometricNormal() const;
 
     bool specular;
 

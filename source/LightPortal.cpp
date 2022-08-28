@@ -79,7 +79,7 @@ double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
         auto t = p.Intersect(ray);
         if(t != -inf) {
             auto portalNormal = p.GetNormal();
-            auto lightNormal = info.GetNormal();
+            auto lightNormal = info.normal;
 
             auto portalPoint = ray.origin + t*ray.direction;
             auto lightPoint = info.position;

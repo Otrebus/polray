@@ -1,14 +1,12 @@
 #pragma once
 
-#define NOMINMAX
-#include "vector3d.h"
-#include "color.h"
-#include "intersectioninfo.h"
+#include "Color.h"
 #include "EmissiveMaterial.h"
 #include "Utils.h"
 #include <memory>
-#include <vector>
 
+class IntersectionInfo;
+class Vector3d;
 class Bytestream;
 class Scene;
 class Ray;

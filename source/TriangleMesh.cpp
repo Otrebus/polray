@@ -1,21 +1,14 @@
 #include "TriangleMesh.h"
-#include <stack>
-#include <map>
-#include "PhongMaterial.h"
-#include "EmissiveMaterial.h"
-#include "PhongMaterial.h"
-#include "LambertianMaterial.h"
-#include "MirrorMaterial.h"
-#include "DielectricMaterial.h"
-#include "AshikhminShirley.h"
-#include "Scene.h"
-#include <filesystem>
+#include "Matrix3d.h"
+#include "GeometricRoutines.h"
 #include "Utils.h"
-#include <numeric>
+#include "IntersectionInfo.h"
 #include "ObjReader.h"
-
-#define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
-#define new DEBUG_NEW
+#include "Ray.h"
+#include "BoundingBox.h"
+#include "Bytestream.h"
+#include "Scene.h"
+#include <numeric>
 
 MeshTriangle::MeshTriangle(const Vector3d& a, const Vector3d& b, const Vector3d& c)
 {
@@ -131,21 +124,16 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
 	ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
 	ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
-	resultbox.c1.x = inf;
-	resultbox.c2.x = -inf;
-	resultbox.c1.y = inf;
-	resultbox.c2.y = -inf;
-	resultbox.c1.z = inf;
-	resultbox.c2.z = -inf;
+    resultbox = BoundingBox { { inf, inf, inf }, { -inf, -inf, -inf } };
 
 	for(auto v : points)
 	{
-		resultbox.c1.x = v.x < resultbox.c1.x ? v.x : resultbox.c1.x;
-		resultbox.c2.x = v.x > resultbox.c2.x ? v.x : resultbox.c2.x;
-		resultbox.c1.y = v.y < resultbox.c1.y ? v.y : resultbox.c1.y;
-		resultbox.c2.y = v.y > resultbox.c2.y ? v.y : resultbox.c2.y;
-		resultbox.c1.z = v.z < resultbox.c1.z ? v.z : resultbox.c1.z;
-		resultbox.c2.z = v.z > resultbox.c2.z ? v.z : resultbox.c2.z;
+		resultbox.c1.x = min(v.x, resultbox.c1.x);
+		resultbox.c2.x = max(v.x, resultbox.c2.x);
+		resultbox.c1.y = min(v.y, resultbox.c1.y);
+		resultbox.c2.y = max(v.y, resultbox.c2.y);
+		resultbox.c1.z = min(v.z, resultbox.c1.z);
+		resultbox.c2.z = max(v.z, resultbox.c2.z);
 	}
 
 	if(points.size() > 2)

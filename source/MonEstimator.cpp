@@ -1,18 +1,22 @@
 #include <algorithm>
 #include "MonEstimator.h"
-#include "Main.h"
+#include "Bytestream.h"
 
-void Bucket::Save(Bytestream& stream) const {
+void Bucket::Save(Bytestream& stream) const
+{
     stream << avg << nSamples;
 }
-void Bucket::Load(Bytestream& stream) {
+void Bucket::Load(Bytestream& stream) 
+{
     stream >> avg >> nSamples;
 }
 
-MonEstimator::MonEstimator() {
+MonEstimator::MonEstimator()
+{
 }
 
-MonEstimator::MonEstimator(int xres, int yres) {
+MonEstimator::MonEstimator(int xres, int yres)
+{
     buckets = new Bucket[xres*yres*M];
     width = xres;
     height = yres;
@@ -20,11 +24,13 @@ MonEstimator::MonEstimator(int xres, int yres) {
     std::fill(nSamples, nSamples + xres*yres, 0);
 }
 
-Bucket& MonEstimator::GetBucket(int x, int y, int m) const {
+Bucket& MonEstimator::GetBucket(int x, int y, int m) const
+{
     return buckets[y*(width*M) + x*M + m];
 }
 
-void MonEstimator::AddSample(int x, int y, const Color& c) {
+void MonEstimator::AddSample(int x, int y, const Color& c)
+{
     int ns = nSamples[y*width+x];
     auto& bucket = GetBucket(x, y, ns%M);
 
@@ -32,7 +38,8 @@ void MonEstimator::AddSample(int x, int y, const Color& c) {
     nSamples[y*width+x]++;
 }
 
-Color MonEstimator::GetEstimate(int x, int y) const {
+Color MonEstimator::GetEstimate(int x, int y) const
+{
     int ns = nSamples[y*width+x];
     if(ns < M) {
         // If we haven't filled all the buckets yet, just do an average of the samples that we have
@@ -72,7 +79,8 @@ Color MonEstimator::GetEstimate(int x, int y) const {
     }
 }
 
-void MonEstimator::Save(Bytestream& stream) const {
+void MonEstimator::Save(Bytestream& stream) const
+{
     stream << ID_MONESTIMATOR << height << width;
     for(int y = 0; y < height; y++) {
         for(int x = 0; x < width; x++) {
@@ -88,7 +96,8 @@ void MonEstimator::Save(Bytestream& stream) const {
     }
 }
 
-void MonEstimator::Load(Bytestream& stream) {
+void MonEstimator::Load(Bytestream& stream)
+{
     stream >> height >> width;
     nSamples = new int[width*height];
     for(int y = 0; y < height; y++) {

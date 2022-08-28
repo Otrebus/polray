@@ -1,11 +1,12 @@
 #pragma once
 
-#define NOMINMAX
-#include "vector3d.h"
-#include "Ray.h"
-#include <assert.h>
+#include "Camera.h"
+#include <tuple>
+#include "Random.h"
+#include "Bytestream.h"
+#include "Vector3d.h"
 
-class Bytestream;
+class Ray;
 
 class Camera
 {

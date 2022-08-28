@@ -1,15 +1,12 @@
 #pragma once
 
-#define NOMINMAX
-#include "vector3d.h"
-#include "texture.h"
-#include "Ray.h"
 #include "GeometricRoutines.h"
 #include "Random.h"
 #include "Material.h"
-#include "Sample.h"
 
 class Light;
+class Sample;
+class Vector3d;
 
 class EmissiveMaterial : public Material
 {

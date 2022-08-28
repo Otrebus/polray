@@ -1,15 +1,13 @@
 #pragma once
 
-#define NOMINMAX
 #include "Light.h"
-#include "Ray.h"
 #include "Random.h"
-#include <memory>
 #include <tuple>
 
 class Renderer;
 class Scene;
 class EmissiveMaterial;
+class Ray;
 
 class UniformEnvironmentLight : public Light
 {

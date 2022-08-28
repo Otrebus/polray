@@ -1,15 +1,16 @@
 #pragma once
 
-#define NOMINMAX
 #include <vector>
 #include "KDTree.h"
 #include "ColorBuffer.h"
 #include "Camera.h"
 #include "Scene.h"
+#include "Random.h"
 
 class Ray;
 class Primitive;
 class Light;
+class Scene;
 
 class Renderer
 {

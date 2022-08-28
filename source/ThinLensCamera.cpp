@@ -1,6 +1,7 @@
 #include "ThinLensCamera.h"
 #include "Bytestream.h"
 #include "Utils.h"
+#include "Ray.h"
 
 //------------------------------------------------------------------------------
 // Constructor.
@@ -15,7 +16,9 @@ ThinLensCamera::ThinLensCamera()
 ThinLensCamera::ThinLensCamera(const Vector3d& up, const Vector3d& pos, const Vector3d& dir, int xres, int yres, double fov, double focalLength, double lensRadius) 
     : Camera(up, pos, dir, xres, yres, fov), focalLength(focalLength), lensRadius(lensRadius)
 {
-    random.Seed(GetTickCount());
+    #ifdef DETERMINISTIC
+    random.Seed(0);
+    #endif
 }
 
 //------------------------------------------------------------------------------

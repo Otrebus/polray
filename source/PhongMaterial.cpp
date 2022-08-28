@@ -1,6 +1,10 @@
 #include <sstream>
 #include "Bytestream.h"
 #include "PhongMaterial.h"
+#include "IntersectionInfo.h"
+#include "Sample.h"
+#include "Utils.h"
+#include "GeometricRoutines.h"
 
 PhongMaterial::PhongMaterial()
 {
@@ -29,10 +33,10 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
         auto r1 = rnd.GetDouble(0, 1.0);
         auto r2 = rnd.GetDouble(0, 1.0f);
 
-        Vector3d N_g = info.GetGeometricNormal();
-        Vector3d N_s = info.GetNormal();
+        Vector3d N_g = info.geometricnormal;
+        Vector3d N_s = info.normal;
     
-        const Vector3d& w_i = -info.GetDirection();
+        const Vector3d& w_i = -info.direction;
     
         if(w_i*N_g < 0)
             N_g = -N_g;
@@ -55,7 +59,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
             pdf = 0;
 
         Ray out;
-        out.origin = info.GetPosition();
+        out.origin = info.position;
         out.direction = dir;
 
         if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
@@ -69,9 +73,9 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
         auto r1 = rnd.GetDouble(0.0f, 2*pi);
         auto r2 = acos(pow(rnd.GetDouble(0, 1), 1/(alpha+1)));
 
-        Vector3d N_g = info.GetGeometricNormal();
-        Vector3d N_s = info.GetNormal();
-        Vector3d w_i = -info.GetDirection();
+        Vector3d N_g = info.geometricnormal;
+        Vector3d N_s = info.normal;
+        Vector3d w_i = -info.direction;
 
         if(w_i*N_g < 0)
             N_g = -N_g;
@@ -82,12 +86,12 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
         Vector3d N = adjoint ? N_g : N_s;
         Vector3d adjN = adjoint ? N_s : N_g;
 
-        Vector3d up = Reflect(info.GetDirection(), N_s);
+        Vector3d up = Reflect(info.direction, N_s);
 
         auto [right, forward] = MakeBasis(up);
         Vector3d base = forward*cos(r1) + right*sin(r1);
 
-        auto out = Ray(info.GetPosition(), right*std::sin(r1)*sin(r2) + forward*std::cos(r1)*sin(r2) + up*std::cos(r2));
+        auto out = Ray(info.position, right*std::sin(r1)*sin(r2) + forward*std::cos(r1)*sin(r2) + up*std::cos(r2));
         out.direction.Normalize();
         Vector3d w_o = out.direction;
                 double pdf, rpdf;
@@ -109,9 +113,9 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
     auto df = Kd.GetMax();
     auto sp = Ks.GetMax();
 
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
-    const Vector3d& in = -info.GetDirection();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
+    const Vector3d& in = -info.direction;
 
     if(in*N_g < 0)
         N_g = -N_g;
@@ -129,7 +133,7 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
     }
     else
     {
-        Vector3d reflection = Reflect(info.GetDirection(), N_s);
+        Vector3d reflection = Reflect(info.direction, N_s);
 
         if(reflection*out < 0)
             return Color(0, 0, 0);
@@ -165,9 +169,9 @@ double PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, boo
 {
     assert(component == 1 || component == 2);
 
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
-    const Vector3d& in = -info.GetDirection();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
+    const Vector3d& in = -info.direction;
 
     if(in*N_g < 0)
         N_g = -N_g;
@@ -184,7 +188,7 @@ double PhongMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, boo
         return out*normal/pi;
     else
     {
-        Vector3d up = Reflect(info.GetDirection(), N_s);
+        Vector3d up = Reflect(info.direction, N_s);
         return out*up > 0 ? pow(out*up, alpha)*float(alpha + 1)/(2*pi) : 0;
     }
 }

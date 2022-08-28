@@ -2,8 +2,10 @@
 
 #define NOMINMAX
 #include <vector>
-#include "vector3d.h"
-#include "Ray.h"
+
+class Vector3d;
+class Vector2d;
+class Ray;
 
 std::vector<Vector2d> ConvexHull(std::vector<Vector2d> v);
 void ClipPolygonToAAP(int axis, bool side, double position, std::vector<Vector3d>& input);

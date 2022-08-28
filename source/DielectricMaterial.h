@@ -1,20 +1,12 @@
 #pragma once
 
-#define NOMINMAX
-#include "Material.h"
-#include "Vector3d.h"
-#include "Color.h"
 #include "GeometricRoutines.h"
-#include "IntersectionInfo.h"
-#include "Ray.h"
 #include "Random.h"
-#include "Texture.h"
-#include <Windows.h>
-#include <math.h>
-#include "Random.h"
-#include "Sample.h"
+#include "Material.h"
 
-class Ray;
+class Light;
+class Sample;
+class Vector3d;
 
 class DielectricMaterial : public Material
 {

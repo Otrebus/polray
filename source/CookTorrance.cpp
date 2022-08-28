@@ -2,6 +2,10 @@
 #include <sstream>
 #include "Bytestream.h"
 #include "CookTorrance.h"
+#include "Sample.h"
+#include "IntersectionInfo.h"
+#include "Utils.h"
+#include "GeometricRoutines.h"
 
 
 CookTorrance::CookTorrance()
@@ -38,9 +42,9 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
     //float df = Kd.GetMax();
     //float sp = Ks.GetMax();
 
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
-    Vector3d in = -info.GetDirection();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
+    Vector3d in = -info.direction;
 
     if(in*N_g < 0)
         N_g = -N_g;
@@ -69,9 +73,9 @@ Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int)
     //float df = Kd.GetMax();
     //float sp = Ks.GetMax();
 
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
-    Vector3d in = -info.GetDirection();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
+    Vector3d in = -info.direction;
 
     auto h = ((in+out)/2).Normalized();
 
@@ -123,9 +127,9 @@ double CookTorrance::PDF(const IntersectionInfo& info, const Vector3d& out, bool
 {
     assert(component == 1);
 
-    Vector3d N_s = info.GetNormal();
-    Vector3d N_g = info.GetGeometricNormal();
-    const Vector3d& in = -info.GetDirection();
+    Vector3d N_s = info.normal;
+    Vector3d N_g = info.geometricnormal;
+    const Vector3d& in = -info.direction;
 
     if(in*N_g < 0)
         N_g = -N_g;

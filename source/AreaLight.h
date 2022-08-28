@@ -1,14 +1,13 @@
 #pragma once
 
-#define NOMINMAX
 #include "Light.h"
-#include "Ray.h"
 #include "Random.h"
-#include <memory>
+#include "Vector3d.h"
 
 class Renderer;
 class Scene;
 class EmissiveMaterial;
+class Ray;
 
 class AreaLight : public Light
 {
@@ -39,4 +38,3 @@ protected:
     Vector3d pos, c1, c2;
     mutable Random r;
 };
-

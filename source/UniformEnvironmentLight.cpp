@@ -127,17 +127,17 @@ void UniformEnvironmentLight::Load(Bytestream& s)
 Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
 {
     auto [lightPoint, lightNormal] = SamplePoint();
-    auto toLight = lightPoint - info.GetPosition();
-    Ray lightRay = Ray(info.GetPosition(), toLight);
+    auto toLight = lightPoint - info.position;
+    Ray lightRay = Ray(info.position, toLight);
     double d = toLight.Length()*(1.-1.e-6);
     toLight.Normalize();
 
     if(renderer->TraceShadowRay(lightRay, d))
     {
-        double cosphi = abs(info.GetNormal()*toLight);
+        double cosphi = abs(info.normal*toLight);
         double costheta = abs(toLight*lightNormal);
         Color c;
-        Material* mat = info.GetMaterial();
+        Material* mat = info.material;
         c = mat->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d);
         lp = lightPoint;
         ln = lightNormal;

@@ -5,12 +5,11 @@
 #include "LambertianMaterial.h"
 #include "MirrorMaterial.h"
 #include "PhongMaterial.h"
+#include "Bytestream.h"
 
-int Material::highestId = 0;
 
 Material::Material()
 {
-    id = highestId++;
     texture = 0;
     normalmap = 0;
     light = 0;
@@ -26,7 +25,6 @@ Material::~Material()
 
 Material* Material::Create(unsigned char id)
 {
-    // This is sort of unaesthetic
     switch(id)
     {
     case ID_LAMBERTIANMATERIAL:

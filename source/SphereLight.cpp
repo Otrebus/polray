@@ -1,4 +1,3 @@
-#define NOMINMAX
 #include "Bytestream.h"
 #include "EmissiveMaterial.h"
 #include "GeometricRoutines.h"
@@ -118,17 +117,17 @@ void SphereLight::AddToScene(Scene* scn)
 Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
 {
     Vector3d lightPoint, lightNormal;
-    Vector3d toLight = position_ - info.GetPosition();
-    Vector3d normal = info.GetNormal();
+    Vector3d toLight = position_ - info.position;
+    Vector3d normal = info.normal;
     toLight.Normalize();
     SamplePointHemisphere(-toLight, lightPoint, lightNormal);
     lightPoint = lightPoint + lightNormal*eps;
     lp = lightPoint;
     ln = lightNormal;
-    toLight = lightPoint - info.GetPosition();
+    toLight = lightPoint - info.position;
     double d = toLight.Length();
     toLight.Normalize();
-    Ray lightRay = Ray(info.GetPosition(), toLight);
+    Ray lightRay = Ray(info.position, toLight);
 
     if(toLight*lightNormal < 0)
     {
@@ -137,8 +136,7 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
             Color c;
-            c = info.GetMaterial()->BRDF(info, toLight, component)
-                *costheta*cosphi*intensity_*GetArea()/(2*d*d);
+            c = info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(2*d*d);
             return c;
         }
     }

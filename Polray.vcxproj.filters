@@ -221,9 +221,6 @@
     <ClCompile Include="source\ColorBuffer.cpp">
       <Filter>Source Files\Spectral</Filter>
     </ClCompile>
-    <ClCompile Include="source\Sample.cpp">
-      <Filter>Source Files\Spectral</Filter>
-    </ClCompile>
     <ClCompile Include="source\Texture.cpp">
       <Filter>Source Files\Spectral</Filter>
     </ClCompile>
@@ -241,6 +238,9 @@
     </ClCompile>
     <ClCompile Include="source\MeanEstimator.cpp">
       <Filter>Source Files\Renderers</Filter>
+    </ClCompile>
+    <ClCompile Include="source\Sample.cpp">
+      <Filter>Source Files\Materials</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -415,9 +415,6 @@
     <ClInclude Include="source\ColorBuffer.h">
       <Filter>Source Files\Spectral</Filter>
     </ClInclude>
-    <ClInclude Include="source\Sample.h">
-      <Filter>Source Files\Spectral</Filter>
-    </ClInclude>
     <ClInclude Include="source\Texture.h">
       <Filter>Source Files\Spectral</Filter>
     </ClInclude>
@@ -435,6 +432,9 @@
     </ClInclude>
     <ClInclude Include="source\MeanEstimator.h">
       <Filter>Source Files\Renderers</Filter>
+    </ClInclude>
+    <ClInclude Include="source\Sample.h">
+      <Filter>Source Files\Materials</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

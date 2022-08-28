@@ -1,5 +1,6 @@
 #include "BrutePartitioning.h"
 #include "Utils.h"
+#include "Primitive.h"
 
 void BrutePartitioning::Build(const std::vector<const Primitive*>& shapes)
 {

@@ -1,11 +1,10 @@
 #pragma once
 
 #define NOMINMAX
-#include <type_traits>
+
 #include <string>
 #include <unordered_set>
 #include <Windows.h>
-#include "EnvironmentLight.h"
 #include "Renderer.h"
 #include "Camera.h"
 #include "TriangleMesh.h"
@@ -26,13 +25,6 @@
 #include "AreaLight.h"
 #include "MeshLight.h"
 #include "LightPortal.h"
-
-class MeshLight;
-class UniformEnvironmentLight;
-class EnvironmentLight;
-class SphereLight;
-class Light;
-class KDTree;
 
 class Scene : public std::enable_shared_from_this<Scene>
 {

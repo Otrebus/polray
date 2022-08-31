@@ -100,7 +100,7 @@ void KDNode::Build()
 {
 }
 
-BoundingBox KDTree::CalculateExtents(std::vector<const Primitive*>& shapes)
+BoundingBox KDTree::CalculateExtents(const std::vector<const Primitive*>& shapes)
 {
     double maxx = -inf, maxy = -inf, maxz = -inf, minx = inf, miny = inf, minz = inf;
 
@@ -139,7 +139,7 @@ bool KDNode::IsLeaf() const
     //return m_isLeaf;
 }
 
-void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* events, std::vector<const Primitive*>& shapes, int depth, int badsplits)
+void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* events, const std::vector<const Primitive*>& shapes, int depth, int badsplits)
 {
     if(depth > 20 || shapes.size() < 4) // TODO: fix
     {
@@ -503,7 +503,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
 //------------------------------------------------------------------------------
 // Builds a KD-Tree from the supplied vector of primitives
 //------------------------------------------------------------------------------
-void KDTree::Build(std::vector<const Primitive*> shapes)
+void KDTree::Build(const std::vector<const Primitive*>& shapes)
 {
     m_root = new KDNode();
     m_bbox = CalculateExtents(shapes);

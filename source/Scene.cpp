@@ -22,6 +22,8 @@ Scene::Scene()
 Scene::Scene(std::string f)
 {
 	auto [success, mesh, lghts] = ReadFromFile(f, 0);
+    if(!success)
+        __debugbreak();
 	AddModel(mesh);
     for(auto light : lghts)
         AddLight(light);

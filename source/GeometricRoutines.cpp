@@ -104,27 +104,27 @@ double IntersectSphere(const Vector3d& position, double radius, const Ray& ray)
 std::tuple<double, double, double> IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d& v2, const Ray& ray)
 {
     double u, v, t;
-	const Vector3d& D = ray.direction;
+    const Vector3d& D = ray.direction;
 
-	Vector3d E1 = v1-v0, E2 = v2-v0;
-	Vector3d T = ray.origin - v0;
+    Vector3d E1 = v1-v0, E2 = v2-v0;
+    Vector3d T = ray.origin - v0;
 
-	Vector3d P = E2^T, Q = E1^D;
+    Vector3d P = E2^T, Q = E1^D;
 
-	double det = E2*Q;
-	if(!det)
+    double det = E2*Q;
+    if(!det)
         return { -inf, -inf, -inf };
-	u = ray.direction*P/det;
+    u = ray.direction*P/det;
 
-	if(u > 1 || u < 0)
-        return { -inf, -inf, -inf };
-
-	v = T*Q/det;
-
-	if(u+v > 1 || u < 0 || v < 0)
+    if(u > 1 || u < 0)
         return { -inf, -inf, -inf };
 
-	t = E1*P/det;
+    v = T*Q/det;
+
+    if(u+v > 1 || u < 0 || v < 0)
+        return { -inf, -inf, -inf };
+
+    t = E1*P/det;
 
     return { t <= 0 ? -inf : t, u, v };
 }

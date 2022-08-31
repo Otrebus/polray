@@ -1,8 +1,7 @@
+Detabify
 ctrl-F This could also be a hash table, for very large triangle meshes
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Replace debugbreaks with better error messages
-Add physical camera to bdpt
-Add light source resampling to BDPT
 ctrl-F 14 years later
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
@@ -12,9 +11,11 @@ Make TraceShadowRay account for light portals
 Unhardcode light area sampling in light portal
 Think of a better way of dealing with epsilons - account for numerical errors etc
 (mostly for "fun") Make light portals work inside scenes
-Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
 Add check that all primitives have materials, in scene
 Implement multiple importance sampling for light portals
+Add physical camera to bdpt
+Add light source resampling to BDPT
+- Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
 - Make various functions return a tuple instead of taking output parameters
 - Rename various functions from GetBlahBlahBlah to just blah
 - Make Sphere use IntersectSphere in its intersect/generateintersectioninfo functions

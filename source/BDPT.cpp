@@ -70,11 +70,10 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
 
     while(path.size() < 3 || m_random.GetDouble(0.f, 1.f) < rr) {
         BDVertex* lastV = path.back();
-        double lastPdf = lastV->sample.pdf;
-        auto lastSample = lastV->sample.color;
 
         const Primitive* hitPrimitive;
         const Light* hitLight;
+
         auto t = scene->Intersect(lastV->out, hitPrimitive, hitLight);
         if(t < 0)
             break;
@@ -85,16 +84,15 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         else
             hitLight->GenerateIntersectionInfo(lastV->out, info);
 
-        BDVertex* newV = new BDVertex();
-        newV->info = info;
         Vector3d v = (info.position - lastV->out.origin);
         double lSqr = v.Length2();
         v.Normalize();
-        newV->pdf = lastPdf*(abs(info.geometricnormal*info.direction))/(lSqr);
-        newV->alpha = lastV->alpha*lastSample;
-        Material* mat = info.material;
 
-        newV->sample = mat->GetSample(info, lightPath);
+        BDVertex* newV = new BDVertex();
+        newV->info = info;
+        newV->pdf = lastV->sample.pdf*(abs(info.geometricnormal*info.direction))/(lSqr);
+        newV->alpha = lastV->alpha*lastV->sample.color;
+        newV->sample = info.material->GetSample(info, lightPath);
         newV->out = newV->sample.outRay;
         newV->specular = newV->sample.specular;
 
@@ -103,13 +101,12 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         rr = 0.7;
 
         if(!lightPath) {
-            if(!newV->alpha && hitLight != light)
+            if(!newV->alpha || hitLight && hitLight != light)
             {
                 delete newV;
                 return (int) path.size();
             }
 
-            lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
             path.push_back(newV);
 
             if(hitLight == light)
@@ -118,6 +115,8 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
                 samples.push_back(BDSample(0, (int) path.size()));
                 return (int) path.size() - 1;
             }
+            else
+                lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
         } else {
             if(!newV->sample.color)
             {

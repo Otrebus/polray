@@ -44,11 +44,11 @@ public:
     KDNode* m_root;
     KDTree();
     ~KDTree();
-    void Build(std::vector<const Primitive*>);
+    void Build(const std::vector<const Primitive*>&);
     double Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive) const;
-    BoundingBox CalculateExtents(std::vector<const Primitive*>& primitives);
+    BoundingBox CalculateExtents(const std::vector<const Primitive*>& primitives);
     
-    void BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* events, std::vector<const Primitive*>& primitives, int depth, int badsplits);
+    void BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* events, const std::vector<const Primitive*>& primitives, int depth, int badsplits);
 
     BoundingBox m_bbox;
 

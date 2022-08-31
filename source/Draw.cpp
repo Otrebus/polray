@@ -43,7 +43,7 @@
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
 
-//#define INTERIOR
+#define INTERIOR
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
@@ -51,7 +51,7 @@
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-#define KITCHEN2
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -167,7 +167,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     Vector3d target = Vector3d(157, 159, -209);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
-    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).GetLength(), 10.15));
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).Length(), 10.15));
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
 
@@ -1559,6 +1559,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->AddLight(boxLight);
 
     r = std::shared_ptr<BDPT>(new BDPT(s));
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
 #endif
 #ifdef BALLBOX
 

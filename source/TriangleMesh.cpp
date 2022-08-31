@@ -80,6 +80,8 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
 TriangleMesh::TriangleMesh(const std::string& file, Material* mat)
 {
 	auto [success, mesh, meshLights] = ReadFromFile(file, mat);
+    if(!success)
+        __debugbreak();
 	*this = *mesh;
 }
 

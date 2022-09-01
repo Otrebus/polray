@@ -166,59 +166,137 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
     return true;
 }
 
+class Token
+{
+public:
+    enum Type { String, Number, Operator, Newline, Eof };
+
+    Token(Type t, std::string s="") : type(t), str(s)
+    {
+    }
+
+    bool operator==(const Token& token)
+    {
+        return type == token.type && str == token.str;
+    }
+
+    bool operator!=(const Token& token)
+    {
+        return !(*this == token);
+    }
+
+    Type type;
+    std::string str;
+};
+
+
+std::vector<Token> tokenize(std::string str)
+{
+    int p = 0;
+
+    std::vector<Token> v;
+
+    auto skipspace = [&p, &str] ()
+    {
+        while(p < str.length() && str[p] == ' ' || str[p] == '\t')
+            p++;
+    };
+
+    auto peek = [&p, &str, &skipspace] () -> char
+    {
+        return p < str.size() ? str[p] : 0;
+    };
+
+    auto next = [&p, &str, &skipspace] () -> char
+    {
+        return p < str.size() ? str[p++] : 0;
+    };
+
+    auto accept = [&p, &str, &skipspace] (char c) -> bool
+    {
+        return (p < str.size() && str[p] == c) ? ++ p : false;
+    };
+
+    while(p < str.size())
+    {
+        skipspace();
+        if(accept('/'))
+            v.push_back(Token(Token::Operator, "/"));
+        if(peek() == '-' || peek() == '.' || std::isdigit(peek()))
+        {
+            std::string s;
+            while(std::isdigit(peek()) || peek() == '.' || peek() == 'e' || peek() == 'E' || peek() == '+' || peek() == '-')
+                s += next();
+
+            std::stringstream ss(s);
+            double d;
+            ss >> d;
+            if(ss.fail())
+            {
+                // TODO: fail the tokenizer somehow
+                __debugbreak();
+            }
+            v.push_back(Token(Token::Number, s));
+        }
+        if(std::isalpha(peek()))
+        {
+            std::string s;
+            while(!std::isspace(peek()))
+                s += next();
+            v.push_back(Token(Token::String, s));
+        }
+        if(peek() == '\n' || peek() == '\r')
+        {
+            while(accept('\n') || accept('\r'));
+            v.push_back(Token(Token::Newline, "\n"));
+        }
+    }
+    v.push_back(Token(Token::Eof, ""));
+    return v;
+}
+
 class Parser
 {
 public:
-    Parser(std::string* file)
+
+    Parser(std::vector<Token> tokens) : tokens(tokens)
     {
-        str = file;
     }
 
-    char peek()
+    Token peek()
     {
-        return p < str->size() ? (*str)[p] : 0;
+        return p < tokens.size() ? tokens[p] : Token(Token::Eof);
     }
 
-    char next()
+    Token next()
     {
-        return p < str->size() ? (*str)[p++] : 0;
+        return p < tokens.size() ? tokens[p++] : Token(Token::Eof);
     }
 
     bool accept(std::string s)
     {
-        skipspace();
-        if(str->substr(p, s.size()) == s)
-        {
-            p += s.size();
-            return true;
-        }
-        return false;
+        if(p >= tokens.size())
+            return false;
+        
+        return tokens[p].str == s ? ++p : false;
     }
 
-    bool accept(char c)
+    bool accept(const Token& token)
     {
-        skipspace();
-        return (p < str->size() && (*str)[p] == c) ? ++ p : false;
+        return tokens[p] == token ? ++p : false;
+    }
+
+    bool accept(Token::Type t)
+    {
+        return tokens[p].type == t ? ++p : false;
     }
 
     bool eof()
     {
-        return p == (*str).size();
+        return p == tokens.size();
     }
 
-    void skipspace()
-    {
-        while(p < str->length() && (*str)[p] == ' ' || (*str)[p] == '\t')
-            p++;
-    }
-
-    void skipws()
-    {
-        while(p < str->length() && std::isspace((*str)[p]))
-            p++;
-    }
-
-    std::string* str;
+    std::vector<Token> tokens;
     int p;
 };
 
@@ -244,61 +322,48 @@ struct MeshData
 
 std::tuple<bool, std::string> parseStr(Parser& parser)
 {
-    parser.skipspace();
+    if(parser.peek().type != Token::String)
+        return { false, "" };
 
-    std::string str;
-    while(!parser.eof() && !std::isspace(parser.peek()))
-        str += parser.next();
-
-    if(str.empty())
-        return { false, str };
-    return { true, str };
+    return { true, parser.next().str };
 }
 
 std::tuple<bool, int> parseInt(Parser& parser)
 {
-    parser.skipspace();
-
-
-    auto [success, str] = parseStr(parser);
-    if(!success)
+    if(parser.peek().type != Token::Number)
         return { false, 0 };
 
-    std::stringstream ss(str);
-    int d;
+    int d = 0;
+    std::stringstream ss(parser.next().str);
     ss >> d;
 
-    return { !ss.fail(), d };
+    return { true, d };
 }
 
 std::tuple<bool, double> parseDouble(Parser& parser)
 {
-    parser.skipspace();
-
-    auto [success, str] = parseStr(parser);
-    if(!success)
+    if(parser.peek().type != Token::Number)
         return { false, 0 };
 
-    std::stringstream ss(str);
-    double d;
+    double d = 0;
+    std::stringstream ss(parser.next().str);
     ss >> d;
 
-    return { !ss.fail(), d };
+    return { true, d };
 }
 
 std::tuple<bool, int, int, int> parseVertex(Parser& parser)
 {
-    parser.skipspace();
     int n1, n2, n3;
     auto [success, x] = parseInt(parser);
     n1 = x;
     if(!success)
         return { false, 0, 0, 0 };
     
-    if(!parser.accept('/'))
+    if(!parser.accept("/")) // Format is x
         return { true, n1, 0, 0 };
 
-    if(parser.accept('/')) {
+    if(parser.accept("/")) { // Format is x//y
         auto [success, x] = parseInt(parser);
         n2 = x;
         if(!success)
@@ -311,7 +376,7 @@ std::tuple<bool, int, int, int> parseVertex(Parser& parser)
     if(!success2)
         return { false, n1, 0, 0 };
 
-    if(!parser.accept('/'))
+    if(!parser.accept("/"))
         return { true, n1, n2, 0 };
 
     auto [success3, z] = parseInt(parser);
@@ -324,7 +389,6 @@ std::tuple<bool, int, int, int> parseVertex(Parser& parser)
 
 std::tuple<bool, Vector3d> parseCoordinate3d(Parser& parser)
 {
-    parser.skipspace();
     double arr[3];
     for(int i = 0; i < 3; i++) {
         auto [success, d] = parseDouble(parser);
@@ -337,7 +401,6 @@ std::tuple<bool, Vector3d> parseCoordinate3d(Parser& parser)
 
 std::tuple<bool, Vector3d> parseVtCoordinate(Parser& parser)
 {
-    parser.skipspace();
     double arr[3] = { 0, 0, 0 };
     for(int i = 0; i < 3; i++) {
         auto [success, d] = parseDouble(parser);
@@ -371,6 +434,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> _ReadFromFile(std::stri
         str += strs[0] + '\n';
     }
 
+
     MeshData meshData;
     meshData.mesh = new TriangleMesh();
 
@@ -385,19 +449,17 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> _ReadFromFile(std::stri
     bool isLightMesh = false;
     std::unordered_map<MeshVertex*, Vertex3d*> replacement;
 
-    Parser parser(&str);
+    Parser parser(tokenize(str));
 
-    while(parser.peek())
+    while(true)
     {
-        parser.skipws();
+        while(parser.accept(Token::Newline));
 
         if(parser.accept("f"))
         {
             std::vector<MeshVertex*> face;
             std::vector<int> ns;
             std::vector<int> ts;
-
-            std::string s1, s2, s3;
 
             while(true)
             {
@@ -481,7 +543,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> _ReadFromFile(std::stri
                     tri->SetMaterial(meshMat);
             }
         }
-        else if(parser.accept('g'))
+        else if(parser.accept("g"))
         {   
             int names = 0;
             while(true) {
@@ -609,16 +671,20 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> _ReadFromFile(std::stri
             }
             //meshData.normals.push_back(normal);
         }
-        else if(parser.accept('s')) // Smoothing group ending or starting
+        else if(parser.accept("s")) // Smoothing group ending or starting
         {
             auto [success, s1] = parseStr(parser);
-            if(!success) {
-                __debugbreak();
-                return { false, nullptr, {} };
+            if(success) {
+                normalInterp = s1 != "off";
+            } else {
+                auto [success, s1] = parseInt(parser);
+                if(!success)
+                    __debugbreak();
+                normalInterp = s1 != 0;
             }
-            normalInterp = (s1 != "off" && s1 != "0");
+            
         }
-        else if(parser.accept('v'))
+        else if(parser.accept("v"))
         {
             auto [success, coord] = parseCoordinate3d(parser);
             meshData.vectors.push_back(new MeshVertex((coord)));
@@ -646,10 +712,10 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> _ReadFromFile(std::stri
                 curmat = meshData.materials[mtl];
             }
         }
-        else if(parser.eof())
+        else if(parser.accept(Token::Newline));
+        else if(parser.accept(Token::Eof))
             break;
         else {
-            auto str = parser.str->substr(parser.p-20, 40);
             __debugbreak();
             return { false, nullptr, {} };
         }

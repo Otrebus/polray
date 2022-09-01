@@ -43,7 +43,7 @@
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
 
-#define INTERIOR
+//#define INTERIOR
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
@@ -233,7 +233,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->SetPartitioning(new BrutePartitioning());
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef INTERIORSKY
     auto s = std::shared_ptr<Scene> (new Scene("interior-open.obj"));

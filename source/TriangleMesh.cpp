@@ -58,8 +58,9 @@ double MeshTriangle::Intersect(const Ray& ray) const
 bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
 	auto [t, u, v] = IntersectTriangle(v0->pos, v1->pos, v2->pos, ray);
-	if(t < eps)
+	if(t < 0)
         return false;
+
 	Vector3d E1 = v1->pos-v0->pos, E2 = v2->pos-v0->pos;
 
 	info.direction = ray.direction;

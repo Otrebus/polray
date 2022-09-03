@@ -38,6 +38,8 @@ double Triangle::Intersect(const Ray& ray) const
 bool Triangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
     auto [t, u, v] = IntersectTriangle(v0.pos, v1.pos, v2.pos, ray);
+    if(t < 0)
+        return false;
     
     info.direction = ray.direction;
 

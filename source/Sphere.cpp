@@ -33,7 +33,7 @@ double Sphere::Intersect(const Ray& ray) const
 bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
     double t = IntersectSphere(position, radius, ray);
-    if(t < eps)
+    if(t < 0)
         return false;
 
     info.direction = ray.direction;

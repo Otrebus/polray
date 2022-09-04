@@ -12,3 +12,10 @@ std::vector<std::string> split(const std::string& s, char delim)
     }
     return ret;
 }
+
+std::string lower(const std::string& s)
+{
+    std::string ret(s.begin(), s.end());
+    std::transform(ret.begin(), ret.end(), ret.begin(), [](char a) { return (char) tolower(a); });
+    return ret;
+}

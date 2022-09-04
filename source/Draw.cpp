@@ -43,7 +43,9 @@
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
 
-#define INTERIOR
+//#define INTERIOR
+//#define CUBE
+//#define TEAPOTWITHOUTNORMALS
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
@@ -51,7 +53,7 @@
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-//#define KITCHEN2
+#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -234,6 +236,156 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
     r = std::shared_ptr<BDPT>(new BDPT(s));
+#endif
+#ifdef CUBE
+    auto s = std::shared_ptr<Scene> (new Scene("cube.obj"));
+
+    Vector3d camPos = Vector3d(2, 2, 2);
+    Vector3d target = Vector3d(0, 0, 0);
+    Vector3d camdir = target-camPos;
+    camdir.Normalize();
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).Length(), 10.15));
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+
+
+    // tmp
+    //Vector3d camPos = Vector3d(-43.9, 293.8, 43);
+    //Vector3d target = Vector3d(8.6, 230, -301);
+    ///*Vector3d camPos = Vector3d(-150, 184, -760);
+    //Vector3d target = Vector3d(-119, 139, -914);*/
+    //Vector3d camdir = target-camPos;
+    //camdir.Normalize();
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
+
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
+
+    //auto portalLight = new AreaLight(Vector3d(-79, 387, 263), Vector3d(0, 15.0, 0.0), Vector3d(0.0, 0.0, 15.0), Color(7500, 7500, 7500));
+    //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));
+    //auto portalLight = new SphereLight(Vector3d(3854, 1750, -1770), 30.11, Color(5000000, 5000000, 5000000));
+
+    //auto boxLight = new SphereLight(Vector3d(3854, 1750, -1770)*100, 550.11, Color(50000000, 50000000, 50000000));
+
+    //////
+    LightPortal* portalLight = new LightPortal();
+    portalLight->AddPortal(Vector3d(500, 800, -1050), Vector3d(0, -800, 0), Vector3d(0, 0, 1600));
+    auto boxLight = new AreaLight(Vector3d(3854, 1750, -1770)*100, Vector3d(0.0, 0.0, 5050), Vector3d(0.0, 5050, 0.0), Color(130000000/25, 130000000/25, 130000000/25));
+    portalLight->SetLight(boxLight);
+    s->AddLight(portalLight);
+    ////
+    /*auto boxLight = new SphereLight(Vector3d(-43.9, 292, 43.4), 1.11, Color(500000, 500000, 500000));
+    boxLight->AddToScene(s);
+
+    s->AddLight(boxLight);*/
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.9, 0.9, 0.9);
+    //a->Kd = Color(0.0, 0.0, 0.0);
+    //a->alpha = 20;
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.5, 0.5, 0.5);
+    //a->Kd = Color(0.5, 0.5, 0.5);
+    //a->alpha = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0, 0, 0);
+    //a->Rs = Color(0.85, 0.85, 0.85);
+    //a->n = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0.85, 0.85, 0.85);
+    //a->Rs = Color(0, 0, 0);
+    /*a->Rd = Color(0, 0, 0);
+    a->Rs = Color(0.85, 0.85, 0.85);
+    a->n = 1;*/
+
+    /*auto a = new PhongMaterial();
+    a->Ks = Color(0.5, 0.5, 0.5);
+    a->Kd = Color(0, 0, 0);
+    a->alpha = 0;*/
+
+    //s->SetPartitioning(new BrutePartitioning());
+
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
+    r = std::shared_ptr<RayTracer>(new RayTracer(s));
+#endif
+#ifdef TEAPOTWITHOUTNORMALS
+    auto s = std::shared_ptr<Scene> (new Scene("teapotwithoutnormals.obj"));
+
+    Vector3d camPos = Vector3d(30, -30, 30);
+    Vector3d target = Vector3d(0, 0, 0);
+    Vector3d camdir = target-camPos;
+    camdir.Normalize();
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).Length(), 10.15));
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+
+
+    // tmp
+    //Vector3d camPos = Vector3d(-43.9, 293.8, 43);
+    //Vector3d target = Vector3d(8.6, 230, -301);
+    ///*Vector3d camPos = Vector3d(-150, 184, -760);
+    //Vector3d target = Vector3d(-119, 139, -914);*/
+    //Vector3d camdir = target-camPos;
+    //camdir.Normalize();
+    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
+
+    Random ballsR(47);
+    Random test(1);
+
+    Random ballsC(0);
+
+    //auto portalLight = new AreaLight(Vector3d(-79, 387, 263), Vector3d(0, 15.0, 0.0), Vector3d(0.0, 0.0, 15.0), Color(7500, 7500, 7500));
+    //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));
+    //auto portalLight = new SphereLight(Vector3d(3854, 1750, -1770), 30.11, Color(5000000, 5000000, 5000000));
+
+    //auto boxLight = new SphereLight(Vector3d(3854, 1750, -1770)*100, 550.11, Color(50000000, 50000000, 50000000));
+
+    //////
+    LightPortal* portalLight = new LightPortal();
+    portalLight->AddPortal(Vector3d(500, 800, -1050), Vector3d(0, -800, 0), Vector3d(0, 0, 1600));
+    auto boxLight = new AreaLight(Vector3d(3854, 1750, -1770)*100, Vector3d(0.0, 0.0, 5050), Vector3d(0.0, 5050, 0.0), Color(130000000/25, 130000000/25, 130000000/25));
+    portalLight->SetLight(boxLight);
+    s->AddLight(portalLight);
+    ////
+    /*auto boxLight = new SphereLight(Vector3d(-43.9, 292, 43.4), 1.11, Color(500000, 500000, 500000));
+    boxLight->AddToScene(s);
+
+    s->AddLight(boxLight);*/
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.9, 0.9, 0.9);
+    //a->Kd = Color(0.0, 0.0, 0.0);
+    //a->alpha = 20;
+
+    //auto a = new PhongMaterial();
+    //a->Ks = Color(0.5, 0.5, 0.5);
+    //a->Kd = Color(0.5, 0.5, 0.5);
+    //a->alpha = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0, 0, 0);
+    //a->Rs = Color(0.85, 0.85, 0.85);
+    //a->n = 20;
+
+    //auto a = new AshikhminShirley();
+    //a->Rd = Color(0.85, 0.85, 0.85);
+    //a->Rs = Color(0, 0, 0);
+    /*a->Rd = Color(0, 0, 0);
+    a->Rs = Color(0.85, 0.85, 0.85);
+    a->n = 1;*/
+
+    /*auto a = new PhongMaterial();
+    a->Ks = Color(0.5, 0.5, 0.5);
+    a->Kd = Color(0, 0, 0);
+    a->alpha = 0;*/
+
+    //s->SetPartitioning(new BrutePartitioning());
+
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
+    r = std::shared_ptr<RayTracer>(new RayTracer(s));
 #endif
 #ifdef INTERIORSKY
     auto s = std::shared_ptr<Scene> (new Scene("interior-open.obj"));
@@ -694,7 +846,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->SetPartitioning(new BrutePartitioning());
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<RayTracer>(new RayTracer(s));
 #endif
 
 #ifdef WINDOWBOX
@@ -1314,7 +1466,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
-    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
     Vector3d camPos = Vector3d(0, 1.1, 3);
@@ -1402,7 +1554,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->AddLight(boxLight);
 
     e = std::shared_ptr<MonEstimator>(new MonEstimator(XRES, YRES));
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef MESHLIGHTBOX
 

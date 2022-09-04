@@ -7,6 +7,7 @@
 class Vector3d;
 
 std::vector<std::string> split(const std::string& s, char delim);
+std::string lower(const std::string& s);
 
 const double inf = std::numeric_limits<double>::infinity();
 const double pi = 3.141592653589793238462643383279502884;

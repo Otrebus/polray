@@ -14,159 +14,6 @@
 #include <set>
 #include <unordered_map>
 
-bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& materials)
-{
-    std::ifstream matfile;
-
-    matfile.open(matfilestr.c_str(), std::ios::out);
-
-    if(matfile.fail())
-    {
-        matfile.close();
-        return false;
-    }
-
-    TriangleMesh mesh;
-
-    Material* curmat = 0;
-    PhongMaterial* phongmat = 0;
-    std::string matName;
-    bool phong = false, emissive = false;
-    while(!matfile.eof())
-    {
-        std::string line, a;
-        std::getline(matfile, line);
-        std::stringstream ss(line); // Read one line at a time into a stringstream
-        ss >> a;               // and parse it
-
-        std::transform(a.begin(), a.end(), a.begin(), [](char a) { return (char) tolower(a); });
-
-        if(a.length() && a[0] == '#')
-            continue;
-        if(a == "newmtl")
-        {
-            std::string b;
-            ss >> matName;
-            if(!ss)
-                __debugbreak();
-            ss >> b;
-            if(b == ":") // We expect a special material definition to follow
-            {
-                std::stringstream arg;
-                ss >> b;
-                if(!ss)
-                    __debugbreak();
-                transform(b.begin(), b.end(), b.begin(), [](char b) { return (char) tolower(b); });
-                if(b == "emissive")
-                    curmat = new EmissiveMaterial;
-                else if(b == "lambertian")
-                    curmat = new LambertianMaterial;
-                else if(b == "mirror")
-                    curmat = new MirrorMaterial;
-                else if(b == "phong")
-                    curmat = new PhongMaterial;
-                else if(b == "dielectric")
-                    curmat = new DielectricMaterial;
-                else if(b == "ashikhminshirley")
-                    curmat = new AshikhminShirley;
-                while(!matfile.eof())
-                {
-                    std::string line2, s;
-                    std::getline(matfile, line2);
-                    std::stringstream ss2(line2);
-                    ss2 >> s;
-                    if(s == "{")
-                        break;
-                    else if(s == "")
-                        continue;
-                    else
-                        __debugbreak();
-                }
-                while(!matfile.eof())
-                {
-                    std::string s;
-                    std::getline(matfile, s);
-                    s += "\n";
-                    if(s[0] == '}')
-                        break;
-                    arg << s;
-                }
-                materials[matName] = curmat;
-                curmat->ReadProperties(arg);
-            }
-            else
-            {
-                curmat = new PhongMaterial;
-                materials[matName] = curmat;
-                phong = true;
-            }
-        }
-
-        else if(a == "ka")
-        {
-            double dummy;
-            ss >> dummy >> dummy >> dummy;
-            if(!curmat)
-                __debugbreak();
-            if(phong)
-            {
-                phongmat = (PhongMaterial*) curmat;
-                ss >> phongmat->Ka.r >> phongmat->Ka.g >> phongmat->Ka.b;
-            } else if(!emissive)
-                __debugbreak();
-        }
-        else if(a == "kd")
-        {
-            if(!curmat)
-                __debugbreak();
-            if(phong)
-            {
-                phongmat = (PhongMaterial*) curmat;
-                ss >> phongmat->Kd.r >> phongmat->Kd.g >> phongmat->Kd.b;
-            }
-            else if(!emissive)
-                __debugbreak();
-        }
-        else if(a == "ks")
-        {
-            if(!curmat)
-                __debugbreak();
-            if(phong)
-            {
-                phongmat = (PhongMaterial*) curmat;
-                ss >> phongmat->Ks.r >> phongmat->Ks.g >> phongmat->Ks.b;
-            } else if(!emissive)
-                __debugbreak();
-        }
-        else if(a == "ns")
-        {
-            if(!curmat)
-                __debugbreak();
-            if(phong)
-            {
-                phongmat = (PhongMaterial*) curmat;
-                ss >> phongmat->alpha;
-            }
-            else if(!emissive)
-                __debugbreak();
-        }
-        else if(a == "ke") 
-        {
-            Color intensity;
-            ss >> intensity.r >> intensity.g >> intensity.b;
-            if(intensity) {
-                phong = false;
-                emissive = true;
-                delete curmat;
-                MeshLight* ml = new MeshLight(intensity);
-                curmat = ml->material;
-                materials[matName] = curmat;
-            }
-        }
-    }
-    return true;
-}
-
 class Token
 {
 public:
@@ -206,8 +53,200 @@ struct ParseException
     std::string message;
 };
 
-std::vector<Token> tokenize(std::string str)
+class Parser
 {
+public:
+    Parser(std::vector<Token> tokens) : tokens(tokens)
+    {
+    }
+
+    Token peek()
+    {
+        return p < tokens.size() ? tokens[p] : Token(Token::Eof);
+    }
+
+    Token next()
+    {
+        return p < tokens.size() ? tokens[p++] : Token(Token::Eof);
+    }
+
+    bool accept(std::string s)
+    {
+        return p < tokens.size() && tokens[p].str == s ? ++p : false;
+    }
+
+    bool accept(const Token& token)
+    {
+        return p < tokens.size() && tokens[p] == token ? ++p : false;
+    }
+
+    bool accept(Token::Type t)
+    {
+        return p < tokens.size() && tokens[p].type == t ? ++p : false;
+    }
+
+    bool expect(Token::Type t)
+    {
+        if(p >= tokens.size() || tokens[p].type != t)
+            throw ParseException("Expected: "); // TODO: add type to string conversion
+        p++;
+        return true;
+    }
+
+    bool expect(const Token& token)
+    {
+        if(p >= tokens.size() || tokens[p] != token)
+            throw ParseException("Expected: "); // TODO: add type to string conversion
+        p++;
+        return true;
+    }
+
+    bool eof()
+    {
+        return p == tokens.size();
+    }
+
+    std::vector<Token> tokens;
+    int p;
+};
+
+std::tuple<bool, std::string> acceptStr(Parser& parser)
+{
+    if(parser.peek().type != Token::String)
+        return { false, "" };
+
+    return { true, parser.next().str };
+}
+
+bool acceptAnyCaseStr(Parser& parser, std::string str)
+{
+    if(parser.peek().type != Token::String || lower(parser.peek().str) != str)
+        return false;
+    parser.next();
+    return true;
+}
+
+std::string expectStr(Parser& parser)
+{
+    if(parser.peek().type != Token::String)
+        throw ParseException("Alphanumeric string expected");
+    return parser.next().str;
+}
+
+int expectInt(Parser& parser)
+{
+    if(parser.peek().type != Token::Number)
+        throw ParseException("Integer expected", parser.peek().line, parser.peek().column);
+
+    int d = 0;
+    std::stringstream ss(parser.next().str);
+    ss >> d;
+    if(ss.fail())
+        throw ParseException("Integer expected", parser.peek().line, parser.peek().column);
+
+    return d;
+}
+
+std::tuple<bool, int> acceptInt(Parser& parser)
+{
+    if(parser.peek().type != Token::Number)
+        return { false, 0 };
+
+    int d = 0;
+    std::stringstream ss(parser.next().str);
+    ss >> d;
+
+    return { true, d };
+}
+
+double expectDouble(Parser& parser)
+{
+    if(parser.peek().type != Token::Number)
+        throw ParseException("Floating point expected", parser.peek().line, parser.peek().column);
+
+    double d = 0;
+    std::stringstream ss(parser.next().str);
+    ss >> d;
+
+    return d;
+}
+
+std::tuple<bool, double> acceptDouble(Parser& parser)
+{
+    if(parser.peek().type != Token::Number)
+        return { false, 0 };
+
+    double d = 0;
+    std::stringstream ss(parser.next().str);
+    ss >> d;
+
+    return { true, d };
+}
+
+std::tuple<bool, int, int, int> acceptVertex(Parser& parser)
+{
+    auto [success, n1] = acceptInt(parser);
+    if(!success)
+        return { false, 0, 0, 0 };
+    
+    if(!parser.accept("/")) // Format is x
+        return { true, n1, 0, 0 };
+
+    if(parser.accept("/")) { // Format is x//y
+        int n2 = expectInt(parser);
+        return { true, n1, 0, n2 };
+    }
+
+    int n2 = expectInt(parser); // Format is x/y..
+
+    if(!parser.accept("/"))
+        return { true, n1, n2, 0 };
+
+    int n3 = expectInt(parser); // Format is x/y/z
+
+    return { true, n1, n2, n3 };
+}
+
+std::tuple<bool, Vector3d> expectCoordinate3d(Parser& parser)
+{
+    double arr[3];
+    for(int i = 0; i < 3; i++) {
+        auto [success, d] = acceptDouble(parser);
+        if(!success)
+            return { false, { 0, 0, 0 } };
+        arr[i] = d;
+    }
+    return { true, Vector3d(arr[0], arr[1], arr[2]) };
+}
+
+Vector3d expectVtCoordinate(Parser& parser)
+{
+    double arr[3] = { 0, 0, 0 };
+    bool hadSuccess = false;
+    for(int i = 0; i < 3; i++) {
+        auto [success, d] = acceptDouble(parser);
+        if(success) {
+            arr[i] = d;
+            hadSuccess = true;
+        }
+    }
+    if(!hadSuccess)
+        throw ParseException("Bad texture coordinate");
+    return Vector3d(arr[0], arr[1], arr[2]);
+}
+
+std::vector<Token> tokenize(std::ifstream& file)
+{
+    std::string str;
+    while(!file.eof())
+    {
+        std::istringstream ins;
+        std::string line;
+        std::getline(file, line);
+        auto strs = split(line, '#');
+        str += strs[0] + '\n';
+    }
+
     int p = 0;
 
     std::vector<Token> v;
@@ -250,23 +289,28 @@ std::vector<Token> tokenize(std::string str)
     while(p < str.size())
     {
         skipspace();
-        if(accept('/'))
-            addToken(Token(Token::Operator, "/"));
-        if(peek() == '-' || peek() == '.' || std::isdigit(peek()))
+        auto c = peek();
+        if(c == '/' || c == '/' || c == '{' || c == '}' || c == ':') // Operator
+            addToken(Token(Token::Operator, {next()}));
+
+        else if(c == '-' || c == '.' || std::isdigit(c)) // Floating point number
         {
             std::string s;
-            while(std::isdigit(peek()) || peek() == '.' || peek() == 'e' || peek() == 'E' || peek() == '+' || peek() == '-')
+            auto c = peek();
+            // Not the best way of parsing a floating point number ..
+            for(auto c = peek(); std::isdigit(c) || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-'; c = peek())
                 s += next();
 
             std::stringstream ss(s);
             double d;
+            // .. but we do some validation here, at least
             ss >> d;
             if(ss.fail())
                 throw ParseException("Couldn't parse floating point number \"" + s + "\"", line, col);
 
             addToken(Token(Token::Number, s));
         }
-        if(std::isalpha(peek()))
+        else if(std::isalpha(c)) // Identifier
         {
             // Another way we could do this is to make a token resolve to a string type as a last fallback after
             // trying every other type. This would solve stuff like "mttllib ./blah.mtl" which tries to parse
@@ -277,56 +321,171 @@ std::vector<Token> tokenize(std::string str)
                 s += next();
             addToken(Token(Token::String, s));
         }
-        if(peek() == '\n' || peek() == '\r')
-        {
-            while(accept('\n') || accept('\r'));
+        else if(accept('\n')) // Endline
             addToken(Token(Token::Newline, "\n"));
+        else if(accept('\r'));
+        else {
+            throw ParseException(std::string("Couldn't parse character: \"") + peek() + "\"");
         }
     }
     addToken(Token(Token::Eof, ""));
     return v;
 }
 
-class Parser
+bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& materials)
 {
-public:
-    Parser(std::vector<Token> tokens) : tokens(tokens)
+    std::ifstream matfile;
+    matfile.open(matfilestr.c_str(), std::ios::out);
+
+    if(matfile.fail())
     {
+        matfile.close();
+        throw ParseException("Couldn't open the file \"" + matfilestr + "\"");
     }
 
-    Token peek()
-    {
-        return p < tokens.size() ? tokens[p] : Token(Token::Eof);
-    }
+    auto parser = Parser(tokenize(matfile));
 
-    Token next()
+    Material* curmat = 0;
+    PhongMaterial* phongmat = 0;
+    std::string matName;
+    bool phong = false, emissive = false;
+    while(!parser.accept(Token::Eof))
     {
-        return p < tokens.size() ? tokens[p++] : Token(Token::Eof);
-    }
+        if(parser.accept(Token::Newline))
+            while(parser.accept(Token::Newline));
 
-    bool accept(std::string s)
-    {
-        return p < tokens.size() && tokens[p].str == s ? ++p : false;
-    }
+        else if(acceptAnyCaseStr(parser, "newmtl"))
+        {
+            matName = expectStr(parser);
 
-    bool accept(const Token& token)
-    {
-        return p < tokens.size() && tokens[p] == token ? ++p : false;
-    }
+            if(parser.accept(Token(Token::Operator, ":"))) // We expect a special material definition to follow
+            {
+                auto b = expectStr(parser);
+                transform(b.begin(), b.end(), b.begin(), [](char b) { return (char) tolower(b); });
+                if(b == "emissive")
+                    curmat = new EmissiveMaterial;
+                else if(b == "lambertian")
+                    curmat = new LambertianMaterial;
+                else if(b == "mirror")
+                    curmat = new MirrorMaterial;
+                else if(b == "phong")
+                    curmat = new PhongMaterial;
+                else if(b == "dielectric")
+                    curmat = new DielectricMaterial;
+                else if(b == "ashikhminshirley")
+                    curmat = new AshikhminShirley;
+                
+                while(parser.accept(Token::Newline));
+                parser.expect(Token(Token::Operator, "{"));
 
-    bool accept(Token::Type t)
-    {
-        return p < tokens.size() && tokens[p].type == t ? ++p : false;
-    }
+                Token token(Token::Eof);
+                std::string matArg;
+                while((token = parser.next()) != Token(Token::Operator, "}")) {
+                    if(token == Token::Eof)
+                        throw ParseException("Unexpected end of file");
+                    matArg += token.str + " ";
+                }
 
-    bool eof()
-    {
-        return p == tokens.size();
-    }
+                materials[matName] = curmat;
+                std::stringstream ss(matArg);
+                curmat->ReadProperties(ss);
+            }
+            else
+            {
+                curmat = new PhongMaterial;
+                materials[matName] = curmat;
+                phong = true;
+            }
+        }
 
-    std::vector<Token> tokens;
-    int p;
-};
+        else if(acceptAnyCaseStr(parser, "ka"))
+        {
+            // We ignore any ambient term
+            for(int i = 0; i < 3; i++)
+                expectDouble(parser);
+
+            if(!curmat)
+                throw ParseException("No current material specified"); // TODO: not really a parse exception
+        }
+        else if(acceptAnyCaseStr(parser, "tf"))
+        {
+            // We ignore any transmission filter
+            for(int i = 0; i < 3; i++)
+                expectDouble(parser);
+
+            if(!curmat)
+                throw ParseException("No current material specified"); // TODO: not really a parse exception
+        }
+        else if(acceptAnyCaseStr(parser, "kd"))
+        {
+            if(!curmat)
+                throw ParseException("No current material specified"); // TODO: not really a parse exception
+            if(phong)
+            {
+                phongmat = (PhongMaterial*) curmat;
+                phongmat->Kd.r = expectDouble(parser);
+                phongmat->Kd.g = expectDouble(parser);
+                phongmat->Kd.b = expectDouble(parser);
+            }
+            else if(!emissive)
+                __debugbreak();
+        }
+        else if(acceptAnyCaseStr(parser, "ks"))
+        {
+            if(!curmat)
+                throw ParseException("No current material specified"); // TODO: not really a parse exception
+            if(phong)
+            {
+                phongmat = (PhongMaterial*) curmat;
+                phongmat->Ks.r = expectDouble(parser);
+                phongmat->Ks.g = expectDouble(parser);
+                phongmat->Ks.b = expectDouble(parser);
+            }
+            else if(!emissive)
+                __debugbreak();
+        }
+        else if(acceptAnyCaseStr(parser, "ns"))
+        {
+            if(!curmat)
+                throw ParseException("No current material specified"); // TODO: not really a parse exception
+            if(phong)
+            {
+                phongmat = (PhongMaterial*) curmat;
+                phongmat->alpha = expectInt(parser);
+            }
+            else if(!emissive)
+                __debugbreak();
+        }
+        else if(acceptAnyCaseStr(parser, "ke")) 
+        {
+            Color intensity;
+            intensity.r = expectDouble(parser);
+            intensity.g = expectDouble(parser);
+            intensity.b = expectDouble(parser);
+
+            if(intensity) {
+                phong = false;
+                emissive = true;
+                delete curmat;
+                MeshLight* ml = new MeshLight(intensity);
+                curmat = ml->material;
+                materials[matName] = curmat;
+            }
+        }
+        else if(acceptAnyCaseStr(parser, "ni")) 
+            expectDouble(parser);
+        else if(acceptAnyCaseStr(parser, "illum")) 
+            expectInt(parser);
+        else
+        {
+            auto token = parser.peek();
+            throw ParseException("Unknown token \"" + token.str + "\"", token.line, token.column);
+        }
+    }
+    return true;
+}
+
+
 
 struct MeshData
 {
@@ -347,121 +506,6 @@ struct MeshData
         isLightMesh = false;
     }
 };
-
-std::tuple<bool, std::string> acceptStr(Parser& parser)
-{
-    if(parser.peek().type != Token::String)
-        return { false, "" };
-
-    return { true, parser.next().str };
-}
-
-std::string expectStr(Parser& parser)
-{
-    if(parser.peek().type != Token::String)
-        throw ParseException("Alphanumeric string expected");
-    return parser.next().str;
-}
-
-int parseInt(Parser& parser)
-{
-    if(parser.peek().type != Token::Number)
-        throw ParseException("Integer expected", parser.peek().line, parser.peek().column);
-
-    int d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
-
-    return d;
-}
-
-std::tuple<bool, int> acceptInt(Parser& parser)
-{
-    if(parser.peek().type != Token::Number)
-        return { false, 0 };
-
-    int d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
-
-    return { true, d };
-}
-
-std::tuple<bool, double> expectDouble(Parser& parser)
-{
-    if(parser.peek().type != Token::Number)
-        return { false, 0 };
-
-    double d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
-
-    return { true, d };
-}
-
-std::tuple<bool, double> acceptDouble(Parser& parser)
-{
-    if(parser.peek().type != Token::Number)
-        return { false, 0 };
-
-    double d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
-
-    return { true, d };
-}
-
-std::tuple<bool, int, int, int> acceptVertex(Parser& parser)
-{
-    auto [success, n1] = acceptInt(parser);
-    if(!success)
-        return { false, 0, 0, 0 };
-    
-    if(!parser.accept("/")) // Format is x
-        return { true, n1, 0, 0 };
-
-    if(parser.accept("/")) { // Format is x//y
-        int n2 = parseInt(parser);
-        return { true, n1, 0, n2 };
-    }
-
-    int n2 = parseInt(parser); // Format is x/y..
-
-    if(!parser.accept("/"))
-        return { true, n1, n2, 0 };
-
-    int n3 = parseInt(parser); // Format is x/y/z
-
-    return { true, n1, n2, n3 };
-}
-
-std::tuple<bool, Vector3d> expectCoordinate3d(Parser& parser)
-{
-    double arr[3];
-    for(int i = 0; i < 3; i++) {
-        auto [success, d] = expectDouble(parser);
-        if(!success)
-            return { false, { 0, 0, 0 } };
-        arr[i] = d;
-    }
-    return { true, Vector3d(arr[0], arr[1], arr[2]) };
-}
-
-Vector3d expectVtCoordinate(Parser& parser)
-{
-    double arr[3] = { 0, 0, 0 };
-    bool hadSuccess = false;
-    for(int i = 0; i < 3; i++) {
-        auto [success, d] = acceptDouble(parser);
-        if(success) {
-            arr[i] = d;
-            hadSuccess = true;
-        }
-    }
-    if(!hadSuccess)
-        throw ParseException("Bad texture coordinate");
-    return Vector3d(arr[0], arr[1], arr[2]);
-}
 
 std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat)
 {
@@ -491,21 +535,12 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
             return { false, {}, {} };
         }
 
-        std::string str;
-        while(!myfile.eof())
-        {
-            std::istringstream ins;
-            std::string line;
-            std::getline(myfile, line);
-            auto strs = split(line, '#');
-            str += strs[0] + '\n';
-        }
+        Parser parser(tokenize(myfile));
 
-        Parser parser(tokenize(str));
-
-        while(true)
+        while(!parser.accept(Token::Eof))
         {
-            while(parser.accept(Token::Newline));
+            if(parser.accept(Token::Newline))
+                while(parser.accept(Token::Newline));
 
             if(parser.accept("f"))
             {
@@ -571,18 +606,10 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                         tri->SetMaterial(meshMat);
                 }
             }
-            else if(parser.accept("g"))
+            else if(parser.accept("g") || parser.peek() == Token::Eof)
             {   
-                int names = 0;
-                while(true) {
-                    auto [success, dummyName] = acceptStr(parser);
-                    if(success) {
-                        names++;
-                    } else
-                        break;
-                }
-                if(!names)
-                    throw ParseException("One or more names are expected");
+                // We don't care about the name of the group
+                for(auto p = acceptStr(parser); std::get<0>(p); p = acceptStr(parser));
 
                 std::stack<MeshVertex*> vs;
 
@@ -591,7 +618,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 
                 // Create duplicate vertices for every vertex that is part of 
                 // triangles that are above a certain angle threshold to each other
-                if(normalInterp)
+                if(true)
                 {
                     while(!vs.empty())
                     {
@@ -606,10 +633,8 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                                 if(t1->GetNormal() * t2->GetNormal() < 0.7f)
                                 {
                                     // Create two new vertices
-                                    //MeshVertex* v1 = new MeshVertex(*v);
-                                    //v1->triangles.clear();
                                     MeshVertex*& v1 = v;
-                                    MeshVertex* vold(v);
+
                                     v1->triangles.clear();
                                     MeshVertex* v2 = new MeshVertex(*v);
                                     currentMesh->points.push_back(v2);
@@ -617,28 +642,22 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                                     v1->normal = t1->GetNormal(); // Just the geometric normal for now, maybe averaged is better
                                     v2->normal = t2->GetNormal();
                                     // Reassign the triangles that belonged to v to either v1 or v2 depending on their normal
-                                    for(auto& t3 : vold->triangles)
+                                    for(auto& t3 : v->triangles)
                                     {
                                         if(t3->GetNormal() * v1->normal >= 0.7f)
                                         {
                                             // First reassign the correct vector in the triangle
-                                            if(t3->v0 == vold)
-                                                t3->v0 = v1;
-                                            if(t3->v1 == vold)
-                                                t3->v1 = v1;
-                                            if(t3->v2 == vold)
-                                                t3->v2 = v1;
+                                            for(auto vv : { &t3->v0, &t3->v1, &t3->v2 })
+                                                if(*vv == v)
+                                                    *vv = v1;
                                             // Then reassign the triangle in the vector's triangle list
                                             v1->triangles.push_back(t3);
                                         }
                                         else
                                         {
-                                            if(t3->v0 == vold)
-                                                t3->v0 = v2;
-                                            if(t3->v1 == vold)
-                                                t3->v1 = v2;
-                                            if(t3->v2 == vold)
-                                                t3->v2 = v2;
+                                            for(auto vv : { &t3->v0, &t3->v1, &t3->v2 })
+                                                if(*vv == v)
+                                                    *vv = v2;
                                             v2->triangles.push_back(t3);
                                         }
                                     }
@@ -685,7 +704,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                 if(success) {
                     normalInterp = s1 != "off";
                 } else {
-                    int s1 = parseInt(parser);
+                    int s1 = expectInt(parser);
                     normalInterp = s1 != 0;
                 }
             
@@ -715,8 +734,6 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                 }
             }
             else if(parser.accept(Token::Newline));
-            else if(parser.accept(Token::Eof))
-                break;
             else if(parser.accept("l"))
             {
                 while(parser.next().type != Token::Newline);

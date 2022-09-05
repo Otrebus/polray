@@ -53,10 +53,10 @@
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-#define KITCHEN2
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
-//#define BALLSBOX
+#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
 //#define LEGOCAR

@@ -1,4 +1,5 @@
 #include "Color.h"
+#include "Vector3d.h"
 
 const Color Color::Identity = Color(1, 1, 1);
 const Color Color::Black = Color(0, 0, 0);
@@ -23,6 +24,10 @@ int Color::GetInt() const
 Color::Color(double _r, double _g, double _b) : r(_r), g(_g), b(_b)
 {
     assert(IsValid());
+}
+
+Color::Color(const Vector3d& v) : r(v.x), g(v.y), b(v.z)
+{
 }
 
 Color::~Color()

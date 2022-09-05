@@ -1,3 +1,4 @@
+Fix the normalInterp stuff
 Detabify
 ctrl-F This could also be a hash table, for very large triangle meshes
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info

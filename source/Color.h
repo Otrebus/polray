@@ -11,7 +11,8 @@ class Vector3d;
 class Color
 {
 public:
-    Color(double, double, double);  
+    Color(double, double, double);
+    Color(const Vector3d& v);
 
     explicit Color(int);
     Color();

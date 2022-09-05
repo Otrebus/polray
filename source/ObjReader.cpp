@@ -19,7 +19,7 @@ class Token
 public:
     enum Type { String, Number, Operator, Newline, Eof };
 
-    Token(Type t, std::string s="") : type(t), str(s)
+    Token(Type t, std::string s="") : type(t), str(s), line(0), column(0)
     {
     }
 
@@ -40,12 +40,12 @@ public:
 
 struct ParseException
 {
-    ParseException(std::string str, int line, int col)
+    ParseException(const std::string& str, int line, int col)
     {
         message = str + " at line " + std::to_string(line) + ", column " + std::to_string(col);
     }
 
-    ParseException(std::string str)
+    ParseException(const std::string& str)
     {
         message = str;
     }
@@ -56,7 +56,7 @@ struct ParseException
 class Parser
 {
 public:
-    Parser(std::vector<Token> tokens) : tokens(tokens)
+    Parser(const std::vector<Token>& tokens) : tokens(tokens), p(0)
     {
     }
 
@@ -70,7 +70,7 @@ public:
         return p < tokens.size() ? tokens[p++] : Token(Token::Eof);
     }
 
-    bool accept(std::string s)
+    bool accept(const std::string& s)
     {
         return p < tokens.size() && tokens[p].str == s ? ++p : false;
     }
@@ -207,16 +207,12 @@ std::tuple<bool, int, int, int> acceptVertex(Parser& parser)
     return { true, n1, n2, n3 };
 }
 
-std::tuple<bool, Vector3d> expectCoordinate3d(Parser& parser)
+Vector3d expectVector3d(Parser& parser)
 {
     double arr[3];
-    for(int i = 0; i < 3; i++) {
-        auto [success, d] = acceptDouble(parser);
-        if(!success)
-            return { false, { 0, 0, 0 } };
-        arr[i] = d;
-    }
-    return { true, Vector3d(arr[0], arr[1], arr[2]) };
+    for(int i = 0; i < 3; i++)
+        arr[i] = expectDouble(parser);
+    return Vector3d(arr[0], arr[1], arr[2]);
 }
 
 Vector3d expectVtCoordinate(Parser& parser)
@@ -290,7 +286,7 @@ std::vector<Token> tokenize(std::ifstream& file)
     {
         skipspace();
         auto c = peek();
-        if(c == '/' || c == '/' || c == '{' || c == '}' || c == ':') // Operator
+        if(c == '/' || c == '{' || c == '}' || c == ':') // Operator
             addToken(Token(Token::Operator, {next()}));
 
         else if(c == '-' || c == '.' || std::isdigit(c)) // Floating point number
@@ -422,10 +418,8 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
                 throw ParseException("No current material specified"); // TODO: not really a parse exception
             if(phong)
             {
-                phongmat = (PhongMaterial*) curmat;
-                phongmat->Kd.r = expectDouble(parser);
-                phongmat->Kd.g = expectDouble(parser);
-                phongmat->Kd.b = expectDouble(parser);
+                phongmat = static_cast<PhongMaterial*>(curmat);
+                phongmat->Kd = expectVector3d(parser);
             }
             else if(!emissive)
                 __debugbreak();
@@ -436,10 +430,8 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
                 throw ParseException("No current material specified"); // TODO: not really a parse exception
             if(phong)
             {
-                phongmat = (PhongMaterial*) curmat;
-                phongmat->Ks.r = expectDouble(parser);
-                phongmat->Ks.g = expectDouble(parser);
-                phongmat->Ks.b = expectDouble(parser);
+                phongmat = static_cast<PhongMaterial*>(curmat);
+                phongmat->Ks = expectVector3d(parser);
             }
             else if(!emissive)
                 __debugbreak();
@@ -450,7 +442,7 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
                 throw ParseException("No current material specified"); // TODO: not really a parse exception
             if(phong)
             {
-                phongmat = (PhongMaterial*) curmat;
+                phongmat = static_cast<PhongMaterial*>(curmat);
                 phongmat->alpha = expectInt(parser);
             }
             else if(!emissive)
@@ -459,9 +451,7 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
         else if(acceptAnyCaseStr(parser, "ke")) 
         {
             Color intensity;
-            intensity.r = expectDouble(parser);
-            intensity.g = expectDouble(parser);
-            intensity.b = expectDouble(parser);
+            intensity = expectVector3d(parser);
 
             if(intensity) {
                 phong = false;
@@ -485,45 +475,24 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
     return true;
 }
 
-
-
-struct MeshData
+std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat)
 {
+    Material* curmat = nullptr;
+    std::ifstream myfile;
+    myfile.open(file.c_str(), std::ios::out);
+
     std::map<std::string, Material*> materials;
     std::set<MeshLight*> meshLights;
 
-    TriangleMesh* mesh;
+    TriangleMesh* mesh = new TriangleMesh();
     bool normalInterp;
-    bool isLightMesh;
 
     std::vector<MeshVertex*> vectors;
     std::vector<Vector3d> normals;
     std::map<int, MeshVertex*> groupVertices; // The vertices that have been added to the current group so far
 
-    MeshData()
-    {
-        normalInterp = true;
-        isLightMesh = false;
-    }
-};
+    TriangleMesh* currentMesh = mesh;
 
-std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat)
-{
-    Material* curmat = 0;
-    std::ifstream myfile;
-    myfile.open(file.c_str(), std::ios::out);
-
-    MeshData meshData;
-    meshData.mesh = new TriangleMesh();
-
-    TriangleMesh* currentMesh = meshData.mesh;
-
-    std::string a;
-    double x, y, z;
-
-    int index = 0;
-    bool normalInterp = true;
-    bool isLightMesh = false;
     std::unordered_map<MeshVertex*, Vertex3d*> replacement;
 
     try {
@@ -532,7 +501,6 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
         {
             myfile.close();
             throw ParseException("Can't open the given .obj file \"" + file + "\"");
-            return { false, {}, {} };
         }
 
         Parser parser(tokenize(myfile));
@@ -553,16 +521,16 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                         break;
 
                     if (v < 0)
-                        v = (int) meshData.vectors.size() + v + 1;
+                        v = (int) vectors.size() + v + 1;
 
                     MeshVertex* mv;
 
-                    auto it = meshData.groupVertices.find(v-1);
-                    if (it == meshData.groupVertices.end()) { // We have not seen this vertex before in this group so create a new one
-                        mv = meshData.groupVertices[v-1] = new MeshVertex(*meshData.vectors[v-1]);
+                    auto it = groupVertices.find(v-1);
+                    if (it == groupVertices.end()) { // We have not seen this vertex before in this group so create a new one
+                        mv = groupVertices[v-1] = new MeshVertex(*vectors[v-1]);
                         if(n) {
                             normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
-                            mv->normal = meshData.normals[n-1];
+                            mv->normal = normals[n-1];
                         }
                         currentMesh->points.push_back(mv);
                     } else { // This vertex is already among the parsed vertices in this group so use that particular one
@@ -570,12 +538,12 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                         if(n)
                         {
                             normalInterp = false;
-                            if(mv->normal != meshData.normals[n-1])  // A different normal was given though, so we still need
+                            if(mv->normal != normals[n-1])  // A different normal was given though, so we still need
                             {                                        // to create an entirely new vertex
                                 mv = new MeshVertex(*mv); 
                                 currentMesh->points.push_back(mv);
                             }
-                            mv->normal = meshData.normals[n-1];
+                            mv->normal = normals[n-1];
                         }  
                     }
                     faceVertices.push_back(mv);
@@ -613,7 +581,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
 
                 std::stack<MeshVertex*> vs;
 
-                for(auto& v : meshData.groupVertices)
+                for(auto& v : groupVertices)
                     vs.push(v.second);
 
                 // Create duplicate vertices for every vertex that is part of 
@@ -672,24 +640,20 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                 } // if(normalInterp ..
 
                 normalInterp = true;
-                meshData.groupVertices.clear();
+                groupVertices.clear();
             } // if(a == "g" ..
             else if(parser.accept("mtllib"))
             {
                 // Check if there's an associated materials file, and parse it
                 auto matfilestr = expectStr(parser);
                 if(!meshMat)
-                    ReadMaterialFile(matfilestr, meshData.materials);
+                    ReadMaterialFile(matfilestr, materials);
                 continue;
             }
             else if(parser.accept("vn"))
             {
-                auto [success, normal] = expectCoordinate3d(parser);
-                if(!success) {
-                    __debugbreak();
-                    return { false, nullptr, {} };
-                }
-                meshData.normals.push_back(normal);
+                auto normal = expectVector3d(parser);
+                normals.push_back(normal);
             }
             else if(parser.accept("o")) {
                 auto str = expectStr(parser);
@@ -707,30 +671,25 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                     int s1 = expectInt(parser);
                     normalInterp = s1 != 0;
                 }
-            
             }
             else if(parser.accept("v"))
             {
-                auto [success, coord] = expectCoordinate3d(parser);
-                meshData.vectors.push_back(new MeshVertex((coord)));
-                index++;
+                auto coord = expectVector3d(parser);
+                vectors.push_back(new MeshVertex((coord)));
             }
             else if(parser.accept("usemtl"))
             {
                 auto mtl = expectStr(parser);
-                auto it = meshData.materials.find(mtl);
-                if(it == meshData.materials.end())
+                auto it = materials.find(mtl);
+                if(it == materials.end())
                     curmat = 0;
                 else {
-                    if(meshData.materials[mtl]->light) {
-                        isLightMesh = true;
-                        meshData.meshLights.emplace((MeshLight*) meshData.materials[mtl]->light);
-                        currentMesh = ((MeshLight*) meshData.materials[mtl]->light)->mesh;
-                    } else {
-                        isLightMesh = false;
-                        currentMesh = meshData.mesh;
-                    }
-                    curmat = meshData.materials[mtl];
+                    if(materials[mtl]->light) {
+                        meshLights.emplace(static_cast<MeshLight*>(materials[mtl]->light));
+                        currentMesh = (static_cast<MeshLight*>(materials[mtl]->light)->mesh);
+                    } else
+                        currentMesh = mesh;
+                    curmat = materials[mtl];
                 }
             }
             else if(parser.accept(Token::Newline));
@@ -744,54 +703,54 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
             }
         }
     }
-    catch(ParseException p)
+    catch(const ParseException& p)
     {
         logger.Box(p.message);
         __debugbreak();
     }
 
-    for(auto& t : meshData.mesh->triangles) {
+    for(auto& t : mesh->triangles) {
         for(auto vv : { &t->v0, &t->v1, &t->v2 }) {
-            auto& v = (*((MeshVertex**) vv));
+            auto& v = (*(reinterpret_cast<MeshVertex**>(vv)));
             if(replacement.find(v) == replacement.end()) {
                 auto oldv = v;
-                v = (MeshVertex*) new Vertex3d(v->pos, v->normal, v->texpos);
+                v = static_cast<MeshVertex*>(new Vertex3d(v->pos, v->normal, v->texpos));
                 replacement[oldv] = (Vertex3d*) v;
-                meshData.mesh->points.push_back(v);
+                mesh->points.push_back(v);
                 replacement[v] = v;
             }
             else
-                v = (MeshVertex*) replacement[v];
+                v = static_cast<MeshVertex*>(replacement[v]);
         }
     }
-    for(auto& p : meshData.mesh->points)
-        if(replacement.find((MeshVertex*)p) != replacement.end())
-            p = replacement[(MeshVertex*)p];
+    for(auto& p : mesh->points)
+        if(replacement.find(static_cast<MeshVertex*>(p)) != replacement.end())
+            p = replacement[static_cast<MeshVertex*>(p)];
 
-    for(auto& m : meshData.meshLights) {
+    for(auto& m : meshLights) {
         for(auto& t : m->mesh->triangles) {
             for(auto vv : { &t->v0, &t->v1, &t->v2 }) {
                 auto& v = (*((MeshVertex**) vv));
                 if(replacement.find(v) == replacement.end()) {
                     auto oldv = v;
-                    v = (MeshVertex*) new Vertex3d(v->pos, v->normal, v->texpos);
-                    replacement[oldv] = (Vertex3d*) v;
+                    v = static_cast<MeshVertex*>(new Vertex3d(v->pos, v->normal, v->texpos));
+                    replacement[oldv] = static_cast<Vertex3d*>(v);
                     m->mesh->points.push_back(v);
                     replacement[v] = v;
                 }
                 else
-                    v = (MeshVertex*) replacement[v];
+                    v = static_cast<MeshVertex*>(replacement[v]);
             }
         }
         for(auto& p : m->mesh->points)
-            if(replacement.find((MeshVertex*)p) != replacement.end())
-                p = replacement[(MeshVertex*)p];
+            if(replacement.find(static_cast<MeshVertex*>(p)) != replacement.end())
+                p = replacement[static_cast<MeshVertex*>(p)];
     }
 
-    for(auto it = meshData.materials.begin(); it != meshData.materials.end(); it++)
-        meshData.mesh->materials.push_back((*it).second);
+    for(auto it = materials.begin(); it != materials.end(); it++)
+        mesh->materials.push_back((*it).second);
 
     myfile.close();
-    auto meshLightVector = std::vector<MeshLight*>(meshData.meshLights.begin(), meshData.meshLights.end());
-    return { true, meshData.mesh, meshLightVector };
+    auto meshLightVector = std::vector<MeshLight*>(meshLights.begin(), meshLights.end());
+    return { true, mesh, meshLightVector };
 }

@@ -37,8 +37,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     WNDCLASSEX  wc;
     HWND	    hWnd;
     MSG         msg;
+
     const int xres = XRES;
     const int yres = YRES;
+
     bool windowed = true;
 
     bufferMutex = CreateMutex(0, false, 0);
@@ -105,27 +107,22 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         return false;
     }
 
-     gfx->ClearScreen(255, 255, 255);
+    gfx->ClearScreen(255, 255, 255);
 
-     int blah;
-     blah = sizeof(std::shared_ptr<Material>);
+    std::shared_ptr<Scene> scene;
+    std::shared_ptr<Renderer> renderer;
+    std::shared_ptr<Estimator> estimator;
 
-     std::shared_ptr<Scene> scene;
-     std::shared_ptr<Renderer> renderer;
-     std::shared_ptr<Estimator> estimator;
-     Bytestream bb;
-     bb << (int) 3;
-     std::ifstream ifile("btstrout");
-    if (ifile.good()) {
+    std::ifstream ifile("btstrout");
+    if (ifile.good())
         rendering = new Rendering("btstrout");
-    }
     else
     {
         MakeScene(renderer, estimator);
         rendering = new Rendering(renderer, estimator);
     }
         
-     rendering->Start();
+    rendering->Start();
 
     while(!g_quitting)
     {

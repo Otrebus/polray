@@ -13,13 +13,32 @@
 #include <tuple>
 #include <set>
 #include <unordered_map>
+#include "Timer.h"
+#include <charconv>
+
+
+std::string lower(const std::string_view s)
+{
+    std::string ret(s.begin(), s.end());
+    std::transform(ret.begin(), ret.end(), ret.begin(), [](char a) { return (char) tolower(a); });
+    return ret;
+}
+
 
 class Token
 {
 public:
     enum Type { String, Number, Operator, Newline, Eof };
 
-    Token(Type t, std::string s="") : type(t), str(s), line(0), column(0)
+    Token(Type t, const char* a, const char* b) : type(t), str(a, b), line(0), column(0)
+    {
+    }
+
+    Token(Type t, const std::string& a) : type(t), str(a), line(0), column(0)
+    {
+    }
+
+    Token(Type t) : type(t), line(0), column(0)
     {
     }
 
@@ -35,7 +54,7 @@ public:
 
     int line, column;
     Type type;
-    std::string str;
+    std::string_view str;
 };
 
 struct ParseException
@@ -75,9 +94,9 @@ public:
         return p < tokens.size() && tokens[p].str == s ? ++p : false;
     }
 
-    bool accept(const Token& token)
+    bool accept(const Token& t)
     {
-        return p < tokens.size() && tokens[p] == token ? ++p : false;
+        return p < tokens.size() && tokens[p] == t ? ++p : false;
     }
 
     bool accept(Token::Type t)
@@ -110,7 +129,7 @@ public:
     int p;
 };
 
-std::tuple<bool, std::string> acceptStr(Parser& parser)
+std::tuple<bool, std::string_view> acceptStr(Parser& parser)
 {
     if(parser.peek().type != Token::String)
         return { false, "" };
@@ -118,7 +137,7 @@ std::tuple<bool, std::string> acceptStr(Parser& parser)
     return { true, parser.next().str };
 }
 
-bool acceptAnyCaseStr(Parser& parser, std::string str)
+bool acceptAnyCaseStr(Parser& parser, const char* str)
 {
     if(parser.peek().type != Token::String || lower(parser.peek().str) != str)
         return false;
@@ -126,7 +145,7 @@ bool acceptAnyCaseStr(Parser& parser, std::string str)
     return true;
 }
 
-std::string expectStr(Parser& parser)
+std::string_view expectStr(Parser& parser)
 {
     if(parser.peek().type != Token::String)
         throw ParseException("Alphanumeric string expected");
@@ -139,9 +158,9 @@ int expectInt(Parser& parser)
         throw ParseException("Integer expected", parser.peek().line, parser.peek().column);
 
     int d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
-    if(ss.fail())
+    auto st = parser.next().str;
+    auto res = std::from_chars(st.data(), st.data() + st.size(), d);
+    if(res.ec == std::errc::invalid_argument)
         throw ParseException("Integer expected", parser.peek().line, parser.peek().column);
 
     return d;
@@ -153,8 +172,8 @@ std::tuple<bool, int> acceptInt(Parser& parser)
         return { false, 0 };
 
     int d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
+    auto st = parser.next().str;
+    auto res = std::from_chars(st.data(), st.data() + st.size(), d);
 
     return { true, d };
 }
@@ -165,8 +184,8 @@ double expectDouble(Parser& parser)
         throw ParseException("Floating point expected", parser.peek().line, parser.peek().column);
 
     double d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
+    auto st = parser.next().str;
+    auto res = std::from_chars(st.data(), st.data() + st.size(), d);
 
     return d;
 }
@@ -177,8 +196,8 @@ std::tuple<bool, double> acceptDouble(Parser& parser)
         return { false, 0 };
 
     double d = 0;
-    std::stringstream ss(parser.next().str);
-    ss >> d;
+    auto st = parser.next().str;
+    auto res = std::from_chars(st.data(), st.data() + st.size(), d);
 
     return { true, d };
 }
@@ -231,9 +250,10 @@ Vector3d expectVtCoordinate(Parser& parser)
     return Vector3d(arr[0], arr[1], arr[2]);
 }
 
-std::vector<Token> tokenize(std::ifstream& file)
+std::vector<Token> tokenize(std::ifstream& file, std::string& str)
 {
-    std::string str;
+    Timer t1;
+    t1.Reset();
     while(!file.eof())
     {
         std::istringstream ins;
@@ -286,25 +306,25 @@ std::vector<Token> tokenize(std::ifstream& file)
     {
         skipspace();
         auto c = peek();
-        if(c == '/' || c == '{' || c == '}' || c == ':') // Operator
-            addToken(Token(Token::Operator, {next()}));
+        if(c == '/' || c == '{' || c == '}' || c == ':') { // Operator
+            addToken(Token(Token::Operator, str.c_str()+p, str.c_str()+p+1));
+            p++;
+        }
 
         else if(c == '-' || c == '.' || std::isdigit(c)) // Floating point number
         {
-            std::string s;
             auto c = peek();
+            int d = p;
             // Not the best way of parsing a floating point number ..
             for(auto c = peek(); std::isdigit(c) || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-'; c = peek())
-                s += next();
+                p++;
 
-            std::stringstream ss(s);
-            double d;
-            // .. but we do some validation here, at least
-            ss >> d;
-            if(ss.fail())
-                throw ParseException("Couldn't parse floating point number \"" + s + "\"", line, col);
+            double D = 0;
+            auto res = std::from_chars(str.c_str()+d, str.c_str() + p, D);
+            if(res.ec == std::errc::invalid_argument)
+                throw ParseException("Couldn't parse floating point number \"" + std::string(str.c_str()+d, str.c_str() + p) + "\"", line, col);
 
-            addToken(Token(Token::Number, s));
+            addToken(Token(Token::Number, str.c_str()+d, str.c_str()+p));
         }
         else if(std::isalpha(c)) // Identifier
         {
@@ -312,19 +332,27 @@ std::vector<Token> tokenize(std::ifstream& file)
             // trying every other type. This would solve stuff like "mttllib ./blah.mtl" which tries to parse
             // ./blah.mtl as a floating point number, and then just throwing outright, instead of trying to
             // interpret it as a string. Of course, this wouldn't solve other types of contextual ambiguities
-            std::string s;
+            int d = p;
             while(!std::isspace(peek()))
-                s += next();
-            addToken(Token(Token::String, s));
+                p++;
+            addToken(Token(Token::String, str.c_str()+d, str.c_str()+p));
         }
-        else if(accept('\n')) // Endline
-            addToken(Token(Token::Newline, "\n"));
-        else if(accept('\r'));
+        else if(c == '\n') // Endline
+        {
+            int d = p;
+            addToken(Token(Token::Newline, str.c_str()+d, str.c_str()+ ++p));
+        }
+        else if(accept('\r'))
+        {
+            int d = p;
+            addToken(Token(Token::Newline, str.c_str()+d, str.c_str()+ ++p));
+        }
         else {
             throw ParseException(std::string("Couldn't parse character: \"") + peek() + "\"");
         }
     }
-    addToken(Token(Token::Eof, ""));
+    addToken(Token(Token::Eof));
+    logger.Box(std::to_string(t1.GetTime()));
     return v;
 }
 
@@ -339,7 +367,8 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
         throw ParseException("Couldn't open the file \"" + matfilestr + "\"");
     }
 
-    auto parser = Parser(tokenize(matfile));
+    std::string str;
+    auto parser = Parser(tokenize(matfile, str));
 
     Material* curmat = 0;
     PhongMaterial* phongmat = 0;
@@ -356,7 +385,7 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
 
             if(parser.accept(Token(Token::Operator, ":"))) // We expect a special material definition to follow
             {
-                auto b = expectStr(parser);
+                auto b = std::string(expectStr(parser));
                 transform(b.begin(), b.end(), b.begin(), [](char b) { return (char) tolower(b); });
                 if(b == "emissive")
                     curmat = new EmissiveMaterial;
@@ -379,7 +408,7 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
                 while((token = parser.next()) != Token(Token::Operator, "}")) {
                     if(token == Token::Eof)
                         throw ParseException("Unexpected end of file");
-                    matArg += token.str + " ";
+                    matArg += std::string(token.str) + " ";
                 }
 
                 materials[matName] = curmat;
@@ -469,7 +498,7 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
         else
         {
             auto token = parser.peek();
-            throw ParseException("Unknown token \"" + token.str + "\"", token.line, token.column);
+            throw ParseException("Unknown token \"" + std::string(token.str) + "\"", token.line, token.column);
         }
     }
     return true;
@@ -503,7 +532,8 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
             throw ParseException("Can't open the given .obj file \"" + file + "\"");
         }
 
-        Parser parser(tokenize(myfile));
+        std::string str;
+        Parser parser(tokenize(myfile, str));
 
         while(!parser.accept(Token::Eof))
         {
@@ -539,7 +569,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                         {
                             normalInterp = false;
                             if(mv->normal != normals[n-1])  // A different normal was given though, so we still need
-                            {                                        // to create an entirely new vertex
+                            {                               // to create an entirely new vertex
                                 mv = new MeshVertex(*mv); 
                                 currentMesh->points.push_back(mv);
                             }
@@ -647,7 +677,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
                 // Check if there's an associated materials file, and parse it
                 auto matfilestr = expectStr(parser);
                 if(!meshMat)
-                    ReadMaterialFile(matfilestr, materials);
+                    ReadMaterialFile(std::string(matfilestr), materials);
                 continue;
             }
             else if(parser.accept("vn"))
@@ -679,7 +709,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
             }
             else if(parser.accept("usemtl"))
             {
-                auto mtl = expectStr(parser);
+                auto mtl = std::string(expectStr(parser));
                 auto it = materials.find(mtl);
                 if(it == materials.end())
                     curmat = 0;
@@ -699,7 +729,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::strin
             }
             else {
                 auto token = parser.peek();
-                throw ParseException("Unknown token \"" + token.str + "\"", token.line, token.column);
+                throw ParseException("Unknown token \"" + std::string(token.str) + "\"", token.line, token.column);
             }
         }
     }

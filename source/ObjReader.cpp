@@ -17,18 +17,11 @@
 #include <charconv>
 
 
-std::string lower(const std::string_view s)
-{
-    std::string ret(s.begin(), s.end());
-    std::transform(ret.begin(), ret.end(), ret.begin(), [](char a) { return (char) tolower(a); });
-    return ret;
-}
-
-
 class Token
 {
 public:
     enum Type { String, Number, Operator, Newline, Eof };
+    static inline std::string typeStrs[5] = { "string", "number", "operator", "newline", "eof" };
 
     Token(Type t, const char* a, const char* b) : type(t), str(a, b), line(0), column(0)
     {
@@ -64,6 +57,11 @@ struct ParseException
         message = str + " at line " + std::to_string(line) + ", column " + std::to_string(col);
     }
 
+    ParseException(const std::string& str, const Token& t)
+    {
+        message = str + " at line " + std::to_string(t.line) + ", column " + std::to_string(t.column);
+    }
+
     ParseException(const std::string& str)
     {
         message = str;
@@ -81,33 +79,33 @@ public:
 
     Token peek()
     {
-        return p < tokens.size() ? tokens[p] : Token(Token::Eof);
+        return tokens[p];
     }
 
     Token next()
     {
-        return p < tokens.size() ? tokens[p++] : Token(Token::Eof);
+        return tokens[p++];
     }
 
-    bool accept(const std::string& s)
+    bool accept(const char* s)
     {
-        return p < tokens.size() && tokens[p].str == s ? ++p : false;
+        return tokens[p].str == s ? ++p : false;
     }
 
     bool accept(const Token& t)
     {
-        return p < tokens.size() && tokens[p] == t ? ++p : false;
+        return tokens[p] == t ? ++p : false;
     }
 
     bool accept(Token::Type t)
     {
-        return p < tokens.size() && tokens[p].type == t ? ++p : false;
+        return tokens[p].type == t ? ++p : false;
     }
 
     bool expect(Token::Type t)
     {
         if(p >= tokens.size() || tokens[p].type != t)
-            throw ParseException("Expected: "); // TODO: add type to string conversion
+            throw ParseException("Expected " + Token::typeStrs[t], tokens[p]);
         p++;
         return true;
     }
@@ -115,7 +113,7 @@ public:
     bool expect(const Token& token)
     {
         if(p >= tokens.size() || tokens[p] != token)
-            throw ParseException("Expected: "); // TODO: add type to string conversion
+            throw ParseException("Expected " + Token::typeStrs[token.type] + " " + std::string(token.str), tokens[p]);
         p++;
         return true;
     }
@@ -137,10 +135,15 @@ std::tuple<bool, std::string_view> acceptStr(Parser& parser)
     return { true, parser.next().str };
 }
 
-bool acceptAnyCaseStr(Parser& parser, const char* str)
+bool acceptAnyCaseStr(Parser& parser, const std::string_view& str)
 {
-    if(parser.peek().type != Token::String || lower(parser.peek().str) != str)
+    if(parser.peek().type != Token::String)
         return false;
+
+    const auto& a = parser.peek().str;
+    if(!std::equal(a.begin(), a.end(), str.begin(), str.end(), [](char a, char b) { return tolower(a) == tolower(b); }))
+        return false;
+
     parser.next();
     return true;
 }
@@ -148,20 +151,20 @@ bool acceptAnyCaseStr(Parser& parser, const char* str)
 std::string_view expectStr(Parser& parser)
 {
     if(parser.peek().type != Token::String)
-        throw ParseException("Alphanumeric string expected");
+        throw ParseException("Alphanumeric string expected", parser.peek().line, parser.peek().column);
     return parser.next().str;
 }
 
 int expectInt(Parser& parser)
 {
     if(parser.peek().type != Token::Number)
-        throw ParseException("Integer expected", parser.peek().line, parser.peek().column);
+        throw ParseException("Integer expected", parser.peek());
 
     int d = 0;
-    auto st = parser.next().str;
+    const auto& st = parser.next().str;
     auto res = std::from_chars(st.data(), st.data() + st.size(), d);
     if(res.ec == std::errc::invalid_argument)
-        throw ParseException("Integer expected", parser.peek().line, parser.peek().column);
+        throw ParseException("Integer expected", parser.peek());
 
     return d;
 }
@@ -172,7 +175,7 @@ std::tuple<bool, int> acceptInt(Parser& parser)
         return { false, 0 };
 
     int d = 0;
-    auto st = parser.next().str;
+    const auto& st = parser.next().str;
     auto res = std::from_chars(st.data(), st.data() + st.size(), d);
 
     return { true, d };
@@ -181,10 +184,10 @@ std::tuple<bool, int> acceptInt(Parser& parser)
 double expectDouble(Parser& parser)
 {
     if(parser.peek().type != Token::Number)
-        throw ParseException("Floating point expected", parser.peek().line, parser.peek().column);
+        throw ParseException("Floating point expected", parser.peek());
 
     double d = 0;
-    auto st = parser.next().str;
+    const auto& st = parser.next().str;
     auto res = std::from_chars(st.data(), st.data() + st.size(), d);
 
     return d;
@@ -196,7 +199,7 @@ std::tuple<bool, double> acceptDouble(Parser& parser)
         return { false, 0 };
 
     double d = 0;
-    auto st = parser.next().str;
+    const auto& st = parser.next().str;
     auto res = std::from_chars(st.data(), st.data() + st.size(), d);
 
     return { true, d };
@@ -254,31 +257,28 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
 {
     Timer t1;
     t1.Reset();
-    while(!file.eof())
-    {
-        std::istringstream ins;
-        std::string line;
-        std::getline(file, line);
-        auto strs = split(line, '#');
-        str += strs[0] + '\n';
-    }
 
-    int p = 0;
+    // Before tokenizing, remove any comments
+    int i = 0;
+    for(std::string ln; !file.eof(); str += '\n')
+        for(std::getline(file, ln), i = 0; i < ln.size() && ln[i] != '#'; i++)
+            str += ln[i];
 
     std::vector<Token> v;
-    int line = 1, col = 1;
+    int line = 1, col = 1, p = 0;
 
-    auto addToken = [&v, &line, &col] (Token t)
+    auto addToken = [&v, &line, &col, &str] (Token::Type t, int a, int b)
     {
-        for(auto c : t.str) {
-            if(c == '\n')
+        for(auto it = str.begin()+a; it < str.begin()+b; it++) {
+            if(*it == '\n')
                 line++, col = 1;
             else
                 col++;
         }
-        t.line = line;
-        t.column = col;
-        v.push_back(t);
+        Token token(t, str.c_str()+a, str.c_str()+b);
+        token.line = line;
+        token.column = col;
+        v.push_back(token);
     };
 
     auto skipspace = [&p, &str] ()
@@ -287,17 +287,17 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
             p++;
     };
 
-    auto peek = [&p, &str, &skipspace] () -> char
+    auto peek = [&p, &str] () -> char
     {
         return p < str.size() ? str[p] : 0;
     };
 
-    auto next = [&p, &str, &skipspace] () -> char
+    auto next = [&p, &str] () -> char
     {
         return p < str.size() ? str[p++] : 0;
     };
 
-    auto accept = [&p, &str, &skipspace] (char c) -> bool
+    auto accept = [&p, &str] (char c) -> bool
     {
         return (p < str.size() && str[p] == c) ? ++ p : false;
     };
@@ -307,24 +307,24 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
         skipspace();
         auto c = peek();
         if(c == '/' || c == '{' || c == '}' || c == ':') { // Operator
-            addToken(Token(Token::Operator, str.c_str()+p, str.c_str()+p+1));
+            addToken(Token::Operator, p, p+1);
             p++;
         }
 
-        else if(c == '-' || c == '.' || std::isdigit(c)) // Floating point number
+        else if(std::isdigit(c) || c == '-' || c == '.') // Number
         {
             auto c = peek();
             int d = p;
-            // Not the best way of parsing a floating point number ..
+            // Not the best way of parsing a number ..
             for(auto c = peek(); std::isdigit(c) || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-'; c = peek())
                 p++;
 
             double D = 0;
             auto res = std::from_chars(str.c_str()+d, str.c_str() + p, D);
             if(res.ec == std::errc::invalid_argument)
-                throw ParseException("Couldn't parse floating point number \"" + std::string(str.c_str()+d, str.c_str() + p) + "\"", line, col);
+                throw ParseException("Couldn't parse floating point number \"" + str.substr(d, p-d) + "\"", line, col);
 
-            addToken(Token(Token::Number, str.c_str()+d, str.c_str()+p));
+            addToken(Token::Number, d, p);
         }
         else if(std::isalpha(c)) // Identifier
         {
@@ -335,28 +335,27 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
             int d = p;
             while(!std::isspace(peek()))
                 p++;
-            addToken(Token(Token::String, str.c_str()+d, str.c_str()+p));
+            addToken(Token::String, d, p);
         }
         else if(c == '\n') // Endline
         {
             int d = p;
-            addToken(Token(Token::Newline, str.c_str()+d, str.c_str()+ ++p));
+            addToken(Token::Newline, d, ++p);
         }
         else if(accept('\r'))
         {
             int d = p;
-            addToken(Token(Token::Newline, str.c_str()+d, str.c_str()+ ++p));
+            addToken(Token::Newline, d, ++p);
         }
-        else {
+        else
             throw ParseException(std::string("Couldn't parse character: \"") + peek() + "\"");
-        }
     }
-    addToken(Token(Token::Eof));
+    addToken(Token::Eof, str.size(), str.size());
     logger.Box(std::to_string(t1.GetTime()));
     return v;
 }
 
-bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& materials)
+bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Material*>& materials)
 {
     std::ifstream matfile;
     matfile.open(matfilestr.c_str(), std::ios::out);
@@ -399,6 +398,8 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
                     curmat = new DielectricMaterial;
                 else if(b == "ashikhminshirley")
                     curmat = new AshikhminShirley;
+                else
+                    throw ParseException("Unknown material: " + b);
                 
                 while(parser.accept(Token::Newline));
                 parser.expect(Token(Token::Operator, "{"));
@@ -498,13 +499,13 @@ bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& 
         else
         {
             auto token = parser.peek();
-            throw ParseException("Unknown token \"" + std::string(token.str) + "\"", token.line, token.column);
+            throw ParseException("Unknown token \"" + std::string(token.str) + "\"", token);
         }
     }
     return true;
 }
 
-std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat)
+std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string& file, Material* meshMat)
 {
     Material* curmat = nullptr;
     std::ifstream myfile;

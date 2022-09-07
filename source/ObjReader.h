@@ -10,5 +10,5 @@ class Material;
 class TriangleMesh;
 class MeshLight;
 
-std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(std::string file, Material* meshMat);
-bool ReadMaterialFile(std::string matfilestr, std::map<std::string, Material*>& materials);
+std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string& file, Material* meshMat);
+bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Material*>& materials);

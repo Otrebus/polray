@@ -15,7 +15,7 @@ MirrorMaterial::~MirrorMaterial()
 
 Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
 {
-	Vector3d Ng, Ns;
+    Vector3d Ng, Ns;
     const Vector3d in = info.direction;
 
     if(in*info.geometricnormal < 0)
@@ -32,9 +32,9 @@ Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) con
     Vector3d normal = Ns;
 
     Ray out;
-	out.direction = Reflect(info.direction, normal);
-	out.origin = info.position + normal*0.0001f;
-	out.direction.Normalize();
+    out.direction = Reflect(info.direction, normal);
+    out.origin = info.position + normal*0.0001f;
+    out.direction.Normalize();
 
     return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1), out, 1, 1, true, 1);
 }

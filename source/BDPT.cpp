@@ -196,9 +196,9 @@ Color BDPT::EvalPath(const std::vector<BDVertex*>& lightPath, const std::vector<
                 return Color(0, 0, 0);
         }
         BDVertex* lastE = eyePath[t-2]; 
-		if(lastE->out.direction*lightNormal < 0)
+        if(lastE->out.direction*lightNormal < 0)
             return light->GetIntensity()*prevE->alpha/prevE->rr;
-		else 
+        else 
             return Color(0, 0, 0);
     }
 
@@ -466,17 +466,17 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
         delete eyePath[t-1];
 }
 
-void BDPT::Render(Camera& cam, ColorBuffer& colBuf)	
-{	
+void BDPT::Render(Camera& cam, ColorBuffer& colBuf)
+{
     ColorBuffer lightImage(colBuf.GetXRes(), colBuf.GetYRes(), Color::Black);
     ColorBuffer eyeImage(colBuf.GetXRes(), colBuf.GetYRes(), Color::Black);
 
-    for(int x = 0; x < colBuf.GetXRes(); x++)	
-        for(int y = 0; y < colBuf.GetYRes() && !stopping; y++)	
-            RenderPixel(x, y, cam, eyeImage, lightImage);	
+    for(int x = 0; x < colBuf.GetXRes(); x++)
+        for(int y = 0; y < colBuf.GetYRes() && !stopping; y++)
+            RenderPixel(x, y, cam, eyeImage, lightImage);
 
-    for(int x = 0; x < colBuf.GetXRes(); x++)	
-        for(int y = 0; y < colBuf.GetYRes(); y++)	
+    for(int x = 0; x < colBuf.GetXRes(); x++)
+        for(int y = 0; y < colBuf.GetYRes(); y++)
             colBuf.AddColor(x, y, eyeImage.GetPixel(x, y) + lightImage.GetPixel(x, y));
 }
 

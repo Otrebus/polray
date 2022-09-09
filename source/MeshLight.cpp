@@ -195,7 +195,6 @@ void MeshLight::Transform(const Matrix3d& m)
 
 void MeshLight::Save(Bytestream& stream) const
 {
-    // This could also be a hash table, for very large triangle meshes
     stream << (unsigned char)ID_MESHLIGHT;
     mesh->Save(stream);
     stream << intensity_;
@@ -227,7 +226,7 @@ double MeshLight::GetArea() const
 void MeshLight::AddToScene(Scene* scn)
 {
     for(auto& t : mesh->triangles)
-		Scene::PrimitiveAdder::AddPrimitive(*scn, t);
+        Scene::PrimitiveAdder::AddPrimitive(*scn, t);
     Scene::LightAdder::AddLight(*scn, this);
 }
 

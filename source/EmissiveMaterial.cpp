@@ -15,20 +15,12 @@ EmissiveMaterial::EmissiveMaterial()
 
 EmissiveMaterial::~EmissiveMaterial()
 {
-    // Not sure what I meant with this
-    if(normalmap)
-        delete normalmap;
-    if(texture)
-        delete texture;
 }
 
 Sample EmissiveMaterial::GetSample(const IntersectionInfo& info, bool) const
 {
-    auto pdf = 2*pi;
-    auto rpdf = 2*pi;
-
     auto out = Ray(info.position, -info.direction);
-    return Sample(Color(0.0, 0.0, 0.0), out, pdf, rpdf, false, 1); // Blackbody
+    return Sample(Color(0.0, 0.0, 0.0), out, 2*pi, 2*pi, false, 1);
 }
 
 Light* EmissiveMaterial::GetLight() const

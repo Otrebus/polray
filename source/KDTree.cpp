@@ -151,7 +151,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
     double bestsplit = 0;
     int bestsplitdir = 0;
     char bestside = 0;
-    double bestcost = std::numeric_limits<double>::infinity();
+    double bestcost = inf;
     double boxarea = 2*(bbox.c2.z-bbox.c1.z)*(bbox.c2.y-bbox.c1.y) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.z-bbox.c1.z) + 2*(bbox.c2.x-bbox.c1.x)*(bbox.c2.y-bbox.c1.y);
 
     for(int u = 0; u < 3; u++)
@@ -222,7 +222,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
     // It's not worth it to split this node, make it a leaf
     if(bestcost + boxarea*KDTree::cost_trav > KDTree::cost_triint*shapes.size()*boxarea)
     {
-        if(badsplits <= 0 || bestcost == std::numeric_limits<double>::infinity())
+        if(badsplits <= 0 || bestcost == inf)
         {
             node->m_primitives = shapes;
             //node->m_isLeaf = true;
@@ -558,7 +558,7 @@ IntResult KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool re
         return { -inf, nullptr };
 
     int a = splitdir;
-    double locmint = std::numeric_limits<double>::infinity();
+    double locmint = inf;
     const Primitive* minprimitive = nullptr;
     if(!left && !right) {
         for(auto& s : m_primitives) {

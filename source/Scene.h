@@ -76,14 +76,14 @@ public:
         friend void AreaLight::AddToScene(Scene*);
     };
 
-	Scene(std::string file);
-	Scene();
-	~Scene();
+    Scene(std::string file);
+    Scene();
+    ~Scene();
 
     void Load(Bytestream& b);
     void Save(Bytestream& b) const;
 
-	void AddModel(Model*);
+    void AddModel(Model*);
     void AddLight(Light*);
 
     void SetCamera(Camera* camera);
@@ -106,11 +106,11 @@ public:
     friend class PrimitiveAdder;
     friend class Renderer;
 private:
-	Camera* camera;
+    Camera* camera;
     BoundingBox boundingBox;
     bool calculatedBoundingBox;
 
-	std::vector<Light*> lights;
+    std::vector<Light*> lights;
     std::vector<Model*> models;
     std::vector<const Primitive*> primitives;
     std::unordered_set<Material*> materials;

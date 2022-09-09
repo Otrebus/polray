@@ -112,12 +112,12 @@ bool AreaLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info)
         return false;
 
     info.normal = info.geometricnormal = (c1^c2).Normalized();
-	info.position = pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
-	info.texpos.x = u;
-	info.texpos.y = v;
-	info.material = material;
+    info.position = pos + u*E1 + v*E2 + (info.geometricnormal*info.direction < 0 ? info.geometricnormal*eps : -info.geometricnormal*eps);
+    info.texpos.x = u;
+    info.texpos.y = v;
+    info.material = material;
 
-	return true;
+    return true;
 }
 
 double AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const

@@ -75,34 +75,34 @@ bool Triangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& re
 {
     std::vector<Vector3d> points = { v0.pos, v1.pos, v2.pos };
 
-	ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
-	ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
-	ClipPolygonToAAP(1, true, clipbox.c1.y, points); // Bottom
-	ClipPolygonToAAP(1, false, clipbox.c2.y, points); // Top
-	ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
-	ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
+    ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
+    ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
+    ClipPolygonToAAP(1, true, clipbox.c1.y, points); // Bottom
+    ClipPolygonToAAP(1, false, clipbox.c2.y, points); // Top
+    ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
+    ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
-	resultbox.c1.x = std::numeric_limits<double>::infinity();
-	resultbox.c2.x = -std::numeric_limits<double>::infinity();
-	resultbox.c1.y = std::numeric_limits<double>::infinity();
-	resultbox.c2.y = -std::numeric_limits<double>::infinity();
-	resultbox.c1.z = std::numeric_limits<double>::infinity();
-	resultbox.c2.z = -std::numeric_limits<double>::infinity();
+    resultbox.c1.x = inf;
+    resultbox.c2.x = -inf;
+    resultbox.c1.y = inf;
+    resultbox.c2.y = -inf;
+    resultbox.c1.z = inf;
+    resultbox.c2.z = -inf;
 
-	for(auto v : points)
-	{
-		resultbox.c1.x = v.x < resultbox.c1.x ? v.x : resultbox.c1.x;
-		resultbox.c2.x = v.x > resultbox.c2.x ? v.x : resultbox.c2.x;
-		resultbox.c1.y = v.y < resultbox.c1.y ? v.y : resultbox.c1.y;
-		resultbox.c2.y = v.y > resultbox.c2.y ? v.y : resultbox.c2.y;
-		resultbox.c1.z = v.z < resultbox.c1.z ? v.z : resultbox.c1.z;
-		resultbox.c2.z = v.z > resultbox.c2.z ? v.z : resultbox.c2.z;
-	}
+    for(auto v : points)
+    {
+        resultbox.c1.x = v.x < resultbox.c1.x ? v.x : resultbox.c1.x;
+        resultbox.c2.x = v.x > resultbox.c2.x ? v.x : resultbox.c2.x;
+        resultbox.c1.y = v.y < resultbox.c1.y ? v.y : resultbox.c1.y;
+        resultbox.c2.y = v.y > resultbox.c2.y ? v.y : resultbox.c2.y;
+        resultbox.c1.z = v.z < resultbox.c1.z ? v.z : resultbox.c1.z;
+        resultbox.c2.z = v.z > resultbox.c2.z ? v.z : resultbox.c2.z;
+    }
 
-	if(points.size() > 2)
-		return true;
-	else
-		return false;
+    if(points.size() > 2)
+        return true;
+    else
+        return false;
 }
 
 void Triangle::AddToScene(Scene& scene)

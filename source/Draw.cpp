@@ -43,13 +43,13 @@
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
 
-#define INTERIOR
+//#define INTERIOR
 //#define CUBE
 //#define TEAPOTWITHOUTNORMALS
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
-//#define BOX
+#define BOX
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
@@ -1466,7 +1466,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     TriangleMesh teapot("teapotwithnormals.obj", 0);
     teapot.Transform(translate*scale);*/
     //Renderer* boxrenderer = new RayTracer();
-    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats.obj"));
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original-Mats2.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
     //auto s = std::shared_ptr<Scene> (new Scene());
     Vector3d camPos = Vector3d(0, 1.1, 3);
@@ -1532,9 +1532,9 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
 
     //s->SetPartitioning(new BrutePartitioning());
 
-    /*SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, 100*Color(0.5, 0, 0.8));
-    s->AddLight(boxLight);*/
-    //AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
+    //SphereLight* boxLight = new SphereLight(Vector3d(0.5, 1.1, 0.5), 0.11, 100*Color(0.5, 0, 0.8));
+    //s->AddLight(boxLight);
+    AreaLight* boxLight = new AreaLight(Vector3d(-0.2, 1.97, -0.2), Vector3d(0.4, 0.0, 0.0), Vector3d(0.0, 0, 0.4), Color(500, 500, 500));
 
     //auto a = new AshikhminShirley();
     //a->Rs = Color(0.5, 0.4, 0.6);
@@ -1551,10 +1551,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     s->AddModel(sphere2);*/
 
     //boxLight->AddToScene(s);
-    //s->AddLight(boxLight);
+    s->AddLight(boxLight);
 
-    e = std::shared_ptr<MonEstimator>(new MonEstimator(XRES, YRES));
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
+    r = std::shared_ptr<BDPT>(new BDPT(s));
 #endif
 #ifdef MESHLIGHTBOX
 

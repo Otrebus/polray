@@ -255,8 +255,8 @@ Vector3d expectVtCoordinate(Parser& parser)
 
 std::vector<Token> tokenize(std::ifstream& file, std::string& str)
 {
-    Timer t1;
-    t1.Reset();
+    //Timer t1;
+    //t1.Reset();
 
     // Before tokenizing, remove any comments
     int i = 0;
@@ -351,7 +351,7 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
             throw ParseException(std::string("Couldn't parse character: \"") + peek() + "\"");
     }
     addToken(Token::Eof, str.size(), str.size());
-    logger.Box(std::to_string(t1.GetTime()));
+    //logger.Box(std::to_string(t1.GetTime()));
     return v;
 }
 
@@ -452,7 +452,7 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
                 phongmat->Kd = expectVector3d(parser);
             }
             else if(!emissive)
-                __debugbreak();
+                throw ParseException("Kd specified for custom material");
         }
         else if(acceptAnyCaseStr(parser, "ks"))
         {
@@ -464,7 +464,7 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
                 phongmat->Ks = expectVector3d(parser);
             }
             else if(!emissive)
-                __debugbreak();
+                throw ParseException("Ks specified for custom material");
         }
         else if(acceptAnyCaseStr(parser, "ns"))
         {
@@ -476,7 +476,7 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
                 phongmat->alpha = expectInt(parser);
             }
             else if(!emissive)
-                __debugbreak();
+                throw ParseException("Ns specified for custom material");
         }
         else if(acceptAnyCaseStr(parser, "ke")) 
         {

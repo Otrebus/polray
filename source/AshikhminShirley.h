@@ -12,26 +12,26 @@ class AshikhminShirley : public Material
 {
 
 public:
-	AshikhminShirley();
-	~AshikhminShirley();
+    AshikhminShirley();
+    ~AshikhminShirley();
 
-	Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
 
-	Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
+    Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
 
-	Light* GetLight() const;
+    Light* GetLight() const;
     
     virtual double PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const;
 
-	void ReadProperties(std::stringstream& ss);
+    void ReadProperties(std::stringstream& ss);
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
-	mutable Random rnd;
+    mutable Random rnd;
 
-	Color Rd, Rs;
+    Color Rd, Rs;
     int n;
 };
 
-	
+    

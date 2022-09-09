@@ -190,8 +190,8 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, double& tNear, double& tFar, int& ax
     Vector3d transDir = Multiply(invMatU_, invMatV_, invMatW_, inRay.direction);
     Ray ray(transOrigin - transPos, transDir);
 
-    tFar = std::numeric_limits<double>::infinity();
-    tNear = -std::numeric_limits<double>::infinity();
+    tFar = inf;
+    tNear = -inf;
 
     Vector3d c1(-a_/2, -b_/2, -c_/2);
     Vector3d c2(a_/2, b_/2, c_/2);

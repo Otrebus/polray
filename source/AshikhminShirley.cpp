@@ -43,48 +43,41 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
 
     double r = rnd.GetDouble(0.0f, df + sp);
 
+    Vector3d N_g = info.geometricnormal;
+    Vector3d N_s = info.normal;
+    Vector3d w_i = -info.direction;
+
+    if(w_i*N_g < 0)
+        N_g = -N_g;
+
+    if(N_g*N_s < 0)
+        N_s = -N_s;
+
+    Vector3d N = adjoint ? N_g : N_s;
+    Vector3d adjN = adjoint ? N_s : N_g;
+
+    Ray outRay;
+    Vector3d& w_o = outRay.direction;
+
     if(r <= df) // Diffuse bounce
     {
-        Vector3d N_g = info.geometricnormal;
-        Vector3d N_s = info.normal;
-        Vector3d w_i = -info.direction;
-
         double r1 = rnd.GetDouble(0, 1.0);
         double r2 = rnd.GetDouble(0, 1.0);
 
-        if(w_i*N_g < 0)
-            N_g = -N_g;
-
-        if(N_g*N_s < 0)
-            N_s = -N_s;
-
-        Vector3d N = adjoint ? N_g : N_s;
-        Vector3d adjN = adjoint ? N_s : N_g;
-
         auto dir = SampleHemisphereCos(r1, r2, N);
-        const Vector3d& w_o = dir;
 
-        double pdf = w_o*N/pi;
-        double rpdf = w_i*adjN/pi;
-        if(rpdf < 0)
-            rpdf = 0;
-        if(pdf < 0)
-            pdf = 0;
-
-        Ray outRay;
         outRay.origin = info.position;
         outRay.direction = dir;
 
         if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
-        {
-            pdf = rpdf = 0;
-            return Sample(Color(0, 0, 0), outRay, pdf, rpdf, false, 1);
-        }
+            return Sample(Color(0, 0, 0), outRay, 0, 0, false, 1);
 
         // TODO: the below is just the brdf, multiplied by pi, simplify
         Color mod = (28.0f/23.0f)*Rd*(Color::Identity - Rs)*(1-pow(1-abs(N_s*w_i)/2.0f, 5.0f))*(1-pow(1-(N_s*w_o)/2.0f, 5.0f));
 
         auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0f)*mod/(df/(df+sp));
+        double pdf = std::max(0.0, w_o*N/pi);
+        double rpdf = std::max(0.0, w_i*adjN/pi);
         return Sample(color, outRay, pdf, rpdf, false, 1);
     }
     else // Specular bounce
@@ -92,39 +85,20 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) c
         double r1 = rnd.GetDouble(0.0f, 2*pi);
         double r2 = acos(pow(rnd.GetDouble(0, 1.0), 1/double(n+1)));
 
-        Vector3d N_g = info.geometricnormal;
-        Vector3d N_s = info.normal;
-        Vector3d w_i = -info.direction;
-
-        if(w_i*N_g < 0)
-            N_g = -N_g;
-
-        if(N_g*N_s < 0)
-            N_s = -N_s;
-
-        Vector3d N = adjoint ? N_g : N_s;
-        Vector3d adjN = adjoint ? N_s : N_g;
-
         auto [right, forward] = MakeBasis(N_s);
         Vector3d hv = sin(r2)*(forward*cos(r1) + right*sin(r1)) + cos(r2)*N_s;
 
-        Ray outRay;
         outRay = Ray(info.position, -w_i + 2*(w_i*hv)*hv);
         outRay.direction.Normalize();
-        Vector3d& w_o = outRay.direction;
-
-        double pdf = pow(N_s*hv, n)*(n + 1)/((w_i*hv)*8*pi);
-        double rpdf = pdf;
 
         if(w_i*N_s < 0 || w_o*N_s < 0 || w_o*N_g < 0 || w_i*N_g < 0) 
-        {
-            pdf = rpdf = 0;
-            return Sample(Color(0, 0, 0), outRay, pdf, rpdf, false, 2);
-        }
+            return Sample(Color(0, 0, 0), outRay, 0, 0, false, 2);
 
         Color fresnel = Rs + (Color::Identity - Rs)*(pow(1-w_o*hv, 5.0f));
         Color mod = abs(N*w_o)*fresnel/(max(N_s*w_i, N_s*w_o));
         auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0f)*mod/(sp/(df+sp));
+        double pdf = pow(N_s*hv, n)*(n + 1)/((w_i*hv)*8*pi);
+        double rpdf = pdf;
         return Sample(color, outRay, pdf, rpdf, false, 2);
     }
 }
@@ -159,7 +133,7 @@ Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out, 
 
 Light* AshikhminShirley::GetLight() const
 {
-    return 0;
+    return nullptr;
 }
 
 double AshikhminShirley::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const

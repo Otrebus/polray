@@ -1,6 +1,7 @@
 #include <algorithm>
 #include "MonEstimator.h"
 #include "Bytestream.h"
+#include "Utils.h"
 
 void Bucket::Save(Bytestream& stream) const
 {
@@ -41,18 +42,23 @@ void MonEstimator::AddSample(int x, int y, const Color& c)
 Color MonEstimator::GetEstimate(int x, int y) const
 {
     int ns = nSamples[y*width+x];
-    if(ns < M) {
+    if(ns < M)
+    {
         // If we haven't filled all the buckets yet, just do an average of the samples that we have
         auto avg = Color::Black;
         for(int i = 0; i < ns; i++)
             avg += GetBucket(x, y, i).avg/ns;
         return avg;
-    } else {
+    }
+    else
+    {
         // Order the buckets by the average estimator (as pBuckets)
         Bucket* pBuckets[M];
         for(int i = 0; i < M; i++)
             pBuckets[i] = &GetBucket(x, y, i);
-        std::sort(pBuckets, pBuckets+M, [] (Bucket* a, Bucket* b) { return a->avg.GetMax() < b->avg.GetMax(); });
+
+        auto fn = [] (Bucket* a, Bucket* b) { return a->avg.GetMax() < b->avg.GetMax(); };
+        std::sort(pBuckets, pBuckets+M, fn);
 
         // Calculate the Gini coefficent
         double nom = 0, denom = 0;
@@ -64,11 +70,10 @@ Color MonEstimator::GetEstimate(int x, int y) const
         auto G = nom/denom - double(M+1)/M;
         if(!nom)
             return Color::Black;
-        if(std::abs(G) < 1e-9)
+        if(std::abs(G) < eps)
             return pBuckets[0]->avg;
-        if(!(G > 0 && G <= 1)) {
+        if(G <= 0 || G > 1)
             return Color::Black;
-        }
 
         // Average the medians
         int c = int(G*(M/2));
@@ -82,35 +87,27 @@ Color MonEstimator::GetEstimate(int x, int y) const
 void MonEstimator::Save(Bytestream& stream) const
 {
     stream << ID_MONESTIMATOR << height << width;
-    for(int y = 0; y < height; y++) {
-        for(int x = 0; x < width; x++) {
+    for(int y = 0; y < height; y++)
+        for(int x = 0; x < width; x++)
             stream << nSamples[y*width+x];
-        }
-    }
-    for(int y = 0; y < height; y++) {
-        for(int x = 0; x < width; x++) {
-            for(int m = 0; m < M; m++) {
+
+    for(int y = 0; y < height; y++)
+        for(int x = 0; x < width; x++)
+            for(int m = 0; m < M; m++)
                 GetBucket(x, y, m).Save(stream);
-            }
-        }
-    }
 }
 
 void MonEstimator::Load(Bytestream& stream)
 {
     stream >> height >> width;
     nSamples = new int[width*height];
-    for(int y = 0; y < height; y++) {
-        for(int x = 0; x < width; x++) {
+    for(int y = 0; y < height; y++)
+        for(int x = 0; x < width; x++)
             stream >> nSamples[y*width+x];
-        }
-    }
+
     buckets = new Bucket[width*height*M];
-    for(int y = 0; y < height; y++) {
-        for(int x = 0; x < width; x++) {
-            for(int m = 0; m < M; m++) {
+    for(int y = 0; y < height; y++)
+        for(int x = 0; x < width; x++)
+            for(int m = 0; m < M; m++)
                 GetBucket(x, y, m).Load(stream);
-            }
-        }
-    }
 }

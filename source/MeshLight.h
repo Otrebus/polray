@@ -38,7 +38,7 @@ public:
     virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
     Color GetIntensity() const;
 
-    virtual Color NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lightPoint, Vector3d& lightNormal, int component) const;
+    std::tuple<Color, Vector3d> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
 
     virtual double GetArea() const;
 

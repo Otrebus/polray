@@ -163,7 +163,6 @@
     <ClCompile Include="source\CsgIntersection.cpp" />
     <ClCompile Include="source\CsgObject.cpp" />
     <ClCompile Include="source\CsgSphere.cpp" />
-    <ClCompile Include="source\Cubemap.cpp" />
     <ClCompile Include="source\DielectricMaterial.cpp" />
     <ClCompile Include="source\Draw.cpp" />
     <ClCompile Include="source\EmissiveMaterial.cpp" />
@@ -190,7 +189,6 @@
     <ClCompile Include="source\PathTracer.cpp" />
     <ClCompile Include="source\PhongMaterial.cpp" />
     <ClCompile Include="source\PinholeCamera.cpp" />
-    <ClCompile Include="source\PreethamSky.cpp" />
     <ClCompile Include="source\Primitive.cpp" />
     <ClCompile Include="source\Random.cpp" />
     <ClCompile Include="source\Ray.cpp" />
@@ -229,11 +227,9 @@
     <ClInclude Include="source\CsgIntersection.h" />
     <ClInclude Include="source\CsgObject.h" />
     <ClInclude Include="source\CsgSphere.h" />
-    <ClInclude Include="source\Cubemap.h" />
     <ClInclude Include="source\DielectricMaterial.h" />
     <ClInclude Include="source\Draw.h" />
     <ClInclude Include="source\EmissiveMaterial.h" />
-    <ClInclude Include="source\EnvironmentLight.h" />
     <ClInclude Include="source\Estimator.h" />
     <ClInclude Include="source\GeometricRoutines.h" />
     <ClInclude Include="source\Gfx.h" />
@@ -257,7 +253,6 @@
     <ClInclude Include="source\PathTracer.h" />
     <ClInclude Include="source\PhongMaterial.h" />
     <ClInclude Include="source\PinholeCamera.h" />
-    <ClInclude Include="source\PreethamSky.h" />
     <ClInclude Include="source\Primitive.h" />
     <ClInclude Include="source\Random.h" />
     <ClInclude Include="source\Ray.h" />

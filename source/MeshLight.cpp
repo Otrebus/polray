@@ -230,13 +230,13 @@ void MeshLight::AddToScene(Scene* scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-Color MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d&, Vector3d&, int component) const
+std::tuple<Color, Vector3d> MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
-    auto [lightPoint_, lightNormal_] = SamplePoint();
-    Vector3d toLight = lightPoint_ - info.position;
+    auto [lightPoint, lightNormal] = SamplePoint();
+    Vector3d toLight = lightPoint - info.position;
     Vector3d normal = info.normal;
 
-    if(toLight*lightNormal_ < 0)
+    if(toLight*lightNormal < 0)
     {
         double d = toLight.Length();
         toLight.Normalize();
@@ -246,14 +246,14 @@ Color MeshLight::NextEventEstimation(const Renderer* renderer, const Intersectio
         if(renderer->TraceShadowRay(lightRay, (1-1e-6)*d))
         {
             double cosphi = abs(normal*toLight);
-            double costheta = abs(toLight*lightNormal_);
+            double costheta = abs(toLight*lightNormal);
             Color c;
             c = info.material->BRDF(info, toLight, component)
                 *costheta*cosphi*intensity_*GetArea()/(d*d);
-            return c;
+            return { c, lightPoint };
         }
     }
-    return Color(0, 0, 0);
+    return { Color(0, 0, 0), lightPoint };
 }
 
 Color MeshLight::GetIntensity() const

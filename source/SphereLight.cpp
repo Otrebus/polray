@@ -114,7 +114,7 @@ void SphereLight::AddToScene(Scene* scn)
     s->SetMaterial(material);
 }
 
-Color SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
+std::tuple<Color, Vector3d> SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     Vector3d lightPoint, lightNormal;
     Vector3d toLight = position_ - info.position;
@@ -122,8 +122,6 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
     toLight.Normalize();
     SamplePointHemisphere(-toLight, lightPoint, lightNormal);
     lightPoint = lightPoint + lightNormal*eps;
-    lp = lightPoint;
-    ln = lightNormal;
     toLight = lightPoint - info.position;
     double d = toLight.Length();
     toLight.Normalize();
@@ -137,8 +135,8 @@ Color SphereLight::NextEventEstimation(const Renderer* renderer, const Intersect
             double costheta = abs(toLight*lightNormal);
             Color c;
             c = info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(2*d*d);
-            return c;
+            return { c, lightPoint };
         }
     }
-    return Color(0, 0, 0);
+    return { Color(0, 0, 0), lightPoint };
 }

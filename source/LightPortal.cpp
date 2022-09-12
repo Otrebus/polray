@@ -181,16 +181,13 @@ void LightPortal::AddToScene(Scene* scn)
     light->scene = scn;
 }
 
-Color LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
+std::tuple<Color, Vector3d> LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
-    Vector3d lightPoint, lightNormal;
-    auto color = light->NextEventEstimation(renderer, info, lightPoint, lightNormal, component);
-    lp = lightPoint;
-    ln = lightNormal;
+    auto [color, lightPoint] = light->NextEventEstimation(renderer, info, component);
     Ray ray(info.position, (lightPoint-info.position).Normalized());
 
     for(auto p : portals)
         if(p.Intersect(ray) >= 0)
-            return color;
-    return Color(0, 0, 0);
+            return { color, lightPoint } ;
+    return { Color(0, 0, 0), lightPoint };
 }

@@ -112,8 +112,7 @@ Color UniformEnvironmentLight::GetIntensity() const
 
 void UniformEnvironmentLight::Save(Bytestream& s) const
 {
-    s << ID_UNIFORMENVIRONMENTLIGHT << position.x << position.y << position.z
-      << radius << intensity;
+    s << ID_UNIFORMENVIRONMENTLIGHT << position.x << position.y << position.z << radius << intensity;
 }
 void UniformEnvironmentLight::Load(Bytestream& s)
 {
@@ -124,7 +123,7 @@ void UniformEnvironmentLight::Load(Bytestream& s)
     material->light = this;
 }
 
-Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
+std::tuple<Color, Vector3d> UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     auto [lightPoint, lightNormal] = SamplePoint();
     auto toLight = lightPoint - info.position;
@@ -136,14 +135,11 @@ Color UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, con
     {
         double cosphi = abs(info.normal*toLight);
         double costheta = abs(toLight*lightNormal);
-        Color c;
         Material* mat = info.material;
-        c = mat->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d);
-        lp = lightPoint;
-        ln = lightNormal;
-        return c;
+        Color c = mat->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d);
+        return { c, lightPoint };
     }
-    return Color(0, 0, 0);
+    return { Color(0, 0, 0), lightPoint };
 }
 
 std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformEnvironmentLight::GetProjectedSceneHull(Ray& ray, Vector3d normal) const

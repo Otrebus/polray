@@ -181,11 +181,9 @@ void AreaLight::Load(Bytestream& stream)
     stream >> pos >> c1 >> c2 >> intensity_;
 }
 
-Color AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Vector3d& lp, Vector3d& ln, int component) const
+std::tuple<Color, Vector3d> AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     auto [lightPoint, lightNormal] = SamplePoint();
-    lp = lightPoint;
-    ln = lightNormal;
 
     Vector3d toLight = lightPoint - info.position;
     Vector3d normal = info.normal;
@@ -203,8 +201,8 @@ Color AreaLight::NextEventEstimation(const Renderer* renderer, const Intersectio
             double costheta = abs(toLight*lightNormal);
             Color c;
             c = info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(d*d);
-            return c;
+            return { c, lightPoint };
         }
     }
-    return Color::Black;
+    return { Color::Black, lightPoint };
 }

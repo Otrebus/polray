@@ -39,9 +39,6 @@
     <Filter Include="Source Files\Utils">
       <UniqueIdentifier>{dcb247f0-d5ac-43e9-8f98-53c781b0cbae}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Lights\EnvironmentLights">
-      <UniqueIdentifier>{c50c8409-bdfb-4472-a2c1-56baab79e891}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Spectral">
       <UniqueIdentifier>{ccd244fc-f3b8-403e-ac27-7af62679984e}</UniqueIdentifier>
     </Filter>
@@ -187,12 +184,6 @@
     </ClCompile>
     <ClCompile Include="source\BrutePartitioning.cpp">
       <Filter>Source Files\Spatial subdivision</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Cubemap.cpp">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
-    </ClCompile>
-    <ClCompile Include="source\PreethamSky.cpp">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClCompile>
     <ClCompile Include="source\LightPortal.cpp">
       <Filter>Source Files\Lights</Filter>
@@ -378,15 +369,6 @@
     </ClInclude>
     <ClInclude Include="source\BrutePartitioning.h">
       <Filter>Source Files\Spatial subdivision</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Cubemap.h">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
-    </ClInclude>
-    <ClInclude Include="source\PreethamSky.h">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
-    </ClInclude>
-    <ClInclude Include="source\EnvironmentLight.h">
-      <Filter>Source Files\Lights\EnvironmentLights</Filter>
     </ClInclude>
     <ClInclude Include="source\LightPortal.h">
       <Filter>Source Files\Lights</Filter>

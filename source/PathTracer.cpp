@@ -105,12 +105,8 @@ Color PathTracer::TracePath(const Ray& ray) const
         minprimitive = nullptr;
         minlight = nullptr;
         if(scene->Intersect(inRay, minprimitive, minlight) < 0)
-        {
-        //    if(scene->GetEnvironmentLight())
-        //      return scene->GetEnvironmentLight()->GetRadiance(outRay.direction);
-        //    3*Color(0.9, 1.2, 1.5) was the original sky color
             break;
-        }
+
         if(minprimitive)
             minprimitive->GenerateIntersectionInfo(inRay, info);
         else
@@ -140,8 +136,8 @@ Color PathTracer::TracePath(const Ray& ray) const
             sampledLight = false;
         else
         {
-            Vector3d dummy;
-            finalColor += pathColor*light->NextEventEstimation(this, info, dummy, dummy, sample.component);
+            auto [color, lightPoint] = light->NextEventEstimation(this, info, sample.component);
+            finalColor += pathColor*color;
             sampledLight = true;
         }
         pathColor *= c/0.7f;

@@ -19,11 +19,6 @@ typedef double AnglePdf;
 typedef Vector3d Point;
 typedef Vector3d Normal;
 
-// #undef min
-// #undef max
-#define min min
-#define max max
-
 template<typename T> T sgn(T s)
 {
     return s > 0 ? 1 : s < 0 ? -1 : 0;

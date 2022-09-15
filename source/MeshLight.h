@@ -13,10 +13,8 @@ class Renderer;
 class Scene;
 class Matrix3d;
 
-class TriangleNode
+struct TriangleNode
 {
-    friend class MeshLight;
-
     double cutoff;
     TriangleNode* leftChild, *rightChild;
     MeshTriangle* triangle;

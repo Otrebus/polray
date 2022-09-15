@@ -1,3 +1,4 @@
+Fill typedefs ("Normal" etc)
 Fix the normalInterp stuff
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Replace debugbreaks with better error messages
@@ -7,6 +8,7 @@ Copy to clipboard feature
 Refactor GetProjectedSceneHull
 Use more modern threads
 Make TraceShadowRay account for light portals
+"Intersecting against lights might need a rethink"
 Unhardcode light area sampling in light portal
 Think of a better way of dealing with epsilons - account for numerical errors etc
 (mostly for "fun") Make light portals work inside scenes

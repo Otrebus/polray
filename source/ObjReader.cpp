@@ -104,7 +104,7 @@ public:
 
     bool expect(Token::Type t)
     {
-        if(p >= tokens.size() || tokens[p].type != t)
+        if(tokens[p].type != t)
             throw ParseException("Expected " + Token::typeStrs[t], tokens[p]);
         p++;
         return true;
@@ -112,7 +112,7 @@ public:
 
     bool expect(const Token& token)
     {
-        if(p >= tokens.size() || tokens[p] != token)
+        if(tokens[p] != token)
             throw ParseException("Expected " + Token::typeStrs[token.type] + " " + std::string(token.str), tokens[p]);
         p++;
         return true;

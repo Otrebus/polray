@@ -35,8 +35,6 @@ public:
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
-    void Transform(const Matrix3d& m);
-
     double GetArea();
     Vector3d GetNormal() const;
 

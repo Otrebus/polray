@@ -11,6 +11,10 @@
 #include <numeric>
 #include <unordered_map>
 
+MeshVertex::~MeshVertex()
+{
+}
+
 MeshTriangle::MeshTriangle(const Vector3d& a, const Vector3d& b, const Vector3d& c)
 {
     v0 = new MeshVertex(a);

@@ -153,13 +153,10 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> AreaLight::SampleRay() const
 
 std::tuple<Point, Normal> AreaLight::SamplePoint() const
 {
-    double x, y;
+    double x = r.GetDouble(0, 1), y = r.GetDouble(0, 1);
     Vector3d normal = c1^c2;
     normal.Normalize();
     Vector3d dir;
-
-    x = r.GetDouble(0, 1);
-    y = r.GetDouble(0, 1);
 
     return { pos + c1*x + c2*y + eps*normal, normal };
 }
@@ -199,8 +196,7 @@ std::tuple<Color, Vector3d> AreaLight::NextEventEstimation(const Renderer* rende
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
-            Color c;
-            c = info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(d*d);
+            Color c(info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(d*d));
             return { c, lightPoint };
         }
     }

@@ -10,7 +10,7 @@ public:
     Vertex3d(const Vector3d&);
     Vertex3d(double x, double y, double z);
     Vertex3d();
-    ~Vertex3d();
+    virtual ~Vertex3d();
 
     Vector3d pos, normal;
     Vector2d texpos;

@@ -43,19 +43,23 @@ LightPortal::~LightPortal()
 {
 }
 
-void LightPortal::AddPortal(Vector3d pos, Vector3d v1, Vector3d v2) {
+void LightPortal::AddPortal(Vector3d pos, Vector3d v1, Vector3d v2)
+{
     portals.push_back(Portal(pos, v1, v2));
 }
 
-void LightPortal::SetLight(Light* l) {
+void LightPortal::SetLight(Light* l)
+{
     light = l;
 }
 
 double LightPortal::Intersect(const Ray& ray) const
 {
-    for(auto p : portals) {
+    for(auto p : portals)
+    {
         auto t = p.Intersect(ray);
-        if(t != -inf) {
+        if(t != -inf)
+        {
             // This doesn't take into account which side of the portal the light is
             // which helps to calculate self-intersections of a light outside the scene.
             // However, if you put the portals + light inside the scene this wouldn't give the correct result
@@ -75,9 +79,11 @@ bool LightPortal::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& inf
 double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     Ray ray(info.position, out);
-    for(auto p : portals) {
+    for(auto p : portals)
+    {
         auto t = p.Intersect(ray);
-        if(t != -inf) {
+        if(t != -inf)
+        {
             auto portalNormal = p.GetNormal();
             auto lightNormal = info.normal;
 
@@ -95,7 +101,7 @@ double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return 0;
 }
 
-std::tuple<Ray, Color, Vector3d, double, double> LightPortal::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay() const
 {
     // Pick the portal that we will sample the light through
     double areaSum = 0;
@@ -103,9 +109,11 @@ std::tuple<Ray, Color, Vector3d, double, double> LightPortal::SampleRay() const
         areaSum += p.GetArea();
     double a = r.GetDouble(0, areaSum), s = 0;
     Portal portal;
-    for(auto p : portals) {
+    for(auto p : portals)
+    {
         s += p.GetArea()*(1+eps);
-        if(a < s) {
+        if(a < s)
+        {
             portal = p;
             break;
         }
@@ -152,7 +160,8 @@ void LightPortal::Load(Bytestream& stream)
 {
     size_t portalSize;
     stream >> portalSize;
-    for(int i = 0; i < portalSize; i++) {
+    for(int i = 0; i < portalSize; i++)
+    {
         Portal portal;
         stream >> portal.pos >> portal.v1 >> portal.v2;
         portals.push_back(portal);
@@ -181,7 +190,7 @@ void LightPortal::AddToScene(Scene* scn)
     light->scene = scn;
 }
 
-std::tuple<Color, Vector3d> LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     auto [color, lightPoint] = light->NextEventEstimation(renderer, info, component);
     Ray ray(info.position, (lightPoint-info.position).Normalized());

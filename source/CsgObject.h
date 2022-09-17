@@ -26,7 +26,7 @@ public:
     virtual bool Intersect(const Ray& ray, hits& intersects) const = 0;
 
     virtual BoundingBox GetBoundingBox() const = 0;
-    virtual bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const = 0;
+    virtual std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const = 0;
 
     virtual double Intersect(const Ray& ray) const = 0;
     virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;

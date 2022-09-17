@@ -26,7 +26,8 @@ Light* Light::Create(unsigned char c)
         return new UniformEnvironmentLight;
     else if(c == ID_MESHLIGHT)
         return new MeshLight;
-    else {
+    else
+    {
         __debugbreak();
         return new AreaLight; // To satisfy the compiler who thinks the function otherwise might return null
     }

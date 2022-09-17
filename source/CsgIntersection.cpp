@@ -43,10 +43,9 @@ BoundingBox CsgIntersection::GetBoundingBox() const
     return BoundingBox(c1, c2);
 }
 
-bool CsgIntersection::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
+std::tuple<bool, BoundingBox> CsgIntersection::GetClippedBoundingBox(const BoundingBox&) const
 {
-    resultbox = GetBoundingBox();
-    return true;
+    return { true, GetBoundingBox() };
 }
 
 double CsgIntersection::Intersect(const Ray& ray) const

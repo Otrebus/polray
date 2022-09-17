@@ -49,13 +49,13 @@ double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return std::max(0.0, (out*info.normal)/pi);
 }
 
-std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SphereLight::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SphereLight::SampleRay() const
 {
     Ray ray;
 
     auto [point, normal] = SamplePoint();
     ray.origin = point;
-    auto [right, forward] = MakeBasis(normal);
+    auto [rightNode, forward] = MakeBasis(normal);
 
     double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
@@ -78,7 +78,7 @@ std::tuple<Point, Normal> SphereLight::SamplePoint() const
 
 void SphereLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const
 {
-    Vector3d right, forward;
+    Vector3d rightNode, forward;
     double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
     Vector3d pos;
     pos = SampleHemisphereUniform(r1, r2, apex);
@@ -114,7 +114,7 @@ void SphereLight::AddToScene(Scene* scn)
     s->SetMaterial(material);
 }
 
-std::tuple<Color, Vector3d> SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     Vector3d lightPoint, lightNormal;
     Vector3d toLight = position_ - info.position;

@@ -15,7 +15,7 @@ void ClipPolygonToAAP(int axis, bool side, double pos, std::vector<Vector3d>& in
     output.reserve(6);
     const int& a = axis;
 
-    for(std::vector<Vector3d>::iterator it = input.begin(); it < input.end(); it++)
+    for(auto it = input.begin(); it < input.end(); it++)
     {
         Vector3d s = *it, e; // Start and end vectors for this line segment
         e = it + 1 == input.end() ? input.front() : it[1];
@@ -60,16 +60,16 @@ std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
 Vector3d SampleHemisphereCos(double r1, double r2, const Vector3d& apex)
 {
     // See also: https://twitter.com/mmalex/status/1550765798263758848
-    auto [right, forward] = MakeBasis(apex);
+    auto [rightNode, forward] = MakeBasis(apex);
 
-    return forward*cos(r1*2*pi)*sqrt(r2) + right*sin(r1*2*pi)*sqrt(r2) + apex*sqrt(1-r2) + apex*eps;
+    return forward*cos(r1*2*pi)*sqrt(r2) + rightNode*sin(r1*2*pi)*sqrt(r2) + apex*sqrt(1-r2) + apex*eps;
 }
 
 Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
 {
-    auto [right, forward] = MakeBasis(apex);
+    auto [rightNode, forward] = MakeBasis(apex);
 
-    return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + right*sin(r1*2*pi)*sqrt(1-r2*r2) + apex*r2;
+    return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + rightNode*sin(r1*2*pi)*sqrt(1-r2*r2) + apex*r2;
 }
 
 Vector3d SampleSphereUniform(double r1, double r2)
@@ -92,7 +92,8 @@ double IntersectSphere(const Vector3d& position, double radius, const Ray& ray)
 
     double t = -B/(2*A) - sqrt(D);
 
-    if(D > 0) {
+    if(D > 0)
+    {
         if(t < eps)
             return -B/(2*A) + sqrt(D) > 0 ? t = -B/(2*A) + sqrt(D) : -inf;
         return t;

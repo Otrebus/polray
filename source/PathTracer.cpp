@@ -122,9 +122,9 @@ Color PathTracer::TracePath(const Ray& ray) const
                 return finalColor/lightWeight;
             else return pathColor*( info.normal*info.direction < 0
                         ? light->GetIntensity()/lightWeight : Color(0, 0, 0) );
-        } else if(info.material->GetLight()) {
-            return finalColor/lightWeight;
         }
+        else if(info.material->GetLight())
+            return finalColor/lightWeight;
 
         auto sample = material->GetSample(info, false);
         auto c = sample.color;

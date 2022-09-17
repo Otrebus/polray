@@ -10,9 +10,11 @@ class SpatialPartitioning;
 
 class SAHEvent;
 
-struct IntResult {
-    double t;
-    const Primitive* primitive;
+class KDPrimitive
+{
+public:
+    const Primitive* p;
+    int side;
 };
 
 class KDNode
@@ -26,12 +28,13 @@ public:
     static double SAHCost(int nPrimitives, double area, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side);
 
     double Intersect(const Ray&, const Primitive*&) const;
-    IntResult IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive) const;
+    std::pair<double, const Primitive*> IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive) const;
     double IntersectIter(const Ray& _ray, const Primitive* &minprimitive, double tmin, double tmax) const;
 
+    void Build(BoundingBox& bbox, std::vector<SAHEvent*>* events, const std::vector<KDPrimitive*>& primitives, int depth, int badsplits);
     bool IsLeaf() const;
 
-    KDNode *left, *right;
+    KDNode *leftNode, *rightNode;
     double m_splitpos;
     int splitdir;
 };
@@ -47,8 +50,6 @@ public:
     void Build(const std::vector<const Primitive*>&);
     double Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive) const;
     BoundingBox CalculateExtents(const std::vector<const Primitive*>& primitives);
-    
-    void BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* events, const std::vector<const Primitive*>& primitives, int depth, int badsplits);
 
     BoundingBox m_bbox;
 
@@ -57,15 +58,16 @@ public:
     static double cost_trav;
     static double cost_boxint;
 
-    static const int left = 0;
-    static const int right = 1;
+    static const int leftNode = 0;
+    static const int rightNode = 1;
 };
 
 class SAHEvent
 {
 public:
-    SAHEvent(const Primitive*, double, int);
-    const Primitive* triangle;
+    SAHEvent(KDPrimitive*, double, int);
+
+    KDPrimitive* primitive;
     double position;
     int type;
     static const char end = 0;

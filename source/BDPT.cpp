@@ -46,7 +46,8 @@ void Roulette::AddSample(double sample, int nrays)
     samplesSq.push_back(sample*sample);
     rays.push_back(nrays);
 
-    if(samples.size() > N) {
+    if(samples.size() > N)
+    {
         sum -= samples.front();
         sumSq -= samplesSq.front();
         sumRays -= rays.front();
@@ -57,18 +58,20 @@ void Roulette::AddSample(double sample, int nrays)
     }
 }
 
-double Roulette::GetThreshold() const {
+double Roulette::GetThreshold() const
+{
     std::lock_guard<std::mutex> lock(*m);
     auto size = samples.size();
     auto ret = std::sqrt((sumSq - (1/double(size))*sum*sum)/double(sumRays));
     return std::isfinite(ret) ? std::abs(ret) : 1;
 }
 
-int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const {
-
+int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const
+{
     double rr = 0.7;
 
-    while(path.size() < 3 || m_random.GetDouble(0.f, 1.f) < rr) {
+    while(path.size() < 3 || m_random.GetDouble(0.f, 1.f) < rr)
+    {
         BDVertex* lastV = path.back();
 
         const Primitive* hitPrimitive;
@@ -100,7 +103,8 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         //rr = std::min(1.0, newV->alpha.GetLuminance()/roulette[x+y*XRES].GetThreshold());
         rr = 0.7;
 
-        if(!lightPath) {
+        if(!lightPath)
+        {
             if(!newV->alpha || hitLight && hitLight != light)
             {
                 delete newV;
@@ -117,7 +121,8 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
             }
             else
                 lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
-        } else {
+        } else
+        {
             if(!newV->sample.color)
             {
                 lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
@@ -310,7 +315,8 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
             newPdf = light->Pdf(lastL->info, out);
         forwardProbs[s] = newPdf*abs(lastE->info.geometricnormal*out)/(lSqr);
 
-        if(t > 2) {
+        if(t > 2)
+        {
             info = eyePath[t-1]->info;
             info.direction = out;
             out = eyePath[t-2]->info.position - lastE->info.position;
@@ -346,7 +352,8 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
         else
             newPdf = lastE->info.material->PDF(info, out, false, lastE->sample.component);
         backwardProbs[s-1] = newPdf*abs(lastL->info.geometricnormal*out)/lSqr;
-        if(s > 1) {
+        if(s > 1)
+        {
             info = lightPath[s-1]->info;
             info.direction = out;
             out = lightPath[s-2]->info.position - lastL->info.position;
@@ -413,7 +420,8 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
 
         int s = sample.s, t = sample.t;
         // Build the connecting vertex
-        if(s > 0) {
+        if(s > 0)
+        {
             BDVertex* lastL = lightPath[s-1];
             BDVertex* lastE = eyePath[t-1];
 

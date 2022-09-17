@@ -155,10 +155,9 @@ BoundingBox CsgCylinder::GetBoundingBox() const
     return BoundingBox(pos_ + c1, pos_ + c2);
 }
 
-bool CsgCylinder::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
+std::tuple<bool, BoundingBox> CsgCylinder::GetClippedBoundingBox(const BoundingBox&) const
 {
-    resultbox = GetBoundingBox();
-    return true;
+    return { true, GetBoundingBox() };
 }
 
 double CsgCylinder::Intersect(const Ray& inRay) const

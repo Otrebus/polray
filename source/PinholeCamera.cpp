@@ -33,9 +33,9 @@ Ray PinholeCamera::GetRayFromPixel(int x, int y, double a, double b, double, dou
     double rx = halfwidth*(2.f*double(x) - double(xres) + (2.f*a)) / double(xres);
     double ry = halfwidth*(2.f*double(y) - double(yres) + (2.f*b)) / double(xres);
     
-    Vector3d left = up^dir;
-    left.Normalize();
-    Vector3d raydir = dir - (up*ry + left*rx);
+    Vector3d leftNode = up^dir;
+    leftNode.Normalize();
+    Vector3d raydir = dir - (up*ry + leftNode*rx);
     raydir.Normalize();
     return Ray(pos, raydir);
 }
@@ -55,15 +55,15 @@ std::tuple<bool, int, int> PinholeCamera::GetPixelFromRay(const Ray& ray, double
         return { false, 0, 0 };
 
     double ratio = (double)yres/(double)xres;
-    Vector3d left = up^dir;
-    left.Normalize();
+    Vector3d leftNode = up^dir;
+    leftNode.Normalize();
 
-    Vector3d A = left^up;
+    Vector3d A = leftNode^up;
     Vector3d B = dir^ray.direction;
 
     double det = ray.direction*(A);
     double rx = 1/halfwidth*up*B/det;
-    double ry = 1/halfwidth*-left*B/det;
+    double ry = 1/halfwidth*-leftNode*B/det;
 
     double x = ((double)xres*(1.0f - rx)/2.0f);
     double y = ((double)yres*(ratio - ry)/(ratio*2.0f));

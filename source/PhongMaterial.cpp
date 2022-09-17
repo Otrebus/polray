@@ -88,18 +88,17 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) cons
 
         Vector3d up = Reflect(info.direction, N_s);
 
-        auto [right, forward] = MakeBasis(up);
-        Vector3d base = forward*cos(r1) + right*sin(r1);
+        auto [rightNode, forward] = MakeBasis(up);
+        Vector3d base = forward*cos(r1) + rightNode*sin(r1);
 
-        auto out = Ray(info.position, right*std::sin(r1)*sin(r2) + forward*std::cos(r1)*sin(r2) + up*std::cos(r2));
+        auto out = Ray(info.position, rightNode*std::sin(r1)*sin(r2) + forward*std::cos(r1)*sin(r2) + up*std::cos(r2));
         out.direction.Normalize();
         Vector3d w_o = out.direction;
-                double pdf, rpdf;
+
+        double pdf, rpdf;
         pdf = rpdf = pow(out.direction*up, alpha)*(alpha + 1)/(2*pi);
         if(w_i*N_g < 0 || w_o*N_g < 0 || w_i*N_s < 0 || w_o*N_s < 0)
-        {
             return Sample(Color(0, 0, 0), out, 0, 0, false, 2);
-        }
 
         Color mod = abs(out.direction*N)*Ks*float(alpha + 2)/float(alpha + 1);
         return Sample((adjoint ? abs((N_s*w_i)/(N_g*w_i)) : 1)*mod/(sp/(df+sp)), out, pdf, rpdf, false, 2);

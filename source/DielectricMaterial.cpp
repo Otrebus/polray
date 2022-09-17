@@ -69,6 +69,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     }
     Vector3d refraction = wi*(n1/n2) + Ns*(cosi*(n1/n2) - sqrt(d));
     refraction.Normalize();
+
     double cost = -refraction*normal;
     double Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
     double Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
@@ -77,8 +78,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     if(m_rnd.GetDouble(0, 1) > R) // Refracted
     {
         Ray out;
-        out.direction = refraction;
-        out.direction.Normalize();
+        out.direction = refraction.Normalized();
         auto wo = out.direction;
         out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((wi*Ns/(wi*Ng))*(wo*Ng/(wo*Ns))) * Color::Identity : (n1/n2)*(n1/n2)*Color::Identity;
@@ -87,8 +87,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     else // Reflected
     {
         Ray out;
-        out.direction = Reflect(info.direction, Ns);
-        out.direction.Normalize();
+        out.direction = Reflect(info.direction, Ns).Normalized();
         auto wo = out.direction;
         out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;

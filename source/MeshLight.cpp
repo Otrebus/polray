@@ -51,7 +51,8 @@ MeshLight::MeshLight()
 
 MeshTriangle* MeshLight::PickRandomTriangle() const
 {
-    if(!builtTree) {
+    if(!builtTree)
+    {
         area_ = 0;
         for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
             area_ += (*it)->GetArea();
@@ -105,7 +106,7 @@ TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaSta
     return node;
 }
 
-std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> MeshLight::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> MeshLight::SampleRay() const
 {
     Ray ray;
     double areaPdf, anglePdf;
@@ -113,7 +114,7 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> MeshLight::SampleRay() const
     auto [point, normal] = SamplePoint();
     ray.origin = point;
 
-    auto [right, forward] = MakeBasis(normal);
+    auto [rightNode, forward] = MakeBasis(normal);
     double r1 = r.GetDouble(0, 1), r2 = r.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
 
@@ -230,7 +231,7 @@ void MeshLight::AddToScene(Scene* scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-std::tuple<Color, Vector3d> MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     auto [lightPoint, lightNormal] = SamplePoint();
     Vector3d toLight = lightPoint - info.position;

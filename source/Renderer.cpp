@@ -6,13 +6,19 @@
 #include "RayTracer.h"
 #include "LightTracer.h"
 
+#include "Timer.h"
+#include "Logger.h"
+
 Renderer::Renderer(std::shared_ptr<Scene> scene)
 {
     stopping = false;
     this->scene = scene;
     if(!scene->partitioning)
         scene->partitioning = new KDTree();
+    Timer t1;
+    t1.Reset();
     scene->partitioning->Build(scene->primitives);
+    logger.Box(std::to_string(t1.GetTime()));
     m_lights = scene->GetLights();
 }
 

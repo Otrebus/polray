@@ -52,7 +52,7 @@ bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, Intersect
     return true;
 }
 
-std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> UniformEnvironmentLight::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> UniformEnvironmentLight::SampleRay() const
 {
     Ray ray;
     auto [origin, normal] = SamplePoint();
@@ -60,7 +60,7 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> UniformEnvironmentLight::Sam
     
     double areaPdf = 1/GetArea();
 
-    auto [h, A, right, forward, cv] = GetProjectedSceneHull(ray, normal);
+    auto [h, A, rightNode, forward, cv] = GetProjectedSceneHull(ray, normal);
 
     auto n = normal;
     double a = random.GetDouble(0, A);
@@ -68,14 +68,16 @@ std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> UniformEnvironmentLight::Sam
 
     auto pp = ray.origin + normal*(cv*normal);
 
-    for(int i = 0; i < h.size()-2; i++) {
+    for(int i = 0; i < h.size()-2; i++)
+    {
         aSum += std::abs((h[i+1]-h[0])^(h[i+2]-h[0]))/2;
-        if(aSum > a) {
+        if(aSum > a)
+        {
             double u = sqrt(random.GetDouble(0, 1)), v = random.GetDouble(0, 1);
             auto e1 = h[i+1] - h[0], e2 = h[i+2] - h[0];
 
             auto p = h[0] + u*(e1 + v*(e2-e1));
-            auto p3 = right*p.x + forward*p.y + pp;
+            auto p3 = rightNode*p.x + forward*p.y + pp;
             auto dir = (p3-ray.origin);
             ray.direction = dir.Normalized();
             double anglePdf = dir.Length2()/(ray.direction*n)/A;
@@ -89,7 +91,7 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
 {
     auto n = info.normal;
     auto outRay = Ray(info.position, out);
-    auto [h, A, right, forward, cv] = GetProjectedSceneHull(outRay, n);
+    auto [h, A, rightNode, forward, cv] = GetProjectedSceneHull(outRay, n);
 
     auto v = n*(cv*n);
     auto r = v.Length()/std::abs(out*n);
@@ -123,7 +125,7 @@ void UniformEnvironmentLight::Load(Bytestream& s)
     material->light = this;
 }
 
-std::tuple<Color, Vector3d> UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
 {
     auto [lightPoint, lightNormal] = SamplePoint();
     auto toLight = lightPoint - info.position;
@@ -146,7 +148,7 @@ std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformE
 {
     auto bb = scene->GetBoundingBox();
 
-    auto [right, forward] = MakeBasis(normal);
+    auto [rightNode, forward] = MakeBasis(normal);
 
     Vector3d p[8] = {
         { bb.c2.x, bb.c1.y, bb.c2.z },
@@ -164,9 +166,10 @@ std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformE
     auto n = normal;
 
     std::vector<Vector2d> q;
-    for(int i = 0; i < 8; i++) {
+    for(int i = 0; i < 8; i++)
+    {
         auto u = p[i] - ray.origin;
-        Vector2d w = Vector2d(u * right, u * forward).Normalized();
+        Vector2d w = Vector2d(u * rightNode, u * forward).Normalized();
         auto vp = n*(n*u);
         auto v = n*(cv*n);
         auto rp = ((v.Length() / (u*n)) * (u - n*(u*n)).Length());
@@ -180,5 +183,5 @@ std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformE
     for(int i = 0; i < h.size(); i++)
         A += h[i].x*h[(i+1)%h.size()].y - h[i].y*h[(i+1)%h.size()].x;
     A *= 0.5;
-    return { h, A, right, forward, cv };
+    return { h, A, rightNode, forward, cv };
 }

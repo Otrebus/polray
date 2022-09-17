@@ -29,7 +29,7 @@ public:
     void AddPortal(Vector3d pos, Vector3d v1, Vector3d v2);
     void SetLight(Light* light);
 
-    std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SampleRay() const;
+    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay() const;
     std::tuple<Point, Normal> SamplePoint() const;
 
     double Intersect(const Ray& ray) const;
@@ -37,7 +37,7 @@ public:
 
     double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
 
-    std::tuple<Color, Vector3d> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
+    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
 
     Color GetIntensity() const;
 

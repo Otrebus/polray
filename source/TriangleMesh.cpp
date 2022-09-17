@@ -114,14 +114,15 @@ TriangleMesh::~TriangleMesh()
 
 void TriangleMesh::CalculateVertexNormals()
 {
-    for(auto& p : points) {
+    for(auto& p : points)
+    {
         auto& tris = static_cast<MeshVertex*>(p)->triangles;
         p->normal = std::accumulate(tris.begin(), tris.end(), Vector3d(0, 0, 0),
                 [] (auto a, auto t) { return a + t->GetNormal(); }).Normalized();
     }
 }
 
-bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
+std::tuple<bool, BoundingBox> MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 {
     std::vector<Vector3d> points = { v0->pos, v1->pos, v2->pos };
 
@@ -132,7 +133,7 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
     ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
     ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
-    resultbox = BoundingBox { { inf, inf, inf }, { -inf, -inf, -inf } };
+    BoundingBox resultbox{ { inf, inf, inf }, { -inf, -inf, -inf } };
 
     for(auto v : points)
     {
@@ -145,9 +146,9 @@ bool MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox
     }
 
     if(points.size() > 2)
-        return true;
+        return { true, resultbox };
     else
-        return false;
+        return { false, resultbox };
 }
 
 void TriangleMesh::AddToScene(Scene& scene)

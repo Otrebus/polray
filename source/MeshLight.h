@@ -27,7 +27,7 @@ public:
     MeshLight(Color intensity);
     MeshLight();
     ~MeshLight();
-    std::tuple<Ray, Color, Vector3d, AreaPdf, AnglePdf> SampleRay() const;
+    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay() const;
     std::tuple<Point, Normal> SamplePoint() const;
 
     double Intersect(const Ray& ray) const;
@@ -36,7 +36,7 @@ public:
     virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
     Color GetIntensity() const;
 
-    std::tuple<Color, Vector3d> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
+    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
 
     virtual double GetArea() const;
 

@@ -29,7 +29,7 @@ public:
     MeshTriangle();
     ~MeshTriangle();
 
-    bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
+    std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;
     BoundingBox GetBoundingBox() const;
 
     double Intersect(const Ray& ray) const;

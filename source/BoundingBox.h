@@ -15,6 +15,5 @@ public:
     ~BoundingBox();
     bool ContainsPoint(const Vector3d& v);
     bool Intersect(const Ray& ray, double& tnear, double& tfar) const;
-    bool Intersects(const Ray& r);
     Vector3d c1, c2;
 };

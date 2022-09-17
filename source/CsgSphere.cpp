@@ -60,10 +60,9 @@ BoundingBox CsgSphere::GetBoundingBox() const
                        pos_ + Vector3d(radius_, radius_, radius_));
 }
 
-bool CsgSphere::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
+std::tuple<bool, BoundingBox> CsgSphere::GetClippedBoundingBox(const BoundingBox&) const
 {
-    resultbox = GetBoundingBox();
-    return true;
+    return { true, GetBoundingBox() };
 }
 
 double CsgSphere::Intersect(const Ray& ray) const

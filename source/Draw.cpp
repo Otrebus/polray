@@ -49,11 +49,11 @@
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
-#define BOX
+//#define BOX
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-//#define KITCHEN2
+#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -846,7 +846,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->SetPartitioning(new BrutePartitioning());
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<RayTracer>(new RayTracer(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 
 #ifdef WINDOWBOX

@@ -47,7 +47,8 @@ ColorBuffer::ColorBuffer(const ColorBuffer& cb)
 //------------------------------------------------------------------------------
 // Writes a screenshot to the file with the given name.
 //------------------------------------------------------------------------------
-void ColorBuffer::Dump(std::string filename) {
+void ColorBuffer::Dump(std::string filename)
+{
     std::ofstream file;
     file.open(filename, std::ios::binary);
 
@@ -62,8 +63,10 @@ void ColorBuffer::Dump(std::string filename) {
             file.put((0xFF) &(x >> (i*8)));
 
     // Output the screenshot, bottom-up
-    for (int y = height - 1; y >= 0; y--) {
-        for (int x = 0; x < width; x++) {
+    for (int y = height - 1; y >= 0; y--)
+    {
+        for (int x = 0; x < width; x++)
+        {
             auto color = GetPixel(x, y);
             for(auto c : { color.b, color.g, color.r })
                 file.put((char) max(0, min(255, (int)(255*c))));

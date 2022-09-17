@@ -159,10 +159,9 @@ BoundingBox CsgCuboid::GetBoundingBox() const
     return BoundingBox(pos_ - Vector3d(X, Y, Z), pos_ + Vector3d(X, Y, Z));
 }
 
-bool CsgCuboid::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
+std::tuple<bool, BoundingBox> CsgCuboid::GetClippedBoundingBox(const BoundingBox&) const
 {
-    resultbox = GetBoundingBox();
-    return true;
+    return { true, GetBoundingBox() };
 }
 
 void CsgCuboid::AddToScene(Scene& scene)

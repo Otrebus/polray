@@ -12,7 +12,7 @@ public:
     bool Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const;
 
     virtual BoundingBox GetBoundingBox() const;
-    virtual bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
+    virtual std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;
 
     virtual double Intersect(const Ray& ray) const;
     virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;

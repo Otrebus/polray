@@ -7,5 +7,6 @@ Sample::Sample(const Color& color, const Ray& ray, double pdf, double rpdf, bool
     assert(color.IsValid());
 }
 
-Sample::Sample() {
+Sample::Sample()
+{
 }

@@ -20,7 +20,7 @@ public:
     ~Triangle();
 
     BoundingBox GetBoundingBox() const;
-    bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
+    std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;
     
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;

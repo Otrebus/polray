@@ -6,34 +6,41 @@
 #include "Triangle.h"
 #include "Utils.h"
 #include "Timer.h"
+#include "Random.h"
 
 double KDTree::cost_triint;
 double KDTree::cost_trav;
 double KDTree::cost_boxint;
 double KDTree::mint;
 
-SAHEvent::SAHEvent(const Primitive* m, double p, int t) : triangle(m), position(p), type(t)
+SAHEvent::SAHEvent(KDPrimitive* m, double p, int t) : primitive(m), position(p), type(t)
 {
+}
+
+bool sortFn(const SAHEvent* a, const SAHEvent* b)
+{
+    return a->position == b->position ? a->type < b->type : a->position < b->position;
 }
 
 double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
 {
     double cost;
-    if(side == KDTree::left)
+    if(side == KDTree::leftNode)
     {
         cost = (nLeft + nPlanar)*leftarea + nRight*rightarea;
         cost *= KDTree::cost_triint;
         if(nLeft + nPlanar == 0 || nRight == 0)
             cost *= 1.0f;
     }
-    else if(side == KDTree::right)
+    else if(side == KDTree::rightNode)
     {
         cost = nLeft*leftarea + (nRight + nPlanar)*rightarea;
         cost *= KDTree::cost_triint;
         if(nRight + nPlanar == 0 || nLeft == 0)
             cost *= 1.0f;
     }
-    else {
+    else
+    {
         __debugbreak();
         return 0; // To appease the compiler
     }
@@ -43,13 +50,14 @@ double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, doub
 double KDTree::CalculateCost(int type, int samples)
 {
     Timer counter = Timer();
+    Random rnd;
 
     if(type == 0)
     {
         Triangle t(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f);
         for(int i = 0; i < samples; i++)
         {
-            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(double(rand()%10000)/10000.0f, double(rand()%10000)/10000.0f, 1));
+            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(rnd.GetDouble(0, 1), rnd.GetDouble(0, 1), 1));
             t.Intersect(ray);
         }
     }
@@ -58,8 +66,9 @@ double KDTree::CalculateCost(int type, int samples)
         BoundingBox box(Vector3d(0, 0, 1), Vector3d(0.5, 1, 2));
         for(int i = 0; i < samples; i++)
         {
-            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(double(rand()%10000)/10000.0f, double(rand()%10000)/10000.0f, 1));
-            box.Intersects(ray);
+            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(rnd.GetDouble(0, 1), rnd.GetDouble(0, 1), 1));
+            double d1, d2;
+            box.Intersect(ray, d1, d2);
         }
     }
     return counter.GetTime() / double(samples);
@@ -80,16 +89,16 @@ KDTree::~KDTree()
 
 KDNode::KDNode()
 {
-    left = 0;
-    right = 0;
+    leftNode = 0;
+    rightNode = 0;
 }
 
 KDNode::~KDNode()
 {
-    if(left)
-        delete left;
-    if(right)
-        delete right;
+    if(leftNode)
+        delete leftNode;
+    if(rightNode)
+        delete rightNode;
 }
 
 //------------------------------------------------------------------------------
@@ -102,49 +111,51 @@ void KDNode::Build()
 
 BoundingBox KDTree::CalculateExtents(const std::vector<const Primitive*>& shapes)
 {
-    double maxx = -inf, maxy = -inf, maxz = -inf, minx = inf, miny = inf, minz = inf;
+    BoundingBox resultbox{ { inf, inf, inf }, { -inf, -inf, -inf } };
 
     for(auto& s : shapes)
     {
-        double smaxx, smaxy, smaxz, sminx, sminy, sminz;
+        const auto& bbox = s->GetBoundingBox();
 
-        smaxx = s->GetBoundingBox().c2.x;
-        smaxy = s->GetBoundingBox().c2.y;
-        smaxz = s->GetBoundingBox().c2.z;
-
-        sminx = s->GetBoundingBox().c1.x;
-        sminy = s->GetBoundingBox().c1.y;
-        sminz = s->GetBoundingBox().c1.z;
-
-        if(maxx < smaxx)
-            maxx = smaxx;
-        if(maxy < smaxy)
-            maxy = smaxy;
-        if(maxz < smaxz)
-            maxz = smaxz;
-
-        if(minx > sminx)
-            minx = sminx;
-        if(miny > sminy)
-            miny = sminy;
-        if(minz > sminz)
-            minz = sminz;
+        resultbox.c1.x = min(bbox.c1.x, resultbox.c1.x);
+        resultbox.c2.x = max(bbox.c2.x, resultbox.c2.x);
+        resultbox.c1.y = min(bbox.c1.y, resultbox.c1.y);
+        resultbox.c2.y = max(bbox.c2.y, resultbox.c2.y);
+        resultbox.c1.z = min(bbox.c1.z, resultbox.c1.z);
+        resultbox.c2.z = max(bbox.c2.z, resultbox.c2.z);
     }
-    return BoundingBox(Vector3d(minx, miny, minz), Vector3d(maxx, maxy, maxz));
+    return resultbox;
 }
 
 bool KDNode::IsLeaf() const
 {
-    return !(left || right);
-    //return m_isLeaf;
+    return !(leftNode || rightNode);
 }
 
-void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* events, const std::vector<const Primitive*>& shapes, int depth, int badsplits)
+void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, std::vector<SAHEvent*>& merged)
+{
+    sort(add.begin(), add.end(), sortFn);
+    std::merge(events.begin(), events.end(), add.begin(), add.end(), std::back_inserter(merged), sortFn);
+}
+
+void AddEvent(double& minpoint, double& maxpoint, KDPrimitive*& primitive, std::vector<SAHEvent*>& add)
+{
+    // Planar primitive - insert a planar event into the queue
+    if (minpoint == maxpoint)
+        add.push_back(new SAHEvent(primitive, minpoint, SAHEvent::planar));
+    else
+    {
+        add.push_back(new SAHEvent(primitive, minpoint, SAHEvent::start));
+        add.push_back(new SAHEvent(primitive, maxpoint, SAHEvent::end));
+    }
+}
+
+void KDNode::Build(BoundingBox& bbox, std::vector<SAHEvent*>* events, const std::vector<KDPrimitive*>& shapes, int depth, int badsplits)
 {
     if(depth > 20 || shapes.size() < 4) // TODO: fix
     {
-        node->m_primitives = shapes;
-        //node->m_isLeaf = true;
+        for(auto& s : shapes)
+            m_primitives.push_back(s->p);
         return;
     }
 
@@ -156,66 +167,48 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
 
     for(int u = 0; u < 3; u++)
     {
-        int v = (u + 1) % 3;
-        int w = (u + 2) % 3;
+        int v = (u + 1) % 3, w = (u + 2) % 3;
 
         // First, initiate the primitive counting variables
-        int nLeft = 0;
-        int nRight = (int) shapes.size();
+        int nLeft = 0, nRight = (int) shapes.size();
 
         double leftarea, rightarea;
         double sidearea = (bbox.c2[v]-bbox.c1[v])*(bbox.c2[w]-bbox.c1[w]);
-        double vLength = bbox.c2[v]-bbox.c1[v];
-        double wLength = bbox.c2[w]-bbox.c1[w];
+        double vLength = bbox.c2[v]-bbox.c1[v], wLength = bbox.c2[w]-bbox.c1[w];
         int pp = 0, pe = 0, ps = 0; // Event counters for current position
 
         // Sweep through all events
-        std::vector<SAHEvent*>::iterator it = events[u].begin();
-        
-        while(it < events[u].end())
+        for(auto it = events[u].begin(); it < events[u].end(); )
         {
-            SAHEvent* e = *it;
-            double sweeppos = e->position;
+            double sweeppos = (*it)->position;
 
             leftarea = 2*sidearea + 2*(sweeppos-bbox.c1[u])*(vLength + wLength);
             rightarea = 2*sidearea + 2*(bbox.c2[u]-sweeppos)*(vLength + wLength);
 
             // Go through all events on this position
-            ps = pp = pe = 0;
-
-            while(it < events[u].end() && (*it)->position == sweeppos)
-            {
-                SAHEvent* e2 = *it;
-                if(e2->type == SAHEvent::planar)
-                    pp++;
-                else if(e2->type == SAHEvent::end)
+            for(ps = pp = pe = 0; it < events[u].end() && (*it)->position == sweeppos; it++)
+                if ((*it)->type == SAHEvent::end)
                     pe++;
-                else if(e2->type == SAHEvent::start)
+                else if((*it)->type == SAHEvent::start)
                     ps++;
-//				delete e2;
-                it++;
-            }
+                else
+                    pp++;
 
-            nRight -= pp;
-            nRight -= pe;
+            nRight -= pp + pe;
 
             // Calculate the costs for a split at this location
-            double leftcost = KDNode::SAHCost((int) shapes.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::left);
-            double rightcost = KDNode::SAHCost((int) shapes.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::right);
+            double leftcost = KDNode::SAHCost((int) shapes.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::leftNode);
+            double rightcost = KDNode::SAHCost((int) shapes.size(), boxarea, nLeft, leftarea, nRight, rightarea, pp, KDTree::rightNode);
 
             if(bestcost > min(leftcost, rightcost)) 
             {
                 bestcost = min(leftcost, rightcost);
                 bestsplitdir = u;
                 bestsplit = sweeppos;
-                bestside = leftcost < rightcost ? KDTree::left : KDTree::right;
+                bestside = leftcost < rightcost ? KDTree::leftNode : KDTree::rightNode;
             }
 
-            nLeft += pp;
-            nLeft += ps;
-
-            if(it == events[u].end())
-                break;
+            nLeft += pp + ps;
         }
     }
 
@@ -224,8 +217,8 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
     {
         if(badsplits <= 0 || bestcost == inf)
         {
-            node->m_primitives = shapes;
-            //node->m_isLeaf = true;
+            for(auto& s : shapes)
+                m_primitives.push_back(s->p);
             return;
         }
         else
@@ -237,255 +230,86 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
 
     std::vector<Primitive*> nodeprimitives;
 
-    node->left = new KDNode();
-    node->right = new KDNode();
-    
-    BoundingBox leftbbox;
-    leftbbox.c1 = bbox.c1;
-    leftbbox.c2 = bbox.c2;
-    leftbbox.c2[a] = bestsplit;
+    leftNode = new KDNode();
+    rightNode = new KDNode();
 
-    BoundingBox rightbbox;
-    rightbbox.c1 = bbox.c1;
-    rightbbox.c1[a] = bestsplit;
-    rightbbox.c2 = bbox.c2;
+    m_splitpos = bestsplit;
+    splitdir = bestsplitdir;
 
-    node->m_splitpos = bestsplit;
-    node->splitdir = bestsplitdir;
-
-    std::vector<const Primitive*> leftprimitives, rightprimitives;
+    std::vector<KDPrimitive*> leftprimitives, rightprimitives;
     std::vector<SAHEvent*> leftevents[3], rightevents[3], addleft[3], addright[3];
 
-    const int leftonly = 0;
-    const int both = 1;
-    const int rightonly = 2;
+    const int left = 0, both = 1, right = 2;
 
     // Mark all primitives as straddling for now
     for(auto& s : shapes)
         s->side = both;
+
     for(auto& e : events[a])
     {
         if(e->position <= bestsplit && e->type == SAHEvent::end)
-            e->triangle->side = leftonly;
+            e->primitive->side = left;
         else if(e->position >= bestsplit && e->type == SAHEvent::start)
-            e->triangle->side = rightonly;
+            e->primitive->side = right;
         else if(e->position == bestsplit && e->type == SAHEvent::planar)
         {
-            if(bestside == KDTree::left)
-                e->triangle->side = leftonly;
+            if(bestside == KDTree::leftNode)
+                e->primitive->side = left;
             else
-                e->triangle->side = rightonly;
+                e->primitive->side = right;
         }
     }
 
     for(int u = 0; u < 3; u++)
-    {
         for(auto& e : events[u])
-        {
-            const Primitive* s = e->triangle;
-
-            if(s->side == leftonly)
+            if(e->primitive->side == left)
                 leftevents[u].push_back(e);
-            else if(s->side == rightonly)
+            else if(e->primitive->side == right)
                 rightevents[u].push_back(e);
-        }
-    }
+
+    BoundingBox leftbbox = bbox, rightbbox = bbox;
+    leftbbox.c2[a] = bestsplit;
+    rightbbox.c1[a] = bestsplit;
 
     for(auto s : shapes)
     {
-        if(s->side == leftonly)
+        if(s->side == left)
             leftprimitives.push_back(s);
-        if(s->side == rightonly)
+        if(s->side == right)
             rightprimitives.push_back(s);
 
         if(s->side == both)
         {
-            BoundingBox leftclippedbox, rightclippedbox;
-
             // Get the bounding boxes clipped to the box halves
-            bool isinleft = s->GetClippedBoundingBox(leftbbox, leftclippedbox);
+            auto [isinleft, leftclippedbox] = s->p->GetClippedBoundingBox(leftbbox);
             if(isinleft)
                 leftprimitives.push_back(s);
-            bool isinright = s->GetClippedBoundingBox(rightbbox, rightclippedbox);
+
+            auto [isinright, rightclippedbox] = s->p->GetClippedBoundingBox(rightbbox);
             if(isinright)
                 rightprimitives.push_back(s);
             
             for(int u = 0; u < 3; u++)
             {
-                double maxpoint, minpoint;
-
                 if(isinleft)
-                {
-                    minpoint = leftclippedbox.c1[u];
-                    maxpoint = leftclippedbox.c2[u];
-
-                    // Planar primitive - insert a planar event into the queue
-                    if(minpoint == maxpoint)
-                    {
-                        SAHEvent* e = new SAHEvent(s, minpoint, SAHEvent::planar);
-                        addleft[u].push_back(e);
-                    }
-
-                    else
-                    {
-                        SAHEvent* e1 = new SAHEvent(s, minpoint, SAHEvent::start);
-                        SAHEvent* e2 = new SAHEvent(s, maxpoint, SAHEvent::end);
-                        addleft[u].push_back(e1);
-                        addleft[u].push_back(e2);
-                    }
-                }
+                    AddEvent(leftclippedbox.c1[u], leftclippedbox.c2[u], s, addleft[u]);
 
                 if(isinright)
-                {
-                    minpoint = rightclippedbox.c1[u];
-                    maxpoint = rightclippedbox.c2[u];
-
-                    // Planar primitive - insert a planar event into the queue
-                    if(minpoint == maxpoint)
-                    {
-                        SAHEvent* e = new SAHEvent(s, minpoint, SAHEvent::planar);
-                        addright[u].push_back(e);
-                    }
-
-                    else
-                    {
-                        SAHEvent* e1 = new SAHEvent(s, minpoint, SAHEvent::start);
-                        SAHEvent* e2 = new SAHEvent(s, maxpoint, SAHEvent::end);
-                        addright[u].push_back(e1);
-                        addright[u].push_back(e2);
-                    }
-                }
+                    AddEvent(rightclippedbox.c1[u], rightclippedbox.c2[u], s, addright[u]);
             }
         }
     }
     std::vector<SAHEvent*> mergedLeft[3], mergedRight[3];
 
     // Merge the events of the clipped triangles to the respective event lists
-    for(int u = 0; u < 3; u++)
-    {
-        sort(addleft[u].begin(), addleft[u].end(), 
-            [] (SAHEvent* e1, SAHEvent* e2) -> bool 
-        { return e1->position == e2->position ? e1->type < e2->type : e1->position < e2->position; });
-        
-        std::vector<SAHEvent*>::iterator evIt = leftevents[u].begin();
-        std::vector<SAHEvent*>::iterator addIt = addleft[u].begin();
-
-        while(true)
-        {
-            if(evIt == leftevents[u].end())
-            {
-                while(addIt < addleft[u].end())
-                {
-                    mergedLeft[u].push_back(*addIt);
-                    addIt++;
-                }
-                break;
-            }
-            else if(addIt == addleft[u].end())
-            {
-                while(evIt < leftevents[u].end())
-                {
-                    mergedLeft[u].push_back(*evIt);
-                    evIt++;
-                }
-                break;
-            }
-
-            SAHEvent* leftEv = *evIt;
-            SAHEvent* addEv = *addIt;
-
-            if(leftEv->position < addEv->position)
-            {
-                mergedLeft[u].push_back(leftEv);
-                evIt++;
-                continue;
-            }
-            else if(leftEv->position > addEv->position)
-            {
-                mergedLeft[u].push_back(addEv);
-                addIt++;
-                continue;
-            }
-            else
-            {
-                if(leftEv->type < addEv->type)
-                {
-                    mergedLeft[u].push_back(leftEv);
-                    evIt++;
-                }
-                else
-                {
-                    mergedLeft[u].push_back(addEv);
-                    addIt++;
-                }
-            }
-        }
-    }
+    for(int u = 0; u < 3; u++)   
+        MergeEvents(leftevents[u], addleft[u], mergedLeft[u]);
 
     for(int u = 0; u < 3; u++)
-    {
-        std::sort(addright[u].begin(), addright[u].end(), [] (SAHEvent* e1, SAHEvent* e2) {
-            return e1->position == e2->position ? e1->type < e2->type : e1->position < e2->position;
-        });
+        MergeEvents(rightevents[u], addright[u], mergedRight[u]);
 
-        std::vector<SAHEvent*>::iterator evIt = rightevents[u].begin();
-        std::vector<SAHEvent*>::iterator addIt = addright[u].begin();
-
-        while(true)
-        {
-            if(evIt == rightevents[u].end())
-            {
-                while(addIt < addright[u].end())
-                {
-                    mergedRight[u].push_back(*addIt);
-                    addIt++;
-                }
-                break;
-            }
-            else if(addIt == addright[u].end())
-            {
-                while(evIt < rightevents[u].end())
-                {
-                    mergedRight[u].push_back(*evIt);
-                    evIt++;
-                }
-                break;
-            }
-
-            SAHEvent* rightEv = *evIt;
-            SAHEvent* addEv = *addIt;
-
-            if(rightEv->position < addEv->position)
-            {
-                mergedRight[u].push_back(rightEv);
-                evIt++;
-                continue;
-            }
-            else if(rightEv->position > addEv->position)
-            {
-                mergedRight[u].push_back(addEv);
-                addIt++;
-                continue;
-            }
-            else
-            {
-                if(rightEv->type < addEv->type)
-                {
-                    mergedRight[u].push_back(rightEv);
-                    evIt++;
-                }
-                else
-                {
-                    mergedRight[u].push_back(addEv);
-                    addIt++;
-                }
-            }
-        }
-    }
-
-    BuildNode(node->left, leftbbox, mergedLeft, leftprimitives, depth+1, badsplits);
+    leftNode->Build(leftbbox, mergedLeft, leftprimitives, depth + 1, badsplits);
     leftprimitives.clear();
-
     for(int u = 0; u < 3; u++)
     {
         for(auto& e : addleft[u])
@@ -494,7 +318,7 @@ void KDTree::BuildNode(KDNode* node, BoundingBox& bbox, std::vector<SAHEvent*>* 
         mergedLeft[u].clear();
     }
 
-    BuildNode(node->right, rightbbox, mergedRight, rightprimitives, depth+1, badsplits);
+    rightNode->Build(rightbbox, mergedRight, rightprimitives, depth+1, badsplits);
     for(int u = 0; u < 3; u++)
         for(auto& e : addright[u])
             delete e;
@@ -509,50 +333,37 @@ void KDTree::Build(const std::vector<const Primitive*>& shapes)
     m_bbox = CalculateExtents(shapes);
     std::vector<SAHEvent*> eventlist[3];
 
+    std::vector<KDPrimitive*> primitives;
+    for(auto& s : shapes)
+        primitives.push_back(new KDPrimitive{s, 0});
+
     // Loop through each axis - u is the primary axis
     for(int u = 0; u < 3; u++)
     {
         // Create event lists from the objects
-        for(auto& s : shapes)
+        for(auto& s : primitives)
         {
-            // Get the bounding box of the to this bounding box culled primitive
-            BoundingBox clippedbox;
-            if(!s->GetClippedBoundingBox(m_bbox, clippedbox))
-                continue;
-            
-            double minpoint = clippedbox.c1[u];
-            double maxpoint = clippedbox.c2[u];
-
-            // Planar primitive - insert a planar event into the queue
-            if(minpoint == maxpoint)
-            {
-                SAHEvent* e = new SAHEvent(s, minpoint, SAHEvent::planar);
-                eventlist[u].push_back(e);
-            }
-
-            else
-            {
-                SAHEvent* e1 = new SAHEvent(s, minpoint, SAHEvent::start);
-                SAHEvent* e2 = new SAHEvent(s, maxpoint, SAHEvent::end);
-                eventlist[u].push_back(e1);
-                eventlist[u].push_back(e2);
-            }
+            // Get the bounding box of the primitive culled by the bounding box
+            auto [hasBox, clippedbox] = s->p->GetClippedBoundingBox(m_bbox);
+            if(hasBox)
+                AddEvent(clippedbox.c1[u], clippedbox.c2[u], s, eventlist[u]);
         }
 
         // Sort the event list
-        std::sort(eventlist[u].begin(), eventlist[u].end(), 
-            [] (SAHEvent* e1, SAHEvent* e2) -> bool 
-        { return e1->position < e2->position;});
+        std::sort(eventlist[u].begin(), eventlist[u].end(), sortFn);
     }
 
-    BuildNode(m_root, m_bbox, eventlist, shapes, 0, 3);
+    m_root->Build(m_bbox, eventlist, primitives, 0, 3);
 
     for(int u = 0; u < 3; u++)
         for(auto& e : eventlist[u])
             delete e;
+
+    for(auto p : primitives)
+        delete p;
 }
 
-IntResult KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive=false) const
+std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive=false) const
 {
     if(tmin > tmax)
         return { -inf, nullptr };
@@ -560,48 +371,55 @@ IntResult KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool re
     int a = splitdir;
     double locmint = inf;
     const Primitive* minprimitive = nullptr;
-    if(!left && !right) {
-        for(auto& s : m_primitives) {
+    if(!leftNode && !rightNode)
+    {
+        for(auto& s : m_primitives)
+        {
             double t = s->Intersect(ray);
-            if(t >= tmin && t <= tmax) {
+            if(t >= tmin && t <= tmax)
+            {
                 if(!returnPrimitive)
                     return { t, nullptr };
                 if(t < locmint)
                     minprimitive = s, locmint = t;
             }
         }        
-        return minprimitive ? IntResult { locmint, minprimitive } : IntResult { -inf, nullptr };
+        if(minprimitive)
+            return { locmint, minprimitive };
+        return { -inf, nullptr };
     }
 
-    double k = ray.direction[a];
-    double tint = (m_splitpos - ray.origin[a])/k;    
+    double tint = (m_splitpos - ray.origin[a])/ray.direction[a];
 
-    KDNode* nearnode = k > 0 ? left : right;
-    KDNode* farnode = nearnode == left ? right : left;
+    KDNode* nearnode = ray.direction[a] > 0 ? leftNode : rightNode;
+    KDNode* farnode = nearnode == leftNode ? rightNode : leftNode;
 
     if(tint <= tmin)
     {
-        auto res = farnode->IntersectRec(ray, std::max(tmin, tint-eps), tmax, returnPrimitive);
-        if(res.t != -inf)
-            return res;
-    } else {
-        auto res = nearnode->IntersectRec(ray, tmin, std::min(tint+eps, tmax), returnPrimitive);
-        if(res.t != -inf)
-            return res;
+        auto [t, primitive] = farnode->IntersectRec(ray, std::max(tmin, tint - eps), tmax, returnPrimitive);
+        if(t != -inf)
+            return { t, primitive };
+    }
+    else
+    {
+        auto [t1, primitive1] = nearnode->IntersectRec(ray, tmin, std::min(tint + eps, tmax), returnPrimitive);
+        if(t1 != -inf)
+            return { t1, primitive1 };
 
-        res = farnode->IntersectRec(ray, std::max(tmin, tint-eps), tmax, returnPrimitive);
-        if(res.t != -inf)
-            return res;
+        auto [t2, primitive2] = farnode->IntersectRec(ray, std::max(tmin, tint - eps), tmax, returnPrimitive);
+        if(t2 != -inf)
+            return { t2, primitive2 };
     }
     return { -inf, nullptr };
 }
 
 double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const
 {
-    auto res = m_root->IntersectRec(ray, tmin, tmax, returnPrimitive);
-    if(res.t != -inf) {
-        primitive = res.primitive;
-        return res.t;
+    auto [t, prim] = m_root->IntersectRec(ray, tmin, tmax, returnPrimitive);
+    if(t != -inf)
+    {
+        primitive = prim;
+        return t;
     }
     return -inf;
 }

@@ -19,7 +19,8 @@ CookTorrance::CookTorrance()
 #endif
 }
 
-template<typename T> T sq(T x) {
+template<typename T> T sq(T x)
+{
     return x*x;
 }
 
@@ -27,13 +28,15 @@ CookTorrance::~CookTorrance()
 {
 }
 
-double G_p(Vector3d h, Vector3d w, double alpha) {
+double G_p(Vector3d h, Vector3d w, double alpha)
+{
     double a = (h*w)/(alpha*std::sqrt(1-(h*w)*(h*w)));
     double l = (-1.0 + std::sqrt(1.0+1.0/(a*a)))/2.0;
     return 1.0/(1.0+l);
 }
 
-double D_p(double alpha, double cosn) {
+double D_p(double alpha, double cosn)
+{
     return sq(alpha)/(pi*sq((sq(alpha)-1)*cosn*cosn+1));
 }
 
@@ -54,14 +57,14 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
 
     auto N = N_s;
 
-    auto [right, forward] = MakeBasis(N_s);
+    auto [rightNode, forward] = MakeBasis(N_s);
 
     auto r1 = rnd.GetDouble(0.0, 2*pi);
     auto r2 = rnd.GetDouble(0.0, 1.0);
 
     auto t = std::atan(alpha*std::sqrt(r2)/std::sqrt(1-r2));
 
-    Vector3d h_o = forward*std::cos(r1)*std::sin(t) + right*std::sin(r1)*std::sin(t) + N*std::cos(t);
+    Vector3d h_o = forward*std::cos(r1)*std::sin(t) + rightNode*std::sin(r1)*std::sin(t) + N*std::cos(t);
     auto out = Reflect(-in, h_o);
     auto pdf = D_p(alpha, h_o*N)*(h_o*N)/(4.0*(in*h_o));
     return Sample(BRDF(info, out, 1)/pdf, Ray(info.position, out), pdf, pdf, 0, 1);

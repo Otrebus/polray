@@ -8,11 +8,11 @@ Sphere::Sphere(const Vector3d& v, double r) : position(v), radius(r)
 {
 }
 
-Sphere::Sphere(const Vector3d& pos, const Vector3d& u, const Vector3d& ri, double r) : position(pos), up(u), right(ri), radius(r)
+Sphere::Sphere(const Vector3d& pos, const Vector3d& u, const Vector3d& ri, double r) : position(pos), up(u), rightNode(ri), radius(r)
 {
     up.Normalize();
-    right = (up^right)^up;
-    right.Normalize();
+    rightNode = (up^rightNode)^up;
+    rightNode.Normalize();
 }
 
 Sphere::Sphere() : radius(1), position(0, 0, 0)
@@ -46,7 +46,7 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
     // Texture coordinates - there are probably better methods than this one
     Vector3d v = info.position - position;
     Vector3d w = (up^v)^up;
-    Vector3d forward = up^right;
+    Vector3d forward = up^rightNode;
     v.Normalize();
     w.Normalize();
     forward.Normalize();
@@ -55,7 +55,7 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
     double ucoord;
 
     // Clamp the coordinates to prevent NaNs, which is one of the reasons this method is inferior
-    double wright = w*right > 1 ? 1 : w*right < -1 ? -1 : w*right;
+    double wright = w*rightNode > 1 ? 1 : w*rightNode < -1 ? -1 : w*rightNode;
 
     if(w*forward >= 0)
         ucoord = acos(wright) / (2*pi);
@@ -76,11 +76,10 @@ BoundingBox Sphere::GetBoundingBox() const
     return BoundingBox(c1, c2);
 }
 
-bool Sphere::GetClippedBoundingBox(const BoundingBox&, BoundingBox& resultbox) const
+std::tuple<bool, BoundingBox> Sphere::GetClippedBoundingBox(const BoundingBox&) const
 {
     // Just return the unclipped box for now
-    resultbox = GetBoundingBox();
-    return true;
+    return { true, GetBoundingBox() };
 }
 
 void Sphere::AddToScene(Scene& scene)

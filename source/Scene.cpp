@@ -36,14 +36,18 @@ Scene::~Scene()
 {
 }
 
-BoundingBox Scene::GetBoundingBox() {
+BoundingBox Scene::GetBoundingBox()
+{
     if(calculatedBoundingBox)
         return boundingBox;
-    else {
+    else
+    {
         Vector3d m(inf, inf, inf);
         Vector3d M(-inf, -inf, -inf);
-        for(auto& p : primitives) {
-            for(int i = 0; i < 3; i++) {
+        for(auto& p : primitives)
+        {
+            for(int i = 0; i < 3; i++)
+            {
                 auto bb = p->GetBoundingBox();
                 m[i] = std::min(bb.c1[i], m[i]);
                 M[i] = std::max(bb.c2[i], M[i]);
@@ -155,23 +159,31 @@ double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) co
     double lightT = -inf;
     double minLightT = inf;
 
-    for(auto& light : lights) {
+    for(auto& light : lights)
+    {
         auto t = light->Intersect(ray);
 
-        if(t != -inf && t < minLightT) {
+        if(t != -inf && t < minLightT)
+        {
             minLightT = t;
             l = light;
         }
     }
+
     if(minLightT != inf)
         lightT = minLightT;
-    if(primT != -inf && (lightT == -inf || primT < lightT)) {
+
+    if(primT != -inf && (lightT == -inf || primT < lightT))
+    {
         l = nullptr;
         return primT;
-    } else if(lightT != -inf) {
+    }
+    else if(lightT != -inf)
+    {
         p = nullptr;
         return lightT;
     }
+
     p = nullptr;
     l = nullptr;
     return -inf;
@@ -181,7 +193,8 @@ std::pair<Light*, double> Scene::PickLight(double r1) const
 {
     auto p = 1.0/lights.size() + eps;
     auto sum = 0.0;
-    for(auto light : lights) {
+    for(auto light : lights)
+    {
         sum += p;
         if(sum > r1)
             return { light, p };

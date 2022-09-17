@@ -13,11 +13,11 @@ class Sphere : public Primitive, public Model
 {
 public:
     Sphere(const Vector3d& position, double radius);
-    Sphere(const Vector3d& position, const Vector3d& up, const Vector3d& right, double radius);
+    Sphere(const Vector3d& position, const Vector3d& up, const Vector3d& rightNode, double radius);
     Sphere();
     ~Sphere();
 
-    bool GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const;
+    std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;
     BoundingBox GetBoundingBox() const;
 
     double Intersect(const Ray& ray) const;
@@ -30,5 +30,5 @@ protected:
     friend class Scene;
     virtual void AddToScene(Scene& scene);
     double radius;
-    Vector3d position, up, right;
+    Vector3d position, up, rightNode;
 };

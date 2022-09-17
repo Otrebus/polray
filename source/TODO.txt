@@ -1,8 +1,7 @@
-Fill typedefs ("Normal" etc)
 Fix the normalInterp stuff
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Replace debugbreaks with better error messages
-ctrl-F 14 years later
+Replace some tuples with structures?
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
 Refactor GetProjectedSceneHull
@@ -16,6 +15,8 @@ Add check that all primitives have materials, in scene
 Implement multiple importance sampling for light portals
 Add physical camera to bdpt
 Add light source resampling to BDPT
+- Fill typedefs ("Normal" etc)
+- ctrl-F 14 years later
 - Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
 - Detabify
 - ctrl-F This could also be a hash table, for very large triangle meshes

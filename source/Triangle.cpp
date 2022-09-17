@@ -71,7 +71,7 @@ BoundingBox Triangle::GetBoundingBox() const
     return BoundingBox(c1, c2);
 }
 
-bool Triangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& resultbox) const
+std::tuple<bool, BoundingBox> Triangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 {
     std::vector<Vector3d> points = { v0.pos, v1.pos, v2.pos };
 
@@ -82,27 +82,22 @@ bool Triangle::GetClippedBoundingBox(const BoundingBox& clipbox, BoundingBox& re
     ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
     ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
-    resultbox.c1.x = inf;
-    resultbox.c2.x = -inf;
-    resultbox.c1.y = inf;
-    resultbox.c2.y = -inf;
-    resultbox.c1.z = inf;
-    resultbox.c2.z = -inf;
+    BoundingBox resultbox{ { inf, inf, inf }, { -inf, -inf, -inf } };
 
     for(auto v : points)
     {
-        resultbox.c1.x = v.x < resultbox.c1.x ? v.x : resultbox.c1.x;
-        resultbox.c2.x = v.x > resultbox.c2.x ? v.x : resultbox.c2.x;
-        resultbox.c1.y = v.y < resultbox.c1.y ? v.y : resultbox.c1.y;
-        resultbox.c2.y = v.y > resultbox.c2.y ? v.y : resultbox.c2.y;
-        resultbox.c1.z = v.z < resultbox.c1.z ? v.z : resultbox.c1.z;
-        resultbox.c2.z = v.z > resultbox.c2.z ? v.z : resultbox.c2.z;
+        resultbox.c1.x = min(v.x, resultbox.c1.x);
+        resultbox.c2.x = max(v.x, resultbox.c2.x);
+        resultbox.c1.y = min(v.y, resultbox.c1.y);
+        resultbox.c2.y = max(v.y, resultbox.c2.y);
+        resultbox.c1.z = min(v.z, resultbox.c1.z);
+        resultbox.c2.z = max(v.z, resultbox.c2.z);
     }
 
     if(points.size() > 2)
-        return true;
+        return { true, resultbox };
     else
-        return false;
+        return { false, resultbox };
 }
 
 void Triangle::AddToScene(Scene& scene)

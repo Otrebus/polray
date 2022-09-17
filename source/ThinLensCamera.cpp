@@ -37,13 +37,13 @@ Ray ThinLensCamera::GetRayFromPixel(int x, int y, double a, double b, double u, 
     double rx = halfwidth*(2.f*double(x) - double(xres) + (2.f*a)) / double(xres);
     double ry = halfwidth*(2.f*double(y) - double(yres) + (2.f*b)) / double(xres);
     
-    Vector3d right = dir^up;
-    right.Normalize();
-    Vector3d raydir = dir - (up*ry - right*rx);
+    Vector3d rightNode = dir^up;
+    rightNode.Normalize();
+    Vector3d raydir = dir - (up*ry - rightNode*rx);
     raydir.Normalize();
     Ray centerRay = Ray(pos, raydir);
 
-    Vector3d lensPoint = pos+lensRadius*v*(right*cos(u)+up*sin(u));
+    Vector3d lensPoint = pos+lensRadius*v*(rightNode*cos(u)+up*sin(u));
 
     centerRay.direction.Normalize();
 
@@ -67,8 +67,8 @@ std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, doubl
     if((ray.origin-pos) * dir < 0) // Ray origin behind camera
         return { false, 0, 0 };
 
-    Vector3d right = dir^up;
-    Vector3d lensPoint = pos+lensRadius*v*(right*cos(u)+up*sin(u));
+    Vector3d rightNode = dir^up;
+    Vector3d lensPoint = pos+lensRadius*v*(rightNode*cos(u)+up*sin(u));
 
     Vector3d toCam = lensPoint - ray.origin;
     //double camRayLength = toCam.GetLength();
@@ -82,15 +82,15 @@ std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, doubl
     centerRay.direction.Normalize();
 
     double ratio = (double)yres/(double)xres;
-    Vector3d left = up^dir;
-    left.Normalize();
+    Vector3d leftNode = up^dir;
+    leftNode.Normalize();
 
-    Vector3d A = left^up;
+    Vector3d A = leftNode^up;
     Vector3d B = dir^centerRay.direction;
 
     double det = centerRay.direction*(A);
     double rx = 1/halfwidth*up*B/det;
-    double ry = 1/halfwidth*-left*B/det;
+    double ry = 1/halfwidth*-leftNode*B/det;
 
     double x = ((double)xres*(1.0f - rx)/2.0f);
     double y = ((double)yres*(ratio - ry)/(ratio*2.0f));

@@ -214,19 +214,16 @@ std::tuple<bool, int, int, int> acceptVertex(Parser& parser)
     if(!parser.accept("/")) // Format is x
         return { true, n1, 0, 0 };
 
-    if(parser.accept("/")) { // Format is x//y
-        int n2 = expectInt(parser);
-        return { true, n1, 0, n2 };
-    }
+    if(parser.accept("/")) // Format is x//y
+        return { true, n1, 0, expectInt(parser) };
 
     int n2 = expectInt(parser); // Format is x/y..
 
     if(!parser.accept("/"))
         return { true, n1, n2, 0 };
 
-    int n3 = expectInt(parser); // Format is x/y/z
-
-    return { true, n1, n2, n3 };
+    // Format is x/y/z
+    return { true, n1, n2, expectInt(parser) };
 }
 
 Vector3d expectVector3d(Parser& parser)
@@ -241,9 +238,11 @@ Vector3d expectVtCoordinate(Parser& parser)
 {
     double arr[3] = { 0, 0, 0 };
     bool hadSuccess = false;
-    for(int i = 0; i < 3; i++) {
+    for(int i = 0; i < 3; i++)
+    {
         auto [success, d] = acceptDouble(parser);
-        if(success) {
+        if(success)
+        {
             arr[i] = d;
             hadSuccess = true;
         }
@@ -269,7 +268,8 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
 
     auto addToken = [&v, &line, &col, &str] (Token::Type t, int a, int b)
     {
-        for(auto it = str.begin()+a; it < str.begin()+b; it++) {
+        for(auto it = str.begin()+a; it < str.begin()+b; it++)
+        {
             if(*it == '\n')
                 line++, col = 1;
             else
@@ -306,14 +306,14 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
     {
         skipspace();
         auto c = peek();
-        if(c == '/' || c == '{' || c == '}' || c == ':') { // Operator
+        if(c == '/' || c == '{' || c == '}' || c == ':') // Operator
+        {
             addToken(Token::Operator, p, p+1);
             p++;
         }
 
         else if(std::isdigit(c) || c == '-' || c == '.') // Number
         {
-            auto c = peek();
             int d = p;
             // Not the best way of parsing a number ..
             for(auto c = peek(); std::isdigit(c) || c == '.' || c == 'e' || c == 'E' || c == '+' || c == '-'; c = peek())
@@ -406,7 +406,8 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
 
                 Token token(Token::Eof);
                 std::string matArg;
-                while((token = parser.next()) != Token(Token::Operator, "}")) {
+                while((token = parser.next()) != Token(Token::Operator, "}"))
+                {
                     if(token == Token::Eof)
                         throw ParseException("Unexpected end of file");
                     matArg += std::string(token.str) + " ";
@@ -483,7 +484,8 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
             Color intensity;
             intensity = expectVector3d(parser);
 
-            if(intensity) {
+            if(intensity)
+            {
                 phong = false;
                 emissive = true;
                 delete curmat;
@@ -557,14 +559,18 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
                     MeshVertex* mv;
 
                     auto it = groupVertices.find(v-1);
-                    if (it == groupVertices.end()) { // We have not seen this vertex before in this group so create a new one
+                    if (it == groupVertices.end())
+                    { // We have not seen this vertex before in this group so create a new one
                         mv = groupVertices[v-1] = new MeshVertex(*vectors[v-1]);
-                        if(n) {
+                        if(n)
+                        {
                             normalInterp = false; // A normal was submitted so let's trust that one in accordance with .obj standards
                             mv->normal = normals[n-1];
                         }
                         currentMesh->points.push_back(mv);
-                    } else { // This vertex is already among the parsed vertices in this group so use that particular one
+                    }
+                    else
+                    { // This vertex is already among the parsed vertices in this group so use that particular one
                         mv = it->second;
                         if(n)
                         {
@@ -580,7 +586,8 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
                     faceVertices.push_back(mv);
                 }
 
-                for(int i = 0; i < (int) faceVertices.size()-2; i++) {
+                for(int i = 0; i < (int) faceVertices.size()-2; i++)
+                {
                     auto pv0 = faceVertices[0], pv1 = faceVertices[i+1], pv2 = faceVertices[i+2];
 
                     MeshTriangle* tri = new MeshTriangle(pv0, pv1, pv2);
@@ -593,7 +600,8 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
                             v->normal = tri->GetNormal();
 
                     // No material defined, set to diffuse
-                    if (!curmat) {
+                    if (!curmat)
+                    {
                         LambertianMaterial* mat = new LambertianMaterial();
                         mat->Kd = Color(0.7f, 0.7f, 0.7f);
                         tri->SetMaterial(mat);
@@ -682,53 +690,44 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
                 continue;
             }
             else if(parser.accept("vn"))
-            {
-                auto normal = expectVector3d(parser);
-                normals.push_back(normal);
-            }
-            else if(parser.accept("o")) {
+                normals.push_back(expectVector3d(parser));
+            else if(parser.accept("o"))
                 auto str = expectStr(parser);
-            }
             else if(parser.accept("vt"))
-            {
                 auto texturecoords = expectVtCoordinate(parser);
-            }
             else if(parser.accept("s")) // Smoothing group ending or starting
             {
                 auto [success, s1] = acceptStr(parser);
-                if(success) {
+                if(success)
                     normalInterp = s1 != "off";
-                } else {
-                    int s1 = expectInt(parser);
-                    normalInterp = s1 != 0;
-                }
+                else
+                    normalInterp = expectInt(parser) != 0;
             }
             else if(parser.accept("v"))
-            {
-                auto coord = expectVector3d(parser);
-                vectors.push_back(new MeshVertex((coord)));
-            }
+                vectors.push_back(new MeshVertex(expectVector3d(parser)));
             else if(parser.accept("usemtl"))
             {
                 auto mtl = std::string(expectStr(parser));
                 auto it = materials.find(mtl);
                 if(it == materials.end())
                     curmat = 0;
-                else {
-                    if(materials[mtl]->light) {
+                else
+                {
+                    if(materials[mtl]->light)
+                    {
                         meshLights.emplace(static_cast<MeshLight*>(materials[mtl]->light));
                         currentMesh = (static_cast<MeshLight*>(materials[mtl]->light)->mesh);
-                    } else
+                    }
+                    else
                         currentMesh = mesh;
                     curmat = materials[mtl];
                 }
             }
             else if(parser.accept(Token::Newline));
             else if(parser.accept("l"))
-            {
                 while(parser.next().type != Token::Newline);
-            }
-            else {
+            else
+            {
                 auto token = parser.peek();
                 throw ParseException("Unknown token \"" + std::string(token.str) + "\"", token.line, token.column);
             }
@@ -740,10 +739,13 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
         __debugbreak();
     }
 
-    for(auto& t : mesh->triangles) {
-        for(auto vv : { &t->v0, &t->v1, &t->v2 }) {
+    for(auto& t : mesh->triangles)
+    {
+        for(auto vv : { &t->v0, &t->v1, &t->v2 })
+        {
             auto& v = (*(reinterpret_cast<MeshVertex**>(vv)));
-            if(replacement.find(v) == replacement.end()) {
+            if(replacement.find(v) == replacement.end())
+            {
                 auto oldv = v;
                 v = static_cast<MeshVertex*>(new Vertex3d(v->pos, v->normal, v->texpos));
                 replacement[oldv] = (Vertex3d*) v;
@@ -758,11 +760,15 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
         if(replacement.find(static_cast<MeshVertex*>(p)) != replacement.end())
             p = replacement[static_cast<MeshVertex*>(p)];
 
-    for(auto& m : meshLights) {
-        for(auto& t : m->mesh->triangles) {
-            for(auto vv : { &t->v0, &t->v1, &t->v2 }) {
+    for(auto& m : meshLights)
+    {
+        for(auto& t : m->mesh->triangles)
+        {
+            for(auto vv : { &t->v0, &t->v1, &t->v2 })
+            {
                 auto& v = (*((MeshVertex**) vv));
-                if(replacement.find(v) == replacement.end()) {
+                if(replacement.find(v) == replacement.end())
+                {
                     auto oldv = v;
                     v = static_cast<MeshVertex*>(new Vertex3d(v->pos, v->normal, v->texpos));
                     replacement[oldv] = static_cast<Vertex3d*>(v);

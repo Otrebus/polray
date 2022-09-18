@@ -22,7 +22,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
     for(int samples = 0; samples < xres*yres && ! stopping; samples++)
     {
         auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
-        auto [ray, pathColor, lightNormal, _, __] = light->SampleRay();
+        auto [ray, pathColor, lightNormal, _, __] = light->SampleRay(m_random);
 
         pathColor *= light->GetArea()*light->GetIntensity(); // First direction is from the light source
 
@@ -64,7 +64,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             camRayLength = camRay.direction.Length();
             camRay.direction.Normalize();
 
-            auto sample = info.material->GetSample(info, true);
+            auto sample = info.material->GetSample(info, m_random, true);
             auto c = sample.color;
             bounceRay = sample.outRay;
 

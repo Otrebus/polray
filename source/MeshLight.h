@@ -8,7 +8,7 @@ class MeshTriangle;
 class Material;
 class IntersectionInfo;
 class Vector3d;
-class Random;
+class Randomizer;
 class Renderer;
 class Scene;
 class Matrix3d;
@@ -27,8 +27,7 @@ public:
     MeshLight(Color intensity);
     MeshLight();
     ~MeshLight();
-    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay() const;
-    std::tuple<Point, Normal> SamplePoint() const;
+    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay(Randomizer&) const;
 
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
@@ -36,7 +35,7 @@ public:
     virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
     Color GetIntensity() const;
 
-    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
+    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer&, int component) const;
 
     virtual double GetArea() const;
 
@@ -48,15 +47,17 @@ public:
     void AddPortal(const Vector3d& pos, const Vector3d& v1, const Vector3d& v2);
 
     TriangleMesh* mesh;
+
 protected:
+    std::tuple<Point, Normal> SamplePoint(Randomizer&) const;
+
     mutable bool builtTree;
     mutable KDTree tree;
     friend class Scene;
     virtual void AddToScene(Scene*);
 
     TriangleNode* BuildTree(int from, int to, double area, double cutoff) const;
-    MeshTriangle* PickRandomTriangle() const;
+    MeshTriangle* PickRandomTriangle(Randomizer& rnd) const;
     mutable double area_;
-    mutable Random r;
     mutable TriangleNode* triangleTree_;
 };

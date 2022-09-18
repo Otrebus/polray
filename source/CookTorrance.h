@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Random.h"
+#include "Randomizer.h"
 #include "Material.h"
 
 class Light;
@@ -14,7 +14,7 @@ public:
     CookTorrance();
     ~CookTorrance();
     
-    Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo& info, Randomizer& random, bool adjoint) const;
 
     Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
 
@@ -29,8 +29,6 @@ public:
 
     Texture* texture;
     Texture* normalmap;
-
-    mutable Random rnd;
 
     Color Ks;
     double alpha;

@@ -40,7 +40,7 @@ double D_p(double alpha, double cosn)
     return sq(alpha)/(pi*sq((sq(alpha)-1)*cosn*cosn+1));
 }
 
-Sample CookTorrance::GetSample(const IntersectionInfo& info, bool) const
+Sample CookTorrance::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     //float df = Kd.GetMax();
     //float sp = Ks.GetMax();

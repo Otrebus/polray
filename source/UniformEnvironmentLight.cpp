@@ -52,10 +52,10 @@ bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, Intersect
     return true;
 }
 
-std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> UniformEnvironmentLight::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> UniformEnvironmentLight::SampleRay(Randomizer& rnd) const
 {
     Ray ray;
-    auto [origin, normal] = SamplePoint();
+    auto [origin, normal] = SamplePoint(rnd);
     ray.origin = origin;
     
     double areaPdf = 1/GetArea();
@@ -63,7 +63,7 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> UniformEnvironmentLight::Sampl
     auto [h, A, rightNode, forward, cv] = GetProjectedSceneHull(ray, normal);
 
     auto n = normal;
-    double a = random.GetDouble(0, A);
+    double a = rnd.GetDouble(0, A);
     double aSum = 0;
 
     auto pp = ray.origin + normal*(cv*normal);
@@ -73,7 +73,7 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> UniformEnvironmentLight::Sampl
         aSum += std::abs((h[i+1]-h[0])^(h[i+2]-h[0]))/2;
         if(aSum > a)
         {
-            double u = sqrt(random.GetDouble(0, 1)), v = random.GetDouble(0, 1);
+            double u = sqrt(rnd.GetDouble(0, 1)), v = rnd.GetDouble(0, 1);
             auto e1 = h[i+1] - h[0], e2 = h[i+2] - h[0];
 
             auto p = h[0] + u*(e1 + v*(e2-e1));
@@ -98,9 +98,9 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
     return r*r/std::abs(out*n)/A;
 }
 
-std::tuple<Point, Normal> UniformEnvironmentLight::SamplePoint() const
+std::tuple<Point, Normal> UniformEnvironmentLight::SamplePoint(Randomizer& rnd) const
 {
-    auto r1 = random.GetDouble(0, 1), r2 = random.GetDouble(0, 1);
+    auto r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
     auto pos = SampleSphereUniform(r1, r2);
     auto normal = -pos;
     auto point = position + pos*radius + normal*eps;
@@ -125,9 +125,9 @@ void UniformEnvironmentLight::Load(Bytestream& s)
     material->light = this;
 }
 
-std::tuple<Color, Point> UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
-    auto [lightPoint, lightNormal] = SamplePoint();
+    auto [lightPoint, lightNormal] = SamplePoint(rnd);
     auto toLight = lightPoint - info.position;
     Ray lightRay = Ray(info.position, toLight);
     double d = toLight.Length()*(1.-1.e-6);

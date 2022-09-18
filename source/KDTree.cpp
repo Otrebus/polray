@@ -6,7 +6,7 @@
 #include "Triangle.h"
 #include "Utils.h"
 #include "Timer.h"
-#include "Random.h"
+#include "Randomizer.h"
 
 double KDTree::cost_triint;
 double KDTree::cost_trav;
@@ -50,7 +50,7 @@ double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, doub
 double KDTree::CalculateCost(int type, int samples)
 {
     Timer counter = Timer();
-    Random rnd;
+    Randomizer rnd;
 
     if(type == 0)
     {

@@ -86,7 +86,7 @@ void PathTracer::Load(Bytestream&)
 {
 }
 
-Color PathTracer::TracePath(const Ray& ray) const
+Color PathTracer::TracePath(const Ray& ray)
 {
     const Primitive* minprimitive = nullptr;
     const Light* minlight = nullptr;
@@ -126,7 +126,7 @@ Color PathTracer::TracePath(const Ray& ray) const
         else if(info.material->GetLight())
             return finalColor/lightWeight;
 
-        auto sample = material->GetSample(info, false);
+        auto sample = material->GetSample(info, m_random, false);
         auto c = sample.color;
         outRay = sample.outRay;
 
@@ -136,7 +136,7 @@ Color PathTracer::TracePath(const Ray& ray) const
             sampledLight = false;
         else
         {
-            auto [color, lightPoint] = light->NextEventEstimation(this, info, sample.component);
+            auto [color, lightPoint] = light->NextEventEstimation(this, info, m_random, sample.component);
             finalColor += pathColor*color;
             sampledLight = true;
         }

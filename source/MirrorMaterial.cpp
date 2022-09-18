@@ -13,7 +13,7 @@ MirrorMaterial::~MirrorMaterial()
 {
 }
 
-Sample MirrorMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
+Sample MirrorMaterial::GetSample(const IntersectionInfo& info, Randomizer&, bool adjoint) const
 {
     Vector3d Ng, Ns;
     const Vector3d in = info.direction;

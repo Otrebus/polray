@@ -22,7 +22,7 @@ PhongMaterial::~PhongMaterial()
 {
 }
 
-Sample PhongMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
+Sample PhongMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     auto df = Kd.GetMax();
     auto sp = Ks.GetMax();

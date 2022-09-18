@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include <tuple>
-#include "Random.h"
+#include "Randomizer.h"
 
 class Vector3d;
 

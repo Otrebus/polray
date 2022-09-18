@@ -149,7 +149,7 @@
     <ClCompile Include="source\Ray.cpp">
       <Filter>Source Files\Math</Filter>
     </ClCompile>
-    <ClCompile Include="source\Random.cpp">
+    <ClCompile Include="source\Randomizer.cpp">
       <Filter>Source Files\Math</Filter>
     </ClCompile>
     <ClCompile Include="source\Matrix3d.cpp">
@@ -325,7 +325,7 @@
     <ClInclude Include="source\BoundingBox.h">
       <Filter>Source Files\Math</Filter>
     </ClInclude>
-    <ClInclude Include="source\Random.h">
+    <ClInclude Include="source\Randomizer.h">
       <Filter>Source Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="source\Matrix3d.h">

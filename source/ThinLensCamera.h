@@ -2,7 +2,7 @@
 
 #include "Camera.h"
 #include <tuple>
-#include "Random.h"
+#include "Randomizer.h"
 
 class Vector3d;
 
@@ -24,5 +24,5 @@ public:
     double focalLength;
     double lensRadius;
 
-    mutable Random random;
+    mutable Randomizer random;
 };

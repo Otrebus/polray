@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Random.h"
+#include "Randomizer.h"
 #include "IntersectionInfo.h"
 #include "Sample.h"
 #include <mutex>
@@ -65,11 +65,11 @@ public:
 protected:
     void RenderPixel(int x, int y, Camera& cam, ColorBuffer& eyeImage, ColorBuffer& lightImage);
 
-    int BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const;
+    int BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath);
 
     int BuildEyePath(int x, int y, std::vector<BDVertex*>& path, const Camera& cam,
-                     std::vector<BDSample>& samples, Light* light) const;
-    int BuildLightPath(std::vector<BDVertex*>& path, Light* light) const;
+                     std::vector<BDSample>& samples, Light* light);
+    int BuildLightPath(std::vector<BDVertex*>& path, Light* light);
 
     Color EvalPath(const std::vector<BDVertex*>& lightPath, const std::vector<BDVertex*>& eyePath, 
                    int s, int t, Light* light) const;
@@ -86,5 +86,5 @@ protected:
 
     Roulette* roulette;
     
-    mutable Random m_random;
+    Randomizer m_random;
 };

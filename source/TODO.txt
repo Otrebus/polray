@@ -1,3 +1,4 @@
+Move random number generation out of materials
 Fix the normalInterp stuff
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info
 Replace debugbreaks with better error messages
@@ -15,6 +16,7 @@ Add check that all primitives have materials, in scene
 Implement multiple importance sampling for light portals
 Add physical camera to bdpt
 Add light source resampling to BDPT
+Try including rr with mis
 - Fill typedefs ("Normal" etc)
 - ctrl-F 14 years later
 - Handle loading of multi-vertex faces that all share one normal, e.g. counter light in kitchen2 (if not handled)
@@ -27,7 +29,6 @@ Add light source resampling to BDPT
 - Read light sources from .mtl files
 - Change the DirectHitMIS etc stuff
 - Make mr. lightportal use next event estimation
-- Try including rr with mis o **
 - Investigate BDPT fireflies
 - Add support for proper environment light sources
 - Check that materials can be assigned to different faces (e.g. the microwave in interior.obj)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Random.h"
+#include "Randomizer.h"
 #include "Material.h"
 #include "Color.h"
 
@@ -15,7 +15,7 @@ public:
     AshikhminShirley();
     ~AshikhminShirley();
 
-    Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo& info, Randomizer& random, bool adjoint) const;
 
     Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
 
@@ -27,8 +27,6 @@ public:
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
-
-    mutable Random rnd;
 
     Color Rd, Rs;
     int n;

@@ -12,6 +12,5 @@ public:
     Ray outRay;
     double pdf, rpdf;
     bool specular;
-
     int component;
 };

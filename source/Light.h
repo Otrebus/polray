@@ -19,7 +19,7 @@ public:
     Light();
     Light(Color intensity);
     virtual ~Light() {}
-    virtual std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay() const = 0;
+    virtual std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay(Randomizer& rnd) const = 0;
 
     virtual double Intersect(const Ray& ray) const = 0;
     virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const = 0;
@@ -27,9 +27,8 @@ public:
     virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const = 0;
     virtual Color GetIntensity() const;
 
-    virtual std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const = 0;
+    virtual std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const = 0;
 
-    virtual std::tuple<Point, Normal> SamplePoint() const = 0;
     virtual double GetArea() const = 0;
     virtual void AddToScene(Scene* scene) = 0;
 

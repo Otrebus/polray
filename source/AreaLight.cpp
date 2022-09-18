@@ -126,19 +126,19 @@ double AreaLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return ray.direction*GetNormal()/pi;
 }
 
-std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> AreaLight::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> AreaLight::SampleRay(Randomizer& rnd) const
 {
     Vector3d normal = c1^c2;
     normal.Normalize();
     Vector3d dir;
 
-    double x = r.GetDouble(0, 1);
-    double y = r.GetDouble(0, 1);
+    double x = rnd.GetDouble(0, 1);
+    double y = rnd.GetDouble(0, 1);
 
     auto [rightNode, forward] = MakeBasis(normal);
 
-    double r1 = r.GetDouble(0, 2*pi);
-    double r2 = r.GetDouble(0, 1.0);
+    double r1 = rnd.GetDouble(0, 2*pi);
+    double r2 = rnd.GetDouble(0, 1.0);
 
     Ray ray;
     ray.origin = pos + c1*x + c2*y + eps*normal;
@@ -151,9 +151,9 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> AreaLight::SampleRay() const
     return { ray, color, normal, areaPdf, anglePdf };
 }
 
-std::tuple<Point, Normal> AreaLight::SamplePoint() const
+std::tuple<Point, Normal> AreaLight::SamplePoint(Randomizer& rnd) const
 {
-    double x = r.GetDouble(0, 1), y = r.GetDouble(0, 1);
+    double x = rnd.GetDouble(0, 1), y = rnd.GetDouble(0, 1);
     Vector3d normal = c1^c2;
     normal.Normalize();
     Vector3d dir;
@@ -178,9 +178,9 @@ void AreaLight::Load(Bytestream& stream)
     stream >> pos >> c1 >> c2 >> intensity_;
 }
 
-std::tuple<Color, Point> AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> AreaLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
-    auto [lightPoint, lightNormal] = SamplePoint();
+    auto [lightPoint, lightNormal] = SamplePoint(rnd);
 
     Vector3d toLight = lightPoint - info.position;
     Vector3d normal = info.normal;

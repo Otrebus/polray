@@ -11,7 +11,6 @@
 DielectricMaterial::DielectricMaterial()
 {
     m_ior = 1.5f;
-    m_rnd.Seed(GetTickCount());
 }
 
 //------------------------------------------------------------------------------
@@ -26,7 +25,7 @@ DielectricMaterial::~DielectricMaterial()
 // cases are treated as the same component of the brdf since they are both 
 // specular and reflect the same amount of light for any given bounce.
 //------------------------------------------------------------------------------
-Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
+Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     auto pdf = 1;  // This is not true, of course, which is indicated by the
     auto rpdf = 1; // specularity of this brdf
@@ -75,7 +74,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, bool adjoint)
     double Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
     double R = (Rs*Rs+Rp*Rp)/2.0f;
 
-    if(m_rnd.GetDouble(0, 1) > R) // Refracted
+    if(rnd.GetDouble(0, 1) > R) // Refracted
     {
         Ray out;
         out.direction = refraction.Normalized();

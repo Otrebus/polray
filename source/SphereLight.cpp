@@ -49,15 +49,15 @@ double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return std::max(0.0, (out*info.normal)/pi);
 }
 
-std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SphereLight::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SphereLight::SampleRay(Randomizer& rnd) const
 {
     Ray ray;
 
-    auto [point, normal] = SamplePoint();
+    auto [point, normal] = SamplePoint(rnd);
     ray.origin = point;
     auto [rightNode, forward] = MakeBasis(normal);
 
-    double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
+    double r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
     double anglePdf = abs(ray.direction*normal)/pi;
     double areaPdf = 1/GetArea();
@@ -65,25 +65,15 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SphereLight::SampleRay() const
     return { ray, Color::Identity*pi, normal, areaPdf, anglePdf };
 }
 
-std::tuple<Point, Normal> SphereLight::SamplePoint() const
+std::tuple<Point, Normal> SphereLight::SamplePoint(Randomizer& rnd) const
 {
-    auto r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
+    auto r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
     auto pos = SampleSphereUniform(r1, r2);
 
     auto normal = pos;
     auto point = position_ + pos*radius_ + normal*eps;
 
     return { point, normal };
-}
-
-void SphereLight::SamplePointHemisphere(const Vector3d& apex, Vector3d& point, Vector3d& normal) const
-{
-    Vector3d rightNode, forward;
-    double r1 = r_.GetDouble(0, 1), r2 = r_.GetDouble(0, 1);
-    Vector3d pos;
-    pos = SampleHemisphereUniform(r1, r2, apex);
-    normal = pos;
-    point = position_ + pos*radius_ + normal*eps;
 }
 
 void SphereLight::Save(Bytestream& s) const
@@ -114,13 +104,17 @@ void SphereLight::AddToScene(Scene* scn)
     s->SetMaterial(material);
 }
 
-std::tuple<Color, Point> SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
     Vector3d lightPoint, lightNormal;
     Vector3d toLight = position_ - info.position;
     Vector3d normal = info.normal;
     toLight.Normalize();
-    SamplePointHemisphere(-toLight, lightPoint, lightNormal);
+
+    double r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
+    lightNormal = SampleHemisphereUniform(r1, r2, -toLight);
+    lightPoint = position_ + lightNormal*(radius_+eps);
+
     lightPoint = lightPoint + lightNormal*eps;
     toLight = lightPoint - info.position;
     double d = toLight.Length();

@@ -8,7 +8,7 @@
 
 #include "Estimator.h"
 #include "Rendering.h"
-#include "Random.h"
+#include "Randomizer.h"
 #include "KDTree.h"
 #include "Renderer.h"
 #include "Scene.h"

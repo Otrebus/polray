@@ -5,7 +5,7 @@
 #include "ColorBuffer.h"
 #include "Camera.h"
 #include "Scene.h"
-#include "Random.h"
+#include "Randomizer.h"
 
 class Ray;
 class Primitive;
@@ -34,6 +34,6 @@ protected:
 
     bool stopping;
 
-    mutable Random m_random;
+    mutable Randomizer m_random;
     std::vector<Light*> m_lights;
 };

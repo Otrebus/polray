@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GeometricRoutines.h"
-#include "Random.h"
+#include "Randomizer.h"
 #include "Material.h"
 
 class Light;
@@ -14,7 +14,7 @@ public:
     DielectricMaterial();
     ~DielectricMaterial();
 
-    Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo& info, Randomizer& random, bool adjoint) const;
 
     Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
 
@@ -28,7 +28,6 @@ public:
     void Load(Bytestream& stream);
 
     double m_ior; // Index of refraction
-    mutable Random m_rnd;
 };
 
     

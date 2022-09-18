@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Light.h"
-#include "Random.h"
+#include "Randomizer.h"
 #include "Vector3d.h"
 
 class Renderer;
@@ -23,18 +23,19 @@ public:
 
     double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
 
-    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
+    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer&, int component) const;
 
-    std::tuple<Point, Normal> SamplePoint() const;
-    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay() const;
+    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay(Randomizer& rnd) const;
 
     void Save(Bytestream& s) const;
     void Load(Bytestream& s);
 
     double GetArea() const;
 protected:
+    std::tuple<Point, Normal> SamplePoint(Randomizer& rnd) const;
+
     friend class Scene;
     void AddToScene(Scene* scene);
     Vector3d pos, c1, c2;
-    mutable Random r;
+    Randomizer r;
 };

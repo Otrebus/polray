@@ -8,6 +8,8 @@ class IntersectionInfo;
 class Bytestream;
 class Sample;
 class Color;
+class Random;
+class Randomizer;
 
 class Material
 {
@@ -15,7 +17,7 @@ public:
     Material();
     virtual ~Material();
 
-    virtual Sample GetSample(const IntersectionInfo& info, bool adjoint) const = 0;
+    virtual Sample GetSample(const IntersectionInfo& info, Randomizer& random, bool adjoint) const = 0;
 
     virtual Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const = 0;
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Material.h"
-#include "Random.h"
+#include "Randomizer.h"
 
 class Bytestream;
 class Light;
@@ -14,7 +14,7 @@ public:
     MirrorMaterial();
     ~MirrorMaterial();
 
-    Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo& info, Randomizer& random, bool adjoint) const;
 
     Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
 

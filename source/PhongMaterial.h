@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Material.h"
-#include "Random.h"
+#include "Randomizer.h"
 
 class Bytestream;
 class Light;
@@ -15,7 +15,7 @@ public:
     PhongMaterial();
     ~PhongMaterial();
     
-    Sample GetSample(const IntersectionInfo& info, bool adjoint) const;
+    Sample GetSample(const IntersectionInfo& info, Randomizer& random, bool adjoint) const;
 
     Color BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const;
 
@@ -27,8 +27,6 @@ public:
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
-
-    mutable Random rnd;
 
     // Variables for phong lighting
     Color Ka, Kd, Ks;

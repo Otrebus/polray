@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Random.h"
+#include "Randomizer.h"
 
 class Primitive;
 class ColorBuffer;
@@ -18,5 +18,5 @@ public:
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 private:
-    mutable Random m_random;
+    Randomizer m_random;
 };

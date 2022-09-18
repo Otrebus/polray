@@ -2,7 +2,7 @@
 
 #include "Light.h"
 #include "Ray.h"
-#include "Random.h"
+#include "Randomizer.h"
 #include <memory>
 
 class Renderer;
@@ -29,15 +29,15 @@ public:
     void AddPortal(Vector3d pos, Vector3d v1, Vector3d v2);
     void SetLight(Light* light);
 
-    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay() const;
-    std::tuple<Point, Normal> SamplePoint() const;
+    std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SampleRay(Randomizer&) const;
+    std::tuple<Point, Normal> SamplePoint(Randomizer&) const;
 
     double Intersect(const Ray& ray) const;
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
     double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
 
-    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const;
+    std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer&, int component) const;
 
     Color GetIntensity() const;
 
@@ -51,5 +51,4 @@ protected:
     void AddToScene(Scene*);
     Light* light;
     std::vector<Portal> portals;
-    mutable Random r;
 };

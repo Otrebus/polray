@@ -19,7 +19,7 @@ LambertianMaterial::~LambertianMaterial()
 {
 }
 
-Sample LambertianMaterial::GetSample(const IntersectionInfo& info, bool adjoint) const
+Sample LambertianMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     Ray out;
 

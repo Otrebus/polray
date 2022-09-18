@@ -66,7 +66,7 @@ double Roulette::GetThreshold() const
     return std::isfinite(ret) ? std::abs(ret) : 1;
 }
 
-int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath) const
+int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath)
 {
     double rr = 0.7;
 
@@ -95,7 +95,7 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
         newV->info = info;
         newV->pdf = lastV->sample.pdf*(abs(info.geometricnormal*info.direction))/(lSqr);
         newV->alpha = lastV->alpha*lastV->sample.color;
-        newV->sample = info.material->GetSample(info, lightPath);
+        newV->sample = info.material->GetSample(info, m_random, lightPath);
         newV->out = newV->sample.outRay;
         newV->specular = newV->sample.specular;
 
@@ -121,7 +121,8 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
             }
             else
                 lastV->rpdf = newV->sample.rpdf*abs(lastV->info.geometricnormal*v)/(lSqr);
-        } else
+        }
+        else
         {
             if(!newV->sample.color)
             {
@@ -138,7 +139,7 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
 
 int BDPT::BuildEyePath(int x, int y, std::vector<BDVertex*>& path, 
                        const Camera& cam, std::vector<BDSample>& samples, 
-                       Light* light) const
+                       Light* light)
 {
     BDVertex* camPoint = new BDVertex();
     auto [camu, camv, lensPoint] = cam.SampleAperture();
@@ -162,10 +163,10 @@ int BDPT::BuildEyePath(int x, int y, std::vector<BDVertex*>& path,
     return BuildPath(path, samples, light, false);
 }
 
-int BDPT::BuildLightPath(std::vector<BDVertex*>& path, Light* light) const
+int BDPT::BuildLightPath(std::vector<BDVertex*>& path, Light* light)
 {
     BDVertex* lightPoint = new BDVertex();
-    auto [ray, color, normal, areaPdf, anglePdf] = light->SampleRay();
+    auto [ray, color, normal, areaPdf, anglePdf] = light->SampleRay(m_random);
     lightPoint->out = ray;
     lightPoint->pdf = areaPdf;
 
@@ -294,7 +295,7 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
     forwardProbs[0] = 1/light->GetArea(); // (For direct light hit, s == 0)
     for(int i = 0; i < s; i++) // The first part is readily available
         forwardProbs[i] = lightPath[i]->pdf;
-     
+
     // The last forward pdfs are the backward pdfs of the eye path
     for(int i = s+1; i < s+t; i++)
         forwardProbs[i] = eyePath[s+t-i-1]->rpdf;

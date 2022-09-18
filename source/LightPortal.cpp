@@ -101,13 +101,13 @@ double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return 0;
 }
 
-std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay(Randomizer& rnd) const
 {
     // Pick the portal that we will sample the light through
     double areaSum = 0;
     for(auto p : portals)
         areaSum += p.GetArea();
-    double a = r.GetDouble(0, areaSum), s = 0;
+    double a = rnd.GetDouble(0, areaSum), s = 0;
     Portal portal;
     for(auto p : portals)
     {
@@ -123,11 +123,11 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay() const
     Vector3d portalNormal = portal.v1^portal.v2;
     portalNormal.Normalize();
 
-    double x = r.GetDouble(0, 1.f), y = r.GetDouble(0, 1.f);
+    double x = rnd.GetDouble(0, 1.f), y = rnd.GetDouble(0, 1.f);
     auto portalPos = portal.pos + portal.v1*x + portal.v2*y + (0.0001)*portalNormal;
 
     // Sample the light and calculate the resulting pdfs
-    auto [lightRay, color, normal, lightAreaPdf, lightAnglePdf] = light->SampleRay();
+    auto [lightRay, color, normal, lightAreaPdf, lightAnglePdf] = light->SampleRay(rnd);
 
     auto d = (portalPos-lightRay.origin).Length();
     Ray ray(lightRay.origin, (portalPos-lightRay.origin).Normalized());
@@ -141,7 +141,7 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay() const
     return { ray, std::abs(normal*ray.direction)*Color(1, 1, 1)/dirPdf, normal, lightAreaPdf, dirPdf };
 }
 
-std::tuple<Point, Normal> LightPortal::SamplePoint() const
+std::tuple<Point, Normal> LightPortal::SamplePoint(Randomizer&) const
 {
     // Seems not to be used by any other light
     return { {}, {} };
@@ -190,9 +190,9 @@ void LightPortal::AddToScene(Scene* scn)
     light->scene = scn;
 }
 
-std::tuple<Color, Point> LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
-    auto [color, lightPoint] = light->NextEventEstimation(renderer, info, component);
+    auto [color, lightPoint] = light->NextEventEstimation(renderer, info, rnd, component);
     Ray ray(info.position, (lightPoint-info.position).Normalized());
 
     for(auto p : portals)

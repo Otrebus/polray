@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Renderer.h"
-#include "Random.h"
+#include "Randomizer.h"
 
 class PathTracer : public Renderer
 {
@@ -11,12 +11,12 @@ public:
 
     void Render(Camera& cam, ColorBuffer& colBuf);
 
-    Color TracePath(const Ray& ray) const;
-    Color TracePathPrimitive(const Ray& ray) const;
+    Color TracePath(const Ray& ray);
+    Color TracePathPrimitive(const Ray& ray);
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
 private:
-    mutable Random m_random;
+    Randomizer m_random;
 };

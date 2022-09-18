@@ -36,7 +36,7 @@ void AshikhminShirley::ReadProperties(std::stringstream& ss)
     }
 }
 
-Sample AshikhminShirley::GetSample(const IntersectionInfo& info, bool adjoint) const
+Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     double df = Rd.GetMax();
     double sp = Rs.GetMax();

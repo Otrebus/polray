@@ -2,11 +2,11 @@
 
 #include <random>
 
-class Random
+class Randomizer
 {
 public:
-    Random();
-    Random(unsigned int seed);
+    Randomizer();
+    Randomizer(unsigned int seed);
 
     void Seed(unsigned int seed);
     void Seed();
@@ -14,7 +14,7 @@ public:
     double GetDouble(double a, double b);
     int GetInt(int a, int b);
 
-    ~Random();
+    ~Randomizer();
 
     static thread_local std::default_random_engine generator;
     unsigned int seed;

@@ -2,7 +2,7 @@
 #include "CsgSphere.h"
 #include "CsgCylinder.h"
 #include "CsgCuboid.h"
-#include "Random.h"
+#include "Randomizer.h"
 #include "LightTracer.h"
 #include "LightPortal.h"
 #include "Color.h"
@@ -51,9 +51,9 @@
 //#define INTERIORFOG
 //#define BOX
 //#define MESHLIGHTBOX
-//#define ROOM
+#define ROOM
 //#define EMPTYBOX
-#define KITCHEN2
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -747,10 +747,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
     s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
-    Random ballsR(47);
-    Random test(1);
+    Randomizer ballsR(47);
+    Randomizer test(1);
 
-    Random ballsC(0);
+    Randomizer ballsC(0);
 
     //SphereLight* boxLight = new SphereLight(Vector3d(2, 1.0, 0), 0.11, Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500), s);
@@ -811,10 +811,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     
     portalLight2->SetLight(skyLight);
 
-    /*s->AddLight(portalLight);
-    s->AddLight(portalLight2);*/
-    s->AddLight(sunLight);
-    s->AddLight(skyLight);
+    s->AddLight(portalLight);
+    s->AddLight(portalLight2);
+    //s->AddLight(sunLight);
+    //s->AddLight(skyLight);
 
     //auto a = new PhongMaterial();
     //a->Ks = Color(0.9, 0.9, 0.9);
@@ -846,7 +846,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->SetPartitioning(new BrutePartitioning());
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<PathTracer>(new PathTracer(s));
+    r = std::shared_ptr<LightTracer>(new LightTracer(s));
 #endif
 
 #ifdef WINDOWBOX
@@ -859,10 +859,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(-0.6, 0.5, 0.4)-camPos).GetLength(), 0.15));
     s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
-    Random ballsR(47);
-    Random test(1);
+    Randomizer ballsR(47);
+    Randomizer test(1);
 
-    Random ballsC(0);
+    Randomizer ballsC(0);
 
     //SphereLight* boxLight = new SphereLight(Vector3d(2, 1.0, 0), 0.11, Color(500, 500, 500));
     //AreaLight* boxLight = new AreaLight(Vector3d(4, 1.0, 0), Vector3d(0.0, 0.0, 0.4), Vector3d(0.0, 0.4, 0.0), Color(1500, 1500, 1500), s);

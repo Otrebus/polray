@@ -1,7 +1,7 @@
 #define NOMINMAX
 #include "scene.h"
 #include "triangle.h"
-#include "Random.h"
+#include "Randomizer.h"
 #include "Utils.h"
 #include "ObjReader.h"
 //#include "RayFactory.h"

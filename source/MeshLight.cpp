@@ -49,7 +49,7 @@ MeshLight::MeshLight()
 {
 }
 
-MeshTriangle* MeshLight::PickRandomTriangle() const
+MeshTriangle* MeshLight::PickRandomTriangle(Randomizer& rnd) const
 {
     if(!builtTree)
     {
@@ -63,7 +63,7 @@ MeshTriangle* MeshLight::PickRandomTriangle() const
         tree.Build(v);
         builtTree = true;
     }
-    double f = r.GetDouble(0, area_);
+    double f = rnd.GetDouble(0, area_);
 
     TriangleNode* node = triangleTree_;
     while(true)
@@ -106,16 +106,16 @@ TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaSta
     return node;
 }
 
-std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> MeshLight::SampleRay() const
+std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> MeshLight::SampleRay(Randomizer& rnd) const
 {
     Ray ray;
     double areaPdf, anglePdf;
 
-    auto [point, normal] = SamplePoint();
+    auto [point, normal] = SamplePoint(rnd);
     ray.origin = point;
 
     auto [rightNode, forward] = MakeBasis(normal);
-    double r1 = r.GetDouble(0, 1), r2 = r.GetDouble(0, 1);
+    double r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
 
     anglePdf = abs(ray.direction*normal)/pi;
@@ -173,12 +173,12 @@ double MeshLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return out*info.geometricnormal/pi;
 }
 
-std::tuple<Point, Normal> MeshLight::SamplePoint() const
+std::tuple<Point, Normal> MeshLight::SamplePoint(Randomizer& rnd) const
 {
-    MeshTriangle* t = PickRandomTriangle();
+    MeshTriangle* t = PickRandomTriangle(rnd);
 
-    double u = sqrt(r.GetDouble(0, 1));
-    double v = r.GetDouble(0, 1);
+    double u = sqrt(rnd.GetDouble(0, 1));
+    double v = rnd.GetDouble(0, 1);
 
     Vector3d e1 = t->v1->pos - t->v0->pos;
     Vector3d e2 = t->v2->pos - t->v0->pos;
@@ -231,9 +231,9 @@ void MeshLight::AddToScene(Scene* scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-std::tuple<Color, Point> MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, int component) const
+std::tuple<Color, Point> MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
-    auto [lightPoint, lightNormal] = SamplePoint();
+    auto [lightPoint, lightNormal] = SamplePoint(rnd);
     Vector3d toLight = lightPoint - info.position;
     Vector3d normal = info.normal;
 

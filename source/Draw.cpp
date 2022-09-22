@@ -394,7 +394,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     Vector3d target = Vector3d(157, 159, -209);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
-    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).GetLength(), 10.15));
+    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).Length(), 10.15));
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
 
@@ -407,10 +407,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //camdir.Normalize();
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
 
-    Random ballsR(47);
-    Random test(1);
+    Randomizer ballsR(47);
+    Randomizer test(1);
 
-    Random ballsC(0);
+    Randomizer ballsC(0);
 
     //auto portalLight = new AreaLight(Vector3d(-79, 387, 263), Vector3d(0, 15.0, 0.0), Vector3d(0.0, 0.0, 15.0), Color(7500, 7500, 7500));
     //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));
@@ -454,15 +454,15 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     portalLight->AddPortal(Vector3d(500, 800, -1050), Vector3d(0, -800, 0), Vector3d(0, 0, 1600));
     auto boxLight = new AreaLight(Vector3d(3854, 1750, -1770)*100, Vector3d(0.0, 0.0, 5050), Vector3d(0.0, 5050, 0.0), Color(130000000/25, 130000000/25, 130000000/25));
     portalLight->SetLight(boxLight);
-    s->AddLight(boxLight);
-    //s->AddLight(portalLight);
+    //s->AddLight(boxLight);
+    s->AddLight(portalLight);
     ////
 
     LightPortal* portalLight2 = new LightPortal();
     auto skyLight = new UniformEnvironmentLight(Vector3d(0, 0, 0), 100000, 15*Color(0.9, 1.2, 1.5));
     portalLight2->AddPortal(Vector3d(500, 800, -1050), Vector3d(0, -800, 0), Vector3d(0, 0, 1600));
     portalLight2->SetLight(skyLight);
-    //s->AddLight(portalLight2);
+    s->AddLight(portalLight2);
 
     /*auto boxLight = new SphereLight(Vector3d(-43.9, 292, 43.4), 1.11, Color(500000, 500000, 500000));
     boxLight->AddToScene(s);

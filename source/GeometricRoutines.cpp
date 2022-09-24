@@ -5,10 +5,15 @@
 #include <vector>
 #include <algorithm>
 
-//-----------------------------------------------------------------------------
-// Clips a polygon to an axis aligned plane (apparently this is the
-// Sutherman-Hodgeman algorithm)
-//-----------------------------------------------------------------------------
+/**
+ * Clips a polygon to an axis aligned plane (apparently this is the Sutherman-Hodgeman
+ * algorithm).
+ * 
+ * @param axis The axis (0, 1, 2) to clip about.
+ * @param side The side, positive or negative, to clip away.
+ * @param pos The coordinate along the axis to clip with.
+ * @param input The clipped polygon.
+ */
 void ClipPolygonToAAP(int axis, bool side, double pos, std::vector<Vector3d>& input)
 {
     std::vector<Vector3d> output;
@@ -42,11 +47,24 @@ void ClipPolygonToAAP(int axis, bool side, double pos, std::vector<Vector3d>& in
     input = output;
 }
 
+/**
+ * Reflects an incident vector about a normal.
+ * 
+ * @param incident The incident vector, oriented inwards.
+ * @param normal The reflected vector.
+ * @returns The reflected vector, oriented outwards.
+ */
 Vector3d Reflect(const Vector3d& incident, const Vector3d& normal)
 {
     return incident - normal*(incident*normal)*2;
 }
 
+/**
+ * Forms an orthogonal basis given one vector.
+ * 
+ * @param givenVector One of the vectors of the orthogonal basis.
+ * @returns Two other vectors perpendicular to the given one and each other.
+ */
 std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
 {
     auto v2 = givenVector^Vector3d(1, 0, 0);
@@ -57,14 +75,29 @@ std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
     return { v2.Normalized(), (givenVector^v2).Normalized() };
 }
 
+/**
+ * Returns a cosine weighted random point on the surface of the unit hemisphere.
+ * 
+ * @param r1 A uniformly distributed random number in [0, 1].
+ * @param r2 A uniformly distributed random number in [0, 1].
+ * @param apex The top of the hemisphere
+ * @returns A random point on the surface of the unit hemisphere.
+ */
 Vector3d SampleHemisphereCos(double r1, double r2, const Vector3d& apex)
 {
     // See also: https://twitter.com/mmalex/status/1550765798263758848
     auto [rightNode, forward] = MakeBasis(apex);
-
     return forward*cos(r1*2*pi)*sqrt(r2) + rightNode*sin(r1*2*pi)*sqrt(r2) + apex*sqrt(1-r2) + apex*eps;
 }
 
+/**
+ * Returns a (uniformly) random point on the surface of the unit hemisphere.
+ * 
+ * @param r1 A uniformly distributed random number in [0, 1].
+ * @param r2 A uniformly distributed random number in [0, 1].
+ * @param apex The top of the hemisphere
+ * @returns A random point on the surface of the unit hemisphere.
+ */
 Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
 {
     auto [rightNode, forward] = MakeBasis(apex);
@@ -72,6 +105,13 @@ Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
     return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + rightNode*sin(r1*2*pi)*sqrt(1-r2*r2) + apex*r2;
 }
 
+/**
+ * Returns a (uniformly) random point on the surface of the unit sphere.
+ * 
+ * @param r1 A uniformly distributed random number in [0, 1].
+ * @param r2 A uniformly distributed random number in [0, 1].
+ * @returns A random point on the surface of the unit sphere.
+ */
 Vector3d SampleSphereUniform(double r1, double r2)
 {
     auto z = (r1 - 0.5)*2;
@@ -80,6 +120,15 @@ Vector3d SampleSphereUniform(double r1, double r2)
     return Vector3d(r*cos(u), r*sin(u), z);
 }
 
+/**
+ * Returns parameters about the intersection of a ray with a sphere.
+ * 
+ * @param position The position of the sphere.
+ * @param radius The radius of the sphere.
+ * @param ray The ray to intersect the sphere with.
+ * @returns The distance from the ray origin to the intersection, or -inf if there is no
+ *          intersection.
+ */
 double IntersectSphere(const Vector3d& position, double radius, const Ray& ray)
 {
     Vector3d dir(ray.direction);
@@ -101,7 +150,17 @@ double IntersectSphere(const Vector3d& position, double radius, const Ray& ray)
     return -inf;
 }
 
-
+/**
+ * Returns the parameters of the intersection of a ray with a triangle.
+ * 
+ * @param v0 A vertex of the triangle.
+ * @param v1 A vertex of the triangle.
+ * @param v2 A vertex of the triangle.
+ * @param ray The ray to intersect the triangle with.
+ * @returns A tuple of { t, u, v } where t is the parametric distance along the ray, and u and v
+ *          are the parameters of the intersection in the triangle as v0 + u(v1-v0) + v(v2-v0).
+ *          If there is no intersection, t = -inf.
+ */
 std::tuple<double, double, double> IntersectTriangle(const Vector3d& v0, const Vector3d& v1, const Vector3d& v2, const Ray& ray)
 {
     double u, v, t;
@@ -130,15 +189,18 @@ std::tuple<double, double, double> IntersectTriangle(const Vector3d& v0, const V
     return { t <= 0 ? -inf : t, u, v };
 }
 
-
+/**
+ * Returns the convex hull of a set of points.
+ * 
+ * @param v The set of points.
+ * @returns A vector of the points forming convex hull, counter-clockwise.
+ */
 std::vector<Vector2d> ConvexHull(std::vector<Vector2d> v)
 {
     std::vector<Vector2d> ps, ps2; // Partial and full convex hulls and the output
+    auto turnsRight = [] (Vector2d a, Vector2d b, Vector2d c) { return ((b-a)^(c-a)) < 0; };
 
-    auto sortFn = [] (const Vector2d& a, const Vector2d& b) { return std::make_pair(a.x, a.y) < std::make_pair(b.x, b.y); };
-    auto turnsRight = [] (Vector2d a, Vector2d b, Vector2d c) { return (b.x-a.x)*(c.y-a.y) - (c.x-a.x)*(b.y-a.y) < 0; };
-
-    std::sort(v.begin(), v.end(), sortFn);
+    std::sort(v.begin(), v.end());
 
     for(auto it = v.begin(); it < v.end(); ps.push_back(*it), it++) // Lower hull part
         for(int i = (int) ps.size() - 2; i >= 0 && turnsRight(ps[i], ps[i+1], *it); i--)
@@ -148,8 +210,6 @@ std::vector<Vector2d> ConvexHull(std::vector<Vector2d> v)
         for(int i = (int) ps2.size() - 2; i >= 0 && turnsRight(ps2[i], ps2[i+1], *it); i--)
             ps2.pop_back();
 
-    // Merge the convex hull parts
-    ps.insert(ps.end(), ps2.begin()+1, ps2.end()-1);
-
+    ps.insert(ps.end(), ps2.begin()+1, ps2.end()-1); // Merge the convex hull parts
     return ps;
 }

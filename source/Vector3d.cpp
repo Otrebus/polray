@@ -143,8 +143,14 @@ double Vector2d::Length() const
     return sqrt(x*x+y*y);
 }
 
-double Vector2d::operator^(const Vector2d& v) const {
+double Vector2d::operator^(const Vector2d& v) const
+{
     return x*v.y - y*v.x;
+}
+
+bool Vector2d::operator<(const Vector2d& v) const
+{
+    return std::make_pair(x, y) < std::make_pair(v.x, v.y);
 }
 
 void Vector2d::Normalize()

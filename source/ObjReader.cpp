@@ -16,52 +16,107 @@
 #include "Timer.h"
 #include <charconv>
 
-
+/**
+ * Represents a token in the input string, meaning, a substring of the input string that is
+ * categorized as being of a certain type.
+ */
 class Token
 {
 public:
-    enum Type { String, Number, Operator, Newline, Eof };
+    enum Type { String, Number, Operator, Newline, Eof }; // The type of the token
+    // Maps the token type to its string representation
     static inline std::string typeStrs[5] = { "string", "number", "operator", "newline", "eof" };
 
+    /**
+     * Constructor. Creates a token.
+     * 
+     * @param t The category of the token.
+     * @param a A pointer to where the token starts.
+     * @param b A pointer to where the next token starts.
+     */
     Token(Type t, const char* a, const char* b) : type(t), str(a, b), line(0), column(0)
     {
     }
 
-    Token(Type t, const std::string& a) : type(t), str(a), line(0), column(0)
+    /**
+     * Constructor. Creates a token.
+     * 
+     * @param t The type of the token.
+     * @param s The string that forms the token.
+     */
+    Token(Type t, const std::string& s) : type(t), str(s), line(0), column(0)
     {
     }
 
+    /**
+     * Constructor. Creates a token.
+     * 
+     * @param t The type of the token.
+     */
     Token(Type t) : type(t), line(0), column(0)
     {
     }
 
+    /**
+     * Compares the token to the given token.
+     * 
+     * @param token The token to compare to.
+     * @returns True If the strings forming the tokens are equal, and if their types are the same.
+     */
     bool operator==(const Token& token)
     {
         return type == token.type && str == token.str;
     }
 
+    /**
+     * Compares the token to the given token.
+     * 
+     * @param token The token to compare to.
+     * @returns True If the strings forming the tokens are non-equal, or if their types differ.
+     */
     bool operator!=(const Token& token)
     {
         return !(*this == token);
     }
 
-    int line, column;
-    Type type;
-    std::string_view str;
+    int line, column; // The location of the token in the input
+    Type type; // The type of the token
+    std::string_view str; // The string that forms the token
 };
 
+/**
+ * Represents a parsing error along with information describing its nature.
+ */
 struct ParseException
 {
+    /**
+     * Constructor. Creates a piece of information regarding a parsing error.
+     * 
+     * @param str A string describing the error.
+     * @param line The line of the error.
+     * @param col The column of the error.
+     */
     ParseException(const std::string& str, int line, int col)
     {
         message = str + " at line " + std::to_string(line) + ", column " + std::to_string(col);
     }
 
+    /**
+     * Constructor. Creates a ParseException.
+     * 
+     * @param str A string describing the error.
+     * @param t The token that caused the error.
+     */
     ParseException(const std::string& str, const Token& t)
     {
         message = str + " at line " + std::to_string(t.line) + ", column " + std::to_string(t.column);
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param str A string describing the error.
+     */
     ParseException(const std::string& str)
     {
         message = str;
@@ -70,63 +125,122 @@ struct ParseException
     std::string message;
 };
 
+/**
+ * Represents the current state of parsing a given string. Allows for peeking the current token,
+ * and expecting or accepting some token while advancing the current position in the string.
+ */
 class Parser
 {
 public:
+    /**
+     * Constructor.
+     * 
+     * @param tokens A vector of tokens of a tokenized string.
+     */
     Parser(const std::vector<Token>& tokens) : tokens(tokens), p(0)
     {
     }
 
+    /**
+     * Returns the token at the current position in the string.
+     * 
+     * @returns The token.
+     */
     Token peek()
     {
         return tokens[p];
     }
 
+    /**
+     * Returns the token at the current position in the string, and advances the string pointer.
+     * 
+     * @returns The token at the current position.
+     */
     Token next()
     {
         return tokens[p++];
     }
 
+    /**
+     * Checks if the string contents of the current token equals the argument, and advances to
+     * the next token if it does.
+     * 
+     * @returns True if the string matched.
+     */
     bool accept(const char* s)
     {
         return tokens[p].str == s ? ++p : false;
     }
 
+    /**
+     * Checks if the current token in the parsing stream equals the argument, and advances
+     * the stream if it does.
+     * 
+     * @returns True if the token matched.
+     */
     bool accept(const Token& t)
     {
         return tokens[p] == t ? ++p : false;
     }
 
+    /**
+     * Checks if the type of the current token in the parsing stream equals that of the argument,
+     * and advances the stream if it does.
+     * 
+     * @returns True if the type matched.
+     */
     bool accept(Token::Type t)
     {
         return tokens[p].type == t ? ++p : false;
     }
 
-    bool expect(Token::Type t)
+    /**
+     * Checks that the type of the current token in the stream matches that of the
+     * argument, and advances the stream if so.
+     * 
+     * @throws ParseException if the tokens don't match.
+     */
+    void expect(Token::Type t)
     {
         if(tokens[p].type != t)
             throw ParseException("Expected " + Token::typeStrs[t], tokens[p]);
         p++;
-        return true;
     }
 
-    bool expect(const Token& token)
+    /**
+     * Checks that the current token in the stream matches that of the argument, and advances
+     * the stream if so.
+     * 
+     * @throws ParseException if the tokens don't match.
+     */
+    void expect(const Token& token)
     {
         if(tokens[p] != token)
             throw ParseException("Expected " + Token::typeStrs[token.type] + " " + std::string(token.str), tokens[p]);
         p++;
-        return true;
     }
 
+    /**
+     * Checks if the stream has reached the end.
+     * 
+     * @returns True if we are at EOF.
+     */
     bool eof()
     {
         return p == tokens.size();
     }
 
-    std::vector<Token> tokens;
-    int p;
+    std::string str;
+    std::vector<Token> tokens; // The stream of tokens
+    int p; // The current position in the stream
 };
 
+/**
+ * Optionally attempts to parse a string of any kind.
+ * 
+ * @param parser The parser object.
+ * @returns A pair of { whether we succeeded (bool), and the string that we parsed (string view) }.
+ */
 std::tuple<bool, std::string_view> acceptStr(Parser& parser)
 {
     if(parser.peek().type != Token::String)
@@ -135,6 +249,13 @@ std::tuple<bool, std::string_view> acceptStr(Parser& parser)
     return { true, parser.next().str };
 }
 
+/**
+ * Attempts to parse the given string.
+ * 
+ * @param parser The parser object.
+ * @param parser The string we accept.
+ * @returns Whether the string was parsed.
+ */
 bool acceptAnyCaseStr(Parser& parser, const std::string_view& str)
 {
     if(parser.peek().type != Token::String)
@@ -148,6 +269,13 @@ bool acceptAnyCaseStr(Parser& parser, const std::string_view& str)
     return true;
 }
 
+/**
+ * Unconditionally parses an alphanumeric string without whitespace.
+ * 
+ * @throws A ParseException if the string isn't alphanumeric.
+ * @param parser The parser object.
+ * @returns A string_view of the string.
+ */
 std::string_view expectStr(Parser& parser)
 {
     if(parser.peek().type != Token::String)
@@ -155,6 +283,13 @@ std::string_view expectStr(Parser& parser)
     return parser.next().str;
 }
 
+/**
+ * Unconditionally parses an integer.
+ * 
+ * @throws A ParseException if an integer point number was unable to be parsed.
+ * @param parser The parser object.
+ * @returns The integer.
+ */
 int expectInt(Parser& parser)
 {
     if(parser.peek().type != Token::Number)
@@ -169,6 +304,12 @@ int expectInt(Parser& parser)
     return d;
 }
 
+/**
+ * Optionally parses an integer.
+ * 
+ * @param parser The parser object.
+ * @returns The integer.
+ */
 std::tuple<bool, int> acceptInt(Parser& parser)
 {
     if(parser.peek().type != Token::Number)
@@ -181,7 +322,14 @@ std::tuple<bool, int> acceptInt(Parser& parser)
     return { true, d };
 }
 
-double expectDouble(Parser& parser)
+/**
+ * Unconditionally parses a floating point number.
+ * 
+ * @throws A ParseException if a floating point number was unable to be parsed.
+ * @param parser The parser object.
+ * @returns The real number.
+ */
+double expectReal(Parser& parser)
 {
     if(parser.peek().type != Token::Number)
         throw ParseException("Floating point expected", parser.peek());
@@ -193,7 +341,14 @@ double expectDouble(Parser& parser)
     return d;
 }
 
-std::tuple<bool, double> acceptDouble(Parser& parser)
+/**
+ * Attempts to parse a floating point number.
+ * 
+ * @param parser The parser object.
+ * @returns A tuple of { success, real } where success is if the parsing was successful and
+ *          along with the real number parsed.
+ */
+std::tuple<bool, double> acceptReal(Parser& parser)
 {
     if(parser.peek().type != Token::Number)
         return { false, 0 };
@@ -205,6 +360,15 @@ std::tuple<bool, double> acceptDouble(Parser& parser)
     return { true, d };
 }
 
+/**
+ * Attempts to parse a v/t/n face element.
+ * 
+ * @throws ParseException If an element was encountered but it contained badly formed data.
+ * @param parser The parser object.
+ * @returns A tuple of success/v/t/n indices. Success is true if the parsing succeeded, and the
+ *          remaining entires are the vertex, texture and normal indices, which can be zero if
+ *          it was not supplied.
+ */
 std::tuple<bool, int, int, int> acceptVertex(Parser& parser)
 {
     auto [success, n1] = acceptInt(parser);
@@ -226,21 +390,36 @@ std::tuple<bool, int, int, int> acceptVertex(Parser& parser)
     return { true, n1, n2, expectInt(parser) };
 }
 
+/**
+ * Parses a 3d vector consisting of floating point numbers.
+ * 
+ * @throws ParseException if a 3d vector was unable to be parsed.
+ * @param parser The parser object.
+ * @returns A 3d vector.
+ */
 Vector3d expectVector3d(Parser& parser)
 {
     double arr[3];
     for(int i = 0; i < 3; i++)
-        arr[i] = expectDouble(parser);
+        arr[i] = expectReal(parser);
     return Vector3d(arr[0], arr[1], arr[2]);
 }
 
+/**
+ * Parses a texture coordinate.
+ * 
+ * @throws ParseException if a texture coordinate was unable to be parsed.
+ * @param parser The parser object.
+ * @returns A 3d vector of the coordinates. Depending on the dimensionality of the coordinate
+ *          one or several of the trailing entries could be zero.
+ */
 Vector3d expectVtCoordinate(Parser& parser)
 {
     double arr[3] = { 0, 0, 0 };
     bool hadSuccess = false;
     for(int i = 0; i < 3; i++)
     {
-        auto [success, d] = acceptDouble(parser);
+        auto [success, d] = acceptReal(parser);
         if(success)
         {
             arr[i] = d;
@@ -252,6 +431,13 @@ Vector3d expectVtCoordinate(Parser& parser)
     return Vector3d(arr[0], arr[1], arr[2]);
 }
 
+/**
+ * Turns the contents of a text file into a vector of Tokens.
+ * 
+ * @throws ParseException if an unknown token was encountered.
+ * @param file The file to tokenize.
+ * @returns A vector of Token objects.
+ */
 std::vector<Token> tokenize(std::ifstream& file, std::string& str)
 {
     //Timer t1;
@@ -266,6 +452,7 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
     std::vector<Token> v;
     int line = 1, col = 1, p = 0;
 
+    // Adds a token to the token stream
     auto addToken = [&v, &line, &col, &str] (Token::Type t, int a, int b)
     {
         for(auto it = str.begin()+a; it < str.begin()+b; it++)
@@ -281,22 +468,26 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
         v.push_back(token);
     };
 
+    // Skips every character until the next token
     auto skipspace = [&p, &str] ()
     {
         while(p < str.length() && str[p] == ' ' || str[p] == '\t')
             p++;
     };
 
+    // Returns current character in the string
     auto peek = [&p, &str] () -> char
     {
         return p < str.size() ? str[p] : 0;
     };
 
+    // Advances to the next character in the string
     auto next = [&p, &str] () -> char
     {
         return p < str.size() ? str[p++] : 0;
     };
 
+    // Optionally advances to the next character in the string if the given character matches
     auto accept = [&p, &str] (char c) -> bool
     {
         return (p < str.size() && str[p] == c) ? ++ p : false;
@@ -355,10 +546,19 @@ std::vector<Token> tokenize(std::ifstream& file, std::string& str)
     return v;
 }
 
-bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Material*>& materials)
+/**
+ * Reads a Wavefront .mtl file.
+ * 
+ * @throws ParseException If the file was badly formed.
+ * @param file The name of the obj file.
+ * @param matefilestr The name of the materials file.
+ * @returns A map from the name of the material to the material object.
+ */
+std::map<std::string, Material*> ReadMaterialFile(const std::string& matfilestr)
 {
     std::ifstream matfile;
     matfile.open(matfilestr.c_str(), std::ios::out);
+    std::map<std::string, Material*> materials;
 
     if(matfile.fail())
     {
@@ -429,7 +629,7 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
         {
             // We ignore any ambient term
             for(int i = 0; i < 3; i++)
-                expectDouble(parser);
+                expectReal(parser);
 
             if(!curmat)
                 throw ParseException("No current material specified"); // TODO: not really a parse exception
@@ -438,7 +638,7 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
         {
             // We ignore any transmission filter
             for(int i = 0; i < 3; i++)
-                expectDouble(parser);
+                expectReal(parser);
 
             if(!curmat)
                 throw ParseException("No current material specified"); // TODO: not really a parse exception
@@ -495,7 +695,7 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
             }
         }
         else if(acceptAnyCaseStr(parser, "ni")) 
-            expectDouble(parser);
+            expectReal(parser);
         else if(acceptAnyCaseStr(parser, "illum")) 
             expectInt(parser);
         else
@@ -504,10 +704,18 @@ bool ReadMaterialFile(const std::string& matfilestr, std::map<std::string, Mater
             throw ParseException("Unknown token \"" + std::string(token.str) + "\"", token);
         }
     }
-    return true;
+    return materials;
 }
 
-std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string& file, Material* meshMat)
+/**
+ * Parses a Wavefront .obj file and returns the resulting triangle mesh and vector of light meshes.
+ *
+ * @throws ParseException if something didn't parse correctly. 
+ * @param file The name of the obj file.
+ * @param meshMat An alternate material to be used for the entire mesh, or null.
+ * @returns A pair of the resulting TriangleMesh and a vector of MeshLights.
+ */
+std::pair<TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string& file, Material* meshMat)
 {
     Material* curmat = nullptr;
     std::ifstream myfile;
@@ -518,6 +726,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
 
     TriangleMesh* mesh = new TriangleMesh();
     bool normalInterp;
+    std::string str;
 
     std::vector<MeshVertex*> vectors;
     std::vector<Vector3d> normals;
@@ -535,7 +744,6 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
             throw ParseException("Can't open the given .obj file \"" + file + "\"");
         }
 
-        std::string str;
         Parser parser(tokenize(myfile, str));
 
         while(!parser.accept(Token::Eof))
@@ -686,7 +894,7 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
                 // Check if there's an associated materials file, and parse it
                 auto matfilestr = expectStr(parser);
                 if(!meshMat)
-                    ReadMaterialFile(std::string(matfilestr), materials);
+                    materials = ReadMaterialFile(std::string(matfilestr));
                 continue;
             }
             else if(parser.accept("vn"))
@@ -789,5 +997,5 @@ std::tuple<bool, TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std:
 
     myfile.close();
     auto meshLightVector = std::vector<MeshLight*>(meshLights.begin(), meshLights.end());
-    return { true, mesh, meshLightVector };
+    return { mesh, meshLightVector };
 }

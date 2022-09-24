@@ -1,3 +1,4 @@
+ClipPolygonToAAP, make output returned
 Move random number generation out of materials
 Fix the normalInterp stuff
 Instead of intersect -> generateintersectioninfo just add a boolean to generate intersectioninfo when intersecting, also consider removing the minprimitive thing and just have info

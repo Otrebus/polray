@@ -2,6 +2,13 @@
 #include "Vector3d.h"
 #include <algorithm>
 
+/**
+ * String splitting. Returns the components of the given string split by the given delimiter.
+ * 
+ * @param s The string to split
+ * @param delim The delimiter
+ * @returns A vector of the intermediate strings between the delimiters.
+ */
 std::vector<std::string> split(const std::string& s, char delim)
 {
     std::vector<std::string> ret;
@@ -14,6 +21,12 @@ std::vector<std::string> split(const std::string& s, char delim)
     return ret;
 }
 
+/**
+ * Returns the lowercase version of the string passed
+ * 
+ * @param s The input string.
+ * @returns The input string in lower-case.
+ */
 std::string lower(const std::string& s)
 {
     std::string ret(s.begin(), s.end());

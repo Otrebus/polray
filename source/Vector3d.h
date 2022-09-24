@@ -54,6 +54,7 @@ public:
     Vector2d operator-(const Vector2d&) const;
     Vector2d operator*(double) const;
     double operator^(const Vector2d&) const;
+    bool operator<(const Vector2d&) const;
 
     double operator*(const Vector2d&) const;
 

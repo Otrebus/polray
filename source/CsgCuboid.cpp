@@ -197,9 +197,9 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, double& tNear, double& tFar, int& ax
 
     for(int u = 0; u < 3; u++)
     {
-        if (ray.direction[u] == 0)
+        if(ray.direction[u] == 0)
         {  
-            if (ray.origin[u] > c2[u] || ray.origin[u] < c1[u]) 
+            if(ray.origin[u] > c2[u] || ray.origin[u] < c1[u]) 
                 return false;
         }
         else
@@ -208,24 +208,24 @@ bool CsgCuboid::SlabsTest(const Ray& inRay, double& tNear, double& tFar, int& ax
             int tmpSideFar = 1;
             double t1 = (c1[u] - ray.origin[u]) / ray.direction[u];
             double t2 = (c2[u] - ray.origin[u]) / ray.direction[u];
-            if (t1 > t2)
+            if(t1 > t2)
             {
                 std::swap(tmpSideNear, tmpSideFar);
                 std::swap(t1, t2);
             }
-            if (t1 > tNear) 
+            if(t1 > tNear) 
             {
                 sideNear = tmpSideNear;
                 axisNear = u;
                 tNear = t1;
             }
-            if (t2 < tFar) 
+            if(t2 < tFar) 
             {
                 sideFar = tmpSideFar;
                 axisFar = u;
                 tFar = t2;
             }
-            if (tNear > tFar) 
+            if(tNear > tFar) 
                 return false;
         }  
     }

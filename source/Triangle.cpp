@@ -75,12 +75,12 @@ std::tuple<bool, BoundingBox> Triangle::GetClippedBoundingBox(const BoundingBox&
 {
     std::vector<Vector3d> points = { v0.pos, v1.pos, v2.pos };
 
-    ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
-    ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
-    ClipPolygonToAAP(1, true, clipbox.c1.y, points); // Bottom
-    ClipPolygonToAAP(1, false, clipbox.c2.y, points); // Top
-    ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
-    ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
+    points = ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
+    points = ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
+    points = ClipPolygonToAAP(1, true, clipbox.c1.y, points); // Bottom
+    points = ClipPolygonToAAP(1, false, clipbox.c2.y, points); // Top
+    points = ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
+    points = ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
 
     BoundingBox resultbox{ { inf, inf, inf }, { -inf, -inf, -inf } };
 

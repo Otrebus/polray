@@ -42,14 +42,14 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& r
 
     if(cosi > 0) // Ray from outside the material, going in
     {
-        n1 = 1.0f;
+        n1 = 1.0;
         n2 = m_ior;
         normal = _normal;
     }
     else        // Ray from the inside, going out - stuff is flipped
     {           // to make the rest of the calculations still valid
         n1 = m_ior;
-        n2 = 1.0f;
+        n2 = 1.0;
         normal = -_normal;
         cosi = -cosi;
     }
@@ -72,7 +72,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& r
     double cost = -refraction*normal;
     double Rs = (n1 * cosi - n2 * cost)/(n1 * cosi + n2*cost);
     double Rp = (n1 * cost - n2 * cosi)/(n1 * cost + n2*cosi);
-    double R = (Rs*Rs+Rp*Rp)/2.0f;
+    double R = (Rs*Rs+Rp*Rp)/2.0;
 
     if(rnd.GetDouble(0, 1) > R) // Refracted
     {

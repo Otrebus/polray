@@ -6,15 +6,14 @@
 #include <algorithm>
 
 /**
- * Clips a polygon to an axis aligned plane (apparently this is the Sutherman-Hodgeman
- * algorithm).
+ * Clips a polygon to an axis-aligned plane (apparently this is the Sutherman-Hodgeman algorithm)
  * 
  * @param axis The axis (0, 1, 2) to clip about.
  * @param side The side, positive or negative, to clip away.
  * @param pos The coordinate along the axis to clip with.
  * @param input The clipped polygon.
  */
-void ClipPolygonToAAP(int axis, bool side, double pos, std::vector<Vector3d>& input)
+std::vector<Vector3d> ClipPolygonToAAP(int axis, bool side, double pos, std::vector<Vector3d>& input)
 {
     std::vector<Vector3d> output;
     output.reserve(6);
@@ -44,7 +43,7 @@ void ClipPolygonToAAP(int axis, bool side, double pos, std::vector<Vector3d>& in
                 output.push_back(splitpoint);
         }
     }
-    input = output;
+    return output;
 }
 
 /**
@@ -69,7 +68,7 @@ std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
 {
     auto v2 = givenVector^Vector3d(1, 0, 0);
 
-    if(v2.Length2() < 0.0001f)
+    if(v2.Length2() < 0.0001)
         v2 = givenVector^Vector3d(0, 0, 1);
 
     return { v2.Normalized(), (givenVector^v2).Normalized() };

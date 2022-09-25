@@ -52,7 +52,8 @@ double AreaLight::GetArea() const
     return area;
 }
 
-double AreaLight::Intersect(const Ray& ray) const {
+double AreaLight::Intersect(const Ray& ray) const
+{
     double u, v, t;
     Vector3d D = ray.direction;
 
@@ -81,7 +82,8 @@ double AreaLight::Intersect(const Ray& ray) const {
     return t < 0 ? -inf : t;
 }
 
-bool AreaLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const {
+bool AreaLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
+{
     double u, v, t;
     info.direction = ray.direction;
     Vector3d D = ray.direction;

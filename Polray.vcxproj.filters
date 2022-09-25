@@ -131,9 +131,6 @@
     <ClCompile Include="source\Rendering.cpp">
       <Filter>Source Files\Renderers</Filter>
     </ClCompile>
-    <ClCompile Include="source\Input.cpp">
-      <Filter>Source Files\System</Filter>
-    </ClCompile>
     <ClCompile Include="source\Main.cpp">
       <Filter>Source Files\System</Filter>
     </ClCompile>
@@ -210,9 +207,6 @@
       <Filter>Source Files\Spectral</Filter>
     </ClCompile>
     <ClCompile Include="source\ColorBuffer.cpp">
-      <Filter>Source Files\Spectral</Filter>
-    </ClCompile>
-    <ClCompile Include="source\Texture.cpp">
       <Filter>Source Files\Spectral</Filter>
     </ClCompile>
     <ClCompile Include="source\Draw.cpp">
@@ -331,9 +325,6 @@
     <ClInclude Include="source\Matrix3d.h">
       <Filter>Source Files\Math</Filter>
     </ClInclude>
-    <ClInclude Include="source\Input.h">
-      <Filter>Source Files\System</Filter>
-    </ClInclude>
     <ClInclude Include="source\Gfx.h">
       <Filter>Source Files\System</Filter>
     </ClInclude>
@@ -395,9 +386,6 @@
       <Filter>Source Files\Spectral</Filter>
     </ClInclude>
     <ClInclude Include="source\ColorBuffer.h">
-      <Filter>Source Files\Spectral</Filter>
-    </ClInclude>
-    <ClInclude Include="source\Texture.h">
       <Filter>Source Files\Spectral</Filter>
     </ClInclude>
     <ClInclude Include="source\Draw.h">

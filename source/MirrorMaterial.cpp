@@ -33,10 +33,10 @@ Sample MirrorMaterial::GetSample(const IntersectionInfo& info, Randomizer&, bool
 
     Ray out;
     out.direction = Reflect(info.direction, normal);
-    out.origin = info.position + normal*0.0001f;
+    out.origin = info.position + normal*0.0001;
     out.direction.Normalize();
 
-    return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0f)*Color(1, 1, 1), out, 1, 1, true, 1);
+    return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0)*Color(1, 1, 1), out, 1, 1, true, 1);
 }
 
 Color MirrorMaterial::BRDF(const IntersectionInfo&, const Vector3d&, int) const

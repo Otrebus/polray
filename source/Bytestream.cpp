@@ -1,46 +1,25 @@
 #include "Bytestream.h"
 #include <fstream>
 
-//------------------------------------------------------------------------------
-// Constructor.
-//------------------------------------------------------------------------------
+/**
+ * Constructor.
+ */
 Bytestream::Bytestream() : first(0), fail(false)
 {
 }
 
-//------------------------------------------------------------------------------
-// Destructor.
-//------------------------------------------------------------------------------
+/**
+ * Destructor.
+ */
 Bytestream::~Bytestream()
 {
 }
 
-//------------------------------------------------------------------------------
-// Returns true if a previous operation has failed and the error flag has not
-// been cleared.
-//------------------------------------------------------------------------------
-bool Bytestream::HasFailed() const
-{
-    return fail;
-}
-
-//------------------------------------------------------------------------------
-// Clears the error flag.
-//------------------------------------------------------------------------------
-void Bytestream::ClearFail()
-{
-    fail = false;
-}
-
-//------------------------------------------------------------------------------
-// Returns the size, in bytes, of the data currently in the stream. This is the
-// amount of data put into the stream minus the amount of data streamed from it.
-//------------------------------------------------------------------------------
-size_t Bytestream::GetSize() const
-{
-    return data.size() - first;
-}
-
+/**
+ * Dumps the bytestream into a file.
+ * 
+ * @param fileName The name of the file to write to.
+ */
 void Bytestream::SaveToFile(std::string fileName)
 {
     std::ofstream file;
@@ -49,6 +28,11 @@ void Bytestream::SaveToFile(std::string fileName)
         file.write(&byte, sizeof(char));
 }
 
+/**
+ * Loads the contents of a file into the bytestream.
+ * 
+ * @param fileName The name of the file to read from.
+ */
 void Bytestream::LoadFromFile(std::string fileName)
 {
     std::ifstream file;

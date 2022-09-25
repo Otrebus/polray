@@ -6,11 +6,6 @@
 
 EmissiveMaterial::EmissiveMaterial()
 {
-#ifdef DETERMINISTIC
-    rnd.Seed(0);
-#endif
-    texture = 0;
-    normalmap = 0;
 }
 
 EmissiveMaterial::~EmissiveMaterial()

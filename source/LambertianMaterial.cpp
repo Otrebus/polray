@@ -9,10 +9,6 @@
 LambertianMaterial::LambertianMaterial()
 {
     Kd = Color(1, 1, 1);
-    emissivity = Color(0, 0, 0);
-#ifdef DETERMINISTIC
-    rnd.Seed(0);
-#endif
 }
 
 LambertianMaterial::~LambertianMaterial()

@@ -119,7 +119,7 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> MeshLight::SampleRay(Randomize
     ray.direction = SampleHemisphereCos(r1, r2, normal);
 
     anglePdf = abs(ray.direction*normal)/pi;
-    areaPdf = 1.0f/GetArea();
+    areaPdf = 1.0/GetArea();
 
     return { ray, Color::Identity*pi, normal, areaPdf, anglePdf };
 }

@@ -761,13 +761,13 @@ std::pair<TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string
                     if(!success)
                         break;
 
-                    if (v < 0)
+                    if(v < 0)
                         v = (int) vectors.size() + v + 1;
 
                     MeshVertex* mv;
 
                     auto it = groupVertices.find(v-1);
-                    if (it == groupVertices.end())
+                    if(it == groupVertices.end())
                     { // We have not seen this vertex before in this group so create a new one
                         mv = groupVertices[v-1] = new MeshVertex(*vectors[v-1]);
                         if(n)
@@ -803,21 +803,21 @@ std::pair<TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string
                     for(auto& p : { pv0, pv1, pv2 })
                         p->triangles.push_back(tri);
 
-                    if (pv0->normal.IsNull())
+                    if(pv0->normal.IsNull())
                         for(auto& v : { tri->v0, tri->v1, tri->v2 })
                             v->normal = tri->GetNormal();
 
                     // No material defined, set to diffuse
-                    if (!curmat)
+                    if(!curmat)
                     {
                         LambertianMaterial* mat = new LambertianMaterial();
-                        mat->Kd = Color(0.7f, 0.7f, 0.7f);
+                        mat->Kd = Color(0.7, 0.7, 0.7);
                         tri->SetMaterial(mat);
                         currentMesh->materials.push_back(mat);
                     }
-                    if (curmat && !meshMat)
+                    if(curmat && !meshMat)
                         tri->SetMaterial(curmat);
-                    else if (meshMat)
+                    else if(meshMat)
                         tri->SetMaterial(meshMat);
                 }
             }
@@ -845,7 +845,7 @@ std::pair<TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string
                         {
                             for(auto& t2 : v->triangles)
                             {
-                                if(t1->GetNormal() * t2->GetNormal() < 0.7f)
+                                if(t1->GetNormal() * t2->GetNormal() < 0.7)
                                 {
                                     // Create two new vertices
                                     MeshVertex*& v1 = v;
@@ -859,7 +859,7 @@ std::pair<TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string
                                     // Reassign the triangles that belonged to v to either v1 or v2 depending on their normal
                                     for(auto& t3 : v->triangles)
                                     {
-                                        if(t3->GetNormal() * v1->normal >= 0.7f)
+                                        if(t3->GetNormal() * v1->normal >= 0.7)
                                         {
                                             // First reassign the correct vector in the triangle
                                             for(auto vv : { &t3->v0, &t3->v1, &t3->v2 })

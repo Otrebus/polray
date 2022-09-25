@@ -92,8 +92,8 @@ std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, doubl
     double rx = 1/halfwidth*up*B/det;
     double ry = 1/halfwidth*-leftNode*B/det;
 
-    double x = ((double)xres*(1.0f - rx)/2.0f);
-    double y = ((double)yres*(ratio - ry)/(ratio*2.0f));
+    double x = ((double)xres*(1.0 - rx)/2.0);
+    double y = ((double)yres*(ratio - ry)/(ratio*2.0));
 
     if(x < 0 || x >= xres || y < 0 || y >= yres)
         return { false, 0, 0 };

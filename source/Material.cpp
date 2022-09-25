@@ -10,17 +10,11 @@
 
 Material::Material()
 {
-    texture = 0;
-    normalmap = 0;
     light = 0;
 }
 
 Material::~Material()
 {
-    if(normalmap)
-        delete normalmap;
-    if(texture)
-        delete texture;
 }
 
 Material* Material::Create(unsigned char id)

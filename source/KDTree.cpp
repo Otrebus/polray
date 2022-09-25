@@ -30,14 +30,14 @@ double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, doub
         cost = (nLeft + nPlanar)*leftarea + nRight*rightarea;
         cost *= KDTree::cost_triint;
         if(nLeft + nPlanar == 0 || nRight == 0)
-            cost *= 1.0f;
+            cost *= 1.0;
     }
     else if(side == KDTree::rightNode)
     {
         cost = nLeft*leftarea + (nRight + nPlanar)*rightarea;
         cost *= KDTree::cost_triint;
         if(nRight + nPlanar == 0 || nLeft == 0)
-            cost *= 1.0f;
+            cost *= 1.0;
     }
     else
     {
@@ -54,10 +54,10 @@ double KDTree::CalculateCost(int type, int samples)
 
     if(type == 0)
     {
-        Triangle t(0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f);
+        Triangle t(0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0);
         for(int i = 0; i < samples; i++)
         {
-            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(rnd.GetDouble(0, 1), rnd.GetDouble(0, 1), 1));
+            Ray ray(Vector3d(0.5, 0.5, 0), Vector3d(rnd.GetDouble(0, 1), rnd.GetDouble(0, 1), 1));
             t.Intersect(ray);
         }
     }
@@ -66,7 +66,7 @@ double KDTree::CalculateCost(int type, int samples)
         BoundingBox box(Vector3d(0, 0, 1), Vector3d(0.5, 1, 2));
         for(int i = 0; i < samples; i++)
         {
-            Ray ray(Vector3d(0.5f, 0.5f, 0), Vector3d(rnd.GetDouble(0, 1), rnd.GetDouble(0, 1), 1));
+            Ray ray(Vector3d(0.5, 0.5, 0), Vector3d(rnd.GetDouble(0, 1), rnd.GetDouble(0, 1), 1));
             double d1, d2;
             box.Intersect(ray, d1, d2);
         }
@@ -141,7 +141,7 @@ void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, st
 void AddEvent(double& minpoint, double& maxpoint, KDPrimitive*& primitive, std::vector<SAHEvent*>& add)
 {
     // Planar primitive - insert a planar event into the queue
-    if (minpoint == maxpoint)
+    if(minpoint == maxpoint)
         add.push_back(new SAHEvent(primitive, minpoint, SAHEvent::planar));
     else
     {
@@ -187,7 +187,7 @@ void KDNode::Build(BoundingBox& bbox, std::vector<SAHEvent*>* events, const std:
 
             // Go through all events on this position
             for(ps = pp = pe = 0; it < events[u].end() && (*it)->position == sweeppos; it++)
-                if ((*it)->type == SAHEvent::end)
+                if((*it)->type == SAHEvent::end)
                     pe++;
                 else if((*it)->type == SAHEvent::start)
                     ps++;

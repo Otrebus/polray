@@ -36,10 +36,8 @@ public:
 
     bool IsValid() const;
 
-    double GetLuminance() const;
-    double GetIntensity() const;
+    double GetLuma() const;
     double GetMax() const;
-    double GetSum() const;
 
     double r;
     double g;

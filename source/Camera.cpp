@@ -35,8 +35,8 @@ Camera::~Camera()
 //------------------------------------------------------------------------------
 void Camera::SetFov(double fov)
 {
-    assert(fov > 0.0f && fov < 180.0f);
-    halfwidth = tan(3.14159f*fov/360.0f);
+    assert(fov > 0.0 && fov < 180.0);
+    halfwidth = tan(3.14159*fov/360.0);
 }
 
 //------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ void Camera::SetFov(double fov)
 //------------------------------------------------------------------------------
 double Camera::GetPixelArea() const
 {
-    return halfwidth*halfwidth*4.0f*((double)yres/double(xres))/double(xres*yres);
+    return halfwidth*halfwidth*4.0*((double)yres/double(xres))/double(xres*yres);
 }
 
 //------------------------------------------------------------------------------
@@ -52,7 +52,7 @@ double Camera::GetPixelArea() const
 //------------------------------------------------------------------------------
 double Camera::GetFilmArea() const
 {
-    return (double)yres/(double)xres*halfwidth*halfwidth*4.0f;
+    return (double)yres/(double)xres*halfwidth*halfwidth*4.0;
 }
 
 int Camera::GetXRes() const

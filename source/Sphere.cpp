@@ -17,8 +17,8 @@ Sphere::Sphere(const Vector3d& pos, const Vector3d& u, const Vector3d& ri, doubl
 
 Sphere::Sphere() : radius(1), position(0, 0, 0)
 {
-    radius = 1.0f;
-    position = Vector3d(0.0f, 0.0f, 0.0f);
+    radius = 1.0;
+    position = Vector3d(0.0, 0.0, 0.0);
 }
 
 Sphere::~Sphere()
@@ -60,7 +60,7 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
     if(w*forward >= 0)
         ucoord = acos(wright) / (2*pi);
     else
-        ucoord = 1.0f - acos(wright) / (2*pi);
+        ucoord = 1.0 - acos(wright) / (2*pi);
         
     info.texpos.x = ucoord;
     info.texpos.y = vcoord;

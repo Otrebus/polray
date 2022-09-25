@@ -15,8 +15,6 @@
 #include "timer.h"
 #include "sphere.h"
 #include <vector>
-#include "Texture.h"
-#include "Cubemap.h"
 #include "triangle.h"
 #include "kdtree.h"
 #include "trianglemesh.h"
@@ -38,7 +36,6 @@
 #include "AshikhminShirley.h"
 #include "LambertianMaterial.h"
 #include "SphereLight.h"
-#include "PreethamSky.h"
 #include "MeshLight.h"
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
@@ -49,10 +46,10 @@
 //#define INTERIORSKY
 //#define INTERIORINLIGHT
 //#define INTERIORFOG
-//#define BOX
+#define BOX
 //#define MESHLIGHTBOX
 //#define ROOM
-#define EMPTYBOX
+//#define EMPTYBOX
 //#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
@@ -93,9 +90,9 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //camdir.Normalize();
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
 
-    Random ballsR(47);
+    Randomizer ballsR(47);
 
-    Random ballsC(0);
+    Randomizer ballsC(0);
 
     //auto portalLight = new AreaLight(Vector3d(-79, 387, 263), Vector3d(0, 15.0, 0.0), Vector3d(0.0, 0.0, 15.0), Color(7500, 7500, 7500));
     //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));
@@ -1525,10 +1522,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     ajax->Transform(move2);
     s->AddModel(ajax);
 */
-    Random ballsR(47);
-    Random test(1);
+    Randomizer ballsR(47);
+    Randomizer test(1);
 
-    Random ballsC(0);
+    Randomizer ballsC(0);
 
     //s->SetPartitioning(new BrutePartitioning());
 
@@ -1554,7 +1551,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     s->AddLight(boxLight);
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef MESHLIGHTBOX
 

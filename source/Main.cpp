@@ -20,7 +20,6 @@
 bool g_isActive;
 bool g_quitting;
 Gfx* gfx;
-Input* input;
 Logger logger(LOG_FILENAME);
 LPDIRECTDRAWSURFACE7 bitmapsurface;
 DDSURFACEDESC2 ddsd;
@@ -29,9 +28,12 @@ HANDLE bufferMutex;
 
 Rendering* rendering;
 
-//-----------------------------------------------------------------------------
-// Entry point.
-//-----------------------------------------------------------------------------
+/**
+ * Entry point.
+ * 
+ * @param hInstance The handle of the instance.
+ * @returns The result of the program, 0 for success.
+ */
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 {
     WNDCLASSEX  wc;
@@ -46,7 +48,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     bufferMutex = CreateMutex(0, false, 0);
 
     gfx = new Gfx();
-    input = new Input();
 
     g_isActive = true;
     g_quitting = false;
@@ -64,9 +65,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     wc.lpszClassName = L"Raytracer";
     wc.hIconSm       =  LoadIcon(NULL, IDI_WINLOGO);
 
-    Texture::hInstance = hInstance;
-
-    if (!RegisterClassEx(&wc))
+    if(!RegisterClassEx(&wc))
         return 1;
 
     SetProcessDPIAware();
@@ -83,11 +82,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
 
     SetFocus(hWnd);
 
-    if(!input->Initialize(hInstance, hWnd))
-    {
-        logger.Box("Could not initialize Directinput.");
-        return 1;
-    }
     if(!gfx->Initialize(hWnd, windowed, xres, yres))
     {
         logger.Box("Could not initialize Directdraw.");
@@ -101,12 +95,6 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     ddsd.dwHeight = YRES;
     ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY; 
 
-    if(gfx->m_pDD->CreateSurface(&ddsd, &bitmapsurface, NULL) != DD_OK)
-    {
-        logger.File("Failed to create texture");
-        return false;
-    }
-
     gfx->ClearScreen(255, 255, 255);
 
     std::shared_ptr<Scene> scene;
@@ -114,7 +102,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     std::shared_ptr<Estimator> estimator;
 
     std::ifstream ifile("btstrout");
-    if (ifile.good())
+    if(ifile.good())
         rendering = new Rendering("btstrout");
     else
     {
@@ -145,7 +133,7 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
                     for(int x = 0; x < XRES; x++)
                     {
                         Color color = colorbuffer.GetPixel(x, y);
-                        if (color.r || color.g || color.b)
+                        if(color.r || color.g || color.b)
                             color.r = color.r;
                         gfx->Plot(x, y, color.GetInt());
                     }
@@ -185,9 +173,15 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
     return 0;
 }
 
-//------------------------------------------------------------------------------
-// Handles window events and notifies the graphics and input systems about them.
-//------------------------------------------------------------------------------
+/**
+ * Handles window events and notifies the graphics and input systems about them.
+ * 
+ * @param hWnd A handle to the window
+ * @param msg The message that was passed
+ * @param wParam The word parameter
+ * @param lParam The long parameter
+ * @returns The value returned to the sending thread.
+ */
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch(msg)
@@ -197,12 +191,11 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             return 0;
         break;
     case WM_ACTIVATE:
-        if (LOWORD(wParam) == WA_INACTIVE)
+        if(LOWORD(wParam) == WA_INACTIVE)
             g_isActive = false;
         else 
         {
             g_isActive = true;
-            input->Acquire();
         }
         break;
     case WM_MOVE:
@@ -214,11 +207,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         g_quitting = true;
         PostQuitMessage(0);
         break;
-    case WM_MOUSEMOVE:
-    {
-        input->UpdateCursorPos();
-        break;
-    }
     default:
         break;
     }

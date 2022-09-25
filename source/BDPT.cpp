@@ -382,7 +382,7 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
             weight += l*l;
     }
 
-    return 1.0f/(1.0f+weight);
+    return 1.0/(1.0+weight);
 }
 
 double BDPT::WeighPath(int s, int t, std::vector<BDVertex*>& lightPath,
@@ -397,7 +397,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     std::vector<BDSample> samples;
     std::vector<BDVertex*> eyePath, lightPath;
 
-    auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
+    auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0, 1.0));
 
     int lLength = BuildLightPath(lightPath, light);
     int eLength = BuildEyePath(x, y, eyePath, cam, samples, light);
@@ -467,7 +467,7 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
         }
     }
 
-    roulette[x+y*XRES].AddSample((eyeImage.GetPixel(x, y) + lightImage.GetPixel(x, y)).GetLuminance(), rays);
+    roulette[x+y*XRES].AddSample((eyeImage.GetPixel(x, y) + lightImage.GetPixel(x, y)).GetLuma(), rays);
 
     for(unsigned int s = 1; s < lightPath.size() + 1; s++)
         delete lightPath[s-1];

@@ -145,12 +145,14 @@ std::vector<Light*> Scene::GetLights() const
     return lights;
 }
 
-bool Scene::Intersect(const Ray& ray, double tmax) const {
+bool Scene::Intersect(const Ray& ray, double tmax) const
+{
     const Primitive* dummy;
     return partitioning->Intersect(ray, dummy, 0, tmax, false) > 0;
 };
 
-double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const {
+double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const
+{
     p = nullptr;
     l = nullptr;
     auto primT = partitioning->Intersect(ray, p, 0, inf, true);

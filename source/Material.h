@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Texture.h"
 #include "Color.h"
 
 class Light;
@@ -32,6 +31,4 @@ public:
     static Material* Create(unsigned char);
 
     Light* light;
-    Texture* texture;
-    Texture* normalmap;
 };

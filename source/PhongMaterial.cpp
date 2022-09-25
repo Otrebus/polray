@@ -11,11 +11,7 @@ PhongMaterial::PhongMaterial()
     Kd = Color(1, 1, 1);
     Ks = Color(0, 0, 0);
     Ka = Color(0, 0, 0);
-    normalmap = 0;
     alpha = 0;
-#ifdef DETERMINISTIC
-    rnd.Seed(0);
-#endif
 }
 
 PhongMaterial::~PhongMaterial()
@@ -31,7 +27,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, b
     if(r <= df) // Diffuse bounce
     {
         auto r1 = rnd.GetDouble(0, 1.0);
-        auto r2 = rnd.GetDouble(0, 1.0f);
+        auto r2 = rnd.GetDouble(0, 1.0);
 
         Vector3d N_g = info.geometricnormal;
         Vector3d N_s = info.normal;
@@ -70,7 +66,7 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, b
     }
     else // Specular bounce
     {
-        auto r1 = rnd.GetDouble(0.0f, 2*pi);
+        auto r1 = rnd.GetDouble(0.0, 2*pi);
         auto r2 = acos(pow(rnd.GetDouble(0, 1), 1/(alpha+1)));
 
         Vector3d N_g = info.geometricnormal;

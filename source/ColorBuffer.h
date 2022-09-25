@@ -23,7 +23,6 @@ public:
     void SetPixel(int x, int y, double r, double g, double b);
     void AddColor(int x, int y, const Color& c);
     void Clear(const Color& c);
-    void PutText(const char* const text, int x, int y);
 
     void Dump(std::string filename);
 

@@ -21,7 +21,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
 
     for(int samples = 0; samples < xres*yres && ! stopping; samples++)
     {
-        auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0f, 1.0f));
+        auto [light, lightWeight] = scene->PickLight(m_random.GetDouble(0.0, 1.0));
         auto [ray, pathColor, lightNormal, _, __] = light->SampleRay(m_random);
 
         pathColor *= light->GetArea()*light->GetIntensity(); // First direction is from the light source
@@ -50,7 +50,7 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             Ray bounceRay;
 
             // Figure out if and where the current ray segment hits something
-            if(scene->Intersect(ray, minprimitive, minlight) < 0.0f)
+            if(scene->Intersect(ray, minprimitive, minlight) < 0.0)
                 break;
             if(minprimitive)
                 minprimitive->GenerateIntersectionInfo(ray, info);
@@ -83,10 +83,10 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             }
             
             // Bounce a new ray
-            pathColor*= c/0.7f;
+            pathColor*= c/0.7;
             ray = bounceRay;
 
-        } while(m_random.GetDouble(0.f, 1.f) < 0.7f);
+        } while(m_random.GetDouble(0.f, 1.f) < 0.7);
     }
 }
 

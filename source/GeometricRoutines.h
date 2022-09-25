@@ -8,7 +8,7 @@ class Vector2d;
 class Ray;
 
 std::vector<Vector2d> ConvexHull(std::vector<Vector2d> v);
-void ClipPolygonToAAP(int axis, bool side, double position, std::vector<Vector3d>& input);
+std::vector<Vector3d> ClipPolygonToAAP(int axis, bool side, double position, std::vector<Vector3d>& input);
 
 std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector);
 

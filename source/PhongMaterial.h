@@ -28,7 +28,6 @@ public:
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
-    // Variables for phong lighting
     Color Ka, Kd, Ks;
     double alpha;
 };

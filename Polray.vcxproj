@@ -169,7 +169,6 @@
     <ClCompile Include="source\Estimator.cpp" />
     <ClCompile Include="source\GeometricRoutines.cpp" />
     <ClCompile Include="source\Gfx.cpp" />
-    <ClCompile Include="source\Input.cpp" />
     <ClCompile Include="source\IntersectionInfo.cpp" />
     <ClCompile Include="source\KDTree.cpp" />
     <ClCompile Include="source\LambertianMaterial.cpp" />
@@ -202,7 +201,6 @@
     <ClCompile Include="source\Utils.cpp" />
     <ClCompile Include="source\Sphere.cpp" />
     <ClCompile Include="source\SphereLight.cpp" />
-    <ClCompile Include="source\Texture.cpp" />
     <ClCompile Include="source\ThinLensCamera.cpp" />
     <ClCompile Include="source\Timer.cpp" />
     <ClCompile Include="source\Triangle.cpp" />
@@ -233,7 +231,6 @@
     <ClInclude Include="source\Estimator.h" />
     <ClInclude Include="source\GeometricRoutines.h" />
     <ClInclude Include="source\Gfx.h" />
-    <ClInclude Include="source\Input.h" />
     <ClInclude Include="source\IntersectionInfo.h" />
     <ClInclude Include="source\KDTree.h" />
     <ClInclude Include="source\LambertianMaterial.h" />
@@ -265,7 +262,6 @@
     <ClInclude Include="source\Utils.h" />
     <ClInclude Include="source\Sphere.h" />
     <ClInclude Include="source\SphereLight.h" />
-    <ClInclude Include="source\Texture.h" />
     <ClInclude Include="source\ThinLensCamera.h" />
     <ClInclude Include="source\Timer.h" />
     <ClInclude Include="source\Triangle.h" />

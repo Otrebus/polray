@@ -5,12 +5,10 @@
 
 #include <windows.h>
 #include "Gfx.h"
-#include "Input.h"
 
 extern bool g_isActive;
 extern bool g_quitting;
 extern Gfx* gfx;
-extern Input* input;
 extern LPDIRECTDRAWSURFACE7 bitmapsurface;
 extern DDSURFACEDESC2 ddsd;
 

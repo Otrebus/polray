@@ -7,10 +7,9 @@
 #include "gfx.h"
 #include <cassert>
 
-
-//------------------------------------------------------------------------------
-// Constructor
-//------------------------------------------------------------------------------
+/**
+ * Constructor
+ */
 Gfx::Gfx()
 {
     m_isLocked = false;
@@ -19,9 +18,9 @@ Gfx::Gfx()
     m_pClipper = 0;
 }
 
-//------------------------------------------------------------------------------
-// Destructor
-//------------------------------------------------------------------------------
+/**
+ * Destructor
+ */
 Gfx::~Gfx() 
 {
     // The application freezes at any of these if the Directdraw object has been
@@ -37,10 +36,16 @@ Gfx::~Gfx()
     //              m_pScreenRect = new RECT;
 }
 
-//------------------------------------------------------------------------------
-// Initializes Directdraw, sets the cooperative mode and the display mode, given 
-// a window handle
-//------------------------------------------------------------------------------
+/**
+ * Initializes Directdraw, sets the cooperative mode and the display mode, given
+ * a window handle.
+ * 
+ * @param hWnd The handle of the window
+ * @param windowed Whether we are in windowed mode
+ * @param xres The horizontal resolution
+ * @param yres The vertical resolution
+ * @returns True If the initialization succeeded
+ */
 bool Gfx::Initialize(HWND hWnd, bool windowed, int xres, int yres)
 {
     m_hWnd = hWnd;
@@ -63,32 +68,7 @@ bool Gfx::Initialize(HWND hWnd, bool windowed, int xres, int yres)
             return false;
         }
 
-        // TODO: Replace this with OnWindowMove() and find out just wtf m_pClientRect is supposed to do
-
-        m_pClientRect = new RECT;
-        m_pScreenRect = new RECT;
-        
-        POINT tempPoint;
-
-        GetClientRect(hWnd, m_pClientRect);
-        GetClientRect(hWnd, m_pScreenRect);
-
-        tempPoint.x = m_pScreenRect->left;
-        tempPoint.y = m_pScreenRect->top;
-
-        ClientToScreen(hWnd,&tempPoint);
-
-        m_pScreenRect->left = tempPoint.x;
-        m_pScreenRect->top = tempPoint.y;
-
-        tempPoint.x = m_pScreenRect->right;
-        tempPoint.y = m_pScreenRect->bottom;
-
-        ClientToScreen(hWnd,&tempPoint);
-
-        m_pScreenRect->right = tempPoint.x;
-        m_pScreenRect->bottom = tempPoint.y;
-
+        OnWindowMove();
         return CreateSurfaces(true, 32, xres, yres);
     }
   
@@ -96,10 +76,10 @@ bool Gfx::Initialize(HWND hWnd, bool windowed, int xres, int yres)
     {
         m_lastError = "SetCooperativeLevel failed in Gfx::Initialize";
         m_pDD->Release();
-        return(false);
+        return false;
     }
 
-    if( m_pDD->SetDisplayMode( xres, yres, 32, 0, 0) != DD_OK )
+    if(m_pDD->SetDisplayMode(xres, yres, 32, 0, 0) != DD_OK)
     {
         m_lastError = "SetDisplayMode failed in Gfx::Initialize";
         m_pDD->Release();
@@ -108,50 +88,31 @@ bool Gfx::Initialize(HWND hWnd, bool windowed, int xres, int yres)
     return CreateSurfaces(false, 32, xres, yres);
 }
 
-//------------------------------------------------------------------------------
-// Plots a pixel with the given color at the given coordinate on the backbuffer
-//------------------------------------------------------------------------------
-void Gfx::Plot(int x, int y, uchar r, uchar g, uchar b)
+/**
+ * Plots a pixel with the given color at the given coordinate on the backbuffer.
+ * 
+ * @param The x coordinate of the pixel to be plotted.
+ * @param The y coordinate of the pixel to be plotted.
+ * @param r The red component of the pixel (0-255).
+ * @param g The green component of the pixel (0-255).
+ * @param b The blue component of the pixel (0-255).
+ */
+void Gfx::Plot(int x, int y, int r, int g, int b)
 {
     assert(m_isLocked);
     if(x < 0 || y < 0 || x >= m_xres || y >= m_yres)
         return;
-    ((int*)m_ddsd.lpSurface)[y*m_ddsd.lPitch/sizeof(int) + x] = (int)(b + (g << 8) + (r<< 16));
+    ((int*)m_ddsd.lpSurface)[y*m_ddsd.lPitch/sizeof(int) + x] = (int)(b + (g << 8) + (r << 16));
     return;
 }
 
-//------------------------------------------------------------------------------
-// Plots a pixel with the given color at the given coordinate directly to the
-// device context
-//------------------------------------------------------------------------------
-void Gfx::PutPixel(int x, int y, uchar r, uchar g, uchar b)
-{
-    HDC hdc = GetDC(m_hWnd);
-    SetPixelV(hdc, x, y, RGB(r, g, b));
-}
-
-//------------------------------------------------------------------------------
-// Outputs text
-//------------------------------------------------------------------------------
-bool Gfx::Text(int xout, int yout, const char *txout, int r, int g, int b) 
-{ 
-    HDC hdc;
-    if (m_pDDSBack->GetDC(&hdc) == DD_OK)  
-    {  
-        SetBkMode(hdc, TRANSPARENT); 
-        SetTextColor(hdc, RGB(r, g, b)); 
-        TextOut(hdc, xout, yout, (LPCWSTR) txout, (int)strlen(txout)); 
-        m_pDDSBack->ReleaseDC(hdc);  
-        return true;
-    }; 
-    return false;
-}
-
-
-//------------------------------------------------------------------------------
-// Plots a pixel with the given color at the given coordinate, directly with the
-// byte representation of the color
-//------------------------------------------------------------------------------
+/**
+ * Plots a pixel with the given color at the given coordinate on the backbuffer.
+ * 
+ * @param x The x coordinate of the pixel to be plotted.
+ * @param y The y coordinate of the pixel to be plotted.
+ * @param color The color of the pixel to be plotted (0xAARRGGBB)
+ */
 void Gfx::Plot(int x, int y, int color)
 {
     assert(m_isLocked);
@@ -161,10 +122,12 @@ void Gfx::Plot(int x, int y, int color)
     return;
 }
 
-//------------------------------------------------------------------------------
-// Locks the backbuffer to enable pixel plotting. The backbuffer must be
-// unlocked before flipping surfaces
-//------------------------------------------------------------------------------
+/**
+ * Locks the backbuffer to enable pixel plotting. The backbuffer must be
+ * unlocked before flipping surfaces.
+ * 
+ * @returns True if the locking was successful.
+ */
 bool Gfx::Lock()
 {
     assert(!m_isLocked);
@@ -184,9 +147,11 @@ bool Gfx::Lock()
     return (hresult == DD_OK);
 }
 
-//------------------------------------------------------------------------------
-// Unlocks the backbuffer (see Lock())
-//------------------------------------------------------------------------------
+/**
+ * Unlocks the backbuffer (see Lock()).
+ * 
+ * @returns True if the unlocking was successful.
+ */
 bool Gfx::Unlock()
 {
     assert(m_isLocked);
@@ -197,10 +162,15 @@ bool Gfx::Unlock()
     return true;
 }
 
-//------------------------------------------------------------------------------
-// Clears the backbuffer with the given color
-//------------------------------------------------------------------------------
-bool Gfx::ClearScreen(unsigned char r, unsigned char g, unsigned char b)
+/**
+ * Clears the backbuffer with the given color.
+ * 
+ * @param r The red component of the color.
+ * @param g The green component of the color.
+ * @param b The blue component of the color.
+ * @returns True if the clearing was successful.
+ */
+bool Gfx::ClearScreen(int r, int g, int b)
 {
     HRESULT hresult;
     DDBLTFX ddBltFx;
@@ -208,20 +178,22 @@ bool Gfx::ClearScreen(unsigned char r, unsigned char g, unsigned char b)
     ddBltFx.dwSize = sizeof(DDBLTFX);
     ddBltFx.dwFillColor = (DWORD) (b + (g << 8) + (r << 16));
 
-    hresult = m_pDDSBack->Blt( NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx );
+    hresult = m_pDDSBack->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
     if(hresult == DDERR_SURFACELOST)
     {
         RestoreAllSurfaces();
-        hresult = m_pDDSBack->Blt( NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx );
+        hresult = m_pDDSBack->Blt(NULL, NULL, NULL, DDBLT_COLORFILL | DDBLT_WAIT, &ddBltFx);
     }
 
-    return (hresult==DD_OK);
+    return hresult == DD_OK;
 }
 
-//------------------------------------------------------------------------------
-// Switches the front buffer with the back buffer, so the contents of the back
-// buffer becomes visible on the screen
-//------------------------------------------------------------------------------
+/**
+ * Switches the front and back buffers, so the contents of the back buffer become visible
+ * on the screen.
+ * 
+ * @returns True if the flip was successful.
+ */
 bool Gfx::Flip()
 {
     assert(!(m_isLocked && m_isWindowed));
@@ -249,22 +221,23 @@ bool Gfx::Flip()
             hresult = m_pDDSPrimary->Flip(NULL, DDFLIP_WAIT);
         }
     }
-    return (hresult==DD_OK);
+    return hresult == DD_OK;
 }
 
-//------------------------------------------------------------------------------
-// When a window gets issued a WM_MOVE command, this function must be called
-// in order to let the graphics system be aware of the new window bounds
-//------------------------------------------------------------------------------
+/**
+ * When a window gets issue a WM_MOVE command, this function must be called in order to let the
+ * graphics system be aware of the new window bounds.
+ */
 void Gfx::OnWindowMove() 
 {
-    m_pClientRect = new RECT;
+    if(m_pScreenRect)
+        delete m_pScreenRect;
+ 
     m_pScreenRect = new RECT;
     
     POINT tempPoint;
 
-    GetClientRect(m_hWnd, m_pClientRect); 
-    GetClientRect(m_hWnd, m_pScreenRect); 
+    GetClientRect(m_hWnd, m_pScreenRect);
 
     tempPoint.x = m_pScreenRect->left;
     tempPoint.y = m_pScreenRect->top;
@@ -283,10 +256,16 @@ void Gfx::OnWindowMove()
     m_pScreenRect->bottom = tempPoint.y;
 }
 
-//------------------------------------------------------------------------------
-// Changes the display mode between different resolutions and fullscreen to
-// windowed
-//------------------------------------------------------------------------------
+
+/**
+ * Changes the display mode between different resolutions and fullscreen to windowed
+ * 
+ * @param windowed Whether the application should be windowed mode
+ * @param bpp The number of bits per pixel
+ * @param xres The horizontal resolution
+ * @param yres The vertical resolution
+ * @returns True if the resolution change was successful
+ */
 bool Gfx::ChangeDisplayMode(bool windowed, int bpp, int xres, int yres)
 {
     m_xres = xres;
@@ -316,7 +295,7 @@ bool Gfx::ChangeDisplayMode(bool windowed, int bpp, int xres, int yres)
             return(false);
         }
 
-        if( m_pDD->SetDisplayMode(xres, yres, 32, 0, 0) != DD_OK )
+        if(m_pDD->SetDisplayMode(xres, yres, 32, 0, 0) != DD_OK)
         {
             m_lastError = "SetDisplayMode failed in Gfx::ChangeDisplayMode";
             m_pDD->Release();
@@ -328,9 +307,9 @@ bool Gfx::ChangeDisplayMode(bool windowed, int bpp, int xres, int yres)
     return CreateSurfaces(windowed, bpp, xres, yres);
 }
 
-//------------------------------------------------------------------------------
-// Releases all Directdraw surfaces
-//------------------------------------------------------------------------------
+/**
+ * Releases all DirectDraw surfaces.
+ */
 void Gfx::DestroySurfaces()
 {
     if(m_pDDSBack)
@@ -352,15 +331,20 @@ void Gfx::DestroySurfaces()
     }
 }
 
-//------------------------------------------------------------------------------
-// Creates the front buffer and back buffers
-//------------------------------------------------------------------------------
+/**
+ * Creates the front buffer and back buffers.
+ * 
+ * @param windowed Whether the application is in windowed mode
+ * @param xres The horizontal resolution of the application
+ * @param yres The vertical resolution of the application
+ * @returns True if the surfaces were created successfully
+ */
 bool Gfx::CreateSurfaces(bool windowed, int, int xres, int yres)
 {
     if(windowed)
     {
-        memset( &m_ddsd, 0, sizeof(m_ddsd) );
-        m_ddsd.dwSize = sizeof( m_ddsd );
+        memset(&m_ddsd, 0, sizeof(m_ddsd));
+        m_ddsd.dwSize = sizeof(m_ddsd);
         m_ddsd.dwFlags = DDSD_CAPS;
         m_ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_VIDEOMEMORY;
 
@@ -387,13 +371,13 @@ bool Gfx::CreateSurfaces(bool windowed, int, int xres, int yres)
         return true;
     }
 
-    memset( &m_ddsd, 0, sizeof(m_ddsd) );
-    m_ddsd.dwSize = sizeof( m_ddsd );
+    memset(&m_ddsd, 0, sizeof(m_ddsd));
+    m_ddsd.dwSize = sizeof(m_ddsd);
     m_ddsd.dwFlags = DDSD_CAPS | DDSD_BACKBUFFERCOUNT;
     m_ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
     m_ddsd.dwBackBufferCount = 1;
 
-    if(m_pDD->CreateSurface( &m_ddsd, &m_pDDSPrimary, NULL ) != DD_OK)
+    if(m_pDD->CreateSurface(&m_ddsd, &m_pDDSPrimary, NULL) != DD_OK)
     {
         m_lastError = "Failed to create primary surface (fullscreen)";
         m_pDD->Release();
@@ -412,111 +396,21 @@ bool Gfx::CreateSurfaces(bool windowed, int, int xres, int yres)
     return true;
 }
 
-//------------------------------------------------------------------------------
-// Restores the surfaces that have been lost when other programs have got
-// control of the front buffer
-//------------------------------------------------------------------------------
+/**
+ * Restores the surfaces that where lost when other programs got control of the front buffer
+ */
 void Gfx::RestoreAllSurfaces()
 {
     if(m_pDD)
         m_pDD->RestoreAllSurfaces();
 }
 
-//------------------------------------------------------------------------------
-// Plots a line between two points
-//------------------------------------------------------------------------------
-void Gfx::Line(int fromX, int fromY, int toX, int toY, uchar r, uchar g, uchar b)
-{
-    int dY = abs(toY-fromY);
-    int dX = abs(toX-fromX);
-    bool steep = dY > dX;
-    int h = 0, x = 0, ydir = 1, xdir = 1, d;
-    
-    if(toY < fromY)
-        ydir = -1;
-    if(toX < fromX)
-        xdir = -1;
-    if(steep)
-    {
-        std::swap(fromX, fromY);
-        std::swap(dX, dY);
-    }
-
-    d = -dX;
-    for(x = 0; x <= dX; x++)
-    {
-        if(steep)
-            Plot(fromY+h*xdir, fromX+x*ydir, r, g, b);
-        else
-            Plot(fromX+x*xdir, fromY+h*ydir, r, g, b);
-        d+=2*dY;
-        if(d>0)
-        {
-            d-=2*dX;
-            h++;
-        }
-    }
-}
-
-//------------------------------------------------------------------------------
-// Draws a circle with the given radius and centerpoint. The radius is the
-// amount of pixels between the center and the side of the circle, exclusive,
-// plus one
-//------------------------------------------------------------------------------
-void Gfx::Circle(int X, int Y, int R, uchar r, uchar g, uchar b)
-{
-    assert(R >= 0);
-
-    int d = -(int)R, y = R;
-    for(int x = 0; x < y; x++)
-    {
-        if(d>=0)
-            d+=-2*(--y);
-        d+=2*x+1;
-
-        Plot(X+x, Y+y, r, g, b); // Lower right
-        Plot(X+y, Y+x, r, g, b); // Lower-mid right
-        Plot(X+y, Y-x, r, g, b); // Upper-mid right
-        Plot(X+x, Y-y, r, g, b); // Upper right
-        Plot(X-x, Y+y, r, g, b); // Lower left
-        Plot(X-y, Y+x, r, g, b); // Lower-mid left
-        Plot(X-y, Y-x, r, g, b); // Upper-mid left
-        Plot(X-x, Y-y, r, g, b); // Upper left
-    }
-}
-
-//------------------------------------------------------------------------------
-// Returns true if the application is running in windowed mode
-//------------------------------------------------------------------------------
+/**
+ * Checks if the application is running in windowed mode.
+ * 
+ * @returns True if the application is running windowed mode.
+ */
 bool Gfx::IsWindowed() const
 {
     return m_isWindowed;
 }
-
-//------------------------------------------------------------------------------
-// Checks if it's possible to draw things at the moment. Will return false
-// when the buffers are unable to be restored, eg. due to alt-tabbing
-//------------------------------------------------------------------------------
-bool Gfx::IsReady() const
-{
-    if(m_pDDSPrimary->IsLost())
-        if(m_pDDSPrimary->Restore() != DD_OK)
-            return false;
-    return true;
-}
-
-int Gfx::GetYRes() const
-{
-    return m_yres;
-}
-
-int Gfx::GetXRes() const
-{
-    return m_xres;
-}
-
-std::string Gfx::GetLastError() const
-{
-    return m_lastError;
-}
-

@@ -41,7 +41,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd
     double df = Rd.GetMax();
     double sp = Rs.GetMax();
 
-    double r = rnd.GetDouble(0.0f, df + sp);
+    double r = rnd.GetDouble(0.0, df + sp);
 
     Vector3d N_g = info.geometricnormal;
     Vector3d N_s = info.normal;
@@ -73,16 +73,16 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd
             return Sample(Color(0, 0, 0), outRay, 0, 0, false, 1);
 
         // TODO: the below is just the brdf, multiplied by pi, simplify
-        Color mod = (28.0f/23.0f)*Rd*(Color::Identity - Rs)*(1-pow(1-abs(N_s*w_i)/2.0f, 5.0f))*(1-pow(1-(N_s*w_o)/2.0f, 5.0f));
+        Color mod = (28.0/23.0)*Rd*(Color::Identity - Rs)*(1-pow(1-abs(N_s*w_i)/2.0, 5.0))*(1-pow(1-(N_s*w_o)/2.0, 5.0));
 
-        auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0f)*mod/(df/(df+sp));
+        auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0)*mod/(df/(df+sp));
         double pdf = std::max(0.0, w_o*N/pi);
         double rpdf = std::max(0.0, w_i*adjN/pi);
         return Sample(color, outRay, pdf, rpdf, false, 1);
     }
     else // Specular bounce
     {
-        double r1 = rnd.GetDouble(0.0f, 2*pi);
+        double r1 = rnd.GetDouble(0.0, 2*pi);
         double r2 = acos(pow(rnd.GetDouble(0, 1.0), 1/double(n+1)));
 
         auto [rightNode, forward] = MakeBasis(N_s);
@@ -94,7 +94,7 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd
         if(w_i*N_s < 0 || w_o*N_s < 0 || w_o*N_g < 0 || w_i*N_g < 0) 
             return Sample(Color(0, 0, 0), outRay, 0, 0, false, 2);
 
-        Color fresnel = Rs + (Color::Identity - Rs)*(pow(1-w_o*hv, 5.0f));
+        Color fresnel = Rs + (Color::Identity - Rs)*(pow(1-w_o*hv, 5.0));
         Color mod = abs(N*w_o)*fresnel/(max(N_s*w_i, N_s*w_o));
         auto color = (adjoint ? abs(w_i*N_s)/abs(w_i*N_g) : 1.0f)*mod/(sp/(df+sp));
         double pdf = pow(N_s*hv, n)*(n + 1)/((w_i*hv)*8*pi);

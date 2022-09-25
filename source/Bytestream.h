@@ -40,9 +40,12 @@ public:
     Bytestream();
     ~Bytestream();
 
-    //--------------------------------------------------------------------------
-    // Appends data to the end of the stream.
-    //--------------------------------------------------------------------------
+    /**
+     * Appends data to the end of the stream.
+     * 
+     * @param t The variable to stream from.
+     * @returns A reference to the current bytestream
+     */
     template<typename T> Bytestream& operator<<(const T& t)
     {
         char* p = (char*)&t;
@@ -59,10 +62,12 @@ public:
         return *this;
     }
 
-    //--------------------------------------------------------------------------
-    // Extracts data from the stream, treated as the type of the variable 
-    // specified.
-    //--------------------------------------------------------------------------
+    /**
+     * Extracts data from the stream, treated as the type of the variable specified
+     * 
+     * @param t The variable to stream into.
+     * @returns A reference to the current bytestream
+     */
     template<typename T> Bytestream& operator>>(T& t)
     {
         char* p = (char*)&t;
@@ -79,14 +84,10 @@ public:
         return *this;
     }
 
-    size_t GetSize() const;
-    void ClearFail();
-    bool HasFailed() const;
-
     void SaveToFile(std::string fileName);
     void LoadFromFile(std::string fileName);
-private:
 
+private:
     bool fail;
     unsigned int first;
     std::vector<char> data;

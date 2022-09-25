@@ -12,11 +12,7 @@ CookTorrance::CookTorrance()
 {
     Ks = Color(0, 0, 0);
     ior = 1.5;
-    normalmap = 0;
     alpha = 0;
-#ifdef DETERMINISTIC
-    rnd.Seed(0);
-#endif
 }
 
 template<typename T> T sq(T x)
@@ -40,7 +36,7 @@ double D_p(double alpha, double cosn)
     return sq(alpha)/(pi*sq((sq(alpha)-1)*cosn*cosn+1));
 }
 
-Sample CookTorrance::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
+Sample CookTorrance::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool) const
 {
     //float df = Kd.GetMax();
     //float sp = Ks.GetMax();

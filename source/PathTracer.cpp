@@ -27,7 +27,7 @@ PathTracer::~PathTracer()
 //    else
 //        minlight->GenerateIntersectionInfo(ray, info);
 //
-//	if(m_random.GetDouble(0, 1) > 0.8f)
+//	if(m_random.GetDouble(0, 1) > 0.8)
 //		return Color(0, 0, 0);
 //
 //    Ray out;
@@ -35,7 +35,7 @@ PathTracer::~PathTracer()
 //
 //    Light* l;
 //    if((l = info.material->GetLight()) && info.geometricnormal * info.direction < 0)
-//        return l->GetIntensity()/0.8f;
+//        return l->GetIntensity()/0.8;
 //
 //    while(true)
 //	{
@@ -44,7 +44,7 @@ PathTracer::~PathTracer()
 //            N_g = -N_g;
 //		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
 //
-//		out.origin = info.position + 0.0001f*N_g;
+//		out.origin = info.position + 0.0001*N_g;
 //		if(dir.GetLength() > 1)
 //			continue;
 //		else if(dir*N_g < 0)
@@ -97,7 +97,7 @@ Color PathTracer::TracePath(const Ray& ray)
     bool sampledLight = false;
     inRay = ray;
 
-    double r = m_random.GetDouble(0.0f, 1.0f);
+    double r = m_random.GetDouble(0.0, 1.0);
     auto [light, lightWeight] = scene->PickLight(r);
 
     do
@@ -140,10 +140,10 @@ Color PathTracer::TracePath(const Ray& ray)
             finalColor += pathColor*color;
             sampledLight = true;
         }
-        pathColor *= c/0.7f;
+        pathColor *= c/0.7;
         inRay = outRay;
     }   
-    while(m_random.GetDouble(0, 1) < 0.7f);
+    while(m_random.GetDouble(0, 1) < 0.7);
     
     return finalColor/lightWeight;
 }

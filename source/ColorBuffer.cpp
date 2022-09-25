@@ -5,193 +5,35 @@
 #include <fstream>
 #pragma warning(disable:4996)
 
-//------------------------------------------------------------------------------
-// Constructor.
-//------------------------------------------------------------------------------
+/**
+ * Constructor.
+ * 
+ * @param sizeX The horizontal resolution of the buffer.
+ * @param sizey The vertical resolution of the buffer.
+ */
 ColorBuffer::ColorBuffer(int sizeX, int sizeY) : width(sizeX), height(sizeY)
 {
     m_buffer = new Color[sizeX*sizeY];
 }
 
-
-//------------------------------------------------------------------------------
-// Constructor.
-//------------------------------------------------------------------------------
+/**
+ * Constructor. Creates a color buffer filled with a color.
+ * 
+ * @param sizeX The horizontal resolution of the buffer.
+ * @param sizey The vertical resolution of the buffer.
+ * @param c The color to fill the color buffer with.
+ */
 ColorBuffer::ColorBuffer(int sizeX, int sizeY, Color c) : width(sizeX), height(sizeY)
 {
     m_buffer = new Color[sizeX*sizeY];
     Clear(c);
 }
 
-//------------------------------------------------------------------------------
-// Destructor.
-//------------------------------------------------------------------------------
-ColorBuffer::~ColorBuffer()
-{
-    delete[] m_buffer;
-}
-
-//------------------------------------------------------------------------------
-// Copy constructor.
-//------------------------------------------------------------------------------
-ColorBuffer::ColorBuffer(const ColorBuffer& cb)
-{
-    width = cb.width;
-    height = cb.height;
-    m_buffer = new Color[width*height];
-    for(int y = 0; y < height ; y++)
-        for(int x = 0; x < width; x++)
-            m_buffer[y*width + x] = cb.m_buffer[y*width + x];
-}
-
-//------------------------------------------------------------------------------
-// Writes a screenshot to the file with the given name.
-//------------------------------------------------------------------------------
-void ColorBuffer::Dump(std::string filename)
-{
-    std::ofstream file;
-    file.open(filename, std::ios::binary);
-
-    auto pad = (4 - ((width*3)%4))%4; // Each line needs to be padded to a multiple of 4 wide
-    auto size = ((width*3) + pad)*height;
-
-    // Write the .bmp-specific stuff here
-    file.write("BM", 2);
-    int header[] = { size + 54, 0, 54, 40, width, height, 1572865, 0, size, 0, 0, 0, 0 };
-    for(auto x : header)
-        for(int i = 0; i < 4; i++)
-            file.put((0xFF) &(x >> (i*8)));
-
-    // Output the screenshot, bottom-up
-    for (int y = height - 1; y >= 0; y--)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            auto color = GetPixel(x, y);
-            for(auto c : { color.b, color.g, color.r })
-                file.put((char) max(0, min(255, (int)(255*c))));
-        }
-        for (int n = 0; n < pad; n++)
-            file.put(0);
-    }
-}
-
-//------------------------------------------------------------------------------
-// Sets a pixel in the color buffer to a specified color value.
-//------------------------------------------------------------------------------
-void ColorBuffer::SetPixel(int x, int y, const Color& c)
-{
-    assert(x >= 0 && y >= 0 && x < width && y < height);
-    m_buffer[y*width + x] = c;
-}
-
-//------------------------------------------------------------------------------
-// Sets a pixel in the color buffer to a specified color value.
-//------------------------------------------------------------------------------
-void ColorBuffer::SetPixel(int x, int y, double r, double g, double b)
-{
-    assert(x >= 0 && y >= 0 && x < width && y < height);
-    m_buffer[y*width + x] = Color(r, g, b);
-}
-
-//------------------------------------------------------------------------------
-// Returns the color of a location in the buffer.
-//------------------------------------------------------------------------------
-Color ColorBuffer::GetPixel(int x, int y) const
-{
-    assert(x >= 0 && y >= 0 && x < width && y < height);
-    return m_buffer[y*width + x];
-}
-
-//------------------------------------------------------------------------------
-// Returns the width of the buffer.
-//------------------------------------------------------------------------------
-int ColorBuffer::GetXRes() const
-{
-    return width;
-}
-
-//------------------------------------------------------------------------------
-// Returns the height of the buffer.
-//------------------------------------------------------------------------------
-int ColorBuffer::GetYRes() const
-{
-    return height;
-}
-
-//------------------------------------------------------------------------------
-// Clears the buffer with the specified color.
-//------------------------------------------------------------------------------
-void ColorBuffer::Clear(const Color& c)
-{
-    for(int y = 0; y < height ; y++)
-        for(int x = 0; x < width; x++)
-            m_buffer[y*width + x] = c;
-}
-
-//------------------------------------------------------------------------------
-// Adds to a color value in the buffer.
-//------------------------------------------------------------------------------
-void ColorBuffer::AddColor(int x, int y, const Color& c)
-{
-    assert(x >= 0 && y >= 0 && x < width && y < height);
-    m_buffer[y*width + x] += c;
-}
-
-//------------------------------------------------------------------------------
-// Draws text onto the buffer - this function is relatively slow and should only
-// be used on a buffer with normalized colors.
-//------------------------------------------------------------------------------
-void ColorBuffer::PutText(const char* const text, int x, int y)
-{
-    HDC hdc = CreateCompatibleDC(NULL);
-
-    BITMAPINFO bmi;
-    bmi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
-    bmi.bmiHeader.biWidth = width;
-    bmi.bmiHeader.biHeight = -height;
-    bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biBitCount = 32;
-    bmi.bmiHeader.biCompression = BI_RGB; 
-    bmi.bmiHeader.biSizeImage = 0;
-    bmi.bmiHeader.biXPelsPerMeter = 0;
-    bmi.bmiHeader.biYPelsPerMeter = 0;
-    bmi.bmiHeader.biClrUsed = 0;
-    bmi.bmiHeader.biClrImportant = 0;
-
-    int* pBuffer;
-    HBITMAP hbhb = CreateDIBSection(NULL, &bmi, DIB_RGB_COLORS, (void**)&pBuffer, NULL, 0);
-
-    for(int b = 0; b < height; b++)
-        for(int a = 0; a < width; a++)
-            pBuffer[b*width + a] = m_buffer[b*width + a].GetInt(); // pBuffer can be 0 after many frames, might want to check that out (maybe forgot to delete something)
-
-    SelectObject(hdc, hbhb);
-    ::SetTextColor(hdc, 0x00ffffff);
-    ::SetBkMode(hdc, TRANSPARENT);
-    ::TextOut(hdc, x, y, (LPCWSTR) text, (int) strlen(text));
-
-    for(int b = 0; b < height; b++)
-        for(int a = 0; a < width; a++)
-            m_buffer[b*width + a] = Color(pBuffer[b * width + a]);
-
-    DeleteObject(hbhb);
-    ReleaseDC(NULL, hdc);
-}
-
-void ColorBuffer::Save(Bytestream& b) const
-{
-    b << width << height;
-    for(int y = 0; y < height; y++) 
-    {
-        for(int x = 0; x < width; x++) 
-        {
-            Color c = m_buffer[y*width + x];
-            b << c.r << c.g << c.b;
-        }
-    }
-}
-
+/**
+ * Constructor. Creates the color buffer from a bytestream.
+ * 
+ * @param b The bytestream to deserialize.
+ */
 ColorBuffer::ColorBuffer(Bytestream& b)
 {
     b >> width >> height;
@@ -203,6 +45,167 @@ ColorBuffer::ColorBuffer(Bytestream& b)
             Color c;
             b >> c.r >> c.g >> c.b;
             m_buffer[y*width + x] = c;
+        }
+    }
+}
+
+/**
+ * Destructor.
+ */
+ColorBuffer::~ColorBuffer()
+{
+    delete[] m_buffer;
+}
+
+/**
+ * Copy constructor.
+ * 
+ * @param cb The color buffer to copy.
+ */
+ColorBuffer::ColorBuffer(const ColorBuffer& cb)
+{
+    width = cb.width;
+    height = cb.height;
+    m_buffer = new Color[width*height];
+    for(int y = 0; y < height ; y++)
+        for(int x = 0; x < width; x++)
+            m_buffer[y*width + x] = cb.m_buffer[y*width + x];
+}
+
+/**
+ * Writes a screenshot to the file with the given name.
+ * 
+ * @param filename The filename to serialize into.
+ */
+void ColorBuffer::Dump(std::string filename)
+{
+    std::ofstream file;
+    file.open(filename, std::ios::binary);
+
+    auto pad = (4 - width*3%4)%4; // Each line needs to be padded to a multiple of 4 wide
+    auto size = (width*3 + pad)*height;
+
+    // Write the .bmp-specific stuff here
+    file.write("BM", 2);
+    int header[] = { size + 54, 0, 54, 40, width, height, 1572865, 0, size, 0, 0, 0, 0 };
+    for(auto x : header)
+        for(int i = 0; i < 4; i++)
+            file.put(0xFF &(x >> (i*8)));
+
+    // Output the screenshot, bottom-up
+    for(int y = height - 1; y >= 0; y--)
+    {
+        for(int x = 0; x < width; x++)
+        {
+            auto color = GetPixel(x, y);
+            for(auto c : { color.b, color.g, color.r })
+                file.put((char) max(0, min(255, (int)(255*c))));
+        }
+        for(int n = 0; n < pad; n++)
+            file.put(0);
+    }
+}
+
+/**
+ * Sets a pixel to a certain color.
+ * 
+ * @param x The x coordinate of the pixel.
+ * @param y The y coordinate of the pixel.
+ * @param c The color to set the pixel to.
+ */
+void ColorBuffer::SetPixel(int x, int y, const Color& c)
+{
+    assert(x >= 0 && y >= 0 && x < width && y < height);
+    m_buffer[y*width + x] = c;
+}
+
+/**
+ * Sets a pixel to a certain color.
+ * 
+ * @param x The x coordinate of the pixel.
+ * @param y The y coordinate of the pixel.
+ * @param r The red component of the color to set the pixel to.
+ * @param g The green component of the color to set the pixel to.
+ * @param b The blue component of the color to set the pixel to.
+ */
+void ColorBuffer::SetPixel(int x, int y, double r, double g, double b)
+{
+    assert(x >= 0 && y >= 0 && x < width && y < height);
+    m_buffer[y*width + x] = Color(r, g, b);
+}
+
+/**
+ * Sets a pixel to a certain color.
+ * 
+ * @param x The x coordinate of the pixel.
+ * @param y The y coordinate of the pixel.
+ * @returns The color of the pixel
+ */
+Color ColorBuffer::GetPixel(int x, int y) const
+{
+    assert(x >= 0 && y >= 0 && x < width && y < height);
+    return m_buffer[y*width + x];
+}
+
+/**
+ * Returns the horizontal resolution of the buffer.
+ *
+ * @returns The width of the buffer, in pixels
+ */
+int ColorBuffer::GetXRes() const
+{
+    return width;
+}
+
+/**
+ * Returns the vertical resolution of the buffer.
+ *
+ * @returns The height of the buffer, in pixels
+ */
+int ColorBuffer::GetYRes() const
+{
+    return height;
+}
+
+/**
+ * Clears the buffer with the specified color.
+ *
+ * @param c The color to use to clear the buffer.
+ */
+void ColorBuffer::Clear(const Color& c)
+{
+    for(int y = 0; y < height ; y++)
+        for(int x = 0; x < width; x++)
+            m_buffer[y*width + x] = c;
+}
+
+/**
+ * Add a color to a pixel in the buffer.
+ *
+ * @param x The x coordinate of the pixel.
+ * @param y The y coordinate of the pixel.
+ * @param c The color to use to clear the buffer.
+ */
+void ColorBuffer::AddColor(int x, int y, const Color& c)
+{
+    assert(x >= 0 && y >= 0 && x < width && y < height);
+    m_buffer[y*width + x] += c;
+}
+
+/**
+ * Serializes the color buffer to a bytestream.
+ *
+ * @param b The bytestream to stream to.
+ */
+void ColorBuffer::Save(Bytestream& b) const
+{
+    b << width << height;
+    for(int y = 0; y < height; y++) 
+    {
+        for(int x = 0; x < width; x++) 
+        {
+            Color c = m_buffer[y*width + x];
+            b << c.r << c.g << c.b;
         }
     }
 }

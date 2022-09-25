@@ -27,9 +27,6 @@ public:
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
-    Texture* texture;
-    Texture* normalmap;
-
     Color Ks;
     double alpha;
     double ior;

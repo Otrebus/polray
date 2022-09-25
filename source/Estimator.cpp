@@ -23,10 +23,12 @@ Estimator* Estimator::Create(unsigned char id)
     }
 }
 
-int Estimator::GetWidth() const {
+int Estimator::GetWidth() const
+{
     return width;
 }
 
-int Estimator::GetHeight() const {
+int Estimator::GetHeight() const
+{
     return height;
 }

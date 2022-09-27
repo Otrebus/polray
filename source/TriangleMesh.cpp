@@ -124,23 +124,21 @@ std::tuple<bool, BoundingBox> MeshTriangle::GetClippedBoundingBox(const Bounding
 {
     std::vector<Vector3d> points = { v0->pos, v1->pos, v2->pos };
 
-    points = ClipPolygonToAAP(0, true, clipbox.c1.x, points); // Left side of the bounding box
-    points = ClipPolygonToAAP(0, false, clipbox.c2.x, points); // Right
-    points = ClipPolygonToAAP(1, true, clipbox.c1.y, points); // Bottom
-    points = ClipPolygonToAAP(1, false, clipbox.c2.y, points); // Top
-    points = ClipPolygonToAAP(2, true, clipbox.c1.z, points); // Front
-    points = ClipPolygonToAAP(2, false, clipbox.c2.z, points); // Back
+    for(int i = 0; i < 3; i++)
+    {
+        points = ClipPolygonToAAP(i, true, clipbox.c1[i], points);
+        points = ClipPolygonToAAP(i, false, clipbox.c2[i], points);
+    }
 
     BoundingBox resultbox{ { inf, inf, inf }, { -inf, -inf, -inf } };
 
     for(auto v : points)
     {
-        resultbox.c1.x = min(v.x, resultbox.c1.x);
-        resultbox.c2.x = max(v.x, resultbox.c2.x);
-        resultbox.c1.y = min(v.y, resultbox.c1.y);
-        resultbox.c2.y = max(v.y, resultbox.c2.y);
-        resultbox.c1.z = min(v.z, resultbox.c1.z);
-        resultbox.c2.z = max(v.z, resultbox.c2.z);
+        for(int i = 0; i < 3; i++)
+        {
+            resultbox.c1[i] = min(v[i], resultbox.c1[i]);
+            resultbox.c2[i] = max(v[i], resultbox.c2[i]);
+        }
     }
 
     if(points.size() > 2)

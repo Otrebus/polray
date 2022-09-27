@@ -13,15 +13,39 @@ double KDTree::cost_trav;
 double KDTree::cost_boxint;
 double KDTree::mint;
 
+/**
+ * Creates an event from a primitive, position and type.
+ * 
+ * @param m The primitive to form the event from.
+ * @param p The position to form the event from.
+ * @param t The type (start, end, planar) to form the event from.
+ */
 SAHEvent::SAHEvent(KDPrimitive* m, double p, int t) : primitive(m), position(p), type(t)
 {
 }
 
+/**
+ * The sorting function for events; sorts by position first and then by type
+ * 
+ * @param a An event.
+ * @param b Another event.
+ * @returns True if a precedes b.
+ */
 bool sortFn(const SAHEvent* a, const SAHEvent* b)
 {
     return a->position == b->position ? a->type < b->type : a->position < b->position;
 }
 
+/**
+ * Calculates the cost of splitting the node at the given location.
+ * 
+ * @param nLeft The number of primitives that would end up in the left node.
+ * @param leftarea The surface area of the bounding box of the left node.
+ * @param nRight The number of primitives that would end up in the right node.
+ * @param rightarea The surface area of the bounding box of the right node.
+ * @param nPlanar The number of planar primitives perfectly straddling the nodes.
+ * @param side The side to assign the planar primitives to.
+ */
 double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
 {
     double cost;
@@ -47,6 +71,12 @@ double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, doub
     return cost;
 }
 
+/**
+ * Estimates the cost of a ray/triangle or a bounding box intersection.
+ * 
+ * @param type 0 for triangle intersection, 1 for bounding box intersection
+ * @param The number of attempts.
+ */
 double KDTree::CalculateCost(int type, int samples)
 {
     Timer counter = Timer();
@@ -74,6 +104,9 @@ double KDTree::CalculateCost(int type, int samples)
     return counter.GetTime() / double(samples);
 }
 
+/**
+ * Constructor.
+ */
 KDTree::KDTree()
 {
     KDTree::cost_triint = CalculateCost(0, 1000);
@@ -82,17 +115,26 @@ KDTree::KDTree()
     m_root = 0;
 }
 
+/**
+ * Destructor.
+ */
 KDTree::~KDTree()
 {
     delete m_root;
 }
 
+/**
+ * Constructor.
+ */
 KDNode::KDNode()
 {
-    leftNode = 0;
-    rightNode = 0;
+    leftNode = nullptr;
+    rightNode = nullptr;
 }
 
+/**
+ * Destructor.
+ */
 KDNode::~KDNode()
 {
     if(leftNode)
@@ -109,6 +151,15 @@ void KDNode::Build()
 {
 }
 
+/**
+ * Calculates the size of the .
+ * 
+ * @param events The sorted event list.
+ * @param add The unsorted event list.
+ * @param primitive The primitive that caused the event.
+ * @param add The event list to add to.
+ * @param merge The merged list.
+ */
 BoundingBox KDTree::CalculateExtents(const std::vector<const Primitive*>& shapes)
 {
     BoundingBox resultbox{ { inf, inf, inf }, { -inf, -inf, -inf } };
@@ -116,28 +167,48 @@ BoundingBox KDTree::CalculateExtents(const std::vector<const Primitive*>& shapes
     for(auto& s : shapes)
     {
         const auto& bbox = s->GetBoundingBox();
-
-        resultbox.c1.x = min(bbox.c1.x, resultbox.c1.x);
-        resultbox.c2.x = max(bbox.c2.x, resultbox.c2.x);
-        resultbox.c1.y = min(bbox.c1.y, resultbox.c1.y);
-        resultbox.c2.y = max(bbox.c2.y, resultbox.c2.y);
-        resultbox.c1.z = min(bbox.c1.z, resultbox.c1.z);
-        resultbox.c2.z = max(bbox.c2.z, resultbox.c2.z);
+        for(int i = 0; i < 3; i++)
+        {
+            resultbox.c1[i] = min(bbox.c1[i], resultbox.c1[i]);
+            resultbox.c2[i] = max(bbox.c2[i], resultbox.c2[i]);
+        }
     }
     return resultbox;
 }
 
+/**
+ * Checks if the node is a leaf.
+ * 
+ * @returns True if the node is a leaf.
+ */
 bool KDNode::IsLeaf() const
 {
     return !(leftNode || rightNode);
 }
 
+/**
+ * Merges two lists of events, of which one is unsorted.
+ * 
+ * @param events The sorted event list.
+ * @param add The unsorted event list.
+ * @param primitive The primitive that caused the event.
+ * @param add The event list to add to.
+ * @param merge The merged list.
+ */
 void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, std::vector<SAHEvent*>& merged)
 {
     sort(add.begin(), add.end(), sortFn);
     std::merge(events.begin(), events.end(), add.begin(), add.end(), std::back_inserter(merged), sortFn);
 }
 
+/**
+ * Adds an event into an event list.
+ * 
+ * @param minpoint The minimum point of the primitive along the axis.
+ * @param maxpoint The maximum point of the primitive along the axis.
+ * @param primitive The primitive that caused the event.
+ * @param add The event list to add to.
+ */
 void AddEvent(double& minpoint, double& maxpoint, KDPrimitive*& primitive, std::vector<SAHEvent*>& add)
 {
     // Planar primitive - insert a planar event into the queue
@@ -150,6 +221,16 @@ void AddEvent(double& minpoint, double& maxpoint, KDPrimitive*& primitive, std::
     }
 }
 
+/**
+ * Builds a node of the K-d tree given an event list and a set of primitives that are part of the
+ * node, using the surface-area heuristic.
+ * 
+ * @param bbox The bounding box of the node.
+ * @param events The events for each dimension.
+ * @param shapes The primitives to build the partition structure for.
+ * @param depth The depth of the node.
+ * @param badsplits The number of bad split attempts allowed.
+ */
 void KDNode::Build(BoundingBox& bbox, std::vector<SAHEvent*>* events, const std::vector<KDPrimitive*>& shapes, int depth, int badsplits)
 {
     if(depth > 20 || shapes.size() < 4) // TODO: fix
@@ -324,9 +405,11 @@ void KDNode::Build(BoundingBox& bbox, std::vector<SAHEvent*>* events, const std:
             delete e;
 }
 
-//------------------------------------------------------------------------------
-// Builds a KD-Tree from the supplied vector of primitives
-//------------------------------------------------------------------------------
+/**
+ * Builds a K-d tree from a set of primitives.
+ * 
+ * @param shapes The primitives to build the partition structure for.
+ */
 void KDTree::Build(const std::vector<const Primitive*>& shapes)
 {
     m_root = new KDNode();
@@ -363,6 +446,16 @@ void KDTree::Build(const std::vector<const Primitive*>& shapes)
         delete p;
 }
 
+/**
+ * Intersects the contents of the K-d tree with a ray.
+ * 
+ * @param ray The ray to intersect with.
+ * @param tmin The smallest parametric distance along the ray to find intersections.
+ * @param tmax The greatest parametric distance along the ray to find intersections.
+ * @param returnPrimitive Whether to find the smallest t and return the primitive that was intersected.
+ * @returns The parametric distance along the ray that the intersection happened, or -inf if
+ *          no intersection happened, along with the primitive that was intersected.
+ */
 std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive=false) const
 {
     if(tmin > tmax)
@@ -371,7 +464,7 @@ std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double 
     int a = splitdir;
     double locmint = inf;
     const Primitive* minprimitive = nullptr;
-    if(!leftNode && !rightNode)
+    if(IsLeaf())
     {
         for(auto& s : m_primitives)
         {
@@ -413,6 +506,17 @@ std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double 
     return { -inf, nullptr };
 }
 
+/**
+ * Intersects the contents of the K-d tree with a ray.
+ * 
+ * @param ray The ray to intersect with.
+ * @param primitive The intersected triangle.
+ * @param tmin The smallest parametric distance along the ray to find intersections.
+ * @param tmax The greatest parametric distance along the ray to find intersections.
+ * @param returnPrimitive Whether to find the smallest t and return the primitive that was intersected.
+ * @returns The parametric distance along the ray that the intersection happened, or -inf if
+ *          no intersection happened.
+ */
 double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const
 {
     auto [t, prim] = m_root->IntersectRec(ray, tmin, tmax, returnPrimitive);

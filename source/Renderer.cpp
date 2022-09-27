@@ -16,9 +16,9 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     if(!scene->partitioning)
         scene->partitioning = new KDTree();
 
-    //Timer timer;
+    Timer timer;
     scene->partitioning->Build(scene->primitives);
-    //logger.Box(std::to_string(timer.GetTime()));
+    logger.Box(std::to_string(timer.GetTime()));
 
     m_lights = scene->GetLights();
 }

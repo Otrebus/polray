@@ -2,6 +2,7 @@ Tuplify double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, do
 Returnify void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, std::vector<SAHEvent*>& merged)
 Do same as with MeshTriangle with std::tuple<bool, BoundingBox> Triangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 Remove first two parameters from double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
+GenerateIntersectionInfo return tuple?
 
 Use Luma instead of Max for colors everywhere
 Replace the .0000001s with eps

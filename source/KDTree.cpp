@@ -144,7 +144,7 @@ KDNode::~KDNode()
 }
 
 //------------------------------------------------------------------------------
-// Recursively build a KD-Tree from this node (Currently uses an O(n(logn)^2) 
+// Recursively build a Kd-Tree from this node (Currently uses an O(n(logn)^2) 
 // algorithm).
 //------------------------------------------------------------------------------
 void KDNode::Build()
@@ -152,7 +152,7 @@ void KDNode::Build()
 }
 
 /**
- * Calculates the size of the .
+ * Calculates the size of the Kd-Tree.
  * 
  * @param events The sorted event list.
  * @param add The unsorted event list.
@@ -513,7 +513,10 @@ std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double 
  * @param primitive The intersected triangle.
  * @param tmin The smallest parametric distance along the ray to find intersections.
  * @param tmax The greatest parametric distance along the ray to find intersections.
- * @param returnPrimitive Whether to find the smallest t and return the primitive that was intersected.
+ * @param returnPrimitive Whether to find the smallest parametric distance along the ray that the
+                          primitive was intersected and return the primitive that was
+                          intersected, or just reporting any parametric distance and returning no
+                          primitive.
  * @returns The parametric distance along the ray that the intersection happened, or -inf if
  *          no intersection happened.
  */

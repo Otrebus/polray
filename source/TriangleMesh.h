@@ -49,7 +49,6 @@ public:
     TriangleMesh();
     TriangleMesh(const std::string&, Material*);
     ~TriangleMesh();
-    void CalculateVertexNormals();
 
     void AddToScene(Scene& scene);
 

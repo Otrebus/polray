@@ -11,10 +11,27 @@
 #include <numeric>
 #include <unordered_map>
 
+/**
+ * Destructor.
+ */
 MeshVertex::~MeshVertex()
 {
 }
 
+/**
+ * Constructor.
+ */
+MeshTriangle::MeshTriangle()
+{
+}
+
+/**
+ * Constructor, creates a mesh triangle from three vectors
+ * 
+ * @param a The first vector.
+ * @param b The second vector.
+ * @param c The third vector.
+ */
 MeshTriangle::MeshTriangle(const Vector3d& a, const Vector3d& b, const Vector3d& c)
 {
     v0 = new MeshVertex(a);
@@ -23,29 +40,9 @@ MeshTriangle::MeshTriangle(const Vector3d& a, const Vector3d& b, const Vector3d&
     v0->normal = v1->normal = v2->normal = (v1->pos-v0->pos)^(v2->pos-v0->pos);
 }
 
-Vector3d MeshTriangle::GetNormal() const
-{
-    Vector3d normal = (v1->pos-v0->pos)^(v2->pos-v0->pos);
-    normal.Normalize();
-    return normal;
-}
-
-double MeshTriangle::GetArea()
-{
-    return std::abs(((v1->pos-v0->pos)^(v2->pos-v0->pos)).Length())/2;
-}
-
-MeshTriangle::MeshTriangle(MeshVertex* _v0, MeshVertex* _v1, MeshVertex* _v2)// : mesh(t)
-{
-    v0 = _v0;
-    v1 = _v1;
-    v2 = _v2;
-}
-
-MeshTriangle::MeshTriangle()
-{
-}
-
+/**
+ * Destructor.
+ */
 MeshTriangle::~MeshTriangle()
 {
     delete v0;
@@ -53,6 +50,46 @@ MeshTriangle::~MeshTriangle()
     delete v2;
 }
 
+/**
+ * Returns the normal of the mesh triangle.
+ * 
+ * @returns The normal.
+ */
+Vector3d MeshTriangle::GetNormal() const
+{
+    Vector3d normal = (v1->pos-v0->pos)^(v2->pos-v0->pos);
+    normal.Normalize();
+    return normal;
+}
+
+/**
+ * Returns the area of the mesh triangle.
+ * 
+ * @returns The area of the mesh triangle.
+ */
+double MeshTriangle::GetArea()
+{
+    return std::abs(((v1->pos-v0->pos)^(v2->pos-v0->pos)).Length())/2;
+}
+
+/**
+ * Constructor, creates a mesh triangle from three mesh vertices.
+ * 
+ * @param v0 The first mesh vertex.
+ * @param v1 The second mesh vertex.
+ * @param v2 The third mesh vertex.
+ */
+MeshTriangle::MeshTriangle(MeshVertex* v0, MeshVertex* v1, MeshVertex* v2) : v0(v0), v1(v1), v2(v2)
+{
+}
+
+/**
+ * Intersects the MeshTriangle with a ray.
+ * 
+ * @param ray The ray that hit the triangle.
+ * @returns The parametric distance along the ray that the triangle was hit, or -inf if it
+ * wasn't hit.
+ */
 double MeshTriangle::Intersect(const Ray& ray) const
 {
     auto [t, u, v] = IntersectTriangle(v0->pos, v1->pos, v2->pos, ray);
@@ -60,6 +97,13 @@ double MeshTriangle::Intersect(const Ray& ray) const
 }
 
 
+/**
+ * Generates information about the intersection of a ray hitting a mesh triangle.
+ * 
+ * @param ray The ray that hit the triangle.
+ * @param info The intersection info to fill.
+ * @returns Whether the triangle was hit.
+ */
 bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
     auto [t, u, v] = IntersectTriangle(v0->pos, v1->pos, v2->pos, ray);
@@ -83,43 +127,55 @@ bool MeshTriangle::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& in
     return true;
 }
 
-TriangleMesh::TriangleMesh(const std::string& file, Material* mat)
+/**
+ * Loads the triangle mesh from a .obj file.
+ * 
+ * @param fileName The name of file to load.
+ * @param mat The material to use for the entire mesh, optionally.
+ */
+TriangleMesh::TriangleMesh(const std::string& fileName, Material* mat)
 {
-    auto [mesh, meshLights] = ReadFromFile(file, mat);
+    auto [mesh, meshLights] = ReadFromFile(fileName, mat);
     *this = *mesh;
 }
 
+/**
+ * Constructor.
+ */
 TriangleMesh::TriangleMesh()
 {
 }
 
+/**
+ * Returns the bounding box of the mesh triangle.
+ */
 BoundingBox MeshTriangle::GetBoundingBox() const
 {
-    Vector3d c1, c2;
-    c1.x = min(v0->pos.x, v1->pos.x, v2->pos.x);
-    c1.y = min(v0->pos.y, v1->pos.y, v2->pos.y);
-    c1.z = min(v0->pos.z, v1->pos.z, v2->pos.z);
-
-    c2.x = max(v0->pos.x, v1->pos.x, v2->pos.x);
-    c2.y = max(v0->pos.y, v1->pos.y, v2->pos.y);
-    c2.z = max(v0->pos.z, v1->pos.z, v2->pos.z);
-    return BoundingBox(c1, c2);
+    BoundingBox b;
+    for(int i = 0; i < 3; i++)
+    {
+        b.c1[i] = min(v0->pos[i], v1->pos[i], v2->pos[i]);
+        b.c2[i] = max(v0->pos[i], v1->pos[i], v2->pos[i]);
+    }
+    return b;
 }
 
+/**
+ * Destructor.
+ */
 TriangleMesh::~TriangleMesh()
 {
 }
 
-void TriangleMesh::CalculateVertexNormals()
-{
-    for(auto& p : points)
-    {
-        auto& tris = static_cast<MeshVertex*>(p)->triangles;
-        p->normal = std::accumulate(tris.begin(), tris.end(), Vector3d(0, 0, 0),
-                [] (auto a, auto t) { return a + t->GetNormal(); }).Normalized();
-    }
-}
-
+/**
+ * Returns the bounding box of a mesh triangle where the triangle has been clipped (in the set
+ * difference sense) by the given bounding box, assuming that the triangle is only clipped in
+ * such a way that a convex shape results.
+ * 
+ * @param clipbox The bounding box that we remove part of the triangle from.
+ * @returns A pair indicating whether anything remains of the triangle, and the bounding box of
+ *          the clipped resulting mehs triangle.
+ */
 std::tuple<bool, BoundingBox> MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 {
     std::vector<Vector3d> points = { v0->pos, v1->pos, v2->pos };
@@ -147,13 +203,22 @@ std::tuple<bool, BoundingBox> MeshTriangle::GetClippedBoundingBox(const Bounding
         return { false, resultbox };
 }
 
+/**
+ * Adds the contents of the triangle mesh to the scene.
+ * 
+ * @param scene The scene to add the triangles to.
+ */
 void TriangleMesh::AddToScene(Scene& scene)
 {
     for(auto& t : triangles)
         Scene::PrimitiveAdder::AddPrimitive(scene, t);
 }
 
-
+/**
+ * Linearly transforms the triangle mesh according to the transformation matrix m.
+ * 
+ * @param m The matrix which to transform the triangle mesh with.
+ */
 void TriangleMesh::Transform(const Matrix3d& m)
 {
     // This is the transpose of the inverse used to calculate the transforms of the normals
@@ -163,17 +228,19 @@ void TriangleMesh::Transform(const Matrix3d& m)
         m(0,1)*m(1,2)-m(0,2)*m(1,1),m(0,2)*m(1,0)-m(0,0)*m(1,2),m(0,0)*m(1,1)-m(0,1)*m(1,0),0,
         0,0,0,1);
 
-    int i = 0;
-    for(auto it = points.begin(); it < points.end(); it++)
+    for(auto& v : points)
     {
-        i++;
-        Vertex3d* v = *it;
         v->pos = m*v->pos;
         v->normal = nm*v->normal;
         v->normal.Normalize();
     }
 }
 
+/**
+ * Serializes the triangle mesh to a byte stream.
+ * 
+ * @param stream The stream to serialize to.
+ */
 void TriangleMesh::Save(Bytestream& stream) const
 {
     std::unordered_map<Vertex3d*, unsigned int> vertexMemToIndex;
@@ -207,6 +274,11 @@ void TriangleMesh::Save(Bytestream& stream) const
     }
 }
 
+/**
+ * Deserializes this triangle mesh from a bytestream.
+ * 
+ * @param stream The bytestream to load from.
+ */
 void TriangleMesh::Load(Bytestream& stream)
 {
     size_t nMats, nPoints, nTriangles;

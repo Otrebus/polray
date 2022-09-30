@@ -13,7 +13,7 @@ class Sphere : public Primitive, public Model
 {
 public:
     Sphere(const Vector3d& position, double radius);
-    Sphere(const Vector3d& position, const Vector3d& up, const Vector3d& rightNode, double radius);
+    Sphere(const Vector3d& position, const Vector3d& up, const Vector3d& right, double radius);
     Sphere();
     ~Sphere();
 
@@ -30,5 +30,5 @@ protected:
     friend class Scene;
     virtual void AddToScene(Scene& scene);
     double radius;
-    Vector3d position, up, rightNode;
+    Vector3d position, up, right;
 };

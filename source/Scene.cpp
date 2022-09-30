@@ -4,36 +4,40 @@
 #include "Randomizer.h"
 #include "Utils.h"
 #include "ObjReader.h"
-//#include "RayFactory.h"
 
-//vector<PartRenderer*> PartRenderer::parts;
-
-//------------------------------------------------------------------------------
-// Constructor
-//------------------------------------------------------------------------------
+/**
+ * Constructor.
+ */
 Scene::Scene()
 {
     calculatedBoundingBox = false;
 }
 
-//------------------------------------------------------------------------------
-// Constructor, reads a trianglemesh into the scene data from the supplied file
-//------------------------------------------------------------------------------
-Scene::Scene(std::string f)
+/**
+ * Constructor.
+ * 
+ * @param file The name of the .obj file from which to read the scene.
+ */
+Scene::Scene(std::string file)
 {
-	auto [mesh, lghts] = ReadFromFile(f, 0);
+	auto [mesh, lghts] = ReadFromFile(file, 0);
 	AddModel(mesh);
     for(auto light : lghts)
         AddLight(light);
 }
 
-//------------------------------------------------------------------------------
-// Destructor
-//------------------------------------------------------------------------------
+/**
+ * Destructor.
+ */
 Scene::~Scene()
 {
 }
 
+/**
+ * Returns the bounding box of all primitives in the scene.
+ * 
+ * @returns The bounding box of the scene.
+ */
 BoundingBox Scene::GetBoundingBox()
 {
     if(calculatedBoundingBox)
@@ -57,34 +61,56 @@ BoundingBox Scene::GetBoundingBox()
     }
 }
 
-void Scene::AddModel(Model* s)
+/**
+ * Adds a model to the scene.
+ * 
+ * @param model The model to add to the scene.
+ */
+void Scene::AddModel(Model* model)
 {
 	// It's done this way since every primitive adds to the scene array differently. Triangle meshes
 	// for example adds its individual triangles to the scene array to facilitate kd tree building
-    models.push_back(s);
-	s->AddToScene(*this);
+    models.push_back(model);
+	model->AddToScene(*this);
 }
 
+/**
+ * Intersects all the objects in the scene with a ray.
+ * 
+ * @param ray The ray to intersect the scene with.
+ * @param tmax The maximum distance we're allowed to record a hit within.
+ * @returns True if some object in the scene was intersected.
+ */
 void Scene::AddLight(Light* l)
 {
     l->AddToScene(this);
 }
 
-void Scene::SetCamera(Camera* cam)
+/**
+ * Sets the camera which serves as our viewpoint of the scene.
+ * 
+ * @param camera The camera to use.
+ */
+void Scene::SetCamera(Camera* camera)
 {
-    camera = cam;
+    this->camera = camera;
 }
 
-void Scene::SetPartitioning(SpatialPartitioning* prt)
+/**
+ * Sets the spatial partitioning that the scene will use to calculate ray intersections with.
+ * 
+ * @param partitioning The partitioning that the scene should use.
+ */
+void Scene::SetPartitioning(SpatialPartitioning* partitioning)
 {
-    this->partitioning = prt;
+    this->partitioning = partitioning;
 }
 
-SpatialPartitioning* Scene::GetPartitioning() const
-{
-    return partitioning;
-}
-
+/**
+ * Returns the camera using which we render the scene.
+ * 
+ * @returns The camera.
+ */
 Camera* Scene::GetCamera() const
 {
     return camera;
@@ -135,22 +161,27 @@ void Scene::Save(Bytestream& b) const
         model->Save(b);
 }
 
-std::vector<const Primitive*> Scene::GetPrimitives() const
-{
-    return primitives;
-}
-
-std::vector<Light*> Scene::GetLights() const
-{
-    return lights;
-}
-
+/**
+ * Intersects all the objects in the scene with a ray.
+ * 
+ * @param ray The ray to intersect the scene with.
+ * @param tmax The maximum distance we're allowed to record a hit within.
+ * @returns True if some object in the scene was intersected.
+ */
 bool Scene::Intersect(const Ray& ray, double tmax) const
 {
     const Primitive* dummy;
     return partitioning->Intersect(ray, dummy, 0, tmax, false) > 0;
 };
 
+/**
+ * Intersects all the objects in the scene with a ray.
+ * 
+ * @param ray The ray to intersect the scene with.
+ * @param p The primitive that was hit, if any.
+ * @param l The light that was hit, if any.
+ * @returns The parametric distance along the ray that the entity was hit.
+ */
 double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const
 {
     p = nullptr;
@@ -189,6 +220,12 @@ double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) co
     return -inf;
 };
 
+/**
+ * Randomly picks a light.
+ * 
+ * @param r1 A uniformly random number in [0, 1].
+ * @returns A pair of the picked light and the probability of having picked that light.
+ */
 std::pair<Light*, double> Scene::PickLight(double r1) const
 {
     auto p = 1.0/lights.size() + eps;

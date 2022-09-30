@@ -84,10 +84,10 @@ Sample PhongMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, b
 
         Vector3d up = Reflect(info.direction, N_s);
 
-        auto [rightNode, forward] = MakeBasis(up);
-        Vector3d base = forward*cos(r1) + rightNode*sin(r1);
+        auto [right, forward] = MakeBasis(up);
+        Vector3d base = forward*cos(r1) + right*sin(r1);
 
-        auto out = Ray(info.position, rightNode*std::sin(r1)*sin(r2) + forward*std::cos(r1)*sin(r2) + up*std::cos(r2));
+        auto out = Ray(info.position, right*std::sin(r1)*sin(r2) + forward*std::cos(r1)*sin(r2) + up*std::cos(r2));
         out.direction.Normalize();
         Vector3d w_o = out.direction;
 

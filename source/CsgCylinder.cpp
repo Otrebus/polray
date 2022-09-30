@@ -261,11 +261,6 @@ void CsgCylinder::Load(Bytestream&)
 {
 }
 
-void CsgCylinder::SetMaterial(Material* mat)
-{
-    material = mat;
-}
-
 void CsgCylinder::Rotate(const Vector3d& axis, double angle)
 {
     double u = axis.x;

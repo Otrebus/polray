@@ -114,7 +114,7 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> MeshLight::SampleRay(Randomize
     auto [point, normal] = SamplePoint(rnd);
     ray.origin = point;
 
-    auto [rightNode, forward] = MakeBasis(normal);
+    auto [right, forward] = MakeBasis(normal);
     double r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);
 
@@ -230,6 +230,7 @@ void MeshLight::AddToScene(Scene* scn)
         Scene::PrimitiveAdder::AddPrimitive(*scn, t);
     Scene::LightAdder::AddLight(*scn, this);
 }
+
 
 std::tuple<Color, Point> MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {

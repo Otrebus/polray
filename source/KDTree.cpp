@@ -84,7 +84,7 @@ double KDTree::CalculateCost(int type, int samples)
 
     if(type == 0)
     {
-        Triangle t(0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0);
+        Triangle t(Vector3d(0.0, 1.0, 1.0), Vector3d(0.0, 0.0, 1.0), Vector3d(1.0, 0.0, 1.0));
         for(int i = 0; i < samples; i++)
         {
             Ray ray(Vector3d(0.5, 0.5, 0), Vector3d(rnd.GetDouble(0, 1), rnd.GetDouble(0, 1), 1));

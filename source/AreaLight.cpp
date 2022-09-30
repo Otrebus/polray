@@ -137,14 +137,14 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> AreaLight::SampleRay(Randomize
     double x = rnd.GetDouble(0, 1);
     double y = rnd.GetDouble(0, 1);
 
-    auto [rightNode, forward] = MakeBasis(normal);
+    auto [right, forward] = MakeBasis(normal);
 
     double r1 = rnd.GetDouble(0, 2*pi);
     double r2 = rnd.GetDouble(0, 1.0);
 
     Ray ray;
     ray.origin = pos + c1*x + c2*y + eps*normal;
-    ray.direction = forward*cos(r1)*sqrt(r2) + rightNode*sin(r1)*sqrt(r2) + normal*sqrt(1-r2);
+    ray.direction = forward*cos(r1)*sqrt(r2) + right*sin(r1)*sqrt(r2) + normal*sqrt(1-r2);
 
     double areaPdf = 1.0f/GetArea();
     double anglePdf = abs(ray.direction*normal)/pi;

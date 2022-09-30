@@ -85,8 +85,8 @@ std::tuple<Vector3d, Vector3d> MakeBasis(const Vector3d& givenVector)
 Vector3d SampleHemisphereCos(double r1, double r2, const Vector3d& apex)
 {
     // See also: https://twitter.com/mmalex/status/1550765798263758848
-    auto [rightNode, forward] = MakeBasis(apex);
-    return forward*cos(r1*2*pi)*sqrt(r2) + rightNode*sin(r1*2*pi)*sqrt(r2) + apex*sqrt(1-r2) + apex*eps;
+    auto [right, forward] = MakeBasis(apex);
+    return forward*cos(r1*2*pi)*sqrt(r2) + right*sin(r1*2*pi)*sqrt(r2) + apex*sqrt(1-r2) + apex*eps;
 }
 
 /**
@@ -99,9 +99,9 @@ Vector3d SampleHemisphereCos(double r1, double r2, const Vector3d& apex)
  */
 Vector3d SampleHemisphereUniform(double r1, double r2, const Vector3d& apex)
 {
-    auto [rightNode, forward] = MakeBasis(apex);
+    auto [right, forward] = MakeBasis(apex);
 
-    return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + rightNode*sin(r1*2*pi)*sqrt(1-r2*r2) + apex*r2;
+    return forward*cos(r1*2*pi)*sqrt(1-r2*r2) + right*sin(r1*2*pi)*sqrt(1-r2*r2) + apex*r2;
 }
 
 /**

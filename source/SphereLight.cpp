@@ -55,7 +55,7 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SphereLight::SampleRay(Randomi
 
     auto [point, normal] = SamplePoint(rnd);
     ray.origin = point;
-    auto [rightNode, forward] = MakeBasis(normal);
+    auto [right, forward] = MakeBasis(normal);
 
     double r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
     ray.direction = SampleHemisphereCos(r1, r2, normal);

@@ -89,11 +89,7 @@ public:
     void SetCamera(Camera* camera);
     Camera* GetCamera() const;
 
-    std::vector<const Primitive*> GetPrimitives() const;
-    std::vector<Light*> GetLights() const;
-
     void SetPartitioning(SpatialPartitioning* partitioning);
-    SpatialPartitioning* GetPartitioning() const;
 
     bool Intersect(const Ray&, double tmax) const;
     double Intersect(const Ray&, const Primitive*&, const Light*&) const;

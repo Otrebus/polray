@@ -18,7 +18,7 @@ MeshVertex::~MeshVertex()
 {
 }
 
-/**
+/** 
  * Constructor.
  */
 MeshTriangle::MeshTriangle()
@@ -147,6 +147,13 @@ TriangleMesh::TriangleMesh()
 }
 
 /**
+ * Destructor.
+ */
+TriangleMesh::~TriangleMesh()
+{
+}
+
+/**
  * Returns the bounding box of the mesh triangle.
  */
 BoundingBox MeshTriangle::GetBoundingBox() const
@@ -161,20 +168,13 @@ BoundingBox MeshTriangle::GetBoundingBox() const
 }
 
 /**
- * Destructor.
- */
-TriangleMesh::~TriangleMesh()
-{
-}
-
-/**
  * Returns the bounding box of a mesh triangle where the triangle has been clipped (in the set
  * difference sense) by the given bounding box, assuming that the triangle is only clipped in
  * such a way that a convex shape results.
  * 
  * @param clipbox The bounding box that we remove part of the triangle from.
  * @returns A pair indicating whether anything remains of the triangle, and the bounding box of
- *          the clipped resulting mehs triangle.
+ *          the clipped resulting mesh triangle.
  */
 std::tuple<bool, BoundingBox> MeshTriangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 {

@@ -16,9 +16,6 @@ public:
     virtual double Intersect(const Ray& ray) const;
     virtual bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
-    //void SetMaterial(Material* material);
-    //Material* GetMaterial() const;
-
     void Translate(const Vector3d& direction);
     void Rotate(const Vector3d& axis, double angle);
 

@@ -13,7 +13,6 @@ class BoundingBox;
 class Triangle : public Primitive, public Model
 {
 public:
-    Triangle(double, double, double, double, double, double, double, double, double);
     Triangle(const Vector3d&, const Vector3d&, const Vector3d&);
     Triangle(const Vertex3d&, const Vertex3d&, const Vertex3d&);
     Triangle();

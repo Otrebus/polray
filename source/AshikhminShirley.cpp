@@ -85,8 +85,8 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd
         double r1 = rnd.GetDouble(0.0, 2*pi);
         double r2 = acos(pow(rnd.GetDouble(0, 1.0), 1/double(n+1)));
 
-        auto [rightNode, forward] = MakeBasis(N_s);
-        Vector3d hv = sin(r2)*(forward*cos(r1) + rightNode*sin(r1)) + cos(r2)*N_s;
+        auto [right, forward] = MakeBasis(N_s);
+        Vector3d hv = sin(r2)*(forward*cos(r1) + right*sin(r1)) + cos(r2)*N_s;
 
         outRay = Ray(info.position, -w_i + 2*(w_i*hv)*hv);
         outRay.direction.Normalize();

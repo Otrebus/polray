@@ -177,11 +177,6 @@ void CsgCuboid::Load(Bytestream&)
 {
 }
 
-void CsgCuboid::SetMaterial(Material* mat)
-{
-    material = mat;
-}
-
 bool CsgCuboid::SlabsTest(const Ray& inRay, double& tNear, double& tFar, int& axisNear, int& axisFar, int& sideNear, int& sideFar) const
 {
     Vector3d transPos = Multiply(invMatU_, invMatV_, invMatW_, pos_);

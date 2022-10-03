@@ -1,10 +1,14 @@
 Tuplify double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const
 Returnify void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, std::vector<SAHEvent*>& merged)
+Clean up pathtracer/lighttracer
 Do same as with MeshTriangle with std::tuple<bool, BoundingBox> Triangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 Remove first two parameters from double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
 double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const
 GenerateIntersectionInfo return tuple?
+
 Remove scene->addlight?
+Use more modern threads, and the same mutices (lol) as in bdpt
+Make the buffer in rendering.cpp double buffered so we don't have to mutex it every time WasBufferRedrawn (although that's maybe what rendering->updated does)
 
 Use Luma instead of Max for colors everywhere
 Replace the .0000001s with eps
@@ -18,7 +22,6 @@ Replace some tuples with structures?
 Clean up Ashikhmin & other materials
 Copy to clipboard feature
 Refactor GetProjectedSceneHull
-Use more modern threads
 Make TraceShadowRay account for light portals
 "Intersecting against lights might need a rethink"
 Unhardcode light area sampling in light portal

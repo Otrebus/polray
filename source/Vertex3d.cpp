@@ -1,25 +1,35 @@
 #include "vertex3d.h"
 
-Vertex3d::Vertex3d() : normal(0, 0, 0)
+/**
+ * Constructor.
+ */
+Vertex3d::Vertex3d()
 {
 }
 
-Vertex3d::Vertex3d(double x, double y, double z) : pos(x, y, z), normal(0, 0, 0)
+/**
+ * Constructor.
+ * 
+ * @param pos The position of the vertex.
+ * @param normal The normal of the vertex.
+ * @param texpos The texture position of the vertex.
+ */
+Vertex3d::Vertex3d(const Vector3d& pos, const Vector3d& normal, const Vector2d& texpos) : pos(pos), normal(normal), texpos(texpos)
 {
 }
 
-Vertex3d::Vertex3d(double x, double y, double z, double nx, double ny, double nz, double u, double v) : pos(x, y, z), normal(nx, ny, nz), texpos(u, v)
+/**
+ * Constructor, creates a vertex from a vector.
+ * 
+ * @parameter v The vector from which to copy the position from.
+ */
+Vertex3d::Vertex3d(const Vector3d& v) : pos(v), normal(0, 0, 0)
 {
 }
 
-Vertex3d::Vertex3d(const Vector3d& po, const Vector3d& norm, const Vector2d& tp) : pos(po), normal(norm), texpos(tp)
-{
-}
-
-Vertex3d::Vertex3d(const Vector3d& po) : pos(po), normal(0, 0, 0)
-{
-}
-
+/**
+ * Destructor.
+ */
 Vertex3d::~Vertex3d()
 {
 }

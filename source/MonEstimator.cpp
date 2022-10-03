@@ -3,19 +3,39 @@
 #include "Bytestream.h"
 #include "Utils.h"
 
+/**
+ * Saves a bucket to a bytestream.
+ * 
+ * @param stream The bytestream to serialize to.
+ */
 void Bucket::Save(Bytestream& stream) const
 {
     stream << avg << nSamples;
 }
+
+/**
+ * Loads a bucket from a bytestream.
+ * 
+ * @param stream The stream to deserialize from.
+ */
 void Bucket::Load(Bytestream& stream) 
 {
     stream >> avg >> nSamples;
 }
 
+/**
+ * Constructor.
+ */
 MonEstimator::MonEstimator()
 {
 }
 
+/**
+ * Constructor.
+ * 
+ * @param x The horizontal size of the buffer.
+ * @param y The vertical size of the buffer.
+ */
 MonEstimator::MonEstimator(int xres, int yres)
 {
     buckets = new Bucket[xres*yres*M];
@@ -25,11 +45,24 @@ MonEstimator::MonEstimator(int xres, int yres)
     std::fill(nSamples, nSamples + xres*yres, 0);
 }
 
+/**
+ * Returns a bucket.
+ * 
+ * @param x The horizontal component of the bucket.
+ * @param y The vertical component of the bucket.
+ * @param m The number of the bucket.
+ */
 Bucket& MonEstimator::GetBucket(int x, int y, int m) const
 {
     return buckets[y*(width*M) + x*M + m];
 }
 
+/**
+ * Adds a sample to a pixel.
+ * 
+ * @param x The horizontal component of the pixel coordinate.
+ * @param y The vertical component of the pixel coordinate.
+ */
 void MonEstimator::AddSample(int x, int y, const Color& c)
 {
     int ns = nSamples[y*width+x];
@@ -39,6 +72,12 @@ void MonEstimator::AddSample(int x, int y, const Color& c)
     nSamples[y*width+x]++;
 }
 
+/**
+ * Returns the current estimate of a pixel color.
+ * 
+ * @param x The horizontal component of the pixel coordinate.
+ * @param y The vertical component of the pixel coordinate.
+ */
 Color MonEstimator::GetEstimate(int x, int y) const
 {
     int ns = nSamples[y*width+x];
@@ -84,6 +123,11 @@ Color MonEstimator::GetEstimate(int x, int y) const
     }
 }
 
+/**
+ * Saves the estimator to a bytestream.
+ * 
+ * @param stream The bytestream to serialize to.
+ */
 void MonEstimator::Save(Bytestream& stream) const
 {
     stream << ID_MONESTIMATOR << height << width;
@@ -97,6 +141,11 @@ void MonEstimator::Save(Bytestream& stream) const
                 GetBucket(x, y, m).Save(stream);
 }
 
+/**
+ * Loads the estimator from a bytestream.
+ * 
+ * @param stream The bytestream to deserialize from.
+ */
 void MonEstimator::Load(Bytestream& stream)
 {
     stream >> height >> width;

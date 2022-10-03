@@ -803,7 +803,7 @@ std::pair<TriangleMesh*, std::vector<MeshLight*>> ReadFromFile(const std::string
                     for(auto& p : { pv0, pv1, pv2 })
                         p->triangles.push_back(tri);
 
-                    if(pv0->normal.IsNull())
+                    if(!pv0->normal)
                         for(auto& v : { tri->v0, tri->v1, tri->v2 })
                             v->normal = tri->GetNormal();
 

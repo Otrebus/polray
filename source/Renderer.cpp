@@ -5,10 +5,14 @@
 #include "BDPT.h"
 #include "RayTracer.h"
 #include "LightTracer.h"
-
 #include "Timer.h"
 #include "Logger.h"
 
+/**
+ * Constructor.
+ * 
+ * @param scene The scene used for rendering.
+ */
 Renderer::Renderer(std::shared_ptr<Scene> scene)
 {
     stopping = false;
@@ -21,29 +25,48 @@ Renderer::Renderer(std::shared_ptr<Scene> scene)
     logger.Box(std::to_string(timer.GetTime()));
 }
 
+/**
+ * Destructor.
+ */
 Renderer::~Renderer()
 {
 }
 
-//------------------------------------------------------------------------------
-// Traces a ray the through scene graph and returns TRUE if ray was NOT 
-// intersected
-//------------------------------------------------------------------------------
+/**
+ * Traces a shadow ray through the scene.
+ * 
+ * @param ray The ray to trace.
+ * @param tmax The maximum parametric distance along the ray to search for hits.
+ * @returns True if the ray was not intersected.
+ */
 bool Renderer::TraceShadowRay(const Ray& ray, double tmax) const
 {
     return !scene->Intersect(ray, tmax);
 }
 
+/**
+ * Returns the scene used by the renderer.
+ * 
+ * @returns The scene used by the renderer.
+ */
 std::shared_ptr<Scene> Renderer::GetScene() const
 {
     return scene;
 }
 
+/**
+ * Stops rendering.
+ */
 void Renderer::Stop()
 {
     stopping = true;
 }
 
+/**
+ * Creates a renderer given an id (see Bytestream.h) and a scene.
+ * 
+ * @returns A pointer to the created renderer.
+ */
 Renderer* Renderer::Create(unsigned char id, std::shared_ptr<Scene> scn)
 {
     switch(id)

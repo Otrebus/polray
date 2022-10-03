@@ -7,7 +7,14 @@
 #include "Utils.h"
 #include "GeometricRoutines.h"
 
+template<typename T> T sq(T x)
+{
+    return x*x;
+}
 
+/**
+ * Constructor.
+ */
 CookTorrance::CookTorrance()
 {
     Ks = Color(0, 0, 0);
@@ -15,11 +22,9 @@ CookTorrance::CookTorrance()
     alpha = 0;
 }
 
-template<typename T> T sq(T x)
-{
-    return x*x;
-}
-
+/**
+ * Destructor.
+ */
 CookTorrance::~CookTorrance()
 {
 }
@@ -36,6 +41,15 @@ double D_p(double alpha, double cosn)
     return sq(alpha)/(pi*sq((sq(alpha)-1)*cosn*cosn+1));
 }
 
+/**
+ * Samples the material given a surface intersection.
+ * 
+ * @param info The intersection info.
+ * @param rnd The randomizer to use.
+ * @param adjoint Whether we are doing path tracing or light tracing.
+ * @returns The sample, containing information of its color, outgoing direction and the
+ *          (r)pdf value.
+ */
 Sample CookTorrance::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool) const
 {
     //float df = Kd.GetMax();
@@ -66,7 +80,14 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, Randomizer& rnd, bo
     return Sample(BRDF(info, out, 1)/pdf, Ray(info.position, out), pdf, pdf, 0, 1);
 }
 
-
+/**
+ * Returns the value of the brdf in a certain ingoing/outgoing direction for a brdf component.
+ * 
+ * @param info The intersection info.
+ * @param out The outgoing direction.
+ * @param component The component of the brdf.
+ * @returns The value of the brdf.
+ */
 Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
 {
     //float df = Kd.GetMax();
@@ -99,11 +120,21 @@ Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int)
     return Ks*D*G*F/(4*(out*N)*(in*N));
 }
 
+/**
+ * Returns the associated light of this material, if any.
+ * 
+ * @returns The light.
+ */
 Light* CookTorrance::GetLight() const
 {
     return light;
 }
 
+/**
+ * Reads the properties of the material from a stringstream (from a .mtl file).
+ * 
+ * @param ss The stringstream.
+ */
 void CookTorrance::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
@@ -122,6 +153,16 @@ void CookTorrance::ReadProperties(std::stringstream& ss)
     }
 }
 
+/**
+ * Calculates the value of the probability distribution function that we use to sample the
+ * brdf for a certain surface intersection and outgoing direction.
+ * 
+ * @param info The information about the incoming ray into the material.
+ * @param out The sampled outgoing ray.
+ * @param adjoint Whether we are using path tracing or (adjoint) light tracing.
+ * @param component The component of the brdf that we sampled.
+ * @returns The value of the pdf in the given outgoing direction.
+ */
 double CookTorrance::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const
 {
     assert(component == 1);
@@ -146,12 +187,22 @@ double CookTorrance::PDF(const IntersectionInfo& info, const Vector3d& out, bool
     return 1; // TODO: fix
 }
 
+/**
+ * Saves the material to a bytestream.
+ * 
+ * @param stream The stream to serialize to.
+ */
 void CookTorrance::Save(Bytestream& stream) const
 {
     stream << (unsigned char) ID_COOKTORRANCEMATERIAL;
     stream << Ks << alpha;
 }
 
+/**
+ * Loads the material from a bytestream.
+ * 
+ * @param stream The bytestream to deserialize from.
+ */
 void CookTorrance::Load(Bytestream& stream)
 {
     stream >> Ks >> alpha;

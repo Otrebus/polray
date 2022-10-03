@@ -5,7 +5,9 @@
 #include "IntersectionInfo.h"
 #include "GeometricRoutines.h"
 
-
+/**
+ * Constructor.
+ */
 AshikhminShirley::AshikhminShirley()
 {
     Rs = Color(1, 1, 1);
@@ -13,6 +15,9 @@ AshikhminShirley::AshikhminShirley()
     n = 1;
 }
 
+/**
+ * Destructor.
+ */
 AshikhminShirley::~AshikhminShirley()
 {
 }
@@ -36,6 +41,15 @@ void AshikhminShirley::ReadProperties(std::stringstream& ss)
     }
 }
 
+/**
+ * Samples the material given a surface intersection.
+ * 
+ * @param info The intersection info.
+ * @param rnd The randomizer to use.
+ * @param adjoint Whether we are doing path tracing or light tracing.
+ * @returns The sample, containing information of its color, outgoing direction and the
+ *          (r)pdf value.
+ */
 Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     double df = Rd.GetMax();
@@ -103,6 +117,14 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd
     }
 }
 
+/**
+ * Returns the value of the brdf in a certain ingoing/outgoing direction for a brdf component.
+ * 
+ * @param info The intersection info.
+ * @param out The outgoing direction.
+ * @param component The component of the brdf.
+ * @returns The value of the brdf.
+ */
 Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
 {
     double df = Rd.GetMax();
@@ -136,6 +158,16 @@ Light* AshikhminShirley::GetLight() const
     return nullptr;
 }
 
+/**
+ * Calculates the value of the probability distribution function that we use to sample the
+ * brdf for a certain surface intersection and outgoing direction.
+ * 
+ * @param info The information about the incoming ray into the material.
+ * @param out The sampled outgoing ray.
+ * @param adjoint Whether we are using path tracing or (adjoint) light tracing.
+ * @param component The component of the brdf that we sampled.
+ * @returns The value of the pdf in the given outgoing direction.
+ */
 double AshikhminShirley::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int component) const
 {
     Vector3d N_s = info.normal;
@@ -163,11 +195,22 @@ double AshikhminShirley::PDF(const IntersectionInfo& info, const Vector3d& out, 
         return pow(normal*hv, n)*(n + 1)/((in*hv)*8*pi);
 }
 
+/**
+ * Saves the material to a bytestream.
+ * 
+ * @param stream The stream to serialize to.
+ */
 void AshikhminShirley::Save(Bytestream& stream) const
 {
     stream << (unsigned char) ID_ASHIKHMINSHIRLEY;
     stream << Rd << Rs << n;
 }
+
+/**
+ * Loads the material from a bytestream.
+ * 
+ * @param stream The bytestream to deserialize from.
+ */
 void AshikhminShirley::Load(Bytestream& stream)
 {
     stream >> Rd >> Rs >> n;

@@ -4,6 +4,12 @@
 #include "ColorBuffer.h"
 #include <thread>
 
+/**
+ * Constructor.
+ * 
+ * @param r The integrator to use.
+ * @param e The estimator to use.
+ */
 Rendering::Rendering(std::shared_ptr<Renderer> r, std::shared_ptr<Estimator> e) : 
     renderer(r), estimator(e), running(false), updated(true), stopping(false), nSamples(0)
 {
@@ -14,6 +20,11 @@ Rendering::Rendering(std::shared_ptr<Renderer> r, std::shared_ptr<Estimator> e) 
     bufferMutex = CreateMutex(0, false, 0);
 }
 
+/**
+ * Constructor. Resumes a rendering from a file.
+ * 
+ * @param fileName The name of the file to use.
+ */
 Rendering::Rendering(std::string fileName) : running(false), updated(true), stopping(false)
 {
     Bytestream b;
@@ -35,6 +46,11 @@ Rendering::Rendering(std::string fileName) : running(false), updated(true), stop
     image->Clear(Color::Black);
 }
  
+/**
+ * Saves the rendering to a file.
+ * 
+ * @param fileName The name of the file to stream to.
+ */
 void Rendering::SaveRendering(std::string fileName)
 {
     Bytestream b;
@@ -44,11 +60,19 @@ void Rendering::SaveRendering(std::string fileName)
     b.SaveToFile(fileName);
 }
 
+/**
+ * Returns true if the current buffer has been updated since the last time it was requested by GetImage.
+ * 
+ * @returns True if the buffer has been updated since GetImage was previously called.
+ */
 bool Rendering::WasBufferRedrawn() const
 {
     return updated;
 }
 
+/**
+ * Returns the current buffer of the rendering.
+ */
 ColorBuffer Rendering::GetImage()
 {
     WaitForSingleObject(bufferMutex, INFINITE);
@@ -58,6 +82,9 @@ ColorBuffer Rendering::GetImage()
     return tmp;
 }
 
+/**
+ * The entry point of each rendering thread.
+ */
 void Rendering::Thread()
 {
     while(true)
@@ -69,20 +96,12 @@ void Rendering::Thread()
             break;   // was not rendered entirely and should be discarded
         WaitForSingleObject(bufferMutex, INFINITE);
         for(int y = 0; y < image->GetYRes(); y++)
-        {
             for(int x = 0; x < image->GetXRes(); x++)			
-            {
-                //if(y == YRES/2 && x == XRES/2)
-                //    __debugbreak();
                 estimator->AddSample(x, y, temp.GetPixel(x, y));
-            }
-        }
         for(int y = 0; y < image->GetYRes(); y++)
         {
             for(int x = 0; x < image->GetXRes(); x++)
             {
-                //if(y == YRES/2 && x == XRES/2)
-                //    __debugbreak();
                 Color c = estimator->GetEstimate(x, y);
                 
                 double exposure = 0.75;
@@ -94,16 +113,14 @@ void Rendering::Thread()
             }
         }
         updated = true;
-        nSamples ++;
+        nSamples++;
         ReleaseMutex(bufferMutex);
     }
 }
 
-void Rendering::Thread(void* r)
-{
-    ((Rendering*) r)->Thread();
-}
-
+/**
+ * Starts the renderer; loads up all the threads the CPU can muster.
+ */
 void Rendering::Start()
 {
     assert(!running);
@@ -115,9 +132,12 @@ void Rendering::Start()
 #endif
 
     for(unsigned int i = 0; i < processorCount; i++)
-        _beginthread(Rendering::Thread, 0, (void*)this);
+        _beginthread([] (auto r) { ((Rendering*) r)->Thread(); }, 0, (void*)this);
 }
 
+/**
+ * Stops the rendering process and lets all threads die.
+ */
 void Rendering::Stop()
 {
     stopping = true;

@@ -2,23 +2,38 @@
 #include "Utils.h"
 #include "Ray.h"
 
-BoundingBox::BoundingBox(const Vector3d& a, const Vector3d& b) : c1(a), c2(b)
+/**
+ * Constructor.
+ * 
+ * @param c1 The minimal corner of the bounding box.
+ * @param c2 The maximal corner of the bounding box.
+ */
+BoundingBox::BoundingBox(const Vector3d& c1, const Vector3d& c2) : c1(c1), c2(c2)
 {
 }
 
+/**
+ * Destructor.
+ */
 BoundingBox::~BoundingBox()
 {
 }
 
+/**
+ * Constructor.
+ */
 BoundingBox::BoundingBox()
 {
 }
 
-bool BoundingBox::ContainsPoint(const Vector3d& v)
-{
-    return (v.x <= c2.x && v.x >= c1.x && v.y <= c2.y && v.y >= c1.y && v.z >= c1.z && v.z <= c2.z);
-}
-
+/**
+ * Checks if a ray intersects with the bounding box.
+ * 
+ * @param ray The ray to intersect with.
+ * @param tnear The closest parametric distance along the ray to count as an intersection.
+ * @param tfar The farthest parametric distance along the ray to count as an intersection.
+ * @returns True if there's an intersection in a distance along the ray in [tnear, tfar].
+ */
 bool BoundingBox::Intersect(const Ray& ray, double& tnear, double& tfar) const
 {  
   
@@ -48,21 +63,4 @@ bool BoundingBox::Intersect(const Ray& ray, double& tnear, double& tfar) const
         }  
     }
     return true;
-}
-
-BoundingBox& BoundingBox::operator=(const BoundingBox& b)
-{
-    c1 = b.c1;
-    c2 = b.c2;
-    return *this;
-}
-
-double BoundingBox::GetArea() const
-{
-    return (c2.z-c1.z)*(c2.y-c1.y)*2 + (c2.x-c1.x)*(c2.z-c1.z)*2 + (c2.x-c1.x)*(c2.y-c1.y)*2;
-}
-
-double BoundingBox::GetVolume() const
-{
-    return (c2.z-c1.z)*(c2.y-c1.y)*(c2.x-c1.x);
 }

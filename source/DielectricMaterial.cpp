@@ -5,26 +5,30 @@
 #include "Sample.h"
 #include "IntersectionInfo.h"
 
-//------------------------------------------------------------------------------
-// Constructor
-//------------------------------------------------------------------------------
+/**
+ * Constructor.
+ */
 DielectricMaterial::DielectricMaterial()
 {
     m_ior = 1.5f;
 }
 
-//------------------------------------------------------------------------------
-// Destructor
-//------------------------------------------------------------------------------
+/**
+ * Destructor.
+ */
 DielectricMaterial::~DielectricMaterial()
 {
 }
 
-//------------------------------------------------------------------------------
-// A sample is generated in either the reflected or refracted direction - both 
-// cases are treated as the same component of the brdf since they are both 
-// specular and reflect the same amount of light for any given bounce.
-//------------------------------------------------------------------------------
+/**
+ * Samples the material given a surface intersection.
+ * 
+ * @param info The intersection info.
+ * @param rnd The randomizer to use.
+ * @param adjoint Whether we are doing path tracing or light tracing.
+ * @returns The sample, containing information of its color, outgoing direction and the
+ *          (r)pdf value.
+ */
 Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     auto pdf = 1;  // This is not true, of course, which is indicated by the
@@ -94,27 +98,34 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& r
     }
 }
 
-//------------------------------------------------------------------------------
-// Returns the value of the BRDF in the direction given in direction out
-// relative to the given intersectioninfo. In the case of any specular material
-// the BRDF is 0 in all directions, since it is effectively a distribution.
-//------------------------------------------------------------------------------
+/**
+ * Returns the value of the brdf in a certain ingoing/outgoing direction for a brdf component.
+ * 
+ * @param info The intersection info.
+ * @param out The outgoing direction.
+ * @param component The component of the brdf.
+ * @returns The value of the brdf.
+ */
 Color DielectricMaterial::BRDF(const IntersectionInfo&, const Vector3d&, int) const
 {
     return Color(0, 0, 0); // The chance that the out, in vectors 
 }                          // are reflectant is 0
 
-//------------------------------------------------------------------------------
-// Returns the assigned light of this material, which is always 0 (none).
-//------------------------------------------------------------------------------
+/**
+ * Returns the associated light of this material, if any.
+ * 
+ * @returns The light.
+ */
 Light* DielectricMaterial::GetLight() const
 {
     return light;
 }
 
-//------------------------------------------------------------------------------
-// Reads and sets the properties of this material from a stringstream.
-//------------------------------------------------------------------------------
+/**
+ * Reads the properties of the material from a stringstream (from a .mtl file).
+ * 
+ * @param ss The stringstream.
+ */
 void DielectricMaterial::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
@@ -126,24 +137,37 @@ void DielectricMaterial::ReadProperties(std::stringstream& ss)
     }
 }
 
-//------------------------------------------------------------------------------
-// Returns the value of the probability distribution function for a sample
-// generated in direction out given the intersectioninfo for the orientation
-// of the material boundary, etc. The value in this case is always 0, but should
-// never be used in practice since it would only cause NaNs in any integrator.
-// Hence the actual value is returned as 1, just to avoid any potential issues.
-//------------------------------------------------------------------------------
+/**
+ * Calculates the value of the probability distribution function that we use to sample the
+ * brdf for a certain surface intersection and outgoing direction.
+ * 
+ * @param info The information about the incoming ray into the material.
+ * @param out The sampled outgoing ray.
+ * @param adjoint Whether we are using path tracing or (adjoint) light tracing.
+ * @param component The component of the brdf that we sampled.
+ * @returns The value of the pdf in the given outgoing direction.
+ */
 double DielectricMaterial::PDF(const IntersectionInfo&, const Vector3d&, bool, int) const
 {
     return 1;
 }
 
+/**
+ * Saves the material to a bytestream.
+ * 
+ * @param stream The stream to serialize to.
+ */
 void DielectricMaterial::Save(Bytestream& stream) const
 {
     stream << (unsigned char) ID_DIELECTRICMATERIAL;
     stream << m_ior;
 }
 
+/**
+ * Loads the material from a bytestream.
+ * 
+ * @param stream The bytestream to deserialize from.
+ */
 void DielectricMaterial::Load(Bytestream& stream)
 {
     stream >> m_ior;

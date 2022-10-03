@@ -39,12 +39,9 @@ public:
     double GetLuma() const;
     double GetMax() const;
 
-    double r;
-    double g;
-    double b;
+    double r, g, b;
 
-    const static Color Identity;
-    const static Color Black;
+    const static Color Identity, Black;
 };
 
 Color operator*(double, const Color&);

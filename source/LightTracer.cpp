@@ -1,15 +1,28 @@
 #include "LightTracer.h"
 #include "Sample.h"
 
-
+/**
+ * Constructor.
+ * 
+ * @param scene The scene that we render.
+ */
 LightTracer::LightTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
 }
 
+/**
+ * Destructor.
+ */
 LightTracer::~LightTracer()
 {
 }
 
+/**
+ * Adds a number of estimates of the importance transport equation.
+ * 
+ * @param cam The horizontal component of the pixel coordinate.
+ * @param culBuf The color buffer to add sample estimates to.
+ */
 void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
     const double xres = (double)colBuf.GetXRes();
@@ -90,11 +103,21 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
     }
 }
 
+/**
+ * Saves information about the renderer to a bytestream.
+ * 
+ * @param stream The bytestream to stream to.
+ */
 void LightTracer::Save(Bytestream& stream) const
 {
     stream << ID_LIGHTTRACER;
 }
 
-void LightTracer::Load(Bytestream&)
+/**
+ * Loads the renderer from a bytestream.
+ * 
+ * @param stream The bytestream to stream from.
+ */
+void LightTracer::Load(Bytestream& stream)
 {
 }

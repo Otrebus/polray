@@ -4,23 +4,28 @@
 #include "Utils.h"
 #include "Main.h"
 
-//------------------------------------------------------------------------------
-// Constructor
-//------------------------------------------------------------------------------
+/**
+ * Constructor.
+ * 
+ * @param scn The scene that we are rendering.
+ */
 RayTracer::RayTracer(std::shared_ptr<Scene> scn) : Renderer(scn)
 {
 }
 
-//------------------------------------------------------------------------------
-// Destructor
-//------------------------------------------------------------------------------
+/**
+ * Destructor.
+ */
 RayTracer::~RayTracer()
 {
 }
 
-//------------------------------------------------------------------------------
-// Returns the radiance emitted towards us from the direction of a submitted ray
-//------------------------------------------------------------------------------
+/**
+ * Traces a ray through the scene from the camera and returns some helpful information (currently
+ * used for debugging).
+ * 
+ * @param ray The ray to trace.
+ */
 Color RayTracer::TraceRay(const Ray& ray) const
 {
     Color c = TraceRayRecursive(ray, 50, 0, 1.0);
@@ -28,6 +33,12 @@ Color RayTracer::TraceRay(const Ray& ray) const
     return c;
 }
 
+/**
+ * Renders the scene.
+ * 
+ * @param cam The camera to render the scene from.
+ * @param colBuf The color buffer to render to.
+ */
 void RayTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
     int xres = colBuf.GetXRes();
@@ -48,9 +59,16 @@ void RayTracer::Render(Camera& cam, ColorBuffer& colBuf)
     }
 }
 
-//------------------------------------------------------------------------------
-// Helper function for TraceRay
-//------------------------------------------------------------------------------
+/**
+ * Helper function for TraceRay. The purpose of this function right now is just for debug information
+ * and its functionality changes.
+ * 
+ * @param ray The ray to trace.
+ * @param bounces The number of bounces of the ray to trace, or something.
+ * @param contribution This used to be the intensity of the color traced so far or something, for
+ *                     early termination.
+ * @returns Whatever we're currently using as debug info.
+ */
 Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double contribution) const
 {
     if(contribution < 0.005)
@@ -100,9 +118,13 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double cont
         return Color(0, 0, 0);
 }
 
-//------------------------------------------------------------------------------
-// Traces ray with t parameter between 0..tmax and checks if occluded
-//------------------------------------------------------------------------------
+/**
+ * Traces a shadow ray and checks of it's occluded.
+ * 
+ * @param ray The ray to trace.
+ * @param tmax The maximum parametric distance along the ray to trace.
+ * @returns True if the shadow ray hits something before tmax.
+ */
 bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
 {
     const Primitive* dummy = nullptr;
@@ -113,12 +135,21 @@ bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
     return true;
 }
 
-
+/**
+ * Saves information about the renderer to a bytestream.
+ * 
+ * @param stream The bytestream to serialize to.
+ */
 void RayTracer::Save(Bytestream& stream) const
 {
     stream << ID_RAYTRACER;
 }
 
-void RayTracer::Load(Bytestream&)
+/**
+ * Loads information about the renderer process from a file.
+ * 
+ * @param stream The bytestream to deserialize from.
+ */
+void RayTracer::Load(Bytestream& bytestream)
 {
 }

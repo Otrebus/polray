@@ -7,7 +7,8 @@ const int M = 21;
 
 class MonEstimator;
 
-class Bucket {
+class Bucket
+{
 public:
     Bucket() : avg(Color::Black), nSamples(0) { }
     void Save(Bytestream& stream) const;

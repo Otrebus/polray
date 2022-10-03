@@ -21,14 +21,15 @@ public:
     Vector3d operator-=(const Vector3d& v);
 
     Vector3d operator*=(const Matrix3d& m);
+    bool operator!() const;
     bool operator!=(const Vector3d&) const;
     bool operator==(const Vector3d&) const;
     double operator*(const Vector3d&) const;
     Vector3d operator^(const Vector3d&)	const;
-    Vector3d operator/(const double) const;
+    Vector3d operator/(double) const;
     Vector3d operator/=(double);
     Vector3d operator*=(double);
-    Vector3d operator*(const double) const;
+    Vector3d operator*(double) const;
     double& operator[](int);
     double operator[](int) const;
     
@@ -36,7 +37,6 @@ public:
     double Length2() const;
     void Normalize();
     Vector3d Normalized() const;
-    bool IsNull() const;
     bool IsValid() const;
 
     double x, y, z;

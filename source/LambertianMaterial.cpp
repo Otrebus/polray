@@ -6,15 +6,30 @@
 #include "IntersectionInfo.h"
 #include "Utils.h"
 
+/**
+ * Constructor.
+ */
 LambertianMaterial::LambertianMaterial()
 {
     Kd = Color(1, 1, 1);
 }
 
+/**
+ * Destructor.
+ */
 LambertianMaterial::~LambertianMaterial()
 {
 }
 
+/**
+ * Samples the material given a surface intersection.
+ * 
+ * @param info The intersection info.
+ * @param rnd The randomizer to use.
+ * @param adjoint Whether we are doing path tracing or light tracing.
+ * @returns The sample, containing information of its color, outgoing direction and the
+ *          (r)pdf value.
+ */
 Sample LambertianMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
     Ray out;
@@ -54,6 +69,14 @@ Sample LambertianMaterial::GetSample(const IntersectionInfo& info, Randomizer& r
     return Sample(color, out, pdf, rpdf, false, 1);
 }
 
+/**
+ * Returns the value of the brdf in a certain ingoing/outgoing direction for a brdf component.
+ * 
+ * @param info The intersection info.
+ * @param out The outgoing direction.
+ * @param component The component of the brdf.
+ * @returns The value of the brdf.
+ */
 Color LambertianMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
 {
     Vector3d N_s = info.normal;
@@ -74,11 +97,21 @@ Color LambertianMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out
     return Kd/pi;
 }
 
+/**
+ * Returns the associated light of this material, if any.
+ * 
+ * @returns The light.
+ */
 Light* LambertianMaterial::GetLight() const
 {
     return light;
 }
 
+/**
+ * Reads the properties of the material from a stringstream (from a .mtl file).
+ * 
+ * @param ss The stringstream.
+ */
 void LambertianMaterial::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())
@@ -94,6 +127,16 @@ void LambertianMaterial::ReadProperties(std::stringstream& ss)
     }
 }
 
+/**
+ * Calculates the value of the probability distribution function that we use to sample the
+ * brdf for a certain surface intersection and outgoing direction.
+ * 
+ * @param info The information about the incoming ray into the material.
+ * @param out The sampled outgoing ray.
+ * @param adjoint Whether we are using path tracing or (adjoint) light tracing.
+ * @param component The component of the brdf that we sampled.
+ * @returns The value of the pdf in the given outgoing direction.
+ */
 double LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out, bool adjoint, int) const
 {
     Vector3d N_s = info.normal;
@@ -114,12 +157,22 @@ double LambertianMaterial::PDF(const IntersectionInfo& info, const Vector3d& out
     return (adjoint ? N_g : N_s)*w_o/pi;
 }
 
+/**
+ * Saves the material to a bytestream.
+ * 
+ * @param stream The stream to serialize to.
+ */
 void LambertianMaterial::Save(Bytestream& stream) const
 {
     stream << (unsigned char) ID_LAMBERTIANMATERIAL;
     stream << Kd;
 }
 
+/**
+ * Loads the material from a bytestream.
+ * 
+ * @param stream The bytestream to deserialize from.
+ */
 void LambertianMaterial::Load(Bytestream& stream)
 {
     stream >> Kd;

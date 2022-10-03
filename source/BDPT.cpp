@@ -489,12 +489,21 @@ void BDPT::Render(Camera& cam, ColorBuffer& colBuf)
             colBuf.AddColor(x, y, eyeImage.GetPixel(x, y) + lightImage.GetPixel(x, y));
 }
 
-
+/**
+ * Saves information about the renderer to a bytestream.
+ * 
+ * @param stream The bytestream to stream to.
+ */
 void BDPT::Save(Bytestream& stream) const
 {
     stream << ID_BDPT;
 }
 
-void BDPT::Load(Bytestream&)
+/**
+ * Loads the renderer from a bytestream.
+ * 
+ * @param stream The bytestream to stream from.
+ */
+void BDPT::Load(Bytestream& stream)
 {
 }

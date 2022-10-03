@@ -2,63 +2,83 @@
 #include "Primitive.h"
 #include "Sample.h"
 
+/**
+ * Constructor.
+ * 
+ * @param scene The scene that we render.
+ */
 PathTracer::PathTracer(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
-    //m_random.Seed(GetTickCount());
-#ifdef DETERMINISTIC
-    m_random.Seed();
-#endif
 }
 
+/**
+ * Destructor.
+ */
 PathTracer::~PathTracer()
 {
 }
 
-//Color PathTracer::TracePathPrimitive(const Ray& ray) const
-//{
-//	const Primitive* minprimitive = nullptr;
-//    const Light* minlight = nullptr;
-//	IntersectionInfo info;
-//
-//	if(scene->Intersect(ray, minprimitive, minlight) < 0)
-//		return Color(0, 0, 0);
-//    if(minprimitive)
-//	    minprimitive->GenerateIntersectionInfo(ray, info);
-//    else
-//        minlight->GenerateIntersectionInfo(ray, info);
-//
-//	if(m_random.GetDouble(0, 1) > 0.8)
-//		return Color(0, 0, 0);
-//
-//    Ray out;
-//	Vector3d dir;
-//
-//    Light* l;
-//    if((l = info.material->GetLight()) && info.geometricnormal * info.direction < 0)
-//        return l->GetIntensity()/0.8;
-//
-//    while(true)
-//	{
-//        Vector3d N_g = info.geometricnormal;
-//        if(N_g*info.direction > 0)
-//            N_g = -N_g;
-//		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
-//
-//		out.origin = info.position + 0.0001*N_g;
-//		if(dir.GetLength() > 1)
-//			continue;
-//		else if(dir*N_g < 0)
-//			dir = -dir;
-//		dir.Normalize();
-//		break;
-//	}
-//    Color mod = info.material->BRDF(info, dir)*2*pi*abs(info.normal*dir);
-//
-//	out.direction = dir;
-//	Color c = mod*TracePathPrimitive(out)/0.8f;
-//	return c;
-//}
+/**
+ * Calculates the contribution of one sample of the path tracing algorithm using no importance
+ * sampling.
+ * 
+ * @param ray The direction of the ray whose first intersection with the scene we calculate the
+ *            rendering equation integral at.
+ */
+Color PathTracer::TracePathPrimitive(const Ray& ray)
+{
+	const Primitive* minprimitive = nullptr;
+    const Light* minlight = nullptr;
+	IntersectionInfo info;
 
+	if(scene->Intersect(ray, minprimitive, minlight) < 0)
+		return Color(0, 0, 0);
+    if(minprimitive)
+	    minprimitive->GenerateIntersectionInfo(ray, info);
+    else
+        minlight->GenerateIntersectionInfo(ray, info);
+
+	if(m_random.GetDouble(0, 1) > 0.8)
+		return Color(0, 0, 0);
+
+    Ray out;
+	Vector3d dir;
+
+    Light* l;
+    if((l = info.material->GetLight()) && info.geometricnormal * info.direction < 0)
+        return l->GetIntensity()/0.8;
+
+    while(true)
+	{
+        Vector3d N_g = info.geometricnormal;
+        if(N_g*info.direction > 0)
+            N_g = -N_g;
+		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
+
+		out.origin = info.position + 0.0001*N_g;
+		if(dir.Length() > 1)
+			continue;
+		else if(dir*N_g < 0)
+			dir = -dir;
+		dir.Normalize();
+		break;
+	}
+
+    // TODO: Need to unhardcode the component to make this sort of sampling work
+    Color mod = info.material->BRDF(info, dir, 1)*2*pi*abs(info.normal*dir);
+
+	out.direction = dir;
+	Color c = mod*TracePathPrimitive(out)/0.8f;
+	return c;
+}
+
+/**
+ * Calculates one sample per pixel using path tracing from the given camera, into the given
+ * color buffer.
+ * 
+ * @param cam The camera from whose perspective we render.
+ * @param colBuf The color buffer that we dump pixel contributions into.
+ */
 void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
 {
     int xres = colBuf.GetXRes();
@@ -77,15 +97,31 @@ void PathTracer::Render(Camera& cam, ColorBuffer& colBuf)
     }
 }
 
+/**
+ * Saves information about the renderer to a bytestream.
+ * 
+ * @param stream The bytestream to stream to.
+ */
 void PathTracer::Save(Bytestream& stream) const
 {
     stream << ID_PATHTRACER;
 }
 
-void PathTracer::Load(Bytestream&)
+/**
+ * Loads the renderer from a bytestream.
+ * 
+ * @param stream The bytestream to stream from.
+ */
+void PathTracer::Load(Bytestream& stream)
 {
 }
 
+/**
+ * Calculates the contribution of one sample of the path tracing algorithm.
+ * 
+ * @param ray The ray to trace.
+ * @returns The contribution of the sample.
+ */
 Color PathTracer::TracePath(const Ray& ray)
 {
     const Primitive* minprimitive = nullptr;

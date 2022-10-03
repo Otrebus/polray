@@ -1,22 +1,26 @@
 #include "Ray.h"
 #include "IntersectionInfo.h"
 
-Ray::Ray(const Vector3d& org, const Vector3d& dir) : origin(org), direction(dir)
+/**
+ * Constructor
+ * 
+ * @param origin The origin of the ray.
+ * @param direction The direction of the ray.
+ */
+Ray::Ray(const Vector3d& origin, const Vector3d& direction) : origin(origin), direction(direction)
 {
 }
 
-Ray::Ray(const Vector3d& org, const Vector3d& dir, IntersectionInfo ii) : origin(org), direction(dir)
-{
-}
-
+/**
+ * Constructor.
+ */
 Ray::Ray()
 {
 }
 
-Ray::Ray(const Ray& r) : direction(r.direction), origin(r.origin)
-{
-}
-
+/**
+ * Destructor.
+ */
 Ray::~Ray()
 {
 }

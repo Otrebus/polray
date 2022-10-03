@@ -24,7 +24,6 @@ public:
     ColorBuffer GetImage();
 //private:
     void Thread();
-    static void __cdecl Thread(void*);
 
     std::shared_ptr<Renderer> renderer;
     std::shared_ptr<Estimator> estimator;

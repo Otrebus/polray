@@ -3,10 +3,18 @@
 #include "MeanEstimator.h"
 #include "Bytestream.h"
 
+/**
+ * Destructor.
+ */
 Estimator::~Estimator()
 {
 }
 
+/**
+ * Creates an estimator given an id (see ByteStream.h).
+ * 
+ * @returns The created estimator.
+ */
 Estimator* Estimator::Create(unsigned char id)
 {
     switch(id)
@@ -23,11 +31,21 @@ Estimator* Estimator::Create(unsigned char id)
     }
 }
 
+/**
+ * Returns the width of the buffer.
+ * 
+ * @returns The horizontal width of the buffer in terms of pixels.
+ */
 int Estimator::GetWidth() const
 {
     return width;
 }
 
+/**
+ * Returns the height of the buffer.
+ * 
+ * @returns The vertical span of the buffer in terms of pixels.
+ */
 int Estimator::GetHeight() const
 {
     return height;

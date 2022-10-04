@@ -5,6 +5,12 @@
 #include "LightPortal.h"
 #include "Utils.h"
 
+/**
+ * Checks if and where the given ray intersects the light.
+ * 
+ * @param ray The ray to check against the light.
+ * @returns The distance along the ray that the light source was hit.
+ */
 double Portal::Intersect(const Ray& ray) const
 {
     double u, v, t;
@@ -35,24 +41,48 @@ double Portal::Intersect(const Ray& ray) const
     return t <= 0 ? -inf : t;
 }
 
+/**
+ * Constructor.
+ */
 LightPortal::LightPortal()
 {
 }
 
+/**
+ * Destructor.
+ */
 LightPortal::~LightPortal()
 {
 }
 
+/**
+ * Adds a portal to the set of portals.
+ * 
+ * @param pos The position of the portal.
+ * @param v1 One vector of the parallelogram that forms the portal.
+ * @param v2 The other vector of the parallelogram that forms the portal.
+ */
 void LightPortal::AddPortal(Vector3d pos, Vector3d v1, Vector3d v2)
 {
     portals.push_back(Portal(pos, v1, v2));
 }
 
+/**
+ * Sets the light that is the source of the portal radiance.
+ * 
+ * @param l The light that shines through the portal.
+ */
 void LightPortal::SetLight(Light* l)
 {
     light = l;
 }
 
+/**
+ * Checks if and where the given ray intersects the light.
+ * 
+ * @param ray The ray to check against the light.
+ * @returns The distance along the ray that the light source was hit.
+ */
 double LightPortal::Intersect(const Ray& ray) const
 {
     for(auto p : portals)
@@ -71,11 +101,25 @@ double LightPortal::Intersect(const Ray& ray) const
     return -inf;
 }
 
+/**
+ * Returns the intersection info of a ray that hit the light.
+ * 
+ * @param ray The ray that hit the light.
+ * @param info The intersection info to fill in.
+ * @returns Whether the area light was actually hit by the ray.
+ */
 bool LightPortal::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
     return light->GenerateIntersectionInfo(ray, info);
 }
 
+/**
+ * Returns the value of the angle pdf of a ray that was sampled at the light source.
+ * 
+ * @param info Contains the point that we evaluate the pdf at.
+ * @param out The outgoing vector at that point.
+ * @returns The value of the angle pdf at the given point and outgoing vector.
+ */
 double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     Ray ray(info.position, out);
@@ -101,6 +145,12 @@ double LightPortal::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return 0;
 }
 
+/**
+ * Samples an outgoing ray from the light.
+ * 
+ * @param rnd The randomizer to sample with.
+ * @returns A tuple of the outgoing ray, its sampled color and normal and the area and angle pdfs.
+ */
 std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay(Randomizer& rnd) const
 {
     // Pick the portal that we will sample the light through
@@ -141,21 +191,36 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay(Randomi
     return { ray, std::abs(normal*ray.direction)*Color(1, 1, 1)/dirPdf, normal, lightAreaPdf, dirPdf };
 }
 
+/**
+ * Samples a random point of the area light.
+ * 
+ * @param rnd The randomizer to sample with.
+ * @returns A tuple of the point and its normal.
+ */
 std::tuple<Point, Normal> LightPortal::SamplePoint(Randomizer&) const
 {
     // Seems not to be used by any other light
     return { {}, {} };
 }
 
+/**
+ * Saves the light source to a stream.
+ * 
+ * @param stream The stream that we serialize to.
+ */
 void LightPortal::Save(Bytestream& stream) const
 {
-    stream << ID_LIGHTPORTAL;
-    stream << portals.size();
+    stream << ID_LIGHTPORTAL << portals.size();
     for(auto portal : portals)
         stream << portal.pos << portal.v1 << portal.v2;
     light->Save(stream);
 }
 
+/**
+ * Loads the light source from a stream.
+ * 
+ * @param stream The stream that we deserialize from.
+ */
 void LightPortal::Load(Bytestream& stream)
 {
     size_t portalSize;
@@ -173,16 +238,31 @@ void LightPortal::Load(Bytestream& stream)
     light->Load(stream);
 }
 
+/**
+ * Returns the area of the light.
+ * 
+ * @returns The area of the light.
+ */
 double LightPortal::GetArea() const
 {
     return light->GetArea();
 }
 
+/**
+ * Returns the radiance that the light emits in every direction.
+ * 
+ * @returns The emitted radiance.
+ */
 Color LightPortal::GetIntensity() const
 {
     return light->GetIntensity();
 }
 
+/**
+ * Adds the light to a scene.
+ * 
+ * @param scn The scene to add to.
+ */
 void LightPortal::AddToScene(Scene* scn)
 {
     light->material->light = this;
@@ -190,6 +270,16 @@ void LightPortal::AddToScene(Scene* scn)
     light->scene = scn;
 }
 
+/**
+ * Estimates the integral of the rendering equation in the solid angle area that this light spans
+ * on the surface of the given intersection info.
+ * 
+ * @param renderer The renderer that calculates the next event estimation.
+ * @param info The intersection info at the point whose rendering equation integral we calculate.
+ * @param rnd The randomizer.
+ * @param component The component of the brdf.
+ * @returns A tuple of the estimate and the point estimated on the light source.
+ */
 std::tuple<Color, Point> LightPortal::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
     auto [color, lightPoint] = light->NextEventEstimation(renderer, info, rnd, component);

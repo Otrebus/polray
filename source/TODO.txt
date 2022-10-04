@@ -4,7 +4,12 @@ Clean up pathtracer/lighttracer
 Do same as with MeshTriangle with std::tuple<bool, BoundingBox> Triangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 Remove first two parameters from double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
 double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const
-GenerateIntersectionInfo return tuple?
+GenerateIntersectionInfo return tuple
+Arealight pdf, instead of info + vector maybe just ray as argument
+
+The camera model/sampling should be recoded
+
+"Seems not to be used by any other light"
 
 Remove scene->addlight?
 Use more modern threads, and the same mutices (lol) as in bdpt

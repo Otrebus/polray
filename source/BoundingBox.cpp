@@ -30,8 +30,8 @@ BoundingBox::BoundingBox()
  * Checks if a ray intersects with the bounding box.
  * 
  * @param ray The ray to intersect with.
- * @param tnear The closest parametric distance along the ray to count as an intersection.
- * @param tfar The farthest parametric distance along the ray to count as an intersection.
+ * @param tnear The closest distance along the ray to count as an intersection.
+ * @param tfar The farthest distance along the ray to count as an intersection.
  * @returns True if there's an intersection in a distance along the ray in [tnear, tfar].
  */
 bool BoundingBox::Intersect(const Ray& ray, double& tnear, double& tfar) const

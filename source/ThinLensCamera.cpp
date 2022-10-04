@@ -3,16 +3,25 @@
 #include "Utils.h"
 #include "Ray.h"
 
-//------------------------------------------------------------------------------
-// Constructor.
-//------------------------------------------------------------------------------
+/**
+ * Constructor.
+ */
 ThinLensCamera::ThinLensCamera()
 {
 }
 
-//------------------------------------------------------------------------------
-// Constructor.
-//------------------------------------------------------------------------------
+/**
+ * Constructor.
+ * 
+ * @param aup The up vector.
+ * @param apos The position of the camera.
+ * @param adir The direction the camera points in.
+ * @param xres The horizontal resolution of the camera.
+ * @param yres The vertical resolution of the camera.
+ * @param fov The horizontal field of view of the camera.
+ * @param focalLength The focal length of the camera.
+ * @param lensRadius The radius of the lens.
+ */
 ThinLensCamera::ThinLensCamera(const Vector3d& up, const Vector3d& pos, const Vector3d& dir, int xres, int yres, double fov, double focalLength, double lensRadius) 
     : Camera(up, pos, dir, xres, yres, fov), focalLength(focalLength), lensRadius(lensRadius)
 {
@@ -21,17 +30,24 @@ ThinLensCamera::ThinLensCamera(const Vector3d& up, const Vector3d& pos, const Ve
     #endif
 }
 
-//------------------------------------------------------------------------------
-// Destructor.
-//------------------------------------------------------------------------------
+/**
+ * Destructor.
+ */
 ThinLensCamera::~ThinLensCamera()
 {
 }
 
-//------------------------------------------------------------------------------
-// Returns the ray originating on pixel (x, y) with internal pixel coordinate
-// (a, b) that was refracted through polar coordinates (u, v) on the lens.
-//------------------------------------------------------------------------------
+/**
+ * Returns the ray that starts from pixel (x, y) with internal pixel coordinate (a, b)
+ * that goes through the camera pinhole.
+ * 
+ * @param x The horizontal component of the pixel coordinate.
+ * @param y The vertical component of the pixel coordinate.
+ * @param a The horizontal component of the coordinate inside the pixel.
+ * @param b The vertical component of the coordinate inside the pixel.
+ * @returns Whether the ray is in front of the camera, and the coordinate on the film plane
+ *          that it hits.
+ */
 Ray ThinLensCamera::GetRayFromPixel(int x, int y, double a, double b, double u, double v) const
 {
     double rx = halfwidth*(2.f*double(x) - double(xres) + (2.f*a)) / double(xres);
@@ -53,12 +69,15 @@ Ray ThinLensCamera::GetRayFromPixel(int x, int y, double a, double b, double u, 
     return outRay;
 }
 
-//------------------------------------------------------------------------------
-// Returns the pixel coordinates that a ray strikes on the pinhole camera film
-// plane. The ray is assumed to always go through the pinhole: the function
-// returns false only if the ray does not hit the film plane (screen), or if
-// it starts behind the camera or heads away from the camera.
-//------------------------------------------------------------------------------
+/**
+ * Returns the pixel coordinates that a ray strikes on the camera film plane.
+ * 
+ * @param ray The ray that strikes the camera.
+ * @param u The parametric angle on the lens in [0, 1].
+ * @param v The parametric radius on the lens in [0, 1].
+ * @returns Whether the ray is in front of the camera, and the coordinate on the film plane
+ *          that it hits.
+ */
 std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, double u, double v) const
 {
     if(ray.direction*dir > 0) // Ray shooting away from camera
@@ -102,9 +121,11 @@ std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, doubl
 }
 
 
-//------------------------------------------------------------------------------
-// Randomly samples the camera aperture
-//------------------------------------------------------------------------------
+/**
+ * Samples a point on the aperture.
+ * 
+ * @returns The parametric coordinates of the sampled point, and the position vector of the point.
+ */
 std::tuple<double, double, Vector3d> ThinLensCamera::SampleAperture() const
 {
     double u = random.GetDouble(0, 2*pi);
@@ -114,12 +135,22 @@ std::tuple<double, double, Vector3d> ThinLensCamera::SampleAperture() const
     return { u, v, position };
 }
 
+/**
+ * Loads the camera from a bytestream.
+ * 
+ * @param stream The stream to serialize from.
+ */
 void ThinLensCamera::Save(Bytestream& stream) const
 {
     stream << ID_THINLENSCAMERA << pos << dir << up << halfwidth << xres << yres 
            << focalLength << lensRadius;
 }
 
+/**
+ * Saves the camera to a bytestream.
+ * 
+ * @param stream The bytestream to serialize to.
+ */
 void ThinLensCamera::Load(Bytestream& stream)
 {
     stream >> pos >> dir >> up >> halfwidth >> xres >> yres 

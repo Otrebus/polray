@@ -156,7 +156,7 @@ double IntersectSphere(const Vector3d& position, double radius, const Ray& ray)
  * @param v1 A vertex of the triangle.
  * @param v2 A vertex of the triangle.
  * @param ray The ray to intersect the triangle with.
- * @returns A tuple of { t, u, v } where t is the parametric distance along the ray, and u and v
+ * @returns A tuple of { t, u, v } where t is the distance along the ray, and u and v
  *          are the parameters of the intersection in the triangle as v0 + u(v1-v0) + v(v2-v0).
  *          If there is no intersection, t = -inf.
  */

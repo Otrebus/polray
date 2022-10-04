@@ -6,14 +6,28 @@
 #include "MeshLight.h"
 #include "Bytestream.h"
 
+/**
+ * Constructor.
+ */
 Light::Light()
 {
 }
 
+/**
+ * Constructor.
+ * 
+ * @param intensity The radiance emitted by the light.
+ */
 Light::Light(Color intensity) : intensity_(intensity)
 {
 }
 
+/**
+ * Creates a light given the id of the light type.
+ * 
+ * @param c The id of the light (see Bytestream.h).
+ * @returns A pointed to the created light.
+ */
 Light* Light::Create(unsigned char c)
 {
     if(c == ID_AREALIGHT)
@@ -33,6 +47,11 @@ Light* Light::Create(unsigned char c)
     }
 }
 
+/**
+ * Returns the radiance emission of the light.
+ * 
+ * @returns The radiance that the light emits.
+ */
 Color Light::GetIntensity() const
 {
     return intensity_;

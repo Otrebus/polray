@@ -5,10 +5,20 @@
 #include "SphereLight.h"
 #include "Utils.h"
 
+/**
+ * Constructor.
+ */
 SphereLight::SphereLight()
 {
 }
 
+/**
+ * Constructor.
+ * 
+ * @param pos The position of the light.
+ * @param rad The radius of the light.
+ * @param str The intensity of the light.
+ */
 SphereLight::SphereLight(Vector3d pos, double rad, Color str)
     : position_(pos), radius_(rad), Light(str)
 {
@@ -20,15 +30,31 @@ SphereLight::SphereLight(Vector3d pos, double rad, Color str)
     material->light = this;
 }
 
+/**
+ * Destructor.
+ */
 SphereLight::~SphereLight()
 {
 }
 
+/**
+ * Checks if and where the given ray intersects the light.
+ * 
+ * @param ray The ray to check against the light.
+ * @returns The distance along the ray that the light source was hit.
+ */
 double SphereLight::Intersect(const Ray& ray) const
 {
     return IntersectSphere(position_, radius_, ray);
 }
 
+/**
+ * Returns the intersection info of a ray that hit the light.
+ * 
+ * @param ray The ray that hit the light.
+ * @param info The intersection info to fill in.
+ * @returns Whether the area light was actually hit by the ray.
+ */
 bool SphereLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
     double t = IntersectSphere(position_, radius_, ray);
@@ -49,6 +75,12 @@ double SphereLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
     return std::max(0.0, (out*info.normal)/pi);
 }
 
+/**
+ * Samples an outgoing ray from the light.
+ * 
+ * @param rnd The randomizer to sample with.
+ * @returns A tuple of the outgoing ray, its sampled color and normal and the area and angle pdfs.
+ */
 std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> SphereLight::SampleRay(Randomizer& rnd) const
 {
     Ray ray;
@@ -76,20 +108,34 @@ std::tuple<Point, Normal> SphereLight::SamplePoint(Randomizer& rnd) const
     return { point, normal };
 }
 
-void SphereLight::Save(Bytestream& s) const
+/**
+ * Saves the light source to a stream.
+ * 
+ * @param stream The stream that we serialize to.
+ */
+void SphereLight::Save(Bytestream& stream) const
 {
-    s << ID_SPHERELIGHT << position_.x << position_.y << position_.z
-      << radius_ << intensity_;
+    stream << ID_SPHERELIGHT << position_.x << position_.y << position_.z << radius_ << intensity_;
 }
-void SphereLight::Load(Bytestream& s)
+
+/**
+ * Loads the light source from a stream.
+ * 
+ * @param stream The stream that we deserialize from.
+ */
+void SphereLight::Load(Bytestream& stream)
 {
-    s >> position_.x >> position_.y >> position_.z 
-      >> radius_ >> intensity_;
+    stream >> position_.x >> position_.y >> position_.z >> radius_ >> intensity_;
     material = new EmissiveMaterial();
     material->emissivity = intensity_;
     material->light = this;
 }
 
+/**
+ * Returns the area of the light.
+ * 
+ * @returns The area of the light.
+ */
 double SphereLight::GetArea() const
 {
     return 4*pi*radius_*radius_;
@@ -104,6 +150,16 @@ void SphereLight::AddToScene(Scene* scn)
     s->SetMaterial(material);
 }
 
+/**
+ * Estimates the integral of the rendering equation in the solid angle area that this light spans
+ * on the surface of the given intersection info.
+ * 
+ * @param renderer The renderer that calculates the next event estimation.
+ * @param info The intersection info at the point whose rendering equation integral we calculate.
+ * @param rnd The randomizer.
+ * @param component The component of the brdf.
+ * @returns A tuple of the estimate and the point estimated on the light source.
+ */
 std::tuple<Color, Point> SphereLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
     Vector3d lightPoint, lightNormal;

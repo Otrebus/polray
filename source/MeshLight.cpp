@@ -31,6 +31,11 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
     builtTree = true;
 }
 
+/**
+ * Constructor.
+ * 
+ * @param intensity The radiance that the light lets out in every direction.
+ */
 MeshLight::MeshLight(Color intensity)
 {
 #ifdef DETERMINISTIC
@@ -45,10 +50,18 @@ MeshLight::MeshLight(Color intensity)
     builtTree = false;
 }
 
+/**
+ * Constructor.
+ */
 MeshLight::MeshLight()
 {
 }
 
+/**
+ * Picks a random triangle inside the mesh light weighted by area.
+ * 
+ * @param rnd The randomizer used to generate random numbers.
+ */
 MeshTriangle* MeshLight::PickRandomTriangle(Randomizer& rnd) const
 {
     if(!builtTree)
@@ -75,6 +88,16 @@ MeshTriangle* MeshLight::PickRandomTriangle(Randomizer& rnd) const
             node = node->rightChild;
 }
 
+/**
+ * Builds the acceleration tree structure of the mesh light that speeds up triangle picking.
+ * 
+ * @param from The first triangle to put into the tree.
+ * @param to The first triangle to not put into the tree.
+ * @param area The total area of the triangles we put into the tree.
+ * @param areaStart The total area of the triangles before 'from'.
+ * 
+ * @returns A pointer to the root of the tree.
+ */
 TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaStart) const
 {
     std::vector<MeshTriangle*>& triangles = mesh->triangles;
@@ -106,6 +129,12 @@ TriangleNode* MeshLight::BuildTree(int from, int to, double area, double areaSta
     return node;
 }
 
+/**
+ * Samples an outgoing ray from the light.
+ * 
+ * @param rnd The randomizer to sample with.
+ * @returns A tuple of the outgoing ray, its sampled color and normal and the area and angle pdfs.
+ */
 std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> MeshLight::SampleRay(Randomizer& rnd) const
 {
     Ray ray;
@@ -124,10 +153,19 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> MeshLight::SampleRay(Randomize
     return { ray, Color::Identity*pi, normal, areaPdf, anglePdf };
 }
 
+/**
+ * Destructor.
+ */
 MeshLight::~MeshLight()
 {
 }
 
+/**
+ * Checks if and where the given ray intersects the light.
+ * 
+ * @param ray The ray to check against the light.
+ * @returns The distance along the ray that the light source was hit.
+ */
 double MeshLight::Intersect(const Ray&) const
 {    
     /*if(!builtTree) {
@@ -148,6 +186,13 @@ double MeshLight::Intersect(const Ray&) const
     return -inf;
 }
 
+/**
+ * Returns the intersection info of a ray that hit the light.
+ * 
+ * @param ray The ray that hit the light.
+ * @param info The intersection info to fill in.
+ * @returns Whether the area light was actually hit by the ray.
+ */
 bool MeshLight::GenerateIntersectionInfo(const Ray&, IntersectionInfo&) const
 {
     /*if(!builtTree) {
@@ -168,11 +213,24 @@ bool MeshLight::GenerateIntersectionInfo(const Ray&, IntersectionInfo&) const
     return false;
 }
 
+/**
+ * Returns the value of the angle pdf of a ray that was sampled at the light source.
+ * 
+ * @param info Contains the point that we evaluate the pdf at.
+ * @param out The outgoing vector at that point.
+ * @returns The value of the angle pdf at the given point and outgoing vector.
+ */
 double MeshLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     return out*info.geometricnormal/pi;
 }
 
+/**
+ * Samples a random point of the area light.
+ * 
+ * @param rnd The randomizer to sample with.
+ * @returns A tuple of the point and its normal.
+ */
 std::tuple<Point, Normal> MeshLight::SamplePoint(Randomizer& rnd) const
 {
     MeshTriangle* t = PickRandomTriangle(rnd);
@@ -189,11 +247,21 @@ std::tuple<Point, Normal> MeshLight::SamplePoint(Randomizer& rnd) const
     return { point, normal };
 }
 
+/**
+ * Performs a linear transform of the model of the light.
+ * 
+ * @param m The matrix that describes the transformation.
+ */
 void MeshLight::Transform(const Matrix3d& m)
 {
     mesh->Transform(m);
 }
 
+/**
+ * Saves the light source to a stream.
+ * 
+ * @param stream The stream that we serialize to.
+ */
 void MeshLight::Save(Bytestream& stream) const
 {
     stream << (unsigned char)ID_MESHLIGHT;
@@ -201,6 +269,11 @@ void MeshLight::Save(Bytestream& stream) const
     stream << intensity_;
 }
 
+/**
+ * Loads the light source from a stream.
+ * 
+ * @param stream The stream that we deserialize from.
+ */
 void MeshLight::Load(Bytestream& stream)
 {
     mesh = new TriangleMesh();
@@ -211,6 +284,11 @@ void MeshLight::Load(Bytestream& stream)
     stream >> intensity_;
 }
 
+/**
+ * Returns the area of the light.
+ * 
+ * @returns The area of the light.
+ */
 double MeshLight::GetArea() const
 {
     if(!builtTree) {
@@ -224,6 +302,11 @@ double MeshLight::GetArea() const
     return area_;
 }
 
+/**
+ * Adds the light to a scene.
+ * 
+ * @param scn The scene to add the light to.
+ */
 void MeshLight::AddToScene(Scene* scn)
 {
     for(auto& t : mesh->triangles)
@@ -231,7 +314,16 @@ void MeshLight::AddToScene(Scene* scn)
     Scene::LightAdder::AddLight(*scn, this);
 }
 
-
+/**
+ * Estimates the integral of the rendering equation in the solid angle area that this light spans
+ * on the surface of the given intersection info.
+ * 
+ * @param renderer The renderer that calculates the next event estimation.
+ * @param info The intersection info at the point whose rendering equation integral we calculate.
+ * @param rnd The randomizer.
+ * @param component The component of the brdf.
+ * @returns A tuple of the estimate and the point estimated on the light source.
+ */
 std::tuple<Color, Point> MeshLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
     auto [lightPoint, lightNormal] = SamplePoint(rnd);
@@ -256,9 +348,4 @@ std::tuple<Color, Point> MeshLight::NextEventEstimation(const Renderer* renderer
         }
     }
     return { Color(0, 0, 0), lightPoint };
-}
-
-Color MeshLight::GetIntensity() const
-{
-    return intensity_;
 }

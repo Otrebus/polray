@@ -4,21 +4,32 @@
 #include "UniformEnvironmentLight.h"
 #include "GeometricRoutines.h"
 
-
+/**
+ * Constructor.
+ */
 UniformEnvironmentLight::UniformEnvironmentLight()
 {
     material = new EmissiveMaterial();
 }
 
+/**
+ * Constructor.
+ * 
+ * @param position The position of the light.
+ * @param radius The radius of the light.
+ * @param color The radiance that the light emits in every direction.
+ */
 UniformEnvironmentLight::UniformEnvironmentLight(const Vector3d& position, double radius, const Color& color) : position(position), radius(radius), intensity(color)
 {
     material = new EmissiveMaterial();
     intensity = color;
-#ifdef DETERMINISTIC
-    r.Seed(0);
-#endif
 }
 
+/**
+ * Adds the light to the scene.
+ * 
+ * @param scn The scene to add to.
+ */
 void UniformEnvironmentLight::AddToScene(Scene* scn)
 {
     material->light = this;
@@ -27,16 +38,34 @@ void UniformEnvironmentLight::AddToScene(Scene* scn)
     scene = scn;
 }
 
+/**
+ * Returns the area of the light.
+ * 
+ * @returns The area of the light.
+ */
 double UniformEnvironmentLight::GetArea() const
 {
     return radius*radius*4*pi;
 }
 
+/**
+ * Checks if and where the given ray intersects the light.
+ * 
+ * @param ray The ray to check against the light.
+ * @returns The distance along the ray that the light source was hit.
+ */
 double UniformEnvironmentLight::Intersect(const Ray& ray) const
 {
     return IntersectSphere(position, radius, ray);
 }
 
+/**
+ * Returns the intersection info of a ray that hit the light.
+ * 
+ * @param ray The ray that hit the light.
+ * @param info The intersection info to fill in.
+ * @returns Whether the area light was actually hit by the ray.
+ */
 bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
     double t = IntersectSphere(position, radius, ray);
@@ -52,6 +81,12 @@ bool UniformEnvironmentLight::GenerateIntersectionInfo(const Ray& ray, Intersect
     return true;
 }
 
+/**
+ * Samples an outgoing ray from the light.
+ * 
+ * @param rnd The randomizer to sample with.
+ * @returns A tuple of the outgoing ray, its sampled color and normal and the area and angle pdfs.
+ */
 std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> UniformEnvironmentLight::SampleRay(Randomizer& rnd) const
 {
     Ray ray;
@@ -87,6 +122,13 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> UniformEnvironmentLight::Sampl
     return { ray, Color::Identity, Vector3d(1, 1, 1), 1, 1 }; // Should never happen
 }
 
+/**
+ * Returns the value of the angle pdf of a ray that was sampled at the light source.
+ * 
+ * @param info Contains the point that we evaluate the pdf at.
+ * @param out The outgoing vector at that point.
+ * @returns The value of the angle pdf at the given point and outgoing vector.
+ */
 double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d& out) const
 {
     auto n = info.normal;
@@ -98,6 +140,12 @@ double UniformEnvironmentLight::Pdf(const IntersectionInfo& info, const Vector3d
     return r*r/std::abs(out*n)/A;
 }
 
+/**
+ * Samples a random point of the area light.
+ * 
+ * @param rnd The randomizer to sample with.
+ * @returns A tuple of the point and its normal.
+ */
 std::tuple<Point, Normal> UniformEnvironmentLight::SamplePoint(Randomizer& rnd) const
 {
     auto r1 = rnd.GetDouble(0, 1), r2 = rnd.GetDouble(0, 1);
@@ -107,24 +155,39 @@ std::tuple<Point, Normal> UniformEnvironmentLight::SamplePoint(Randomizer& rnd) 
     return { point, normal };
 }
 
-Color UniformEnvironmentLight::GetIntensity() const 
+/**
+ * Saves the light source to a stream.
+ * 
+ * @param stream The stream that we serialize to.
+ */
+void UniformEnvironmentLight::Save(Bytestream& stream) const
 {
-    return intensity;
+    stream << ID_UNIFORMENVIRONMENTLIGHT << position.x << position.y << position.z << radius << intensity;
 }
 
-void UniformEnvironmentLight::Save(Bytestream& s) const
+/**
+ * Loads the light source from a stream.
+ * 
+ * @param stream The stream that we deserialize from.
+ */
+void UniformEnvironmentLight::Load(Bytestream& stream)
 {
-    s << ID_UNIFORMENVIRONMENTLIGHT << position.x << position.y << position.z << radius << intensity;
-}
-void UniformEnvironmentLight::Load(Bytestream& s)
-{
-    s >> position.x >> position.y >> position.z 
-      >> radius >> intensity;
+    stream >> position.x >> position.y >> position.z >> radius >> intensity;
     material = new EmissiveMaterial();
     material->emissivity = intensity;
     material->light = this;
 }
 
+/**
+ * Estimates the integral of the rendering equation in the solid angle area that this light spans
+ * on the surface of the given intersection info.
+ * 
+ * @param renderer The renderer that calculates the next event estimation.
+ * @param info The intersection info at the point whose rendering equation integral we calculate.
+ * @param rnd The randomizer.
+ * @param component The component of the brdf.
+ * @returns A tuple of the estimate and the point estimated on the light source.
+ */
 std::tuple<Color, Point> UniformEnvironmentLight::NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const
 {
     auto [lightPoint, lightNormal] = SamplePoint(rnd);

@@ -40,7 +40,7 @@
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
 
-//#define INTERIOR
+#define INTERIOR
 //#define CUBE
 //#define TEAPOTWITHOUTNORMALS
 //#define INTERIORSKY
@@ -50,7 +50,7 @@
 //#define MESHLIGHTBOX
 //#define ROOM
 //#define EMPTYBOX
-#define KITCHEN2
+//#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
 //#define BALLSBOX
@@ -166,8 +166,8 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     Vector3d target = Vector3d(157, 159, -209);
     Vector3d camdir = target-camPos;
     camdir.Normalize();
-    s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).Length(), 10.15));
-    //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, (Vector3d(120, 161, -139)-camPos).Length(), 10.15));
+    s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
 
 
     // tmp
@@ -179,10 +179,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //camdir.Normalize();
     //s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 40));
 
-    Random ballsR(47);
-    Random test(1);
+    Randomizer ballsR(47);
+    Randomizer test(1);
 
-    Random ballsC(0);
+    Randomizer ballsC(0);
 
     //auto portalLight = new AreaLight(Vector3d(-79, 387, 263), Vector3d(0, 15.0, 0.0), Vector3d(0.0, 0.0, 15.0), Color(7500, 7500, 7500));
     //auto portalLight = new SphereLight(Vector3d(301, 370, -154), 0.11, Color(5000000, 5000000, 5000000));

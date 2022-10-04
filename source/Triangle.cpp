@@ -46,7 +46,7 @@ Triangle::~Triangle()
  * Intersects the MeshTriangle with a ray.
  * 
  * @param ray The ray that hit the triangle.
- * @returns The parametric distance along the ray that the triangle was hit, or -inf if it
+ * @returns The distance along the ray that the triangle was hit, or -inf if it
  * wasn't hit.
  */
 double Triangle::Intersect(const Ray& ray) const

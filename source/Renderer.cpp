@@ -36,7 +36,7 @@ Renderer::~Renderer()
  * Traces a shadow ray through the scene.
  * 
  * @param ray The ray to trace.
- * @param tmax The maximum parametric distance along the ray to search for hits.
+ * @param tmax The maximum distance along the ray to search for hits.
  * @returns True if the ray was not intersected.
  */
 bool Renderer::TraceShadowRay(const Ray& ray, double tmax) const

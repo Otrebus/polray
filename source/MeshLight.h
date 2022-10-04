@@ -33,7 +33,6 @@ public:
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
     virtual double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
-    Color GetIntensity() const;
 
     std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer&, int component) const;
 
@@ -43,8 +42,6 @@ public:
     virtual void Load(Bytestream& s);
 
     void Transform(const Matrix3d& m);
-
-    void AddPortal(const Vector3d& pos, const Vector3d& v1, const Vector3d& v2);
 
     TriangleMesh* mesh;
 

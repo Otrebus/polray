@@ -450,10 +450,10 @@ void KDTree::Build(const std::vector<const Primitive*>& shapes)
  * Intersects the contents of the K-d tree with a ray.
  * 
  * @param ray The ray to intersect with.
- * @param tmin The smallest parametric distance along the ray to find intersections.
- * @param tmax The greatest parametric distance along the ray to find intersections.
+ * @param tmin The smallest distance along the ray to find intersections.
+ * @param tmax The greatest distance along the ray to find intersections.
  * @param returnPrimitive Whether to find the smallest t and return the primitive that was intersected.
- * @returns The parametric distance along the ray that the intersection happened, or -inf if
+ * @returns The distance along the ray that the intersection happened, or -inf if
  *          no intersection happened, along with the primitive that was intersected.
  */
 std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double tmin, double tmax, bool returnPrimitive=false) const
@@ -511,13 +511,13 @@ std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double 
  * 
  * @param ray The ray to intersect with.
  * @param primitive The intersected triangle.
- * @param tmin The smallest parametric distance along the ray to find intersections.
- * @param tmax The greatest parametric distance along the ray to find intersections.
- * @param returnPrimitive Whether to find the smallest parametric distance along the ray that the
+ * @param tmin The smallest distance along the ray to find intersections.
+ * @param tmax The greatest distance along the ray to find intersections.
+ * @param returnPrimitive Whether to find the smallest distance along the ray that the
                           primitive was intersected and return the primitive that was
-                          intersected, or just reporting any parametric distance and returning no
+                          intersected, or just reporting any distance and returning no
                           primitive.
- * @returns The parametric distance along the ray that the intersection happened, or -inf if
+ * @returns The distance along the ray that the intersection happened, or -inf if
  *          no intersection happened.
  */
 double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const

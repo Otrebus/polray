@@ -122,7 +122,7 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double cont
  * Traces a shadow ray and checks of it's occluded.
  * 
  * @param ray The ray to trace.
- * @param tmax The maximum parametric distance along the ray to trace.
+ * @param tmax The maximum distance along the ray to trace.
  * @returns True if the shadow ray hits something before tmax.
  */
 bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const

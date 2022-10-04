@@ -180,7 +180,7 @@ bool Scene::Intersect(const Ray& ray, double tmax) const
  * @param ray The ray to intersect the scene with.
  * @param p The primitive that was hit, if any.
  * @param l The light that was hit, if any.
- * @returns The parametric distance along the ray that the entity was hit.
+ * @returns The distance along the ray that the entity was hit.
  */
 double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const
 {

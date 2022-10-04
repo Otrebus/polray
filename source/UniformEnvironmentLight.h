@@ -22,7 +22,6 @@ public:
     bool GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const;
 
     double Pdf(const IntersectionInfo& info, const Vector3d& out) const;
-    Color GetIntensity() const;
 
     std::tuple<Color, Point> NextEventEstimation(const Renderer* renderer, const IntersectionInfo& info, Randomizer& rnd, int component) const;
 

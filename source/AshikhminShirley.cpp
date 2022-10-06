@@ -22,6 +22,11 @@ AshikhminShirley::~AshikhminShirley()
 {
 }
 
+/**
+ * Reads the properties of the material from a stringstream (from a .mtl file).
+ * 
+ * @param ss The stringstream.
+ */
 void AshikhminShirley::ReadProperties(std::stringstream& ss)
 {
     while(!ss.eof())

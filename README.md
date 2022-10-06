@@ -1,4 +1,5 @@
 # Polray
+![Demo](./renders/demo.gif)
 ## Description
 A physically-based CPU renderer.
 
@@ -22,6 +23,5 @@ Materials
 * Isotropic Ashikhmin-shirley
 * Phong
 * Diffuse lambertian
-
-## Screenshots
-![Demo](demo.gif)
+* Dielectric
+* Mirror

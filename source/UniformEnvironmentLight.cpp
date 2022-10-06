@@ -207,6 +207,15 @@ std::tuple<Color, Point> UniformEnvironmentLight::NextEventEstimation(const Rend
     return { Color(0, 0, 0), lightPoint };
 }
 
+/**
+ * Returns the scene hull projected on a plane which runs through the center of the bounding box
+ * of the scene, and is perpendicular against the origin of the given ray towards that center.
+ * 
+ * @param ray The ray from whose origin we project the scene.
+ * @param normal The normal of the environment light at the point of the origin.
+ * @returns A tuple of the convex hull, its area, the basis of the coordinates of the convex hull,
+ *          and the vector between the ray origin and the bounding box center
+ */
 std::tuple<std::vector<Vector2d>, double, Vector3d, Vector3d, Vector3d> UniformEnvironmentLight::GetProjectedSceneHull(Ray& ray, Vector3d normal) const
 {
     auto bb = scene->GetBoundingBox();

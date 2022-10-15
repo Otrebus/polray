@@ -1,5 +1,5 @@
 # Polray
-![Demo](./renders/demo.gif)
+![Screenshot](./renders/kitchen.png)
 ## Description
 A physically-based CPU renderer.
 

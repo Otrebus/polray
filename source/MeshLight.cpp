@@ -16,7 +16,7 @@ MeshLight::MeshLight(Color intensity, std::string fileName)
     material->light = this;
     material->emissivity = intensity;
     mesh = new TriangleMesh(fileName, material);
-    intensity_ = intensity;
+    this->intensity = intensity;
 
     area_ = 0;
     for(auto it = mesh->triangles.cbegin(); it < mesh->triangles.cend(); it++)
@@ -46,7 +46,7 @@ MeshLight::MeshLight(Color intensity)
     material->emissivity = intensity;
     mesh = new TriangleMesh();
     mesh->materials.push_back(material);
-    intensity_ = intensity;
+    this->intensity = intensity;
     builtTree = false;
 }
 
@@ -266,7 +266,7 @@ void MeshLight::Save(Bytestream& stream) const
 {
     stream << (unsigned char)ID_MESHLIGHT;
     mesh->Save(stream);
-    stream << intensity_;
+    stream << intensity;
 }
 
 /**
@@ -281,7 +281,7 @@ void MeshLight::Load(Bytestream& stream)
     stream >> dummy;
     mesh->Load(stream);
     mesh->materials[0]->light = this;
-    stream >> intensity_;
+    stream >> intensity;
 }
 
 /**
@@ -337,13 +337,13 @@ std::tuple<Color, Point> MeshLight::NextEventEstimation(const Renderer* renderer
 
         Ray lightRay = Ray(info.position, toLight);
 
-        if(renderer->TraceShadowRay(lightRay, (1-1e-6)*d))
+        if(renderer->TraceShadowRay(lightRay, (1-eps)*d))
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
             Color c;
             c = info.material->BRDF(info, toLight, component)
-                *costheta*cosphi*intensity_*GetArea()/(d*d);
+                *costheta*cosphi*intensity*GetArea()/(d*d);
             return { c, lightPoint };
         }
     }

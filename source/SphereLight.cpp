@@ -115,7 +115,7 @@ std::tuple<Point, Normal> SphereLight::SamplePoint(Randomizer& rnd) const
  */
 void SphereLight::Save(Bytestream& stream) const
 {
-    stream << ID_SPHERELIGHT << position_.x << position_.y << position_.z << radius_ << intensity_;
+    stream << ID_SPHERELIGHT << position_.x << position_.y << position_.z << radius_ << intensity;
 }
 
 /**
@@ -125,9 +125,9 @@ void SphereLight::Save(Bytestream& stream) const
  */
 void SphereLight::Load(Bytestream& stream)
 {
-    stream >> position_.x >> position_.y >> position_.z >> radius_ >> intensity_;
+    stream >> position_.x >> position_.y >> position_.z >> radius_ >> intensity;
     material = new EmissiveMaterial();
-    material->emissivity = intensity_;
+    material->emissivity = intensity;
     material->light = this;
 }
 
@@ -184,7 +184,7 @@ std::tuple<Color, Point> SphereLight::NextEventEstimation(const Renderer* render
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
             Color c;
-            c = info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(2*d*d);
+            c = info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(2*d*d);
             return { c, lightPoint };
         }
     }

@@ -74,7 +74,7 @@ bool Sphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) co
 
     info.normal = (ray.origin + ray.direction*t) - position;
     info.normal.Normalize();
-    info.position = ray.origin + ray.direction*t + info.normal*1e-6;
+    info.position = ray.origin + ray.direction*t + info.normal*eps;
 
     // Texture coordinates - there are probably better methods than this one
     Vector3d v = info.position - position;

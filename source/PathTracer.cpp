@@ -55,7 +55,7 @@ Color PathTracer::TracePathPrimitive(const Ray& ray)
             N_g = -N_g;
 		dir = Vector3d(m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1), m_random.GetDouble(-1, 1));
 
-		out.origin = info.position + 0.0001*N_g;
+		out.origin = info.position + eps*N_g;
 		if(dir.Length() > 1)
 			continue;
 		else if(dir*N_g < 0)

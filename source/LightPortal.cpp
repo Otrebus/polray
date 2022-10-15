@@ -174,7 +174,7 @@ std::tuple<Ray, Color, Normal, AreaPdf, AnglePdf> LightPortal::SampleRay(Randomi
     portalNormal.Normalize();
 
     double x = rnd.GetDouble(0, 1.f), y = rnd.GetDouble(0, 1.f);
-    auto portalPos = portal.pos + portal.v1*x + portal.v2*y + (0.0001)*portalNormal;
+    auto portalPos = portal.pos + portal.v1*x + portal.v2*y + eps*portalNormal;
 
     // Sample the light and calculate the resulting pdfs
     auto [lightRay, color, normal, lightAreaPdf, lightAnglePdf] = light->SampleRay(rnd);

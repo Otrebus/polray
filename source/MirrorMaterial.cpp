@@ -1,6 +1,7 @@
 #include "Bytestream.h"
 #include "MirrorMaterial.h"
 #include "Sample.h"
+#include "Utils.h"
 #include "IntersectionInfo.h"
 #include "GeometricRoutines.h"
 #include <sstream>
@@ -48,7 +49,7 @@ Sample MirrorMaterial::GetSample(const IntersectionInfo& info, Randomizer&, bool
 
     Ray out;
     out.direction = Reflect(info.direction, normal);
-    out.origin = info.position + normal*0.0001;
+    out.origin = info.position + normal*eps;
     out.direction.Normalize();
 
     return Sample((adjoint ? abs(out.direction*Ng)/abs(in*Ng) : 1.0)*Color(1, 1, 1), out, 1, 1, true, 1);

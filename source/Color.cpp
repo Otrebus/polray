@@ -234,16 +234,6 @@ bool Color::operator!() const
 }
 
 /**
- * Returns the maximum component of the color.
- * 
- * @returns The greatest of the r, g, and b components of the color.
- */
-double Color::GetMax() const
-{
-    return max(r, g, b);
-}
-
-/**
  * Returns the luma of the color.
  * 
  * @returns The luma of the color.

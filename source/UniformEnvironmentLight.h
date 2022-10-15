@@ -37,6 +37,5 @@ protected:
 
     friend class Scene;
     double radius;
-    Color intensity;
     Vector3d position;
 };

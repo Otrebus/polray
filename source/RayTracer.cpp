@@ -71,7 +71,7 @@ void RayTracer::Render(Camera& cam, ColorBuffer& colBuf)
  */
 Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double contribution) const
 {
-    if(contribution < 0.005)
+    if(contribution < eps)
         return Color(0, 0, 0);
         
     Vector3d dir = ray.direction;
@@ -87,7 +87,7 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double cont
 
     double t = scene->Intersect(ray, minprimitive, minlight);
 
-    if(t > 0.001)
+    if(t > eps)
         objecthit = true;
 
     if(objecthit)

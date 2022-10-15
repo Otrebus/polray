@@ -35,8 +35,8 @@ PhongMaterial::~PhongMaterial()
  */
 Sample PhongMaterial::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
-    auto df = Kd.GetMax();
-    auto sp = Ks.GetMax();
+    auto df = Kd.GetLuma();
+    auto sp = Ks.GetLuma();
     
     auto r = rnd.GetDouble(0, df + sp);
     if(r <= df) // Diffuse bounce
@@ -128,8 +128,8 @@ Color PhongMaterial::BRDF(const IntersectionInfo& info, const Vector3d& out, int
 {
     assert(component == 1 || component == 2);
 
-    auto df = Kd.GetMax();
-    auto sp = Ks.GetMax();
+    auto df = Kd.GetLuma();
+    auto sp = Ks.GetLuma();
 
     Vector3d N_s = info.normal;
     Vector3d N_g = info.geometricnormal;

@@ -57,8 +57,8 @@ void AshikhminShirley::ReadProperties(std::stringstream& ss)
  */
 Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool adjoint) const
 {
-    double df = Rd.GetMax();
-    double sp = Rs.GetMax();
+    double df = Rd.GetLuma();
+    double sp = Rs.GetLuma();
 
     double r = rnd.GetDouble(0.0, df + sp);
 
@@ -132,8 +132,8 @@ Sample AshikhminShirley::GetSample(const IntersectionInfo& info, Randomizer& rnd
  */
 Color AshikhminShirley::BRDF(const IntersectionInfo& info, const Vector3d& out, int component) const
 {
-    double df = Rd.GetMax();
-    double sp = Rs.GetMax();
+    double df = Rd.GetLuma();
+    double sp = Rs.GetLuma();
 
     Vector3d N_s = info.normal;
     Vector3d N_g = info.geometricnormal;

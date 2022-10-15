@@ -33,11 +33,8 @@ public:
     explicit operator bool() const;
     double& operator[](int);
     bool operator!() const;
-
     bool IsValid() const;
-
     double GetLuma() const;
-    double GetMax() const;
 
     double r, g, b;
 

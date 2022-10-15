@@ -52,8 +52,8 @@ double D_p(double alpha, double cosn)
  */
 Sample CookTorrance::GetSample(const IntersectionInfo& info, Randomizer& rnd, bool) const
 {
-    //float df = Kd.GetMax();
-    //float sp = Ks.GetMax();
+    //float df = Kd.GetLuma();
+    //float sp = Ks.GetLuma();
 
     Vector3d N_s = info.normal;
     Vector3d N_g = info.geometricnormal;
@@ -90,8 +90,8 @@ Sample CookTorrance::GetSample(const IntersectionInfo& info, Randomizer& rnd, bo
  */
 Color CookTorrance::BRDF(const IntersectionInfo& info, const Vector3d& out, int) const
 {
-    //float df = Kd.GetMax();
-    //float sp = Ks.GetMax();
+    //float df = Kd.GetLuma();
+    //float sp = Ks.GetLuma();
 
     Vector3d N_s = info.normal;
     Vector3d N_g = info.geometricnormal;

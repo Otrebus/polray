@@ -18,7 +18,7 @@ Light::Light()
  * 
  * @param intensity The radiance emitted by the light.
  */
-Light::Light(Color intensity) : intensity_(intensity)
+Light::Light(Color intensity) : intensity(intensity)
 {
 }
 
@@ -54,5 +54,5 @@ Light* Light::Create(unsigned char c)
  */
 Color Light::GetIntensity() const
 {
-    return intensity_;
+    return intensity;
 }

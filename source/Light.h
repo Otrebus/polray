@@ -40,5 +40,5 @@ public:
     EmissiveMaterial* material;
     Scene* scene;
 protected:
-    Color intensity_;
+    Color intensity;
 };

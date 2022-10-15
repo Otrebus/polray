@@ -25,7 +25,7 @@ AreaLight::AreaLight()
 AreaLight::AreaLight(const Vector3d& position, const Vector3d& c1, const Vector3d& c2, const Color& color) : pos(position), c1(c1), c2(c2)
 {
     material = new EmissiveMaterial();
-    intensity_ = color;
+    intensity = color;
 #ifdef DETERMINISTIC
     r.Seed(0);
 #endif
@@ -41,7 +41,7 @@ void AreaLight::AddToScene(Scene* scn)
     scene = scn;
    
     material->light = this;
-    material->emissivity = intensity_;
+    material->emissivity = intensity;
     Triangle* tr1 = new Triangle(pos, pos + c1, pos + c2);
     Triangle* tr2 = new Triangle(pos + c1 + c2, pos + c2, pos + c1);
 
@@ -233,7 +233,7 @@ Vector3d AreaLight::GetNormal() const
  */
 void AreaLight::Save(Bytestream& stream) const
 {
-    stream << ID_AREALIGHT << pos << c1 << c2 << intensity_;
+    stream << ID_AREALIGHT << pos << c1 << c2 << intensity;
 }
 
 /**
@@ -243,7 +243,7 @@ void AreaLight::Save(Bytestream& stream) const
  */
 void AreaLight::Load(Bytestream& stream)
 {
-    stream >> pos >> c1 >> c2 >> intensity_;
+    stream >> pos >> c1 >> c2 >> intensity;
 }
 
 /**
@@ -274,7 +274,7 @@ std::tuple<Color, Point> AreaLight::NextEventEstimation(const Renderer* renderer
         {
             double cosphi = abs(normal*toLight);
             double costheta = abs(toLight*lightNormal);
-            Color c(info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity_*GetArea()/(d*d));
+            Color c(info.material->BRDF(info, toLight, component)*costheta*cosphi*intensity*GetArea()/(d*d));
             return { c, lightPoint };
         }
     }

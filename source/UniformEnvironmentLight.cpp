@@ -19,7 +19,7 @@ UniformEnvironmentLight::UniformEnvironmentLight()
  * @param radius The radius of the light.
  * @param color The radiance that the light emits in every direction.
  */
-UniformEnvironmentLight::UniformEnvironmentLight(const Vector3d& position, double radius, const Color& color) : position(position), radius(radius), intensity(color)
+UniformEnvironmentLight::UniformEnvironmentLight(const Vector3d& position, double radius, const Color& color) : position(position), radius(radius)
 {
     material = new EmissiveMaterial();
     intensity = color;

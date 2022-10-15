@@ -40,7 +40,7 @@
 #include "BrutePartitioning.h"
 #include "UniformEnvironmentLight.h"
 
-#define INTERIOR
+//#define INTERIOR
 //#define CUBE
 //#define TEAPOTWITHOUTNORMALS
 //#define INTERIORSKY
@@ -52,7 +52,7 @@
 //#define EMPTYBOX
 //#define KITCHEN2
 //#define WINDOWBOX
-//#define WINDOWBOX2
+#define WINDOWBOX2
 //#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
@@ -157,7 +157,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     s->AddModel(triangle2);
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 #endif
 #ifdef INTERIOR
     auto s = std::shared_ptr<Scene> (new Scene("interior-open.obj"));
@@ -979,7 +979,8 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //portalLight->SetLight(boxLight);
 
     s->AddLight(portalLight);
-    s->AddLight(portalLight2);
+    //s->AddLight(portalLight2);
+    //s->AddLight(sunLight);
 
     //s->AddLight(fakeSkyLight);
     //s->AddLight(skyLight);
@@ -1028,7 +1029,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     s->AddModel(sphere2);*/
 
     e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
-    r = std::shared_ptr<BDPT>(new BDPT(s));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
 
@@ -1679,10 +1680,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     ajax->Transform(move2);
     s->AddModel(ajax);
 */
-    Random ballsR(47);
-    Random test(1);
+    Randomizer ballsR(47);
+    Randomizer test(1);
 
-    Random ballsC(0);
+    Randomizer ballsC(0);
 
     //s->SetPartitioning(new BrutePartitioning());
 

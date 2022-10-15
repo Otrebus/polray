@@ -96,15 +96,15 @@ Color MonEstimator::GetEstimate(int x, int y) const
         for(int i = 0; i < M; i++)
             pBuckets[i] = &GetBucket(x, y, i);
 
-        auto fn = [] (Bucket* a, Bucket* b) { return a->avg.GetMax() < b->avg.GetMax(); };
+        auto fn = [] (Bucket* a, Bucket* b) { return a->avg.GetLuma() < b->avg.GetLuma(); };
         std::sort(pBuckets, pBuckets+M, fn);
 
         // Calculate the Gini coefficent
         double nom = 0, denom = 0;
         for(int i = 0; i < M; i++)
-            nom += 2*(i+1)*pBuckets[i]->avg.GetMax();  
+            nom += 2*(i+1)*pBuckets[i]->avg.GetLuma();  
         for(int i = 0; i < M; i++)
-            denom += M*pBuckets[i]->avg.GetMax();
+            denom += M*pBuckets[i]->avg.GetLuma();
 
         auto G = nom/denom - double(M+1)/M;
         if(!nom)

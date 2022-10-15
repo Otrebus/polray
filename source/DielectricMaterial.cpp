@@ -66,7 +66,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& r
         out.direction = Reflect(info.direction, Ns);
         out.direction.Normalize();
         auto wo = out.direction;
-        out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.position;
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
         return Sample(color, out, pdf, rpdf, true, 1);
     }
@@ -83,7 +83,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& r
         Ray out;
         out.direction = refraction.Normalized();
         auto wo = out.direction;
-        out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.position + 2*eps*(wo*Ng > 0 ? Ng : -Ng);
         auto color = adjoint ? abs((wi*Ns/(wi*Ng))*(wo*Ng/(wo*Ns))) * Color::Identity : (n1/n2)*(n1/n2)*Color::Identity;
         return Sample(color, out, pdf, rpdf, true, 1);
     }
@@ -92,7 +92,7 @@ Sample DielectricMaterial::GetSample(const IntersectionInfo& info, Randomizer& r
         Ray out;
         out.direction = Reflect(info.direction, Ns).Normalized();
         auto wo = out.direction;
-        out.origin = info.position + 0.0001*(wo*Ng > 0 ? Ng : -Ng);
+        out.origin = info.position;
         auto color = adjoint ? abs((1/(wi*Ng))*(wo*Ng/(1))) * Color::Identity : Color::Identity;
         return Sample(color, out, pdf, rpdf, true, 1);
     }

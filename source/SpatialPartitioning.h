@@ -9,5 +9,5 @@ class SpatialPartitioning
 {
 public:
     virtual void Build(const std::vector<const Primitive*>&) = 0;
-    virtual double Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const = 0;
+    virtual std::tuple<double, const Primitive*> Intersect(const Ray& ray, double tmin, double tmax, bool returnPrimitive) const = 0;
 };

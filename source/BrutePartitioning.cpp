@@ -26,10 +26,11 @@ void BrutePartitioning::Build(const std::vector<const Primitive*>& shapes)
  * @returns The distance along the ray that the intersection happened, or -inf if
  *          no intersection happened.
  */
-double BrutePartitioning::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive = true) const
+std::tuple<double, const Primitive*> BrutePartitioning::Intersect(const Ray& ray, double tmin, double tmax, bool returnPrimitive = true) const
 {
     bool found = false;
     double mint = inf;
+    const Primitive* primitive;
 
     for(auto p : primitives)
     {
@@ -37,13 +38,13 @@ double BrutePartitioning::Intersect(const Ray& ray, const Primitive* &primitive,
         if(t > -inf && t < mint && t >= tmin && t <= tmax)
         {
             if(!returnPrimitive)
-                return true;
+                return { t, nullptr };
             found = true;
             primitive = p;
             mint = t;
         }
     }
     if(found)
-        return mint;
-    return -inf;
+        return { mint, primitive };
+    return { -inf, nullptr };
 }

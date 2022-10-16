@@ -39,7 +39,8 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
 
         pathColor *= light->GetArea()*light->GetIntensity(); // First direction is from the light source
 
-        auto [firstU, firstV, firstLensPoint] = cam.SampleAperture();
+        auto firstU = m_random.GetDouble(0, 1), firstV = m_random.GetDouble(0, 1);
+        auto firstLensPoint = cam.SampleAperture(firstU, firstV);
 
         // Light going straight from the surface of the light source to the camera
         Vector3d lightToCam = firstLensPoint - ray.origin;
@@ -57,13 +58,12 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
             colBuf.AddColor(firstXPixel, firstYPixel, light->GetIntensity()*light->GetArea()*surfcos/(camcos*camcos*camcos*camRayLength*camRayLength*pixelArea*xres*yres)/lightWeight);
         do
         {
-            const Primitive* minprimitive = nullptr;
-            const Light* minlight = nullptr;
             IntersectionInfo info;
             Ray bounceRay;
 
             // Figure out if and where the current ray segment hits something
-            if(scene->Intersect(ray, minprimitive, minlight) < 0.0)
+            auto [t, minprimitive, minlight] = scene->Intersect(ray);
+            if(t < 0.0)
                 break;
             if(minprimitive)
                 minprimitive->GenerateIntersectionInfo(ray, info);
@@ -71,7 +71,8 @@ void LightTracer::Render(Camera& cam, ColorBuffer& colBuf)
                 minlight->GenerateIntersectionInfo(ray, info);
             
             // Next event estimation
-            auto [u, v, lensPoint] = cam.SampleAperture();
+            auto u = m_random.GetDouble(0, 1), v = m_random.GetDouble(0, 1);
+            auto lensPoint = cam.SampleAperture(u, v);
 
             Ray camRay = Ray(info.position, lensPoint - info.position);
             camRayLength = camRay.direction.Length();

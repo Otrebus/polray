@@ -52,8 +52,8 @@
 //#define EMPTYBOX
 //#define KITCHEN2
 //#define WINDOWBOX
-#define WINDOWBOX2
-//#define BALLSBOX
+//#define WINDOWBOX2
+#define BALLSBOX
 //#define CONFERENCE
 //#define BALLBOX
 //#define LEGOCAR
@@ -1352,7 +1352,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     ajax->Transform(move2);
     s->AddModel(ajax);
 */
-    Random ballsR(41);
+    Randomizer ballsR(41);
     //Random test(1);
 
     //Random ballsC(0);

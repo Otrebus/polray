@@ -98,9 +98,9 @@ std::tuple<bool, int, int> PinholeCamera::GetPixelFromRay(const Ray& ray, double
  * 
  * @returns The parametric coordinates of the sampled point, and the position vector of the point.
  */
-std::tuple<double, double, Vector3d> PinholeCamera::SampleAperture() const
+Vector3d PinholeCamera::SampleAperture(double, double) const
 {
-    return { 0, 0, this->pos };
+    return this->pos;
 }
 
 /**

@@ -59,7 +59,7 @@ Ray ThinLensCamera::GetRayFromPixel(int x, int y, double a, double b, double u, 
     raydir.Normalize();
     Ray centerRay = Ray(pos, raydir);
 
-    Vector3d lensPoint = pos+lensRadius*v*(right*cos(u)+up*sin(u));
+    Vector3d lensPoint = SampleAperture(u, v);
 
     centerRay.direction.Normalize();
 
@@ -126,13 +126,9 @@ std::tuple<bool, int, int> ThinLensCamera::GetPixelFromRay(const Ray& ray, doubl
  * 
  * @returns The parametric coordinates of the sampled point, and the position vector of the point.
  */
-std::tuple<double, double, Vector3d> ThinLensCamera::SampleAperture() const
+Vector3d ThinLensCamera::SampleAperture(double u, double v) const
 {
-    double u = random.GetDouble(0, 2*pi);
-    double v = sqrt(random.GetDouble(0, 1));
-
-    Vector3d position = this->pos + lensRadius*v*(up*sin(u) + (dir^up)*cos(u));
-    return { u, v, position };
+    return this->pos + lensRadius*v*(up*sin(u*2*pi) + (dir^up)*cos(u*2*pi));
 }
 
 /**

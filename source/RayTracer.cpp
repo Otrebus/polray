@@ -82,10 +82,7 @@ Color RayTracer::TraceRayRecursive(Ray ray, int bounces, Primitive*, double cont
     if(bounces < 1)
         return Color(1, 0, 0);
 
-    const Primitive* minprimitive = nullptr;
-    const Light* minlight = nullptr;
-
-    double t = scene->Intersect(ray, minprimitive, minlight);
+    auto [t, minprimitive, minlight] = scene->Intersect(ray);
 
     if(t > eps)
         objecthit = true;
@@ -129,8 +126,8 @@ bool RayTracer::TraceShadowRay(const Ray& ray, double tmax) const
 {
     const Primitive* dummy = nullptr;
     const Light* dummy2 = nullptr;
-    double result = scene->Intersect(ray, dummy, dummy2);
-    if(result < tmax*(1-eps))
+    auto [t, minprimitive, minlight] = scene->Intersect(ray);
+    if(t < tmax*(1-eps))
         return false;
     return true;
 }

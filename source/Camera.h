@@ -17,7 +17,7 @@ public:
     
     virtual Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const = 0;
     virtual std::tuple<bool, int, int> GetPixelFromRay(const Ray& ray, double u, double v) const = 0;
-    virtual std::tuple<double, double, Vector3d> SampleAperture() const = 0;
+    virtual Vector3d SampleAperture(double u, double v) const = 0;
 
     void SetFov(double fov);
 

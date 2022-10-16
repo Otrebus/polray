@@ -74,10 +74,7 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
     {
         BDVertex* lastV = path.back();
 
-        const Primitive* hitPrimitive;
-        const Light* hitLight;
-
-        auto t = scene->Intersect(lastV->out, hitPrimitive, hitLight);
+        auto [t, hitPrimitive, hitLight] = scene->Intersect(lastV->out);
         if(t < 0)
             break;
 
@@ -142,8 +139,7 @@ int BDPT::BuildEyePath(int x, int y, std::vector<BDVertex*>& path,
                        Light* light)
 {
     BDVertex* camPoint = new BDVertex();
-    auto [camu, camv, lensPoint] = cam.SampleAperture();
-    camPoint->camU = camu, camPoint->camV = camv;
+    camPoint->camU = m_random.GetDouble(0, 1), camPoint->camV = m_random.GetDouble(0, 1);
     camPoint->out = cam.GetRayFromPixel(x, y, m_random.GetDouble(0, 1), 
                                         m_random.GetDouble(0, 1), camPoint->camU,
                                         camPoint->camV);

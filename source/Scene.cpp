@@ -170,8 +170,7 @@ void Scene::Save(Bytestream& b) const
  */
 bool Scene::Intersect(const Ray& ray, double tmax) const
 {
-    const Primitive* dummy;
-    return partitioning->Intersect(ray, dummy, 0, tmax, false) > 0;
+    return std::get<0>(partitioning->Intersect(ray, 0, tmax, false)) > 0;
 };
 
 /**
@@ -182,11 +181,12 @@ bool Scene::Intersect(const Ray& ray, double tmax) const
  * @param l The light that was hit, if any.
  * @returns The distance along the ray that the entity was hit.
  */
-double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) const
+std::tuple<double, const Primitive*, const Light*> Scene::Intersect(const Ray& ray) const
 {
-    p = nullptr;
-    l = nullptr;
-    auto primT = partitioning->Intersect(ray, p, 0, inf, true);
+    const Primitive* p = nullptr;
+    const Light* l = nullptr;
+    auto [primT, prim] = partitioning->Intersect(ray, 0, inf, true);
+    p = prim;
     double lightT = -inf;
     double minLightT = inf;
 
@@ -207,17 +207,17 @@ double Scene::Intersect(const Ray& ray, const Primitive*& p, const Light*& l) co
     if(primT != -inf && (lightT == -inf || primT < lightT))
     {
         l = nullptr;
-        return primT;
+        return { primT, p, l };
     }
     else if(lightT != -inf)
     {
         p = nullptr;
-        return lightT;
+        return { lightT, p, l };
     }
 
     p = nullptr;
     l = nullptr;
-    return -inf;
+    return { -inf, p, l };
 };
 
 /**

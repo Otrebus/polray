@@ -92,7 +92,7 @@ public:
     void SetPartitioning(SpatialPartitioning* partitioning);
 
     bool Intersect(const Ray&, double tmax) const;
-    double Intersect(const Ray&, const Primitive*&, const Light*&) const;
+    std::tuple<double, const Primitive*, const Light*> Intersect(const Ray&) const;
 
     std::pair<Light*, double> PickLight(double) const;
 

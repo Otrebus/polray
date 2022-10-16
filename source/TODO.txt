@@ -1,5 +1,3 @@
-Tuplify double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const
-Returnify void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, std::vector<SAHEvent*>& merged)
 Clean up pathtracer/lighttracer
 Do same as with MeshTriangle with std::tuple<bool, BoundingBox> Triangle::GetClippedBoundingBox(const BoundingBox& clipbox) const
 Remove first two parameters from double KDNode::SAHCost(int, double, int nLeft, double leftarea, int nRight, double rightarea, int nPlanar, int side)
@@ -16,7 +14,6 @@ Remove scene->addlight?
 Use more modern threads, and the same mutices (lol) as in bdpt
 Make the buffer in rendering.cpp double buffered so we don't have to mutex it every time WasBufferRedrawn (although that's maybe what rendering->updated does)
 
-Replace the .0000001s with eps
 Try removing some color/int multiplication function (already have Color/double)
 ClipPolygonToAAP, make output returned
 Move random number generation out of materials
@@ -37,6 +34,9 @@ Implement multiple importance sampling for light portals
 Add physical camera to bdpt
 Add light source resampling to BDPT
 Try including rr with mis
+- Returnify void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, std::vector<SAHEvent*>& merged)
+- Tuplify double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const
+- Replace the .0000001s with eps
 - Use Luma instead of Max for colors everywhere
 - Fill typedefs ("Normal" etc)
 - ctrl-F 14 years later

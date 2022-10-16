@@ -16,13 +16,11 @@ public:
     Ray GetRayFromPixel(int x, int y, double a, double b, double u, double v) const;
     std::tuple<bool, int, int> GetPixelFromRay(const Ray& ray, double u, double v) const;
 
-    std::tuple<double, double, Vector3d> SampleAperture() const;
+    Vector3d SampleAperture(double u, double v) const;
 
     void Save(Bytestream& stream) const;
     void Load(Bytestream& stream);
 
     double focalLength;
     double lensRadius;
-
-    mutable Randomizer random;
 };

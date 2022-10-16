@@ -45,7 +45,7 @@ public:
     KDTree();
     ~KDTree();
     void Build(const std::vector<const Primitive*>&);
-    double Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive) const;
+    std::tuple<double, const Primitive*> Intersect(const Ray& ray, double tmin, double tmax, bool returnPrimitive) const;
     BoundingBox CalculateExtents(const std::vector<const Primitive*>& primitives);
 
     BoundingBox m_bbox;

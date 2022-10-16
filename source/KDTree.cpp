@@ -195,10 +195,12 @@ bool KDNode::IsLeaf() const
  * @param add The event list to add to.
  * @param merge The merged list.
  */
-void MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add, std::vector<SAHEvent*>& merged)
+std::vector<SAHEvent*> MergeEvents(std::vector<SAHEvent*>& events, std::vector<SAHEvent*>& add)
 {
+    std::vector<SAHEvent*> merged;
     sort(add.begin(), add.end(), sortFn);
     std::merge(events.begin(), events.end(), add.begin(), add.end(), std::back_inserter(merged), sortFn);
+    return merged;
 }
 
 /**
@@ -384,10 +386,10 @@ void KDNode::Build(BoundingBox& bbox, std::vector<SAHEvent*>* events, const std:
 
     // Merge the events of the clipped triangles to the respective event lists
     for(int u = 0; u < 3; u++)   
-        MergeEvents(leftevents[u], addleft[u], mergedLeft[u]);
+        mergedLeft[u] = MergeEvents(leftevents[u], addleft[u]);
 
     for(int u = 0; u < 3; u++)
-        MergeEvents(rightevents[u], addright[u], mergedRight[u]);
+        mergedRight[u] = MergeEvents(rightevents[u], addright[u]);
 
     leftNode->Build(leftbbox, mergedLeft, leftprimitives, depth + 1, badsplits);
     leftprimitives.clear();
@@ -520,13 +522,10 @@ std::pair<double, const Primitive*> KDNode::IntersectRec(const Ray& ray, double 
  * @returns The distance along the ray that the intersection happened, or -inf if
  *          no intersection happened.
  */
-double KDTree::Intersect(const Ray& ray, const Primitive* &primitive, double tmin, double tmax, bool returnPrimitive=true) const
+std::tuple<double, const Primitive*> KDTree::Intersect(const Ray& ray, double tmin, double tmax, bool returnPrimitive = true) const
 {
     auto [t, prim] = m_root->IntersectRec(ray, tmin, tmax, returnPrimitive);
     if(t != -inf)
-    {
-        primitive = prim;
-        return t;
-    }
-    return -inf;
+        return { t, prim };
+    return { -inf, nullptr };
 }

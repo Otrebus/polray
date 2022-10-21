@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Model.cpp
+ * Implementation of the Model base class.
+ */
+
 #include "Model.h"
 #include "Triangle.h"
 #include "TriangleMesh.h"

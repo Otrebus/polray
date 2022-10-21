@@ -1,9 +1,19 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file BrutePartitioning.cpp
+ * 
+ * Implementation of the BrutePartitioning class which serves as a "null-partitioner" used
+ * for debugging.
+ */
+
 #include "BrutePartitioning.h"
 #include "Utils.h"
 #include "Primitive.h"
 
 /**
- * Adds the shapes to the BrutePartitioning.
+ * Adds shapes to the BrutePartitioning.
  * 
  * @param shapes The shapes to add.
  */

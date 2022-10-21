@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Color.cpp
+ * 
+ * Implementation of the Color class.
+ */
+
 #include "Color.h"
 #include "Vector3d.h"
 #include "Utils.h"

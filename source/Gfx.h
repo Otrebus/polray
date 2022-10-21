@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Gfx.h
+ * 
+ * Declaration of functions that handle graphics.
+ */
+
 #pragma once
 
 #define NOMINMAX
@@ -7,7 +16,6 @@
 
 class Gfx
 {
-    friend class Rasterizer;
 public:
     Gfx();
     ~Gfx();

@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file ObjReader.cpp
+ * 
+ * Turns WaveFront .obj files into TriangleMesh and Light objects.
+ */
+
 #include "ObjReader.h"
 #include "TriangleMesh.h"
 #include "PhongMaterial.h"

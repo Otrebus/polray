@@ -1,8 +1,12 @@
-//------------------------------------------------------------------------------
-// File: Logger.cpp
-//  
-// Handles debug and error messages through logging and other means.
-//------------------------------------------------------------------------------
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Logger.cpp
+ * 
+ * Definition of the Logger class which handles debug and error messages through
+ * logging and other means.
+ */
 
 #include "Logger.h"
 #define NOMINMAX

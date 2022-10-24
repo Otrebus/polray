@@ -4,7 +4,7 @@
  * 
  * @file Main.cpp
  * 
- * Entry point.
+ * Entry point and Windows routines.
  */
 
 #include "Main.h"

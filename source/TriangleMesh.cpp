@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file TriangleMesh.cpp
+ * 
+ * Declaration of the TriangleMesh class.
+ */
+
 #include "TriangleMesh.h"
 #include "Matrix3d.h"
 #include "GeometricRoutines.h"

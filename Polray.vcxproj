@@ -273,6 +273,7 @@
     <Text Include="source\TODO.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="LICENSE" />
     <None Include="README.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

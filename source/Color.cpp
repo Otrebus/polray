@@ -4,7 +4,7 @@
  * 
  * @file Color.cpp
  * 
- * Implementation of the Color class.
+ * Implementation of the Color class which represents a quantity of light.
  */
 
 #include "Color.h"

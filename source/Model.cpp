@@ -3,6 +3,7 @@
  * Distributed under GNU GPL v3. For full terms see the LICENSE file.
  * 
  * @file Model.cpp
+ * 
  * Implementation of the Model base class.
  */
 

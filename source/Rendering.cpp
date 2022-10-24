@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Rendering.cpp
+ * 
+ * Implementation of the Rendering class used to represent a rendering in progress.
+ */
+
 #include "Rendering.h"
 #include "Estimator.h"
 #include "Scene.h"

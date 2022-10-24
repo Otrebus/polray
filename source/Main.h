@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Main.h
+ * 
+ * Declares the entry point and some global variables.
+ */
+
 #pragma once
 
 #define WIN32_MEAN_AND_LEAN

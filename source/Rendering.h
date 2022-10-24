@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Rendering.h
+ * 
+ * Declaration of the Rendering class.
+ */
+
 #pragma once
 
 #define NOMINMAX

@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file GeometricRoutines.h
+ * 
+ * Declaration of functions for various geometric routines.
+ */
+
 #pragma once
 
 #define NOMINMAX

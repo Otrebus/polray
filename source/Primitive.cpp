@@ -2,7 +2,7 @@
  * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
  * Distributed under GNU GPL v3. For full terms see the LICENSE file.
  * 
- * @file Model.cpp
+ * @file Primitive.cpp
  * 
  * Implementation of the Primitive base class.
  */

@@ -4,7 +4,7 @@
  * 
  * @file Gfx.h
  * 
- * Declaration of functions that handle graphics.
+ * Declaration of the Gfx class.
  */
 
 #pragma once

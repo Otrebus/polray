@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Randomizer.cpp
+ * 
+ * Implementation of the Randomizer class for random number generation.
+ */
+
 #include "Randomizer.h"
 
 /**

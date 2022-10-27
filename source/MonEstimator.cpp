@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file MonEstimator.cpp
+ * 
+ * Implementation of the MonEstimator class, used for median-of-means estimation of sampled values.
+ */
+
 #include <algorithm>
 #include "MonEstimator.h"
 #include "Bytestream.h"

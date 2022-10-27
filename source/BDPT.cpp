@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file BDPT.cpp
+ * 
+ * Implementation of the BDPT class which renders using bidirectional path tracing.
+ */
+
 #define NOMINMAX
 #include "BDPT.h"
 #include <vector>

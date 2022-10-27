@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Ray.cpp
+ * 
+ * Implementation of the Ray class.
+ */
+
 #include "Ray.h"
 #include "IntersectionInfo.h"
 

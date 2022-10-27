@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Light.cpp
+ * 
+ * Implementation of the Light base class.
+ */
+
 #include "AreaLight.h"
 #include "LightPortal.h"
 #include "Light.h"

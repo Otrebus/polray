@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Camera.cpp
+ * 
+ * Implementation of the Camera base class.
+ */
+
 #include "Camera.h"
 #include "ThinLensCamera.h"
 #include "PinholeCamera.h"

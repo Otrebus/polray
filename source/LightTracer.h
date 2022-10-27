@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file LightTracer.h
+ * 
+ * Declaration of the LightTracer class.
+ */
+
 #pragma once
 
 #include "Renderer.h"

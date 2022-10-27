@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file LightPortal.cpp
+ * 
+ * Implementation of the LightPortal class.
+ */
+
 #include "Bytestream.h"
 #include "EmissiveMaterial.h"
 #include "GeometricRoutines.h"

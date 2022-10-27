@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file LightTracer.cpp
+ * 
+ * Implementation of the LightTracer class.
+ */
+
 #include "LightTracer.h"
 #include "Sample.h"
 

@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file ThinLensCamera.cpp
+ * 
+ * Implementation of the ThinLensCamera class.
+ */
+
 #include "ThinLensCamera.h"
 #include "Bytestream.h"
 #include "Utils.h"

@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Matrix3d.h
+ * 
+ * Declaration of the Matrix3d class.
+ */
+
 #pragma once
 
 #include "Vector3d.h"

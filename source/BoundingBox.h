@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file BoundingBox.h
+ * 
+ * Declaration of the BoundingBox class.
+ */
+
 #pragma once
 
 #include "Vector3D.h"

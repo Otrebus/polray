@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Matrix3d.cpp
+ * 
+ * Implementation of the Matrix3d class.
+ */
+
 #include "Matrix3d.h"
 #include "assert.h"
 

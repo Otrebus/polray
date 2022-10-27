@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file Vertex3d.cpp
+ * 
+ * Implementation of the Vertex3d class.
+ */
+
 #include "vertex3d.h"
 
 /**

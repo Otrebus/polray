@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file CsgObject.h
+ * 
+ * Declaration of the CsgObject base class.
+ */
+
 #pragma once
 
 #include "IntersectionInfo.h"
@@ -8,6 +17,8 @@
 #include <vector>
 #include <memory>
 
+class CsgObject;
+
 class CsgHit
 {
 public:
@@ -15,6 +26,7 @@ public:
     IntersectionInfo info;
     double t;
     HitType type;
+    const CsgObject* object;
 };
 
 class CsgObject : public Model, public Primitive

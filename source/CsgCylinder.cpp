@@ -1,3 +1,12 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file CsgCylinder.cpp
+ * 
+ * Implementation of the CsgCuboid class used in constructive solid geometry.
+ */
+
 #include "BoundingBox.h"
 #include "CsgCylinder.h"
 #include "Scene.h"

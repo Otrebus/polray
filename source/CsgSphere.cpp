@@ -1,7 +1,17 @@
+/**
+ * Copyright (c) 2022 Peter Otrebus-Larsson (otrebus@gmail.com)
+ * Distributed under GNU GPL v3. For full terms see the LICENSE file.
+ * 
+ * @file CsgSphere.cpp
+ * 
+ * Implementation of the CsgSphere class used in constructive solid geometry.
+ */
+
 #include "BoundingBox.h"
 #include "CsgSphere.h"
 #include "Scene.h"
 #include "Utils.h"
+#include "GeometricRoutines.h"
 
 CsgSphere::CsgSphere(const Vector3d& position, double radius) 
     : pos_(position), radius_(radius)
@@ -19,7 +29,6 @@ bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
     double C = vec*vec - radius_*radius_;
     double D = (B*B/(4*A) - C)/A;
 
-    
     if(D < 0)
         return false;
 
@@ -34,6 +43,7 @@ bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
     nearInfo.normal.Normalize();
     nearInfo.position += nearInfo.normal*eps;
     nearInfo.geometricnormal = nearInfo.normal;
+
     farInfo.position = ray.origin + ray.direction*tFar;
     farInfo.normal = farInfo.position - pos_;
     farInfo.normal.Normalize();
@@ -67,21 +77,7 @@ std::tuple<bool, BoundingBox> CsgSphere::GetClippedBoundingBox(const BoundingBox
 
 double CsgSphere::Intersect(const Ray& ray) const
 {
-    double t;
-    Vector3d dir(ray.direction);
-    Vector3d vec = ray.origin - pos_;
-    double A = dir*dir;
-    double B = 2*(vec*dir);
-    double C = vec*vec - radius_*radius_;
-    double D = (B*B/(4*A) - C)/A;
-    if(D < 0)
-        return -inf;
-    t = -B/(2*A) - sqrt(D);
-    if(t < 0)
-        t = -B/(2*A) + sqrt(D);
-    if(t < 0)
-        return false;
-    return true;
+    return IntersectSphere(pos_, radius_, ray);
 }
 
 bool CsgSphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const

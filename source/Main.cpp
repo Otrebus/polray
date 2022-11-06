@@ -30,8 +30,6 @@ bool g_isActive;
 bool g_quitting;
 Gfx* gfx;
 Logger logger(LOG_FILENAME);
-LPDIRECTDRAWSURFACE7 bitmapsurface;
-DDSURFACEDESC2 ddsd;
 
 HANDLE bufferMutex;
 
@@ -97,16 +95,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int)
         return 1;
     }
 
-    memset(&ddsd, 0, sizeof(ddsd));
-    ddsd.dwSize = sizeof(ddsd);
-    ddsd.dwFlags = DDSD_WIDTH | DDSD_HEIGHT | DDSD_CAPS;
-    ddsd.dwWidth = XRES;
-    ddsd.dwHeight = YRES;
-    ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY; 
-
     gfx->ClearScreen(255, 255, 255);
 
-    std::shared_ptr<Scene> scene;
     std::shared_ptr<Renderer> renderer;
     std::shared_ptr<Estimator> estimator;
 

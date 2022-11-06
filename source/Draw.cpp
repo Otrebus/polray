@@ -62,7 +62,8 @@
 //#define KITCHEN2
 //#define WINDOWBOX
 //#define WINDOWBOX2
-#define BALLSBOX
+//#define BALLSBOX
+#define CSGBOX
 //#define CONFERENCE
 //#define BALLBOX
 //#define LEGOCAR
@@ -1872,31 +1873,83 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     //r = std::shared_ptr<BDPT>(new BDPT(s));
     //pScene = &box;
 #endif
-#ifdef CSGTEST
-    auto s = std::shared_ptr<Scene> (new Scene());
-    //Vector3d camPos = Vector3d(0.9f, 0.9f, 2.5f);
-    //Vector3d camPos = Vector3d(3.0f, 2.0f, 4.5f);
-    //Vector3d target = Vector3d(0, 0.0f, 0.0f);
-    Vector3d target = Vector3d(0.0f, 0.0f, 4.5f);
-    Vector3d camPos = Vector3d(0, 0.0f, 0.0f);
-    Vector3d camdir = target-camPos; 
+#ifdef CSGBOX
+
+    auto s = std::shared_ptr<Scene> (new Scene("CornellBox-Original.obj"));
+    //auto s = std::shared_ptr<Scene> (new Scene("trilight.obj"));
+    //auto s = std::shared_ptr<Scene> (new Scene());
+    Vector3d camPos = Vector3d(0, 1.4, 3);
+    Vector3d target = Vector3d(0, 1, 0);
+    Vector3d camdir = target-camPos;
     camdir.Normalize();
+    //box.camera = new Camera(Vector3d(0, 1, 0), camPos, camdir);
+    //s->SetCamera(new ThinLensCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75, 2.4, 0.05));
     s->SetCamera(new PinholeCamera(Vector3d(0, 1, 0), camPos, camdir, XRES, YRES, 75));
-    AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.405, 0.00), Vector3d(0, 0, 0.3), Vector3d(0.3, 0, 0), Color(1500, 1500, 1500), s);
-    //CsgCuboid* cuboid = new CsgCuboid(target, Vector3d(0, 1, 0), Vector3d(1, 0, 0), 4.0/5, 9.0/5, 1.0/5);
-    //CsgCylinder* csgObject = new CsgCylinder(target, Vector3d(0, 0, 1), 2, 0.3);
-    csgObject->Rotate(Vector3d(0, 1, 1), 1.35);
-    csgObject->Translate(Vector3d(0, 0, 4.5f));
+    
+    //box.camera->SetFov(75);
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.65, 0.99, 1.35), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(20, 200, 50), &box);
+    //AreaLight* cubearealight2 = new AreaLight(Vector3d(.25, 0.99, 1.35), Vector3d(0.6, 0, 0), Vector3d(0, 0, 0.6), Color(3, 5, 50), &box);
+
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.99, 1.35), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(400, 400, 400), s);
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.99, 1.35), Vector3d(0.3, 0, 0), Vector3d(0, 0, 0.3), Color(400, 400, 400), s);
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, 0.79, 1.35), Vector3d(0, 0, 0.3), Vector3d(0.3, 0, 0), Color(400, 400, 400), s);
+    
+    //AreaLight* cubearealight = new AreaLight(Vector3d(-.15, -10.99, -30), Vector3d(0.3, 0.0, 0), Vector3d(0.0, 0.3, 0), Color(50000, 50000, 50000), s);
+
+    //MeshLight* cubearealight = new MeshLight(Color(50, 50, 50), "trilight.obj");
+
+    /*MeshTriangle* m = new MeshTriangle(Vector3d(-100000, 100000, -3), Vector3d(100000, 100000, -3), Vector3d(0, -100000, -3));
+    box.AddShape(m);
+    m->material = new PhongMaterial();
+    ((PhongMaterial*)m->material)->Kd = Color(0.7, 0.7 , 0.7);*/
+
+    //s->SetEnvironmentLight(ps);
+    //AshikhminShirley* mat = new AshikhminShirley;
+    PhongMaterial* mat = new PhongMaterial;
+    mat->Kd = Color(0.65, 0.65, 0.6);
+    mat->Ks = Color(0.08, 0.08, 0.08);
+    mat->alpha = 300;
+  /*  TriangleMesh* ajax = new TriangleMesh("Ajax_Jotero_com.obj", mat);
+    double rt = -0.8;
+    Matrix3d rot (cos(rt), 0, sin(rt), 0,
+                  0, 1, 0, 0,
+                  -sin(rt), 0, cos(rt), 0,
+                  0, 0, 0, 0);
+    Matrix3d move(1,0,0,0,
+                   0,1,0,0,
+                   0,0,1,17.28,
+                   0,0,0,1);
+    Matrix3d scale(0.035f,0,0,0,
+                   0,0.035f,0,0,
+                   0,0,0.035f,0,
+                   0,0,0,0.035f);
+    Matrix3d move2(1,0,0,-0.4,
+                   0,1,0,-0.7,
+                   0,0,1,1.7,
+                   0,0,0,0);
+    
+    ajax->Transform(rot);
+    ajax->Transform(move);
+    ajax->Transform(scale);
+    ajax->Transform(move2);
+    s->AddModel(ajax);
+*/
+    Randomizer ballsR(41);
+    
+    auto csgObject = new CsgSphere(Vector3d(-0.5, 1, 1), 0.2);
+    csgObject->SetMaterial(mat);
+    auto csgObject2 = new CsgSphere(Vector3d(-0.4, 1, 1), 0.2);
+    csgObject2->SetMaterial(mat);
+
+    auto csgObject3 = new CsgDifference(csgObject, csgObject2);
 
     //   csgObject->Rotate(Vector3d(0, 1, 0), 3.14);
        //csgObject->Rotate(Vector3d(0, 1, 0), 0.44);
-    csgObject->AddToScene(*s);
-    LambertianMaterial* mat = new LambertianMaterial;
-    mat->Kd = Color(0.7, 0.7, 0.7);
+    csgObject3->AddToScene(*s);
     csgObject->SetMaterial(mat);
-    r = std::shared_ptr<RayTracer>(new RayTracer(s));
 
+    e = std::shared_ptr<MeanEstimator>(new MeanEstimator(XRES, YRES));
+    r = std::shared_ptr<PathTracer>(new PathTracer(s));
 
 #endif
-
 }

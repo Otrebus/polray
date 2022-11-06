@@ -18,7 +18,6 @@
 extern bool g_isActive;
 extern bool g_quitting;
 extern Gfx* gfx;
-extern LPDIRECTDRAWSURFACE7 bitmapsurface;
 extern DDSURFACEDESC2 ddsd;
 
 extern HANDLE bufferMutex;

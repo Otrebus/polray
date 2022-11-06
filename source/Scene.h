@@ -23,6 +23,7 @@
 
 #include "SpatialPartitioning.h"
 #include "CsgIntersection.h"
+#include "CsgDifference.h"
 #include "CsgSphere.h"
 #include "CsgCylinder.h"
 #include "CsgCuboid.h"
@@ -54,6 +55,7 @@ public:
         friend void CsgCylinder::AddToScene(Scene& scene);
         friend void CsgSphere::AddToScene(Scene& scene);
         friend void CsgIntersection::AddToScene(Scene& scene);
+        friend void CsgDifference::AddToScene(Scene& scene);
         friend void MeshLight::AddToScene(Scene* scene);
         friend void SphereLight::AddToScene(Scene* scene);
     };

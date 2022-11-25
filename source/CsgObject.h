@@ -35,7 +35,7 @@ public:
     typedef std::vector<CsgHit> hits;
     virtual ~CsgObject() {}
 
-    virtual bool Intersect(const Ray& ray, hits& intersects) const = 0;
+    virtual hits AllIntersects(const Ray& ray) const = 0;
 
     virtual BoundingBox GetBoundingBox() const = 0;
     virtual std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const = 0;

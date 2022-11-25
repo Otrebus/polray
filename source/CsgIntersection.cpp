@@ -19,12 +19,11 @@ CsgIntersection::CsgIntersection(CsgObject* a, CsgObject* b)
 {
 }
 
-bool CsgIntersection::Intersect(const Ray& ray, 
-                                CsgObject::hits& intersects) const
+CsgObject::hits CsgIntersection::AllIntersects(const Ray& ray) const
 {
-    CsgObject::hits hitsA, hitsB;
-    objA_->Intersect(ray, hitsA);
-    objB_->Intersect(ray, hitsB);
+    CsgObject::hits intersects;
+    auto hitsA = objA_->AllIntersects(ray);
+    auto hitsB = objB_->AllIntersects(ray);
     CsgObject::hits allHits(hitsA.size() + hitsB.size());
     std::merge(hitsA.begin(), hitsA.end(), hitsB.begin(), hitsB.end(), 
                allHits.begin(), [](CsgHit& a, CsgHit& b) { return a.t < b.t; });
@@ -36,7 +35,7 @@ bool CsgIntersection::Intersect(const Ray& ray,
                       intersects.push_back(h); };
     for_each(allHits.begin(), allHits.end(), func);
 
-    return !intersects.empty();
+    return intersects;
 }
 
 BoundingBox CsgIntersection::GetBoundingBox() const
@@ -59,8 +58,7 @@ std::tuple<bool, BoundingBox> CsgIntersection::GetClippedBoundingBox(const Bound
 
 double CsgIntersection::Intersect(const Ray& ray) const
 {
-    CsgObject::hits hits;
-    Intersect(ray, hits);
+    auto hits = AllIntersects(ray);
     auto firstHit = std::find_if(hits.begin(), hits.end(), 
                     [] (CsgHit& a) { return (a.t > 0); });
     return firstHit != hits.end() ? (*firstHit).t : -inf;
@@ -69,8 +67,8 @@ double CsgIntersection::Intersect(const Ray& ray) const
 bool CsgIntersection::GenerateIntersectionInfo(const Ray& ray, 
                                                IntersectionInfo& info) const
 {
-    CsgObject::hits hits;
-    if(!Intersect(ray, hits))
+    auto hits = AllIntersects(ray);
+    if(hits.empty())
         return false;
     auto firstHit = std::find_if(hits.begin(), hits.end(), 
                     [] (CsgHit& a) { return (a.t > 0); });

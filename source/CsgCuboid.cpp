@@ -13,6 +13,9 @@
 #include "Ray.h"
 #include "Utils.h"
 
+/**
+ * Constructor.
+ */
 CsgCuboid::CsgCuboid(const Vector3d& position, const Vector3d& x, 
                      const Vector3d& y, double a, double b, double c) 
                      : pos_(position), x_(x), y_(y), a_(a), b_(b), c_(c)
@@ -25,15 +28,20 @@ CsgCuboid::CsgCuboid(const Vector3d& position, const Vector3d& x,
     Precalculate();
 }
 
-bool CsgCuboid::Intersect(const Ray& inRay, 
-                          std::vector<CsgHit>& intersects) const
+/**
+ * Intersects the cuboid with the given ray.
+ * 
+ * @param ray The ray to intersect with.
+ */
+std::vector<CsgHit> CsgCuboid::AllIntersects(const Ray& ray) const
 {
     double tnear, tfar;
     int axisNear, axisFar, sideNear, sideFar;
     Vector3d nearNormal(0, 0, 0), farNormal(0, 0, 0);
+    std::vector<CsgHit> intersects;
 
-    if(!SlabsTest(inRay, tnear, tfar, axisNear, axisFar, sideNear, sideFar))
-        return false;
+    if(!SlabsTest(ray, tnear, tfar, axisNear, axisFar, sideNear, sideFar))
+        return intersects;
 
     nearNormal[axisNear] = sideNear;
     farNormal[axisFar] = sideFar;
@@ -42,15 +50,15 @@ bool CsgCuboid::Intersect(const Ray& inRay,
 
     nearHit.normal = nearHit.geometricnormal 
                    = Multiply(x_, y_, z_, nearNormal);
-    nearHit.direction = inRay.direction;
-    nearHit.position = inRay.origin + inRay.direction*tnear 
+    nearHit.direction = ray.direction;
+    nearHit.position = ray.origin + ray.direction*tnear 
                      + nearHit.normal*eps;
     nearHit.material = material;
 
     farHit.normal = farHit.geometricnormal 
                    = Multiply(x_, y_, z_, farNormal);
-    farHit.direction = inRay.direction;
-    farHit.position = inRay.origin + inRay.direction*tfar 
+    farHit.direction = ray.direction;
+    farHit.position = ray.origin + ray.direction*tfar 
                     + farHit.normal*eps;
     farHit.material = material;
 
@@ -64,7 +72,7 @@ bool CsgCuboid::Intersect(const Ray& inRay,
 
     intersects.push_back(nearI);
     intersects.push_back(farI);
-    return true;
+    return intersects;
 }
 
 void CsgCuboid::Rotate(const Vector3d& axis, double angle)

@@ -17,7 +17,7 @@ class CsgSphere : public CsgObject
 public:
     CsgSphere(const Vector3d& position, double radius);
 
-    bool Intersect(const Ray& ray, hits& intersects) const;
+    hits AllIntersects(const Ray& ray) const;
 
     virtual BoundingBox GetBoundingBox() const;
     virtual std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;

@@ -1909,6 +1909,11 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     mat->Kd = Color(0.65, 0.65, 0.6);
     mat->Ks = Color(0.08, 0.08, 0.08);
     mat->alpha = 300;
+
+    PhongMaterial* mat2 = new PhongMaterial;
+    mat2->Kd = Color(0.15, 0.8, 0.22);
+    mat2->Ks = Color(0.08, 0.08, 0.08);
+    mat2->alpha = 300;
   /*  TriangleMesh* ajax = new TriangleMesh("Ajax_Jotero_com.obj", mat);
     double rt = -0.8;
     Matrix3d rot (cos(rt), 0, sin(rt), 0,
@@ -1939,7 +1944,7 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     auto csgObject = new CsgSphere(Vector3d(-0.5, 1, 1), 0.2);
     csgObject->SetMaterial(mat);
     auto csgObject2 = new CsgSphere(Vector3d(-0.4, 1, 1), 0.2);
-    csgObject2->SetMaterial(mat);
+    csgObject2->SetMaterial(mat2);
 
     auto csgObject3 = new CsgDifference(csgObject, csgObject2);
 

@@ -18,7 +18,7 @@ class CsgDifference : public CsgObject
 public:
     CsgDifference(CsgObject* a, CsgObject* b);
 
-    bool Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const;
+    hits AllIntersects(const Ray& ray) const;
 
     virtual BoundingBox GetBoundingBox() const;
     virtual std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;

@@ -19,7 +19,7 @@ public:
     CsgCuboid(const Vector3d& position, const Vector3d& x, const Vector3d& y, 
               double a, double b, double c);
 
-    bool Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const;
+    std::vector<CsgHit> AllIntersects(const Ray& ray) const;
 
     virtual BoundingBox GetBoundingBox() const;
     virtual std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;

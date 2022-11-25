@@ -18,8 +18,9 @@ CsgSphere::CsgSphere(const Vector3d& position, double radius)
 {
 }
 
-bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
+std::vector<CsgHit> CsgSphere::AllIntersects(const Ray& ray) const
 {
+    CsgObject::hits intersects;
     double tNear, tFar;
     Vector3d dir(ray.direction);
     Vector3d vec = ray.origin - pos_;
@@ -30,7 +31,7 @@ bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
     double D = (B*B/(4*A) - C)/A;
 
     if(D < 0)
-        return false;
+        return intersects;
 
     tNear = -B/(2*A) - sqrt(D);
     tFar = -B/(2*A) + sqrt(D);
@@ -61,7 +62,7 @@ bool CsgSphere::Intersect(const Ray& ray, std::vector<CsgHit>& intersects) const
 
     intersects.push_back(nearI);
     intersects.push_back(farI);
-    return true;
+    return intersects;
 }
 
 BoundingBox CsgSphere::GetBoundingBox() const
@@ -82,8 +83,8 @@ double CsgSphere::Intersect(const Ray& ray) const
 
 bool CsgSphere::GenerateIntersectionInfo(const Ray& ray, IntersectionInfo& info) const
 {
-    std::vector<CsgHit> infos;
-    if(Intersect(ray, infos))
+    std::vector<CsgHit> infos = AllIntersects(ray);
+    if(!infos.empty())
     {
         CsgHit isec = infos.front();
         if(isec.t >= 0)

@@ -31,8 +31,9 @@ CsgCylinder::CsgCylinder(Vector3d& position, Vector3d& dir,
     Precalculate();
 }
 
-bool CsgCylinder::Intersect(const Ray& inRay, std::vector<CsgHit>& intersects) const
+std::vector<CsgHit> CsgCylinder::AllIntersects(const Ray& inRay) const
 {
+    std::vector<CsgHit> intersects;
     Vector3d transPos = Multiply(invMatU_, invMatV_, invMatW_, pos_);    
     Vector3d transOrigin = Multiply(invMatU_, invMatV_, invMatW_, inRay.origin);
     Vector3d transDir = Multiply(invMatU_, invMatV_, invMatW_, inRay.direction);
@@ -50,7 +51,7 @@ bool CsgCylinder::Intersect(const Ray& inRay, std::vector<CsgHit>& intersects) c
     const double D = b*b - 4*a*c;
 
     if(D < 0)
-        return false;
+        return intersects;
 
     double tNear = (-b - sqrt(D))/(2*a);
     double tFar = (-b + sqrt(D))/(2*a);
@@ -72,7 +73,7 @@ bool CsgCylinder::Intersect(const Ray& inRay, std::vector<CsgHit>& intersects) c
     if(zFar < -length_/2)
     {
         if(zNear < -length_/2)
-            return false;
+            return intersects;
         else if(zNear < length_/2)
         {
             farInfo.normal = Vector3d(0, 0, -1);
@@ -89,7 +90,7 @@ bool CsgCylinder::Intersect(const Ray& inRay, std::vector<CsgHit>& intersects) c
     else if(zFar > length_/2)
     {
         if(zNear > length_/2)
-            return false;
+            return intersects;
         else if(zNear > -length_/2)
         {
             farInfo.normal = Vector3d(0, 0, 1);
@@ -139,7 +140,7 @@ bool CsgCylinder::Intersect(const Ray& inRay, std::vector<CsgHit>& intersects) c
 
     intersects.push_back(nearI);
     intersects.push_back(farI);
-    return true;
+    return intersects;
 }
 
 BoundingBox CsgCylinder::GetBoundingBox() const
@@ -236,8 +237,8 @@ double CsgCylinder::Intersect(const Ray& inRay) const
 
 bool CsgCylinder::GenerateIntersectionInfo(const Ray& inRay, IntersectionInfo& info) const
 {
-    std::vector<CsgHit> infos;
-    if(Intersect(inRay, infos))
+    auto infos = AllIntersects(inRay);
+    if(!infos.empty())
     {
         CsgHit isec = infos.front();
         if(isec.t > 0)

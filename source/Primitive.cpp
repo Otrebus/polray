@@ -25,7 +25,7 @@ Primitive::~Primitive()
 
 /**
  * Sets the material of the primitive.
- * @mat The material that constitutes the primitive.
+ * @param mat The material that constitutes the primitive.
  */
 void Primitive::SetMaterial(Material* mat)
 {

@@ -19,7 +19,7 @@ public:
     CsgCylinder(Vector3d& position, Vector3d& dir, 
                 double length, double radius);
 
-    bool Intersect(const Ray& ray, hits& intersects) const;
+    hits AllIntersects(const Ray& ray) const;
 
     virtual BoundingBox GetBoundingBox() const;
     virtual std::tuple<bool, BoundingBox> GetClippedBoundingBox(const BoundingBox& clipbox) const;

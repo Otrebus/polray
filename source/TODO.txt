@@ -1,3 +1,4 @@
+Csg intersect tuplify
 Clean up lighttracer
 Clean up main.cpp
 Add textures/environment light with textures

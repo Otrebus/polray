@@ -227,6 +227,9 @@
     <ClCompile Include="source\Sample.cpp">
       <Filter>Source Files\Materials</Filter>
     </ClCompile>
+    <ClCompile Include="source\CsgUnion.cpp">
+      <Filter>Source Files\Shapes\Csg</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\Vertex3d.h">
@@ -405,6 +408,9 @@
     </ClInclude>
     <ClInclude Include="source\Sample.h">
       <Filter>Source Files\Materials</Filter>
+    </ClInclude>
+    <ClInclude Include="source\CsgUnion.h">
+      <Filter>Source Files\Shapes\Csg</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

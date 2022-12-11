@@ -8,6 +8,7 @@
  */
 
 #include "CsgIntersection.h"
+#include "CsgUnion.h"
 #include "CsgSphere.h"
 #include "CsgCylinder.h"
 #include "CsgCuboid.h"
@@ -1946,10 +1947,10 @@ void MakeScene(std::shared_ptr<Renderer>& r, std::shared_ptr<Estimator>& e)
     auto csgObject2 = new CsgSphere(Vector3d(-0.4, 1, 1), 0.2);
     csgObject2->SetMaterial(mat2);
 
+       csgObject->Rotate(Vector3d(0, 1, 0), 0.04);
+       //csgObject->Rotate(Vector3d(0, 1, 0), 0.01);
     auto csgObject3 = new CsgDifference(csgObject, csgObject2);
 
-    //   csgObject->Rotate(Vector3d(0, 1, 0), 3.14);
-       //csgObject->Rotate(Vector3d(0, 1, 0), 0.44);
     csgObject3->AddToScene(*s);
     csgObject->SetMaterial(mat);
 

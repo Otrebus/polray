@@ -4,7 +4,7 @@
  * 
  * @file CsgCylinder.cpp
  * 
- * Implementation of the CsgCuboid class used in constructive solid geometry.
+ * Implementation of the CsgCylinder class used in constructive solid geometry.
  */
 
 #include "BoundingBox.h"

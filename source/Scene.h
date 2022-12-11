@@ -16,6 +16,7 @@
 #include <Windows.h>
 #include "Renderer.h"
 #include "Camera.h"
+#include "CsgUnion.h"
 #include "TriangleMesh.h"
 #include "ColorBuffer.h"
 #include "Bytestream.h"
@@ -56,6 +57,7 @@ public:
         friend void CsgSphere::AddToScene(Scene& scene);
         friend void CsgIntersection::AddToScene(Scene& scene);
         friend void CsgDifference::AddToScene(Scene& scene);
+        friend void CsgUnion::AddToScene(Scene& scene);
         friend void MeshLight::AddToScene(Scene* scene);
         friend void SphereLight::AddToScene(Scene* scene);
     };

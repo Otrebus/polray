@@ -163,6 +163,7 @@
     <ClCompile Include="source\CsgIntersection.cpp" />
     <ClCompile Include="source\CsgObject.cpp" />
     <ClCompile Include="source\CsgSphere.cpp" />
+    <ClCompile Include="source\CsgUnion.cpp" />
     <ClCompile Include="source\DielectricMaterial.cpp" />
     <ClCompile Include="source\Draw.cpp" />
     <ClCompile Include="source\EmissiveMaterial.cpp" />
@@ -225,6 +226,7 @@
     <ClInclude Include="source\CsgIntersection.h" />
     <ClInclude Include="source\CsgObject.h" />
     <ClInclude Include="source\CsgSphere.h" />
+    <ClInclude Include="source\CsgUnion.h" />
     <ClInclude Include="source\DielectricMaterial.h" />
     <ClInclude Include="source\Draw.h" />
     <ClInclude Include="source\EmissiveMaterial.h" />

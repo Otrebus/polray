@@ -17,33 +17,49 @@
 
 const int N = 20; // Number of samples per ray to be saved for optimized russian roulette
 
-BDSample::BDSample(int a, int b) : s(a), t(b)
+/**
+ * Constructor for the BDPSample class which is just a pair of numbers holding the number of light
+ * path and eye path vertices of a given sample path.
+ * 
+ * @param s The number of light path vertices.
+ * @param t The number of eye path vertices.
+ */
+BDSample::BDSample(int s, int t) : s(s), t(t)
 {
 }
 
-BDSample::~BDSample()
-{
-}
-
+/**
+ * Constructor of the BDPT renderer.
+ * 
+ * @param scene The scene to render.
+ */
 BDPT::BDPT(std::shared_ptr<Scene> scene) : Renderer(scene)
 {
     roulette = new Roulette[XRES*YRES];
 }
 
-BDPT::~BDPT()
-{
-}
-
+/**
+ * Constructor of the efficiency-optimized Russian roulette threshold provider.
+ */
 Roulette::Roulette() : sum(0), sumSq(0), sumRays(0)
 {
     m = new std::mutex();
 }
 
+/**
+ * Destructor.
+ */
 Roulette::~Roulette()
 {
     delete m;
 }
 
+/**
+ * Adds a sample to calibrate the efficiency-optimized Russian roulette.
+ * 
+ * @param sample The estimator of the sample.
+ * @param nrays The number of rays used to construct the sample.
+ */
 void Roulette::AddSample(double sample, int nrays)
 {
     std::lock_guard<std::mutex> lock(*m);
@@ -67,6 +83,11 @@ void Roulette::AddSample(double sample, int nrays)
     }
 }
 
+/**
+ * Returns the threshhold of efficiency-optimized Russian roulette.
+ * 
+ * @returns The threshhold of efficiency-optimized Russian roulette.
+ */
 double Roulette::GetThreshold() const
 {
     std::lock_guard<std::mutex> lock(*m);
@@ -75,6 +96,17 @@ double Roulette::GetThreshold() const
     return std::isfinite(ret) ? std::abs(ret) : 1;
 }
 
+/**
+ * Constructs a light/eye path in the scene and calculates its partial estimates along the way
+ * together with its pdf evaluations and handles the path extension logic, including Russian
+ * roulette for path termination.
+ * 
+ * @param path The light/eye path to build.
+ * @param samples A vector to push a (0, t) sample if a light was hit.
+ * @param light The light that the light path is/was built from.
+ * @param lightPath Specifies whether we are constructing the light path (as opposed to the eye path).
+ * @returns The number of vertices on the light/eye portion of the path.
+ */
 int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples, Light* light, bool lightPath)
 {
     double rr = 0.7;
@@ -143,6 +175,18 @@ int BDPT::BuildPath(std::vector<BDVertex*>& path, std::vector<BDSample>& samples
     return (int) path.size();
 }
 
+/**
+ * Constructs an eye path, by sampling the light source and then the rest of the path by
+ * calling BuildPath.
+ * 
+ * @param x The horizontal coordinate of the pixel being rendered.
+ * @param y The vertical coordinate of the pixel being rendered.
+ * @param path The eye path to build.
+ * @param cam The camera the path extends from.
+ * @param samples A vector to push a (0, t) sample if a light was hit.
+ * @param light The light that the light path will be built from.
+ * @returns The number of vertices on the path.
+ */
 int BDPT::BuildEyePath(int x, int y, std::vector<BDVertex*>& path, 
                        const Camera& cam, std::vector<BDSample>& samples, 
                        Light* light)
@@ -168,6 +212,14 @@ int BDPT::BuildEyePath(int x, int y, std::vector<BDVertex*>& path,
     return BuildPath(path, samples, light, false);
 }
 
+/**
+ * Constructs an eye path, by sampling the camera and then the rest of the path it by calling
+ * BuildPath.
+ * 
+ * @param path The light path to build.
+ * @param light A pointer to the light the path extends from.
+ * @returns The number of vertices on the path.
+ */
 int BDPT::BuildLightPath(std::vector<BDVertex*>& path, Light* light)
 {
     BDVertex* lightPoint = new BDVertex();
@@ -187,6 +239,17 @@ int BDPT::BuildLightPath(std::vector<BDVertex*>& path, Light* light)
     return BuildPath(path, dummy, light, true);
 }
 
+/**
+ * Returns the Monte-Carlo estimator of a specific connection of prefixes of the light and eye
+ * paths.
+ * 
+ * @param lightPath All the vertices of the light path.
+ * @param eyePath All the vertices of the eye path.
+ * @param s The number of vertices from lightPath used to construct the path.
+ * @param t The number of vertices from eyePath used to construct the path.
+ * @param light A pointer to the light used.
+ * @returns The estimated value of the path.
+ */
 Color BDPT::EvalPath(const std::vector<BDVertex*>& lightPath, const std::vector<BDVertex*>& eyePath,
                      int s, int t, Light* light) const
 {
@@ -239,6 +302,17 @@ Color BDPT::EvalPath(const std::vector<BDVertex*>& lightPath, const std::vector<
     return result;
 }
 
+/**
+ * Calculates the weight of a given construction of a path using equal weighting.
+ * 
+ * @param s The number of vertices from lightPath used to construct the path.
+ * @param t The number of vertices from eyePath used to construct the path.
+ * @param lightPath All the vertices of the light path.
+ * @param eyePath All the vertices of the eye path.
+ * @param light A pointer to the light used.
+ * @param cam A pointer to the camera used.
+ * @returns The weight of the path.
+ */
 double BDPT::UniformWeight(int s, int t, std::vector<BDVertex*>& lightPath,
                       std::vector<BDVertex*>& eyePath, Light*, Camera*) const
 {
@@ -277,6 +351,17 @@ double BDPT::UniformWeight(int s, int t, std::vector<BDVertex*>& lightPath,
     return 1/weight;
 }
 
+/**
+ * Calculates the weight of a given construction of a path, using the power heuristic.
+ * 
+ * @param s The number of vertices from lightPath used to construct the path.
+ * @param t The number of vertices from eyePath used to construct the path.
+ * @param lightPath All the vertices of the light path.
+ * @param eyePath All the vertices of the eye path.
+ * @param light A pointer to the light used.
+ * @param cam A pointer to the camera used.
+ * @returns The weight of the path.
+ */
 double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
                            std::vector<BDVertex*>& eyePath, Light* light, Camera* cam) const
 {
@@ -390,12 +475,36 @@ double BDPT::PowerHeuristic(int s, int t, std::vector<BDVertex*>& lightPath,
     return 1.0/(1.0+weight);
 }
 
+/**
+ * Returns the weight of a particular eye path/light path decomposition of a given path. The sum
+ * of all the possible decompositions of a specific path should equal 1. Currently uses the power
+ * heuristic to calculate the weight.
+ * 
+ * @param s The number of vertices from lightPath used to construct the path.
+ * @param t The number of vertices from eyePath used to construct the path.
+ * @param lightPath All the vertices of the light path.
+ * @param eyePath All the vertices of the eye path.
+ * @param light A pointer to the light used.
+ * @param cam A pointer to the camera used.
+ * @returns The weight of the path.
+ */
 double BDPT::WeighPath(int s, int t, std::vector<BDVertex*>& lightPath,
                       std::vector<BDVertex*>& eyePath, Light* light, Camera* camera) const
 {
     return PowerHeuristic(s, t, lightPath, eyePath, light, camera);
 }
 
+/**
+ * Renders a single pixel by building a light path, an eye path, connecting them together in every
+ * possible way and weighing each estimate using the power heuristic.
+ * 
+ * @param x The x coordinate of the pixel.
+ * @param y The y coordinate of the pixel.
+ * @param cam The camera used to capture the scene.
+ * @param eyeImage The color buffer containing the evaluations of paths containing two or more
+ *                 eye vertices.
+ * @param lightImage The color buffer that holds the evaluations of paths with a single eye vertex.
+ */
 void BDPT::RenderPixel(int x, int y, Camera& cam, 
                        ColorBuffer& eyeImage, ColorBuffer& lightImage)
 {
@@ -416,8 +525,6 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
     for(auto sample : samples)
     {
         Color eval = EvalPath(lightPath, eyePath, sample.s, sample.t, light);
-        // TODO: break early if zero eval
-
         if(!eval)
             continue;
 
@@ -480,6 +587,12 @@ void BDPT::RenderPixel(int x, int y, Camera& cam,
         delete eyePath[t-1];
 }
 
+/**
+ * Renders the scene to a color buffer.
+ * 
+ * @param cam The camera used to capture the scene.
+ * @param colBuf The color buffer to render to.
+ */
 void BDPT::Render(Camera& cam, ColorBuffer& colBuf)
 {
     ColorBuffer lightImage(colBuf.GetXRes(), colBuf.GetYRes(), Color::Black);

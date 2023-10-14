@@ -39,7 +39,6 @@ private:
 class BDSample
 {
 public:
-    ~BDSample();
     friend class BDPT;
 private:
     BDSample(int s, int t);
@@ -56,7 +55,7 @@ private:
     double rr; // The russian roulette factor
     double pdf; // The area pdf of this vertex as if sampled from the previous
     double rpdf; // The area pdf of this vertex as if sampled from the next
-    Color alpha; // The unweighted contribution/measurement (cos*brdf/pdf)
+    Color alpha; // The unweighted estimate (cos*brdf/pdf)
     Sample sample; // The material sample
     IntersectionInfo info;
     bool specular;
@@ -67,7 +66,6 @@ class BDPT : public Renderer
 {
 public:
     BDPT(std::shared_ptr<Scene> scene);
-    virtual ~BDPT();
 
     void Render(Camera& cam, ColorBuffer& colBuf);
 
